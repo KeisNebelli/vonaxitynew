@@ -2,6 +2,9 @@ import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { t } from '@/translations';
+import HeroIllustration from '@/components/visuals/HeroIllustration';
+import AlbaniaMap from '@/components/visuals/AlbaniaMap';
+import { StepIcon, TrustIcon } from '@/components/visuals/StepIcons';
 
 const C = {
   primary: '#2563EB', primaryLight: '#EFF6FF', primaryDark: '#1D4ED8',
@@ -189,7 +192,8 @@ export default function HomePage({ params }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16 }}>
             {Array.isArray(steps) && steps.slice(0, 4).map((s, i) => (
-              <div key={i} style={{ background: C.bg, borderRadius: 14, border: `1px solid ${C.border}`, padding: '24px 20px' }}>
+              <div key={i} style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, padding: '28px 22px' }}>
+                <div style={{ marginBottom: 16 }}><StepIcon step={s.num} size={52} /></div>
                 <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, letterSpacing: '1.5px', marginBottom: 10 }}>STEP {s.num}</div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, marginBottom: 8, lineHeight: 1.4 }}>{s.title}</div>
                 <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>{s.desc}</div>
@@ -264,21 +268,29 @@ export default function HomePage({ params }) {
         </div>
       </section>
 
-      {/* ── Cities ── */}
-      <section style={{ padding: '80px 24px', background: C.bgWhite }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', textAlign: 'center' }}>
-          <TAG>{t(lang, 'cities.tag')}</TAG>
-          <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 40px', letterSpacing: '-1px' }}>{t(lang, 'cities.title')}</h2>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill,minmax(200px,1fr))', gap: 10 }}>
-            {CITIES.map(city => (
-              <div key={city.name} style={{ background: C.bg, borderRadius: 12, border: `1px solid ${C.border}`, padding: '14px 18px', display: 'flex', alignItems: 'center', gap: 12, textAlign: 'left' }}>
-                <div style={{ width: 8, height: 8, borderRadius: '50%', background: C.secondary, flexShrink: 0 }} />
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 600, color: C.textPrimary }}>{city.name}</div>
-                  <div style={{ fontSize: 11, color: C.textTertiary, marginTop: 1 }}>{city.note[lang] || city.note.en}</div>
-                </div>
+      {/* ── Cities with Albania Map ── */}
+      <section style={{ padding:'80px 24px', background:C.bgWhite }}>
+        <div style={{ maxWidth:1100, margin:'0 auto' }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 400px', gap:60, alignItems:'center' }}>
+            <div>
+              <TAG>{t(lang,'cities.tag')}</TAG>
+              <h2 style={{ fontSize:'clamp(28px,4vw,42px)', fontWeight:700, color:C.textPrimary, margin:'0 0 16px', letterSpacing:'-1px' }}>{t(lang,'cities.title')}</h2>
+              <p style={{ fontSize:16, color:C.textSecondary, lineHeight:1.7, marginBottom:32, maxWidth:440 }}>{t(lang,'cities.subtitle')}</p>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                {CITIES.map(city => (
+                  <div key={city.name} style={{ background:C.bg, borderRadius:12, border:`1px solid ${C.border}`, padding:'12px 16px', display:'flex', alignItems:'center', gap:10 }}>
+                    <div style={{ width:8, height:8, borderRadius:'50%', background:C.secondary, flexShrink:0 }} />
+                    <div>
+                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{city.name}</div>
+                      <div style={{ fontSize:11, color:C.textTertiary }}>{city.note[lang]||city.note.en}</div>
+                    </div>
+                  </div>
+                ))}
               </div>
-            ))}
+            </div>
+            <div style={{ display:'flex', justifyContent:'center' }}>
+              <AlbaniaMap lang={lang} />
+            </div>
           </div>
         </div>
       </section>
