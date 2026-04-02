@@ -1,0 +1,27 @@
+{
+  "name": "vonaxity-backend",
+  "version": "0.1.0",
+  "private": true,
+  "scripts": {
+    "dev": "nodemon server.js",
+    "start": "node server.js",
+    "db:migrate": "npx prisma migrate dev",
+    "db:seed": "node prisma/seed.js",
+    "db:studio": "npx prisma studio"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5",
+    "bcryptjs": "^2.4.3",
+    "jsonwebtoken": "^9.0.0",
+    "cookie-parser": "^1.4.6",
+    "@prisma/client": "^5.7.0",
+    "dotenv": "^16.3.1",
+    "stripe": "^14.0.0",
+    "twilio": "^4.19.0"
+  },
+  "devDependencies": {
+    "nodemon": "^3.0.2",
+    "prisma": "^5.7.0"
+  }
+}
