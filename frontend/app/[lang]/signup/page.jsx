@@ -1,15 +1,13 @@
 'use client';
-import { useState } from 'react';
+import { Suspense, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import { api } from '@/lib/api';
 
 const C = { teal: '#0e7490', sage: '#16a34a', border: '#e7e5e4', neutralDark: '#1c1917', neutralMid: '#78716c', neutral: '#f8f7f4' };
-
-const PLANS = ['basic', 'standard', 'premium'];
 const CITIES = ['Tirana', 'Durrës', 'Elbasan', 'Fier', 'Berat', 'Sarandë', 'Kukës', 'Shkodër'];
 
-export default function SignupPage({ params }) {
+function SignupContent({ params }) {
   const lang = params.lang || 'en';
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -28,10 +26,10 @@ export default function SignupPage({ params }) {
     setLoading(true);
     setError('');
     try {
-      const data = await api.register(form);
+      await api.register(form);
       document.cookie = `vonaxity-role=CLIENT;path=/;max-age=604800`;
       document.cookie = `vonaxity-token=set;path=/;max-age=604800`;
-      router.push(`/${lang}/dashboard`);
+      window.location.href = `/${lang}/dashboard`;
     } catch (err) {
       setError(err.message);
     } finally {
@@ -46,7 +44,6 @@ export default function SignupPage({ params }) {
           Von<span style={{ color: C.sage }}>ax</span>ity
         </Link>
 
-        {/* Steps */}
         <div style={{ display: 'flex', gap: 8, marginBottom: 28 }}>
           {[1, 2, 3].map((s) => (
             <div key={s} style={{ flex: 1, height: 4, borderRadius: 2, background: step >= s ? C.teal : C.border, transition: 'background 0.2s' }} />
@@ -115,5 +112,13 @@ export default function SignupPage({ params }) {
         </div>
       </div>
     </div>
+  );
+}
+
+export default function SignupPage({ params }) {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignupContent params={params} />
+    </Suspense>
   );
 }
