@@ -3,45 +3,49 @@ import { t } from '@/translations';
 
 export default function Footer({ lang = 'en' }) {
   const companyLinks = [
-    [t(lang,'footer.companyLinks')[0]||'About Us', `/${lang}/about`],
-    [t(lang,'footer.companyLinks')[1]||'Pricing', `/${lang}/pricing`],
-    [t(lang,'footer.companyLinks')[2]||'FAQ', `/${lang}/faq`],
-    [t(lang,'footer.companyLinks')[3]||'Contact', `/${lang}/contact`],
+    [t(lang, 'footer.companyLinks')[0] || 'About Us', `/${lang}/about`],
+    [t(lang, 'footer.companyLinks')[1] || 'Pricing', `/${lang}/pricing`],
+    [t(lang, 'footer.companyLinks')[2] || 'FAQ', `/${lang}/faq`],
+    [t(lang, 'footer.companyLinks')[3] || 'Contact', `/${lang}/contact`],
   ];
-  const serviceNames = ['Blood Pressure Check','Glucose Check','Vitals Monitoring','Blood Work','Welfare Check'];
+  const services = ['Blood Pressure Check', 'Glucose Monitoring', 'Vitals Check', 'Blood Work', 'Welfare Check'];
 
   return (
-    <footer style={{ background: '#1c1917', color: 'rgba(255,255,255,0.6)', padding: '48px 24px 28px' }}>
+    <footer style={{ background: '#111827', color: 'rgba(255,255,255,0.5)', padding: '56px 24px 32px' }}>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 36, marginBottom: 40 }}>
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 40, marginBottom: 48 }}>
           <div>
-            <div style={{ fontSize: 20, fontWeight: 700, color: '#fff', fontFamily: 'Georgia,serif', marginBottom: 10 }}>Von<span style={{ color: '#4ade80' }}>ax</span>ity</div>
-            <p style={{ fontSize: 13, lineHeight: 1.7, color: 'rgba(255,255,255,0.45)', maxWidth: 200 }}>{t(lang,'footer.tagline')}</p>
-          </div>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '1px', marginBottom: 12, textTransform: 'uppercase' }}>{t(lang,'footer.services')}</div>
-            {serviceNames.map(s => <div key={s} style={{ fontSize: 13, marginBottom: 6, color: 'rgba(255,255,255,0.45)' }}>{s}</div>)}
-          </div>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '1px', marginBottom: 12, textTransform: 'uppercase' }}>{t(lang,'footer.company')}</div>
-            {companyLinks.map(([label,href]) => (
-              <Link key={href} href={href} style={{ display: 'block', fontSize: 13, marginBottom: 6, color: 'rgba(255,255,255,0.45)', textDecoration: 'none' }}>{label}</Link>
-            ))}
-          </div>
-          <div>
-            <div style={{ fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '1px', marginBottom: 12, textTransform: 'uppercase' }}>{t(lang,'footer.contact')}</div>
-            <div style={{ fontSize: 13, marginBottom: 8, color: 'rgba(255,255,255,0.45)' }}>📧 hello@vonaxity.com</div>
-            <div style={{ fontSize: 13, marginBottom: 8, color: 'rgba(255,255,255,0.45)' }}>💬 WhatsApp</div>
-            <div style={{ marginTop: 16, background: 'rgba(239,68,68,0.15)', border: '1px solid rgba(239,68,68,0.3)', borderRadius: 8, padding: '10px 12px' }}>
-              <div style={{ fontSize: 12, color: '#fca5a5', fontWeight: 600 }}>🚨 {t(lang,'footer.emergency')}</div>
-              <div style={{ fontSize: 13, color: '#fca5a5' }}>{t(lang,'footer.emergencyCall')}</div>
+            <div style={{ fontSize: 18, fontWeight: 700, color: '#fff', letterSpacing: '-0.5px', marginBottom: 12 }}>Vonaxity</div>
+            <p style={{ fontSize: 13, lineHeight: 1.7, color: 'rgba(255,255,255,0.4)', maxWidth: 220 }}>{t(lang, 'footer.tagline')}</p>
+            <div style={{ marginTop: 20, background: 'rgba(220,38,38,0.12)', border: '1px solid rgba(220,38,38,0.25)', borderRadius: 8, padding: '10px 14px' }}>
+              <div style={{ fontSize: 11, fontWeight: 700, color: '#FCA5A5', letterSpacing: '0.5px', marginBottom: 3 }}>EMERGENCY IN ALBANIA</div>
+              <div style={{ fontSize: 15, fontWeight: 700, color: '#FCA5A5' }}>Call 127</div>
             </div>
           </div>
+
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: 16 }}>{t(lang, 'footer.services')}</div>
+            {services.map(s => <div key={s} style={{ fontSize: 13, marginBottom: 10, color: 'rgba(255,255,255,0.4)' }}>{s}</div>)}
+          </div>
+
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: 16 }}>{t(lang, 'footer.company')}</div>
+            {companyLinks.map(([label, href]) => (
+              <Link key={href} href={href} style={{ display: 'block', fontSize: 13, marginBottom: 10, color: 'rgba(255,255,255,0.4)', textDecoration: 'none' }}>{label}</Link>
+            ))}
+          </div>
+
+          <div>
+            <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: 16 }}>{t(lang, 'footer.contact')}</div>
+            <div style={{ fontSize: 13, marginBottom: 10, color: 'rgba(255,255,255,0.4)' }}>hello@vonaxity.com</div>
+            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>WhatsApp</div>
+          </div>
         </div>
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.1)', paddingTop: 20, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 10 }}>
-          <div style={{ fontSize: 12 }}>{t(lang,'footer.copyright')}</div>
-          <div style={{ display: 'flex', gap: 16, fontSize: 12 }}>
-            {['Privacy Policy','Terms of Service','GDPR'].map(l => <span key={l} style={{ color: 'rgba(255,255,255,0.35)', cursor: 'pointer' }}>{l}</span>)}
+
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
+          <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>{t(lang, 'footer.copyright')}</div>
+          <div style={{ display: 'flex', gap: 20, fontSize: 12 }}>
+            {['Privacy Policy', 'Terms of Service'].map(l => <span key={l} style={{ color: 'rgba(255,255,255,0.25)', cursor: 'pointer' }}>{l}</span>)}
           </div>
         </div>
       </div>

@@ -1,12 +1,25 @@
 export const metadata = {
-  title: 'Vonaxity',
-  description: 'Home nurse visits in Albania',
+  title: 'Vonaxity — Home Nurse Visits in Albania',
+  description: 'Professional nurse home visits across Albania. Book from anywhere in the world.',
 };
 
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
-      <body style={{ margin: 0 }}>{children}</body>
+      <head>
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
+        <style>{`
+          *, *::before, *::after { box-sizing: border-box; }
+          body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #FAFAF9; color: #111827; -webkit-font-smoothing: antialiased; }
+          a { text-decoration: none; color: inherit; }
+          button { font-family: inherit; }
+          input, textarea, select { font-family: inherit; }
+          h1,h2,h3,h4,h5,h6 { letter-spacing: -0.025em; }
+        `}</style>
+      </head>
+      <body>{children}</body>
     </html>
   );
 }

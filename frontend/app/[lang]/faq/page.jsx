@@ -4,31 +4,33 @@ import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import { t } from '@/translations';
 
+const C = { primary:'#2563EB', primaryLight:'#EFF6FF', bg:'#FAFAF9', bgWhite:'#FFFFFF', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
+
 export default function FAQPage({ params }) {
   const lang = params.lang || 'en';
   const [open, setOpen] = useState(null);
-  const C = { teal: '#0e7490', tealLight: '#e0f2fe', neutral: '#f8f7f4', neutralDark: '#1c1917', neutralMid: '#78716c', white: '#ffffff', border: '#e7e5e4' };
   const faqs = t(lang, 'faq.items');
 
   return (
-    <div style={{ fontFamily: 'system-ui,sans-serif' }}>
+    <div style={{ fontFamily:"'Inter',system-ui,sans-serif" }}>
       <Nav lang={lang} />
-      <section style={{ padding: '72px 24px 80px', background: 'linear-gradient(155deg,#f0f9ff,#f8f7f4)' }}>
-        <div style={{ maxWidth: 700, margin: '0 auto' }}>
-          <h1 style={{ fontSize: 'clamp(28px,5vw,48px)', fontWeight: 800, color: C.neutralDark, fontFamily: 'Georgia,serif', marginBottom: 12, letterSpacing: '-1.5px', textAlign: 'center' }}>{t(lang,'faq.title')}</h1>
-          <div style={{ display: 'flex', flexDirection: 'column', gap: 6, marginTop: 32 }}>
-            {Array.isArray(faqs) && faqs.map((f,i) => (
-              <div key={i} style={{ background: C.white, borderRadius: 12, border: `1px solid ${open===i?C.teal:C.border}`, overflow: 'hidden' }}>
-                <button onClick={() => setOpen(open===i?null:i)} style={{ width:'100%',display:'flex',justifyContent:'space-between',alignItems:'center',padding:'16px 20px',background:'transparent',border:'none',cursor:'pointer',textAlign:'left' }}>
-                  <span style={{ fontSize: 14, fontWeight: 600, color: C.neutralDark }}>{f.q}</span>
-                  <span style={{ fontSize: 20, color: C.teal, transform: open===i?'rotate(45deg)':'none', transition: 'transform 0.2s', flexShrink: 0, marginLeft: 12 }}>+</span>
-                </button>
-                {open===i && <div style={{ padding: '0 20px 16px', fontSize: 14, color: C.neutralMid, lineHeight: 1.7 }}>{f.a}</div>}
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 32, background: '#fef2f2', border: '1px solid #fecaca', borderRadius: 10, padding: '14px 18px', textAlign: 'center', fontSize: 13, color: '#991b1b' }}>
-            ⚠️ {t(lang,'ui.emergency')}
+      <section style={{ padding:'80px 24px', background:C.bgWhite, textAlign:'center' }}>
+        <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.primary, background:C.primaryLight, padding:'5px 12px', borderRadius:99, marginBottom:16 }}>{t(lang,'faq.tag')}</div>
+        <h1 style={{ fontSize:'clamp(28px,5vw,48px)', fontWeight:700, color:C.textPrimary, letterSpacing:'-1px', margin:0 }}>{t(lang,'faq.title')}</h1>
+      </section>
+      <section style={{ padding:'40px 24px 80px', background:C.bg }}>
+        <div style={{ maxWidth:700, margin:'0 auto' }}>
+          {Array.isArray(faqs) && faqs.map((f,i) => (
+            <div key={i} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${open===i?C.primary:C.border}`, marginBottom:8, overflow:'hidden', transition:'border-color 0.15s' }}>
+              <button onClick={()=>setOpen(open===i?null:i)} style={{ width:'100%', display:'flex', justifyContent:'space-between', alignItems:'center', padding:'18px 22px', background:'transparent', border:'none', cursor:'pointer', textAlign:'left' }}>
+                <span style={{ fontSize:15, fontWeight:600, color:C.textPrimary }}>{f.q}</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={open===i?C.primary:'#9CA3AF'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink:0, marginLeft:12, transform:open===i?'rotate(180deg)':'none', transition:'transform 0.2s' }}><polyline points="6 9 12 15 18 9"/></svg>
+              </button>
+              {open===i && <div style={{ padding:'0 22px 18px', fontSize:14, color:C.textSecondary, lineHeight:1.75 }}>{f.a}</div>}
+            </div>
+          ))}
+          <div style={{ marginTop:28, background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:12, padding:'14px 18px', fontSize:13, color:'#92400E', textAlign:'center' }}>
+            Non-emergency care only. Emergency in Albania: <strong>127</strong>
           </div>
         </div>
       </section>
