@@ -4,182 +4,114 @@ import MapComponent from './MapComponent';
 import NavigationButton, { QuickNavButtons } from './NavigationButton';
 import { useNurseLocation } from '@/hooks/useNurseLocation';
 
-const C = {
-  teal: '#0e7490', tealLight: '#e0f2fe', tealMid: '#0891b2',
-  sage: '#16a34a', sageLight: '#f0fdf4',
-  amber: '#b45309', amberLight: '#fff7ed',
-  red: '#dc2626', redLight: '#fef2f2',
-  purple: '#7c3aed', purpleLight: '#f5f3ff',
-  neutral: '#f8f7f4', neutralDark: '#1c1917', neutralMid: '#78716c',
-  white: '#ffffff', border: '#e7e5e4', dark: '#0f172a',
+const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#7C3AED', purpleLight:'#F5F3FF', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6' };
+
+const STATUS = {
+  upcoming:   { bg:C.primaryLight, color:C.primary, label:'Upcoming' },
+  accepted:   { bg:C.primaryLight, color:C.primary, label:'Accepted' },
+  on_the_way: { bg:C.warningLight, color:C.warning, label:'On the way' },
+  arrived:    { bg:C.secondaryLight, color:C.secondary, label:'Arrived' },
+  in_progress:{ bg:C.purpleLight, color:C.purple, label:'In progress' },
+  completed:  { bg:C.secondaryLight, color:C.secondary, label:'Completed' },
+  no_show:    { bg:C.errorLight, color:C.error, label:'No show' },
 };
 
-const statusColors = {
-  upcoming: { bg: C.tealLight, color: C.teal, label: '⏰ Upcoming' },
-  accepted: { bg: C.tealLight, color: C.teal, label: '✓ Accepted' },
-  on_the_way: { bg: C.amberLight, color: C.amber, label: '🚗 On the way' },
-  arrived: { bg: C.sageLight, color: C.sage, label: '📍 Arrived' },
-  in_progress: { bg: C.purpleLight, color: C.purple, label: '🏥 In progress' },
-  completed: { bg: C.sageLight, color: C.sage, label: '✓ Completed' },
-  no_show: { bg: C.redLight, color: C.red, label: '✗ No show' },
-};
+function PhoneIcon() { return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81a19.79 19.79 0 01-3.07-8.67A2 2 0 012 .19h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L6.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>; }
+function MapPinIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>; }
+function AlertIcon() { return <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>; }
+function MapIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polygon points="1 6 1 22 8 18 16 22 23 18 23 2 16 6 8 2 1 6"/><line x1="8" y1="2" x2="8" y2="18"/><line x1="16" y1="6" x2="16" y2="22"/></svg>; }
+function LocationIcon() { return <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>; }
 
-/**
- * VisitLocationCard
- * Full visit card with embedded map, address, navigation and status controls
- *
- * Props:
- * - visit: { id, clientName, address, lat, lng, service, date, time, status, notes, age, phone }
- * - onStatusChange: (visitId, newStatus) => void
- * - onComplete: (visitId) => void — opens complete visit form
- * - compact: boolean — compact card mode without map
- */
 export default function VisitLocationCard({ visit, onStatusChange, onComplete, compact = false }) {
   const [mapVisible, setMapVisible] = useState(!compact);
   const [activeStatus, setActiveStatus] = useState(visit.status || 'upcoming');
   const { location, error: locError, loading: locLoading, permission, getLocation, distanceTo } = useNurseLocation();
-
   const distance = visit.lat && visit.lng ? distanceTo(visit.lat, visit.lng) : null;
-  const status = statusColors[activeStatus] || statusColors.upcoming;
+  const status = STATUS[activeStatus] || STATUS.upcoming;
 
-  const updateStatus = (newStatus) => {
-    setActiveStatus(newStatus);
-    onStatusChange?.(visit.id, newStatus);
-  };
+  const updateStatus = (s) => { setActiveStatus(s); onStatusChange?.(visit.id, s); };
 
   return (
-    <div style={{
-      background: C.white, borderRadius: 18,
-      border: `1.5px solid ${activeStatus === 'on_the_way' ? C.amber : activeStatus === 'arrived' || activeStatus === 'in_progress' ? C.teal : C.border}`,
-      overflow: 'hidden', boxShadow: '0 2px 16px rgba(0,0,0,0.06)',
-      transition: 'border-color 0.2s',
-    }}>
+    <div style={{ background:C.bgWhite, borderRadius:16, border:`1.5px solid ${activeStatus==='on_the_way'?C.warning:activeStatus==='arrived'||activeStatus==='in_progress'?C.primary:C.border}`, overflow:'hidden', boxShadow:'0 1px 8px rgba(0,0,0,0.05)' }}>
 
       {/* Status bar */}
-      <div style={{ background: status.bg, padding: '10px 18px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
-        <span style={{ fontSize: 13, fontWeight: 700, color: status.color }}>{status.label}</span>
-        <div style={{ display: 'flex', gap: 6, alignItems: 'center' }}>
-          {distance && (
-            <span style={{ fontSize: 12, color: status.color, background: 'rgba(255,255,255,0.6)', padding: '2px 8px', borderRadius: 20, fontWeight: 600 }}>
-              📍 {distance.km}km · {distance.etaText}
-            </span>
-          )}
-          <span style={{ fontSize: 12, color: status.color, fontWeight: 600 }}>{visit.time}</span>
+      <div style={{ background:status.bg, padding:'10px 18px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+        <span style={{ fontSize:12, fontWeight:700, color:status.color, letterSpacing:'0.2px' }}>{status.label}</span>
+        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+          {distance && <span style={{ fontSize:12, color:status.color, background:'rgba(255,255,255,0.6)', padding:'2px 8px', borderRadius:99, fontWeight:600 }}>{distance.km}km · {distance.etaText}</span>}
+          <span style={{ fontSize:13, fontWeight:700, color:status.color }}>{visit.time}</span>
         </div>
       </div>
 
       {/* Patient info */}
-      <div style={{ padding: '18px 18px 14px' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 12 }}>
+      <div style={{ padding:'18px 18px 14px' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:14 }}>
           <div>
-            <div style={{ fontSize: 18, fontWeight: 800, color: C.neutralDark, marginBottom: 3, letterSpacing: '-0.3px' }}>
-              {visit.clientName}
-            </div>
-            <div style={{ fontSize: 13, color: C.teal, fontWeight: 700, marginBottom: 4 }}>{visit.service}</div>
-            <div style={{ fontSize: 12, color: C.neutralMid }}>Age {visit.age} · {visit.date}</div>
+            <div style={{ fontSize:18, fontWeight:700, color:C.textPrimary, marginBottom:3, letterSpacing:'-0.3px' }}>{visit.clientName}</div>
+            <div style={{ fontSize:13, fontWeight:600, color:C.primary, marginBottom:4 }}>{visit.service}</div>
+            <div style={{ fontSize:12, color:C.textTertiary }}>Age {visit.age} · {visit.date}</div>
           </div>
-          <a href={`tel:${visit.phone}`} style={{
-            width: 44, height: 44, borderRadius: '50%', background: C.sageLight,
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            fontSize: 20, textDecoration: 'none', border: `1px solid rgba(22,163,74,0.2)`,
-            flexShrink: 0,
-          }}>
-            📞
+          <a href={`tel:${visit.phone}`} style={{ width:42, height:42, borderRadius:'50%', background:C.secondaryLight, display:'flex', alignItems:'center', justifyContent:'center', color:C.secondary, textDecoration:'none', border:`1px solid rgba(5,150,105,0.15)`, flexShrink:0 }}>
+            <PhoneIcon />
           </a>
         </div>
 
         {/* Address */}
-        <div style={{ background: C.neutral, borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', gap: 10, alignItems: 'flex-start' }}>
-          <span style={{ fontSize: 16, flexShrink: 0, marginTop: 1 }}>📍</span>
+        <div style={{ background:C.bg, borderRadius:10, padding:'10px 14px', marginBottom:12, display:'flex', gap:10, alignItems:'flex-start' }}>
+          <div style={{ color:C.error, marginTop:1, flexShrink:0 }}><MapPinIcon /></div>
           <div>
-            <div style={{ fontSize: 13, fontWeight: 600, color: C.neutralDark, lineHeight: 1.5 }}>{visit.address}</div>
-            {visit.lat && visit.lng && (
-              <div style={{ fontSize: 11, color: C.neutralMid, marginTop: 2, fontFamily: 'monospace' }}>
-                {visit.lat.toFixed(4)}, {visit.lng.toFixed(4)}
-              </div>
-            )}
+            <div style={{ fontSize:13, fontWeight:500, color:C.textPrimary, lineHeight:1.5 }}>{visit.address}</div>
+            {visit.lat && visit.lng && <div style={{ fontSize:11, color:C.textTertiary, marginTop:2, fontFamily:'monospace' }}>{visit.lat.toFixed(4)}, {visit.lng.toFixed(4)}</div>}
           </div>
         </div>
 
         {/* Notes */}
         {visit.notes && (
-          <div style={{ background: C.amberLight, borderRadius: 10, padding: '10px 14px', marginBottom: 14, display: 'flex', gap: 10, border: `1px solid rgba(180,83,9,0.15)` }}>
-            <span style={{ fontSize: 16, flexShrink: 0 }}>📋</span>
-            <div style={{ fontSize: 13, color: C.amber, lineHeight: 1.6, fontStyle: 'italic' }}>{visit.notes}</div>
+          <div style={{ background:C.warningLight, borderRadius:10, padding:'10px 14px', marginBottom:12, display:'flex', gap:10, border:`1px solid rgba(217,119,6,0.15)` }}>
+            <div style={{ color:C.warning, marginTop:1, flexShrink:0 }}><AlertIcon /></div>
+            <div style={{ fontSize:13, color:C.warning, lineHeight:1.6 }}>{visit.notes}</div>
           </div>
         )}
 
         {/* Map toggle */}
-        <button onClick={() => setMapVisible(!mapVisible)} style={{ width: '100%', background: 'transparent', border: `1.5px solid ${C.border}`, borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 600, color: C.teal, cursor: 'pointer', marginBottom: mapVisible ? 12 : 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
-          {mapVisible ? '🗺️ Hide map' : '🗺️ Show map'}
+        <button onClick={()=>setMapVisible(!mapVisible)} style={{ width:'100%', background:'transparent', border:`1.5px solid ${C.border}`, borderRadius:10, padding:'10px', fontSize:13, fontWeight:600, color:C.primary, cursor:'pointer', marginBottom:mapVisible?12:0, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+          <MapIcon /> {mapVisible?'Hide map':'Show map'}
         </button>
       </div>
 
-      {/* Embedded map */}
+      {/* Map */}
       {mapVisible && visit.lat && visit.lng && (
-        <div style={{ padding: '0 18px 14px' }}>
-          <MapComponent
-            patientLat={visit.lat}
-            patientLng={visit.lng}
-            nurseLat={location?.lat}
-            nurseLng={location?.lng}
-            patientName={visit.clientName}
-            height="240px"
-          />
+        <div style={{ padding:'0 18px 14px' }}>
+          <MapComponent patientLat={visit.lat} patientLng={visit.lng} nurseLat={location?.lat} nurseLng={location?.lng} patientName={visit.clientName} height="240px" />
         </div>
       )}
 
-      {/* Nurse location */}
+      {/* Location button */}
       {permission !== 'granted' && (
-        <div style={{ padding: '0 18px 14px' }}>
-          <button onClick={getLocation} disabled={locLoading} style={{ width: '100%', background: C.tealLight, border: `1.5px solid rgba(8,145,178,0.2)`, borderRadius: 10, padding: '10px', fontSize: 13, fontWeight: 600, color: C.teal, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6, opacity: locLoading ? 0.7 : 1 }}>
-            {locLoading ? '📡 Getting location...' : '📡 Enable my location'}
+        <div style={{ padding:'0 18px 14px' }}>
+          <button onClick={getLocation} disabled={locLoading} style={{ width:'100%', background:C.primaryLight, border:`1.5px solid rgba(37,99,235,0.15)`, borderRadius:10, padding:'10px', fontSize:13, fontWeight:600, color:C.primary, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', gap:6, opacity:locLoading?0.7:1 }}>
+            <LocationIcon /> {locLoading?'Getting location...':'Enable my location'}
           </button>
-          {locError && <div style={{ fontSize: 12, color: C.red, marginTop: 6, textAlign: 'center' }}>{locError}</div>}
+          {locError && <div style={{ fontSize:12, color:C.error, marginTop:6, textAlign:'center' }}>{locError}</div>}
         </div>
       )}
 
-      {/* Navigation buttons */}
-      <div style={{ padding: '0 18px 18px', display: 'flex', flexDirection: 'column', gap: 10 }}>
-        <NavigationButton
-          lat={visit.lat}
-          lng={visit.lng}
-          address={visit.address}
-          nurseLat={location?.lat}
-          nurseLng={location?.lng}
-          label="Get Directions"
-          size="lg"
-          variant="primary"
-        />
-        <QuickNavButtons
-          lat={visit.lat}
-          lng={visit.lng}
-          address={visit.address}
-          nurseLat={location?.lat}
-          nurseLng={location?.lng}
-        />
+      {/* Nav buttons */}
+      <div style={{ padding:'0 18px 18px', display:'flex', flexDirection:'column', gap:10 }}>
+        <NavigationButton lat={visit.lat} lng={visit.lng} address={visit.address} nurseLat={location?.lat} nurseLng={location?.lng} label="Get directions" size="lg" variant="primary" />
+        <QuickNavButtons lat={visit.lat} lng={visit.lng} address={visit.address} nurseLat={location?.lat} nurseLng={location?.lng} />
       </div>
 
-      {/* Live status controls */}
-      {(activeStatus === 'upcoming' || activeStatus === 'accepted' || activeStatus === 'on_the_way' || activeStatus === 'arrived' || activeStatus === 'in_progress') && (
-        <div style={{ borderTop: `1px solid ${C.border}`, padding: '14px 18px', background: C.neutral }}>
-          <div style={{ fontSize: 11, fontWeight: 700, color: C.neutralMid, letterSpacing: '1px', marginBottom: 10 }}>UPDATE STATUS</div>
-          <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
-            {activeStatus !== 'on_the_way' && (
-              <button onClick={() => updateStatus('on_the_way')} style={statusBtn(C.amber, C.amberLight)}>🚗 On my way</button>
-            )}
-            {activeStatus === 'on_the_way' && (
-              <button onClick={() => updateStatus('arrived')} style={statusBtn(C.sage, C.sageLight)}>📍 Arrived</button>
-            )}
-            {activeStatus === 'arrived' && (
-              <button onClick={() => updateStatus('in_progress')} style={statusBtn(C.purple, C.purpleLight)}>🏥 Start visit</button>
-            )}
-            {(activeStatus === 'in_progress' || activeStatus === 'arrived') && (
-              <button onClick={() => onComplete?.(visit.id)} style={statusBtn(C.teal, C.tealLight)}>✅ Complete visit</button>
-            )}
-            {activeStatus !== 'no_show' && (
-              <button onClick={() => updateStatus('no_show')} style={statusBtn(C.red, C.redLight)}>✗ No show</button>
-            )}
+      {/* Status controls */}
+      {['upcoming','accepted','on_the_way','arrived','in_progress'].includes(activeStatus) && (
+        <div style={{ borderTop:`1px solid ${C.border}`, padding:'14px 18px', background:C.bg }}>
+          <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', marginBottom:10 }}>UPDATE STATUS</div>
+          <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
+            {activeStatus!=='on_the_way' && <button onClick={()=>updateStatus('on_the_way')} style={sBtn(C.warning,C.warningLight)}>On my way</button>}
+            {activeStatus==='on_the_way' && <button onClick={()=>updateStatus('arrived')} style={sBtn(C.secondary,C.secondaryLight)}>Arrived</button>}
+            {activeStatus==='arrived' && <button onClick={()=>updateStatus('in_progress')} style={sBtn(C.purple,C.purpleLight)}>Start visit</button>}
+            {['in_progress','arrived'].includes(activeStatus) && <button onClick={()=>onComplete?.(visit.id)} style={sBtn(C.primary,C.primaryLight)}>Complete visit</button>}
+            {activeStatus!=='no_show' && <button onClick={()=>updateStatus('no_show')} style={sBtn(C.error,C.errorLight)}>No show</button>}
           </div>
         </div>
       )}
@@ -187,39 +119,26 @@ export default function VisitLocationCard({ visit, onStatusChange, onComplete, c
   );
 }
 
-const statusBtn = (color, bg) => ({
-  fontSize: 12, fontWeight: 700, padding: '8px 14px',
-  borderRadius: 8, border: 'none', cursor: 'pointer',
-  background: bg, color: color, transition: 'opacity 0.15s',
-});
+const sBtn = (color, bg) => ({ fontSize:12, fontWeight:600, padding:'8px 16px', borderRadius:8, border:'none', cursor:'pointer', background:bg, color, letterSpacing:'0.1px' });
 
-/**
- * DailyRouteCard
- * Shows all visits for today in a compact list with map toggle
- * Future-ready for route optimization
- */
 export function DailyRouteCard({ visits, onVisitSelect }) {
   return (
-    <div style={{ background: C.white, borderRadius: 16, border: `1px solid ${C.border}`, overflow: 'hidden' }}>
-      <div style={{ padding: '16px 18px', borderBottom: `1px solid ${C.border}`, display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+    <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, overflow:'hidden' }}>
+      <div style={{ padding:'16px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
         <div>
-          <div style={{ fontSize: 15, fontWeight: 800, color: C.neutralDark }}>Today's route</div>
-          <div style={{ fontSize: 12, color: C.neutralMid }}>{visits.length} visits · tap to navigate</div>
+          <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px' }}>Today's route</div>
+          <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{visits.length} visits scheduled</div>
         </div>
-        <div style={{ fontSize: 22, fontWeight: 800, color: C.teal }}>{visits.length}</div>
+        <div style={{ fontSize:24, fontWeight:800, color:C.primary, letterSpacing:'-1px' }}>{visits.length}</div>
       </div>
-      {visits.map((v, i) => (
-        <div key={v.id} onClick={() => onVisitSelect?.(v)} style={{ padding: '14px 18px', borderBottom: i < visits.length - 1 ? `1px solid ${C.border}` : 'none', cursor: 'pointer', display: 'flex', gap: 14, alignItems: 'center', transition: 'background 0.15s' }}
-          onMouseEnter={e => e.currentTarget.style.background = C.neutral}
-          onMouseLeave={e => e.currentTarget.style.background = 'transparent'}>
-          <div style={{ width: 32, height: 32, borderRadius: '50%', background: C.tealLight, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 13, fontWeight: 800, color: C.teal, flexShrink: 0 }}>
-            {i + 1}
+      {visits.map((v,i) => (
+        <div key={v.id} onClick={()=>onVisitSelect?.(v)} style={{ padding:'14px 20px', borderBottom:i<visits.length-1?`1px solid ${C.borderSubtle}`:'none', cursor:'pointer', display:'flex', gap:14, alignItems:'center' }}>
+          <div style={{ width:32, height:32, borderRadius:'50%', background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:700, color:C.primary, flexShrink:0 }}>{i+1}</div>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{v.clientName}</div>
+            <div style={{ fontSize:12, color:C.textTertiary, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', marginTop:2 }}>{v.address}</div>
           </div>
-          <div style={{ flex: 1, minWidth: 0 }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.neutralDark }}>{v.clientName}</div>
-            <div style={{ fontSize: 12, color: C.neutralMid, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.address}</div>
-          </div>
-          <div style={{ fontSize: 13, fontWeight: 700, color: C.teal, flexShrink: 0 }}>{v.time}</div>
+          <div style={{ fontSize:13, fontWeight:700, color:C.primary, flexShrink:0 }}>{v.time}</div>
         </div>
       ))}
     </div>
