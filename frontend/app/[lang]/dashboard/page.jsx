@@ -128,8 +128,8 @@ function Visits({ visits }) {
 
 // ── Settings ──────────────────────────────────────────────────────────────────
 function Settings({ user, relative, lang }) {
-  const [profile, setProfile] = useState({ name:user.name, email:user.email, phone:user.phone||'', country:user.country||'', city:user.city||'' });
-  const [rel, setRel] = useState({ name:relative?.name||'', city:relative?.city||'', address:relative?.address||'', phone:relative?.phone||'', age:relative?.age||'', healthNotes:relative?.healthNotes||'' });
+  const [profile, setProfile] = useState(() => ({ name:user.name, email:user.email, phone:user.phone||'', country:user.country||'', city:user.city||'' }));
+  const [rel, setRel] = useState(() => ({ name:relative?.name||'', city:relative?.city||'', address:relative?.address||'', phone:relative?.phone||'', age:relative?.age||'', healthNotes:relative?.healthNotes||'' }));
   const [password, setPassword] = useState({ current:'', newPass:'', confirm:'' });
   const [contact, setContact] = useState({ preferredContact:'email', emergencyName:'', emergencyPhone:'' });
   const [saving, setSaving] = useState(false);
