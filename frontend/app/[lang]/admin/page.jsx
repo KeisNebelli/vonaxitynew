@@ -705,129 +705,124 @@ function Payments() {
 // ── AI Assistant ──────────────────────────────────────────────────────────────
 function AIAssistant({ clients, nurses, visits }) {
   const [messages, setMessages] = useState([
-    { role:'assistant', content:"Hi! I'm the Vonaxity smart assistant. I can instantly analyze your platform data and answer operational questions. Try asking me something below or click a quick question!" }
+    { role:'assistant', content:"Hi! I'm the Vonaxity AI assistant. I can help you analyze your platform data, answer questions about clients and nurses, and help you manage day-to-day operations. What would you like to know?" }
   ]);
   const [input, setInput] = useState('');
+  const [loading, setLoading] = useState(false);
 
-  // Free rule-based engine — no API costs
-  const analyze = (q) => {
-    const query = q.toLowerCase();
-    const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
-    const pending = nurses.filter(n=>n.status==='PENDING');
-    const approved = nurses.filter(n=>n.status==='APPROVED');
-    const completed = visits.filter(v=>v.status==='COMPLETED');
-    const noShow = visits.filter(v=>v.status==='NO_SHOW');
-    const revenue = MOCK_PAYMENTS.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
+  const CONTEXT = `
+You are the internal AI assistant for Vonaxity, a home nurse visit platform in Albania.
+You have access to the following platform data:
 
-    if (query.includes('unassigned')) {
-      if (unassigned.length===0) return 'All visits are currently assigned. No action needed.';
-      return `There are ${unassigned.length} unassigned visit${unassigned.length>1?'s':''}:\n\n${unassigned.map(v=>`• ${v.clientName} — ${v.service} in ${v.city} on ${new Date(v.scheduledAt).toLocaleDateString()}`).join('\n')}\n\nGo to the Alerts tab to assign nurses quickly.`;
-    }
-    if (query.includes('tirana') && (query.includes('nurse') || query.includes('available'))) {
-      const tiranaApproved = approved.filter(n=>n.city==='Tirana');
-      return `${tiranaApproved.length} approved nurse${tiranaApproved.length!==1?'s':''} available in Tirana:\n\n${tiranaApproved.map(n=>`• ${n.name} — Rating ${n.rating} · ${n.totalVisits} visits\n  Available: ${n.availability.slice(0,3).join(', ')}${n.availability.length>3?'...':''}`).join('\n\n')}`;
-    }
-    if (query.includes('nurse') && (query.includes('available') || query.includes('approved'))) {
-      const byCity = {};
-      approved.forEach(n=>{ if(!byCity[n.city]) byCity[n.city]=[]; byCity[n.city].push(n.name); });
-      return `${approved.length} approved nurses across ${Object.keys(byCity).length} cities:\n\n${Object.entries(byCity).map(([city,ns])=>`• ${city}: ${ns.join(', ')}`).join('\n')}`;
-    }
-    if (query.includes('premium')) {
-      const premiumClients = clients.filter(c=>c.plan==='premium');
-      return `${premiumClients.length} clients on the Premium plan:\n\n${premiumClients.map(c=>`• ${c.name} (${c.country}) — ${c.status} · ${c.visitsUsed}/${c.visitsTotal} visits used`).join('\n')}`;
-    }
-    if (query.includes('pending') && query.includes('nurse')) {
-      if (pending.length===0) return 'No nurse applications pending. All applications have been reviewed.';
-      return `${pending.length} nurse application${pending.length!==1?'s':''} awaiting review:\n\n${pending.map(n=>`• ${n.name} — ${n.city} · Applied ${n.joinedAt}\n  License: ${n.licenseNumber}`).join('\n\n')}\n\nGo to the Nurses tab or Alerts to approve or reject.`;
-    }
-    if (query.includes('today') || query.includes('scheduled')) {
-      const today = visits.filter(v=>['PENDING','IN_PROGRESS','ON_THE_WAY'].includes(v.status));
-      if (today.length===0) return 'No visits scheduled or in progress right now.';
-      return `${today.length} visit${today.length!==1?'s':''} currently scheduled or in progress:\n\n${today.map(v=>`• ${v.clientName} — ${v.service} in ${v.city}\n  Nurse: ${v.nurseName||'Unassigned'} · ${new Date(v.scheduledAt).toLocaleDateString()}`).join('\n\n')}`;
-    }
-    if (query.includes('city') && query.includes('most')) {
-      const cityCounts = {};
-      visits.forEach(v=>{ cityCounts[v.city]=(cityCounts[v.city]||0)+1; });
-      const sorted = Object.entries(cityCounts).sort((a,b)=>b[1]-a[1]);
-      return `Visit breakdown by city:\n\n${sorted.map(([city,count])=>`• ${city}: ${count} visit${count!==1?'s':''}`).join('\n')}\n\nTirana leads with ${sorted[0][1]} visits.`;
-    }
-    if (query.includes('revenue') || query.includes('payment') || query.includes('money')) {
-      const failed = MOCK_PAYMENTS.filter(p=>p.status==='failed');
-      return `Revenue summary:\n\n• Total collected: €${revenue}\n• Successful payments: ${MOCK_PAYMENTS.filter(p=>p.status==='paid').length}\n• Failed payments: ${failed.length}${failed.length>0?'\n\nFailed payments:\n'+failed.map(p=>`• ${p.clientName} — €${p.amount} (${p.date})`).join('\n'):''}`;
-    }
-    if (query.includes('no show') || query.includes('no-show') || query.includes('missed')) {
-      if (noShow.length===0) return 'No no-shows recorded. All completed visits went ahead as planned.';
-      return `${noShow.length} no-show${noShow.length!==1?'s':''} recorded:\n\n${noShow.map(v=>`• ${v.clientName} — ${v.service} in ${v.city} on ${new Date(v.scheduledAt).toLocaleDateString()}\n  Nurse: ${v.nurseName}${v.nurseNotes?'\n  Note: '+v.nurseNotes:''}`).join('\n\n')}`;
-    }
-    if (query.includes('client') && (query.includes('total') || query.includes('how many'))) {
-      const byCountry = {};
-      clients.forEach(c=>{ byCountry[c.country]=(byCountry[c.country]||0)+1; });
-      return `${clients.length} total clients:\n\n• Active: ${clients.filter(c=>c.status==='ACTIVE').length}\n• Trial: ${clients.filter(c=>c.status==='TRIAL').length}\n\nBy country:\n${Object.entries(byCountry).map(([country,count])=>`• ${country}: ${count}`).join('\n')}`;
-    }
-    if (query.includes('summary') || query.includes('overview') || query.includes('status')) {
-      return `Platform summary:\n\n• Clients: ${clients.length} (${clients.filter(c=>c.status==='ACTIVE').length} active, ${clients.filter(c=>c.status==='TRIAL').length} trial)\n• Nurses: ${nurses.length} (${approved.length} approved, ${pending.length} pending)\n• Visits: ${visits.length} total (${completed.length} completed, ${unassigned.length} unassigned)\n• Revenue: €${revenue}\n• Alerts: ${unassigned.length} unassigned visit${unassigned.length!==1?'s':''}, ${pending.length} pending nurse${pending.length!==1?'s':''}`;
-    }
-    if (query.includes('rating') || query.includes('best nurse') || query.includes('top nurse')) {
-      const sorted = [...approved].sort((a,b)=>b.rating-a.rating);
-      return `Nurses ranked by rating:\n\n${sorted.map((n,i)=>`${i+1}. ${n.name} (${n.city}) — ${n.rating} rating · ${n.totalVisits} visits`).join('\n')}`;
-    }
+CLIENTS (${clients.length} total):
+${clients.map(c=>`- ${c.name} (${c.country}, ${c.plan} plan, ${c.status}), relative: ${c.relative.name} in ${c.relative.city}`).join('\n')}
 
-    return `I can answer questions about:\n\n• Unassigned visits — "How many unassigned visits?"\n• Nurse availability — "Which nurses are in Tirana?"\n• Client plans — "Show premium clients"\n• Alerts — "Any pending nurse applications?"\n• Revenue — "What's our total revenue?"\n• City breakdown — "Which city has the most visits?"\n• Platform summary — "Give me an overview"\n\nTry one of the quick questions above or rephrase your question!`;
-  };
+NURSES (${nurses.length} total):
+${nurses.map(n=>`- ${n.name} (${n.city}, ${n.status}, rating: ${n.rating}, ${n.totalVisits} visits)`).join('\n')}
 
-  const sendMessage = () => {
-    if (!input.trim()) return;
+VISITS (${visits.length} total):
+${visits.map(v=>`- ${v.clientName} → ${v.service} in ${v.city} on ${new Date(v.scheduledAt).toLocaleDateString()}, nurse: ${v.nurseName||'UNASSIGNED'}, status: ${v.status}`).join('\n')}
+
+ALERTS:
+- Unassigned visits: ${visits.filter(v=>v.status==='UNASSIGNED').length}
+- Pending nurse approvals: ${nurses.filter(n=>n.status==='PENDING').length}
+- No-shows: ${visits.filter(v=>v.status==='NO_SHOW').length}
+
+Answer questions about this data. Be concise, helpful, and operational. Format numbers clearly.
+If asked to take actions, explain what action should be taken and who to contact.
+  `.trim();
+
+  const sendMessage = async () => {
+    if (!input.trim() || loading) return;
     const userMsg = input.trim();
     setInput('');
-    const reply = analyze(userMsg);
-    setMessages(prev=>[...prev, { role:'user', content:userMsg }, { role:'assistant', content:reply }]);
+    setMessages(prev=>[...prev,{ role:'user', content:userMsg }]);
+    setLoading(true);
+
+    try {
+      const response = await fetch('https://api.anthropic.com/v1/messages', {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          model:'claude-sonnet-4-20250514',
+          max_tokens:1000,
+          system: CONTEXT,
+          messages:[
+            ...messages.filter(m=>m.role!=='assistant'||messages.indexOf(m)>0).map(m=>({ role:m.role, content:m.content })),
+            { role:'user', content:userMsg }
+          ],
+        }),
+      });
+      const data = await response.json();
+      const reply = data.content?.[0]?.text || 'Sorry, I could not generate a response.';
+      setMessages(prev=>[...prev,{ role:'assistant', content:reply }]);
+    } catch (err) {
+      setMessages(prev=>[...prev,{ role:'assistant', content:'Connection error. Please try again.' }]);
+    } finally { setLoading(false); }
   };
 
   const QUICK = [
     'How many unassigned visits do we have?',
     'Which nurses are available in Tirana?',
     'Show me clients on the premium plan',
+    'What visits are scheduled for today?',
     'Are there any nurse applications pending?',
     'Which city has the most visits?',
-    'Give me a platform summary',
   ];
 
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 120px)', maxWidth:760 }}>
       <div style={{ background:C.primaryLight, borderRadius:14, border:`1px solid rgba(37,99,235,0.15)`, padding:'16px 20px', marginBottom:20, display:'flex', gap:12, alignItems:'center' }}>
         <div style={{ width:40, height:40, borderRadius:'50%', background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>
         </div>
         <div>
-          <div style={{ fontSize:15, fontWeight:700, color:C.primary }}>Vonaxity Smart Assistant</div>
-          <div style={{ fontSize:12, color:'#3B82F6', marginTop:2 }}>Instant data analysis · No API cost · Real-time platform insights</div>
+          <div style={{ fontSize:15, fontWeight:700, color:C.primary }}>Vonaxity AI Assistant</div>
+          <div style={{ fontSize:12, color:'#3B82F6', marginTop:2 }}>Powered by Claude · Has access to all platform data</div>
         </div>
       </div>
 
+      {/* Quick actions */}
       <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:16 }}>
         {QUICK.map(q => (
-          <button key={q} onClick={()=>setInput(q)} style={{ fontSize:12, fontWeight:500, padding:'6px 12px', borderRadius:99, border:`1px solid ${C.border}`, background:C.bgWhite, color:C.textSecondary, cursor:'pointer', whiteSpace:'nowrap' }}>
+          <button key={q} onClick={()=>{ setInput(q); }} style={{ fontSize:12, fontWeight:500, padding:'6px 12px', borderRadius:99, border:`1px solid ${C.border}`, background:C.bgWhite, color:C.textSecondary, cursor:'pointer', whiteSpace:'nowrap' }}>
             {q}
           </button>
         ))}
       </div>
 
+      {/* Messages */}
       <div style={{ flex:1, overflowY:'auto', background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20, marginBottom:16, display:'flex', flexDirection:'column', gap:14 }}>
         {messages.map((m,i) => (
           <div key={i} style={{ display:'flex', gap:10, alignItems:'flex-start', flexDirection:m.role==='user'?'row-reverse':'row' }}>
-            <div style={{ width:32, height:32, borderRadius:'50%', background:m.role==='user'?'#1E3A5F':C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:700, color:m.role==='user'?'#93C5FD':C.primary, flexShrink:0 }}>
+            <div style={{ width:32, height:32, borderRadius:'50%', background:m.role==='user'?'#1E3A5F':C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:m.role==='user'?'#93C5FD':C.primary, flexShrink:0 }}>
               {m.role==='user'?'A':'AI'}
             </div>
-            <div style={{ maxWidth:'78%', background:m.role==='user'?C.primary:C.bg, borderRadius:m.role==='user'?'14px 14px 4px 14px':'14px 14px 14px 4px', padding:'12px 16px', fontSize:14, color:m.role==='user'?'#fff':C.textPrimary, lineHeight:1.7, whiteSpace:'pre-wrap' }}>
+            <div style={{ maxWidth:'75%', background:m.role==='user'?C.primary:C.bg, borderRadius:m.role==='user'?'14px 14px 4px 14px':'14px 14px 14px 4px', padding:'12px 16px', fontSize:14, color:m.role==='user'?'#fff':C.textPrimary, lineHeight:1.65, whiteSpace:'pre-wrap' }}>
               {m.content}
             </div>
           </div>
         ))}
+        {loading && (
+          <div style={{ display:'flex', gap:10, alignItems:'center' }}>
+            <div style={{ width:32, height:32, borderRadius:'50%', background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:C.primary }}>AI</div>
+            <div style={{ background:C.bg, borderRadius:'14px 14px 14px 4px', padding:'12px 16px', fontSize:14, color:C.textTertiary }}>Thinking...</div>
+          </div>
+        )}
       </div>
 
+      {/* Input */}
       <div style={{ display:'flex', gap:10 }}>
-        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&sendMessage()} placeholder="Ask about clients, nurses, visits, revenue..." style={{ flex:1, padding:'12px 16px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' }} />
-        <button onClick={sendMessage} disabled={!input.trim()} style={{ padding:'12px 20px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:14, fontWeight:600, cursor:'pointer', opacity:!input.trim()?0.5:1 }}>Send</button>
+        <input
+          value={input}
+          onChange={e=>setInput(e.target.value)}
+          onKeyDown={e=>e.key==='Enter'&&!e.shiftKey&&sendMessage()}
+          placeholder="Ask about clients, nurses, visits, revenue..."
+          style={{ flex:1, padding:'12px 16px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' }}
+        />
+        <button onClick={sendMessage} disabled={!input.trim()||loading} style={{ padding:'12px 20px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:14, fontWeight:600, cursor:'pointer', opacity:!input.trim()||loading?0.5:1 }}>
+          Send
+        </button>
       </div>
     </div>
   );
