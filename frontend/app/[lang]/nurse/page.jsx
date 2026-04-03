@@ -9,9 +9,9 @@ const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', seco
 const MOCK_NURSE = { name:'Elona Berberi', email:'nurse@test.com', phone:'+355690001111', city:'Tirana', initials:'EB', rating:4.8, totalVisits:47, totalEarnings:940, payRatePerVisit:20, licenseNumber:'ALB-NURSE-2024-001', bio:'Specialised in cardiovascular monitoring and diabetic care. 6 years of home nursing experience across Tirana.', specialties:['Blood Pressure','Glucose Monitoring','Vitals'], languages:['Albanian','English'], availability:['Monday','Tuesday','Wednesday','Friday'] };
 
 const MOCK_VISITS = [
-  { id:'v1', relative:{ name:'Fatmira Murati', address:'Rruga e Elbasanit 14, Tirana', phone:'+355690001111', age:74, city:'Tirana' }, serviceType:'Blood Pressure + Glucose Check', scheduledAt:'2024-12-20T10:00:00Z', status:'PENDING', notes:'Patient has diabetes. Bring glucose kit. Ring doorbell twice.' },
-  { id:'v2', relative:{ name:'Besnik Kola', address:'Bulevardi Bajram Curri 5, Tirana', phone:'+355690002222', age:68, city:'Tirana' }, serviceType:'Vitals Monitoring', scheduledAt:'2024-12-20T14:30:00Z', status:'PENDING', notes:'Post-surgery check. 3rd floor.' },
-  { id:'v3', relative:{ name:'Lirije Hoxha', address:'Rruga Myslym Shyri 22, Tirana', phone:'+355690003333', age:81, city:'Tirana' }, serviceType:'Welfare Check', scheduledAt:'2024-12-19T09:00:00Z', status:'COMPLETED', notes:'', bpSystolic:126, bpDiastolic:80, glucose:5.2, nurseNotes:'Patient well. Mild fatigue.' },
+  { id:'v1', relative:{ name:'Fatmira Murati', address:'Rruga e Elbasanit 14, Tirana', phone:'+355690001111', age:74, city:'Tirana' }, serviceType:'Blood Pressure + Glucose Check', scheduledAt:'2024-12-20T10:00:00Z', status:'PENDING', notes:'Patient has diabetes. Bring glucose kit. Ring doorbell twice.', lat:41.3275, lng:19.8187 },
+  { id:'v2', relative:{ name:'Besnik Kola', address:'Bulevardi Bajram Curri 5, Tirana', phone:'+355690002222', age:68, city:'Tirana' }, serviceType:'Vitals Monitoring', scheduledAt:'2024-12-20T14:30:00Z', status:'PENDING', notes:'Post-surgery check. 3rd floor.', lat:41.3317, lng:19.8319 },
+  { id:'v3', relative:{ name:'Lirije Hoxha', address:'Rruga Myslym Shyri 22, Tirana', phone:'+355690003333', age:81, city:'Tirana' }, serviceType:'Welfare Check', scheduledAt:'2024-12-19T09:00:00Z', status:'COMPLETED', notes:'', bpSystolic:126, bpDiastolic:80, glucose:5.2, nurseNotes:'Patient well. Mild fatigue.', lat:41.3248, lng:19.8227 },
 ];
 
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -32,7 +32,8 @@ function formatVisit(v) {
     id: v.id,
     clientName: v.relative?.name || 'Patient',
     address: v.relative?.address || '',
-    lat: null, lng: null,
+    lat: v.lat || null,
+    lng: v.lng || null,
     service: v.serviceType,
     date: new Date(v.scheduledAt).toISOString().split('T')[0],
     time: new Date(v.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'}),
