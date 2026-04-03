@@ -132,35 +132,39 @@ export default function HomePage({ params }) {
             </div>
           </div>
 
-          {/* Hero card */}
-          <div style={{ background: C.bgWhite, border: `1px solid ${C.border}`, borderRadius: 20, padding: 24, boxShadow: '0 4px 24px rgba(0,0,0,0.07)' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 20, paddingBottom: 16, borderBottom: `1px solid ${C.borderSubtle}` }}>
-              <div style={{ width: 44, height: 44, borderRadius: '50%', background: C.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-              </div>
-              <div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary }}>Fatmira Murati</div>
-                <div style={{ fontSize: 12, color: C.textTertiary }}>Tirana · Age 74</div>
-              </div>
-              <div style={{ marginLeft: 'auto', display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: C.secondary, background: C.secondaryLight, padding: '4px 10px', borderRadius: 99 }}>
-                <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.secondary }} />
-                {lang === 'sq' ? 'Vizitë sot' : 'Visit today'}
-              </div>
+          {/* Hero photo + floating card */}
+          <div style={{ position: 'relative' }}>
+            <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
+              <img
+                src="/hero.jpg"
+                alt="Nurse visiting patient at home"
+                style={{ width: '100%', height: 420, objectFit: 'cover', display: 'block' }}
+              />
             </div>
-            {[
-              [lang === 'sq' ? 'Infermierja' : 'Nurse assigned', 'Elona Berberi', true],
-              [lang === 'sq' ? 'Planifikuar' : 'Scheduled', 'Dec 20 · 10:00 AM', false],
-              [lang === 'sq' ? 'Shërbimi' : 'Service', 'Blood pressure + glucose', false],
-              [lang === 'sq' ? 'BP e fundit' : 'Last BP reading', '128/82', false],
-            ].map(([k, v, blue]) => (
-              <div key={k} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '11px 0', borderBottom: `1px solid ${C.borderSubtle}` }}>
-                <span style={{ fontSize: 13, color: C.textTertiary }}>{k}</span>
-                <span style={{ fontSize: 13, fontWeight: 600, color: blue ? C.primary : C.textPrimary }}>{v}</span>
+            {/* Floating info card over the photo */}
+            <div style={{ position: 'absolute', bottom: 20, left: 20, right: 20, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(0,0,0,0.12)', border: `1px solid ${C.border}` }}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
+                <div>
+                  <div style={{ fontSize: 14, fontWeight: 700, color: C.textPrimary }}>Fatmira Murati</div>
+                  <div style={{ fontSize: 12, color: C.textTertiary }}>Tirana · Age 74</div>
+                </div>
+                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: C.secondary, background: C.secondaryLight, padding: '4px 10px', borderRadius: 99 }}>
+                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.secondary }} />
+                  {lang === 'sq' ? 'Vizitë sot' : 'Visit today'}
+                </div>
               </div>
-            ))}
-            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 12 }}>
-              <span style={{ fontSize: 13, color: C.textTertiary }}>Plan</span>
-              <span style={{ fontSize: 12, fontWeight: 600, color: C.primary, background: C.primaryLight, padding: '4px 10px', borderRadius: 99 }}>Standard · €50/mo</span>
+              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
+                {[
+                  [lang === 'sq' ? 'Infermierja' : 'Nurse', 'Elona Berberi', true],
+                  [lang === 'sq' ? 'Planifikuar' : 'Time', '10:00 AM', false],
+                  [lang === 'sq' ? 'Shërbimi' : 'Service', 'BP + glucose', false],
+                ].map(([k, v, blue]) => (
+                  <div key={k}>
+                    <div style={{ fontSize: 10, color: C.textTertiary, marginBottom: 2 }}>{k}</div>
+                    <div style={{ fontSize: 13, fontWeight: 600, color: blue ? C.primary : C.textPrimary }}>{v}</div>
+                  </div>
+                ))}
+              </div>
             </div>
           </div>
         </div>
