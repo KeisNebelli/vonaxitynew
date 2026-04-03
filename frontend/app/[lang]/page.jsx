@@ -1,330 +1,154 @@
 import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
+import NurseAvatar, { StarRating } from '@/components/ui/NurseAvatar';
 import { t } from '@/translations';
-import HeroIllustration from '@/components/visuals/HeroIllustration';
-import AlbaniaMap from '@/components/visuals/AlbaniaMap';
-import { StepIcon, TrustIcon } from '@/components/visuals/StepIcons';
 
-const C = {
-  primary: '#2563EB', primaryLight: '#EFF6FF', primaryDark: '#1D4ED8',
-  secondary: '#059669', secondaryLight: '#ECFDF5',
-  bg: '#FAFAF9', bgWhite: '#FFFFFF', bgSubtle: '#F5F5F4',
-  textPrimary: '#111827', textSecondary: '#6B7280', textTertiary: '#9CA3AF',
-  border: '#E5E7EB', borderSubtle: '#F3F4F6',
-  warning: '#D97706', warningLight: '#FFFBEB',
-};
+const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
 
-const CITIES = [
-  { name: 'Tirana', note: { en: 'Capital · Most nurses', sq: 'Kryeqyteti' } },
-  { name: 'Durrës', note: { en: 'Coastal city', sq: 'Bregdetar' } },
-  { name: 'Elbasan', note: { en: 'Central Albania', sq: 'Shqipëria qendrore' } },
-  { name: 'Fier', note: { en: 'Southern hub', sq: 'Jugu' } },
-  { name: 'Berat', note: { en: 'UNESCO city', sq: 'UNESCO' } },
-  { name: 'Sarandë', note: { en: 'Riviera region', sq: 'Riviera' } },
-  { name: 'Kukës', note: { en: 'Northern Albania', sq: 'Veriu' } },
-  { name: 'Shkodër', note: { en: 'Northern hub', sq: 'Veri-qendër' } },
+const NURSES = [
+  { id:1, name:'Elona Berberi', city:'Tirana', rating:4.9, reviews:23, visits:47, bio:'Specialised in cardiovascular monitoring and diabetic care. 6 years of home nursing experience across Tirana.', specialties:['Blood Pressure','Glucose Monitoring','Vitals'], languages:['Albanian','English'], available:true, experience:'6 years' },
+  { id:2, name:'Mirjeta Doshi', city:'Durrës', rating:4.7, reviews:18, visits:31, bio:'Experienced in post-surgical care and elderly welfare checks. Compassionate approach with elderly patients.', specialties:['Welfare Check','Blood Work','Vitals'], languages:['Albanian','Italian'], available:true, experience:'4 years' },
+  { id:3, name:'Fatjona Leka', city:'Fier', rating:4.9, reviews:14, visits:22, bio:'Dedicated to preventive care and health education. Works closely with families to ensure the best outcomes.', specialties:['Blood Pressure','Welfare Check','General'], languages:['Albanian','Greek'], available:true, experience:'5 years' },
+  { id:4, name:'Arba Hoxha', city:'Elbasan', rating:4.6, reviews:11, visits:19, bio:'Skilled in blood work collection and laboratory coordination. Calm and professional in all interactions.', specialties:['Blood Work','Glucose Monitoring','Vitals'], languages:['Albanian'], available:true, experience:'3 years' },
+  { id:5, name:'Diona Krasniqi', city:'Shkodër', rating:4.8, reviews:9, visits:15, bio:'Passionate about bringing quality healthcare to underserved areas. Specialises in chronic condition monitoring.', specialties:['Blood Pressure','Glucose Monitoring','Blood Work'], languages:['Albanian','English'], available:false, experience:'4 years' },
+  { id:6, name:'Besa Marku', city:'Tirana', rating:4.7, reviews:16, visits:28, bio:'Experienced paediatric and geriatric nurse. Known for her warm and reassuring manner with patients.', specialties:['Welfare Check','Vitals','General'], languages:['Albanian','English'], available:true, experience:'7 years' },
 ];
 
-const PLANS = [
-  { name: 'Basic', price: '€30', visits: 1, featured: false },
-  { name: 'Standard', price: '€50', visits: 2, featured: true },
-  { name: 'Premium', price: '€120', visits: 4, featured: false },
-];
+const CITIES = ['All cities', 'Tirana', 'Durrës', 'Elbasan', 'Fier', 'Shkodër'];
 
-const TRUST_ITEMS = [
-  { icon: <ShieldIcon />, title: 'Licensed nurses only', sub: 'Background-checked & verified' },
-  { icon: <CheckIcon />, title: 'Health report after every visit', sub: 'Emailed to you within hours' },
-  { icon: <HomeIcon />, title: 'Visits in 8 cities', sub: 'Tirana, Durrës, Elbasan & more' },
-  { icon: <GlobeIcon />, title: 'Book from anywhere', sub: 'UK, Italy, Germany, USA & more' },
-];
+function ShieldIcon() { return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>; }
+function MapPinIcon() { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>; }
+function BriefcaseIcon() { return <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 21V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v16"/></svg>; }
 
-function ShieldIcon() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
-}
-function CheckIcon() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>;
-}
-function HomeIcon() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>;
-}
-function GlobeIcon() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 010 20M12 2a15.3 15.3 0 000 20"/></svg>;
-}
-function HeartIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>;
-}
-function ActivityIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>;
-}
-function ClipboardIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/><rect x="9" y="3" width="6" height="4" rx="1"/></svg>;
-}
-function DropletIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2.69l5.66 5.66a8 8 0 11-11.31 0z"/></svg>;
-}
-function UsersIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>;
-}
-function FileTextIcon() {
-  return <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>;
-}
-function WarningIcon() {
-  return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>;
-}
-
-const SERVICE_ITEMS = [
-  { Icon: ActivityIcon, titleKey: 0, descKey: 0 },
-  { Icon: DropletIcon, titleKey: 1, descKey: 1 },
-  { Icon: HeartIcon, titleKey: 2, descKey: 2 },
-  { Icon: ClipboardIcon, titleKey: 3, descKey: 3 },
-  { Icon: UsersIcon, titleKey: 4, descKey: 4 },
-  { Icon: FileTextIcon, titleKey: 5, descKey: 5 },
-];
-
-const TAG = ({ children }) => (
-  <div style={{ display: 'inline-block', fontSize: 11, fontWeight: 700, letterSpacing: '1.2px', textTransform: 'uppercase', color: C.primary, background: C.primaryLight, padding: '5px 12px', borderRadius: '99px', marginBottom: 16 }}>
-    {children}
-  </div>
-);
-
-export default function HomePage({ params }) {
+export default function NursesPage({ params }) {
   const lang = params.lang || 'en';
-  const services = t(lang, 'services.items');
-  const faqs = t(lang, 'faq.items');
-  const steps = t(lang, 'howItWorks.steps');
+  const available = NURSES.filter(n => n.available);
 
   return (
-    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: C.bg }}>
+    <div style={{ fontFamily:"'Inter',system-ui,sans-serif", background:C.bg }}>
       <Nav lang={lang} />
 
-      {/* ── Hero ── */}
-      <section style={{ padding: '80px 24px 96px', background: C.bgWhite }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: '1fr 420px', gap: 60, alignItems: 'center' }}>
-          <div>
-            <TAG>Serving Albania since 2024</TAG>
-            <h1 style={{ fontSize: 'clamp(38px,5vw,56px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: '-1.5px', color: C.textPrimary, margin: '0 0 20px' }}>
-              {t(lang, 'hero.headline1')}<br />
-              <span style={{ color: C.primary }}>{t(lang, 'hero.headline2')}</span>
-            </h1>
-            <p style={{ fontSize: 17, lineHeight: 1.75, color: C.textSecondary, maxWidth: 480, margin: '0 0 36px' }}>
-              {t(lang, 'hero.subtitle')}
-            </p>
-            <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 52 }}>
-              <Link href={`/${lang}/signup`}>
-                <button style={{ fontSize: 15, fontWeight: 600, padding: '14px 28px', borderRadius: 10, border: 'none', background: C.primary, color: '#fff', cursor: 'pointer', boxShadow: '0 2px 8px rgba(37,99,235,0.25)' }}>
-                  {t(lang, 'hero.cta1')}
-                </button>
-              </Link>
-              <Link href={`/${lang}/how-it-works`}>
-                <button style={{ fontSize: 15, fontWeight: 600, padding: '13px 28px', borderRadius: 10, border: `2px solid ${C.border}`, background: 'transparent', color: C.textPrimary, cursor: 'pointer' }}>
-                  {t(lang, 'hero.cta2')}
-                </button>
-              </Link>
-            </div>
-            <div style={{ display: 'flex', gap: 40 }}>
-              {[['500+', t(lang, 'hero.stat1')], ['8', t(lang, 'hero.stat2')], ['100%', t(lang, 'hero.stat3')]].map(([n, l]) => (
-                <div key={l}>
-                  <div style={{ fontSize: 30, fontWeight: 700, color: C.primary, letterSpacing: '-1px' }}>{n}</div>
-                  <div style={{ fontSize: 12, color: C.textTertiary, marginTop: 2 }}>{l}</div>
-                </div>
-              ))}
-            </div>
-          </div>
-
-          {/* Hero photo + floating card */}
-          <div style={{ position: 'relative' }}>
-            <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
-              <img
-                src="/hero.jpg"
-                alt="Nurse visiting patient at home"
-                style={{ width: '100%', height: 420, objectFit: 'cover', display: 'block' }}
-              />
-            </div>
-            {/* Floating info card over the photo */}
-            <div style={{ position: 'absolute', bottom: 20, left: 20, right: 20, background: 'rgba(255,255,255,0.95)', backdropFilter: 'blur(12px)', borderRadius: 16, padding: '16px 18px', boxShadow: '0 4px 24px rgba(0,0,0,0.12)', border: `1px solid ${C.border}` }}>
-              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 }}>
-                <div>
-                  <div style={{ fontSize: 14, fontWeight: 700, color: C.textPrimary }}>Fatmira Murati</div>
-                  <div style={{ fontSize: 12, color: C.textTertiary }}>Tirana · Age 74</div>
-                </div>
-                <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: C.secondary, background: C.secondaryLight, padding: '4px 10px', borderRadius: 99 }}>
-                  <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.secondary }} />
-                  {lang === 'sq' ? 'Vizitë sot' : 'Visit today'}
-                </div>
-              </div>
-              <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
-                {[
-                  [lang === 'sq' ? 'Infermierja' : 'Nurse', 'Elona Berberi', true],
-                  [lang === 'sq' ? 'Planifikuar' : 'Time', '10:00 AM', false],
-                  [lang === 'sq' ? 'Shërbimi' : 'Service', 'BP + glucose', false],
-                ].map(([k, v, blue]) => (
-                  <div key={k}>
-                    <div style={{ fontSize: 10, color: C.textTertiary, marginBottom: 2 }}>{k}</div>
-                    <div style={{ fontSize: 13, fontWeight: 600, color: blue ? C.primary : C.textPrimary }}>{v}</div>
-                  </div>
-                ))}
-              </div>
-            </div>
-          </div>
+      {/* Hero */}
+      <section style={{ padding:'72px 24px 56px', background:C.bgWhite, textAlign:'center' }}>
+        <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.primary, background:C.primaryLight, padding:'5px 12px', borderRadius:99, marginBottom:16 }}>
+          Our nurses
         </div>
-      </section>
+        <h1 style={{ fontSize:'clamp(28px,5vw,48px)', fontWeight:700, color:C.textPrimary, letterSpacing:'-1px', marginBottom:12 }}>
+          Meet your care team
+        </h1>
+        <p style={{ fontSize:17, color:C.textSecondary, maxWidth:480, margin:'0 auto 40px', lineHeight:1.7 }}>
+          Every Vonaxity nurse is licensed, background-checked, and verified before their first visit. Real people, real care.
+        </p>
 
-      {/* ── Trust bar ── */}
-      <section style={{ background: C.bg, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '24px 24px' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20 }}>
-          {TRUST_ITEMS.map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: C.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-                {item.icon}
-              </div>
-              <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.textPrimary }}>{item.title}</div>
-                <div style={{ fontSize: 11, color: C.textTertiary, marginTop: 1 }}>{item.sub}</div>
+        {/* Trust badges */}
+        <div style={{ display:'flex', justifyContent:'center', gap:16, flexWrap:'wrap' }}>
+          {[['Licensed & verified','Every nurse holds a valid Albanian nursing license'],['Background checked','Criminal record check before joining'],['Ongoing training','Regular clinical skills updates']].map(([title, sub]) => (
+            <div key={title} style={{ display:'flex', alignItems:'center', gap:10, background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'10px 16px' }}>
+              <div style={{ width:32, height:32, borderRadius:8, background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', color:C.primary, flexShrink:0 }}><ShieldIcon /></div>
+              <div style={{ textAlign:'left' }}>
+                <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{title}</div>
+                <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{sub}</div>
               </div>
             </div>
           ))}
         </div>
       </section>
 
-      {/* ── How it works ── */}
-      <section style={{ padding: '80px 24px', background: C.bgWhite }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <TAG>{t(lang, 'howItWorks.tag')}</TAG>
-            <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1px' }}>{t(lang, 'howItWorks.title')}</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16 }}>
-            {Array.isArray(steps) && steps.slice(0, 4).map((s, i) => (
-              <div key={i} style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, padding: '28px 22px' }}>
-                <div style={{ marginBottom: 16 }}><StepIcon step={s.num} size={52} /></div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, letterSpacing: '1.5px', marginBottom: 10 }}>STEP {s.num}</div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, marginBottom: 8, lineHeight: 1.4 }}>{s.title}</div>
-                <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>{s.desc}</div>
-              </div>
-            ))}
-          </div>
+      {/* Stats bar */}
+      <section style={{ background:C.primaryLight, borderTop:`1px solid rgba(37,99,235,0.1)`, borderBottom:`1px solid rgba(37,99,235,0.1)`, padding:'20px 24px' }}>
+        <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', justifyContent:'space-around', flexWrap:'wrap', gap:20 }}>
+          {[['6+','Verified nurses'],['4.8','Average rating'],['8','Cities covered'],['150+','Visits completed']].map(([n,l]) => (
+            <div key={l} style={{ textAlign:'center' }}>
+              <div style={{ fontSize:28, fontWeight:700, color:C.primary, letterSpacing:'-1px' }}>{n}</div>
+              <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{l}</div>
+            </div>
+          ))}
         </div>
       </section>
 
-      {/* ── Services ── */}
-      <section style={{ padding: '80px 24px', background: C.bg }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ marginBottom: 48 }}>
-            <TAG>{t(lang, 'services.tag')}</TAG>
-            <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1px' }}>{t(lang, 'services.title')}</h2>
-            <p style={{ fontSize: 16, color: C.textSecondary, maxWidth: 480 }}>{t(lang, 'services.subtitle')}</p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(290px,1fr))', gap: 16 }}>
-            {SERVICE_ITEMS.map(({ Icon, titleKey }, i) => (
-              <div key={i} style={{ background: C.bgWhite, borderRadius: 14, border: `1px solid ${C.border}`, padding: 22 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 11, background: C.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
-                  <Icon />
-                </div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, marginBottom: 6 }}>
-                  {Array.isArray(services) && services[i]?.title}
-                </div>
-                <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>
-                  {Array.isArray(services) && services[i]?.desc}
-                </div>
-              </div>
-            ))}
-          </div>
-          <div style={{ marginTop: 24, background: C.warningLight, border: `1px solid #FDE68A`, borderRadius: 12, padding: '14px 18px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-            <div style={{ flexShrink: 0, marginTop: 1 }}><WarningIcon /></div>
-            <p style={{ fontSize: 13, color: '#92400E', margin: 0, lineHeight: 1.6 }}>
-              <strong>Non-emergency care only.</strong> {t(lang, 'services.emergency')} <strong>127</strong> {t(lang, 'services.immediately')}
-            </p>
-          </div>
-        </div>
-      </section>
-
-      {/* ── Pricing ── */}
-      <section style={{ padding: '80px 24px', background: C.primaryLight }}>
-        <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
-          <TAG>{t(lang, 'pricing.tag')}</TAG>
-          <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1px' }}>{t(lang, 'pricing.title')}</h2>
-          <p style={{ fontSize: 16, color: C.textSecondary, marginBottom: 48 }}>{t(lang, 'pricing.subtitle')}</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(250px,1fr))', gap: 16 }}>
-            {PLANS.map(p => (
-              <div key={p.name} style={{ background: C.bgWhite, borderRadius: 18, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: '28px 24px', position: 'relative' }}>
-                {p.featured && (
-                  <div style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', background: C.primary, color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 99, whiteSpace: 'nowrap', letterSpacing: '0.3px' }}>
-                    {t(lang, 'pricing.mostPopular')}
-                  </div>
-                )}
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.textTertiary, marginBottom: 8 }}>{p.name}</div>
-                <div style={{ fontSize: 44, fontWeight: 700, color: C.textPrimary, letterSpacing: '-2px', marginBottom: 4 }}>{p.price}</div>
-                <div style={{ fontSize: 13, color: C.textTertiary, marginBottom: 16 }}>{t(lang, 'pricing.perMonth')}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.primary, background: C.primaryLight, display: 'inline-block', padding: '4px 12px', borderRadius: 99, marginBottom: 24 }}>
-                  {p.visits} {p.visits === 1 ? t(lang, 'pricing.visitMonth') : t(lang, 'pricing.visitsMonth')}
-                </div>
-                <br />
-                <Link href={`/${lang}/signup?plan=${p.name.toLowerCase()}`}>
-                  <button style={{ width: '100%', padding: '12px', borderRadius: 10, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? C.primary : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-                    {t(lang, 'pricing.getStarted')}
-                  </button>
-                </Link>
-                <div style={{ fontSize: 11, color: C.textTertiary, marginTop: 10 }}>{t(lang, 'pricing.trialNote')}</div>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
-
-      {/* ── Cities with Albania Map ── */}
-      <section style={{ padding:'80px 24px', background:C.bgWhite }}>
+      {/* Nurse grid */}
+      <section style={{ padding:'56px 24px 80px' }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 400px', gap:60, alignItems:'center' }}>
-            <div>
-              <TAG>{t(lang,'cities.tag')}</TAG>
-              <h2 style={{ fontSize:'clamp(28px,4vw,42px)', fontWeight:700, color:C.textPrimary, margin:'0 0 16px', letterSpacing:'-1px' }}>{t(lang,'cities.title')}</h2>
-              <p style={{ fontSize:16, color:C.textSecondary, lineHeight:1.7, marginBottom:32, maxWidth:440 }}>{t(lang,'cities.subtitle')}</p>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-                {CITIES.map(city => (
-                  <div key={city.name} style={{ background:C.bg, borderRadius:12, border:`1px solid ${C.border}`, padding:'12px 16px', display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ width:8, height:8, borderRadius:'50%', background:C.secondary, flexShrink:0 }} />
-                    <div>
-                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{city.name}</div>
-                      <div style={{ fontSize:11, color:C.textTertiary }}>{city.note[lang]||city.note.en}</div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:20 }}>
+            {NURSES.map(nurse => (
+              <div key={nurse.id} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.05)', transition:'box-shadow 0.2s' }}>
+                {/* Card header */}
+                <div style={{ padding:'24px 24px 0' }}>
+                  <div style={{ display:'flex', gap:16, alignItems:'flex-start', marginBottom:16 }}>
+                    <NurseAvatar name={nurse.name} size={64} verified={nurse.available} />
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontSize:17, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4 }}>{nurse.name}</div>
+                      <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:13, color:C.textTertiary, marginBottom:6 }}>
+                        <span style={{ color:C.textTertiary }}><MapPinIcon /></span> {nurse.city}
+                        <span style={{ margin:'0 4px', color:C.border }}>·</span>
+                        <span style={{ color:C.textTertiary }}><BriefcaseIcon /></span> {nurse.experience}
+                      </div>
+                      <StarRating rating={nurse.rating} size={13} />
+                      <div style={{ fontSize:11, color:C.textTertiary, marginTop:2 }}>{nurse.reviews} reviews · {nurse.visits} visits</div>
+                    </div>
+                    <div style={{ flexShrink:0 }}>
+                      {nurse.available ? (
+                        <span style={{ fontSize:11, fontWeight:700, color:C.secondary, background:C.secondaryLight, padding:'4px 10px', borderRadius:99, display:'inline-flex', alignItems:'center', gap:4 }}>
+                          <div style={{ width:6, height:6, borderRadius:'50%', background:C.secondary }} />Available
+                        </span>
+                      ) : (
+                        <span style={{ fontSize:11, fontWeight:600, color:C.textTertiary, background:C.bgSubtle, padding:'4px 10px', borderRadius:99 }}>Unavailable</span>
+                      )}
                     </div>
                   </div>
-                ))}
+
+                  {/* Bio */}
+                  <p style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7, marginBottom:16 }}>{nurse.bio}</p>
+
+                  {/* Specialties */}
+                  <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:16 }}>
+                    {nurse.specialties.map(s => (
+                      <span key={s} style={{ fontSize:11, fontWeight:600, color:C.primary, background:C.primaryLight, padding:'4px 10px', borderRadius:99 }}>{s}</span>
+                    ))}
+                  </div>
+
+                  {/* Languages */}
+                  <div style={{ display:'flex', gap:6, alignItems:'center', marginBottom:20 }}>
+                    <span style={{ fontSize:11, color:C.textTertiary }}>Speaks:</span>
+                    {nurse.languages.map(l => (
+                      <span key={l} style={{ fontSize:11, fontWeight:500, color:C.textSecondary, background:C.bgSubtle, padding:'3px 8px', borderRadius:6 }}>{l}</span>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Card footer */}
+                <div style={{ borderTop:`1px solid ${C.border}`, padding:'16px 24px', display:'flex', gap:10 }}>
+                  <Link href={`/${lang}/nurses/${nurse.id}`} style={{ flex:1 }}>
+                    <button style={{ width:'100%', fontSize:13, fontWeight:600, padding:'10px', borderRadius:9, border:`1.5px solid ${C.border}`, background:C.bgWhite, color:C.textPrimary, cursor:'pointer' }}>
+                      View profile
+                    </button>
+                  </Link>
+                  {nurse.available && (
+                    <Link href={`/${lang}/signup`} style={{ flex:1 }}>
+                      <button style={{ width:'100%', fontSize:13, fontWeight:600, padding:'10px', borderRadius:9, border:'none', background:C.primary, color:'#fff', cursor:'pointer' }}>
+                        Book visit
+                      </button>
+                    </Link>
+                  )}
+                </div>
               </div>
-            </div>
-            <div style={{ display:'flex', justifyContent:'center' }}>
-              <AlbaniaMap lang={lang} />
-            </div>
+            ))}
           </div>
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section style={{ padding: '80px 24px', background: C.bg }}>
-        <div style={{ maxWidth: 700, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <TAG>{t(lang, 'faq.tag')}</TAG>
-            <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: 0, letterSpacing: '-1px' }}>{t(lang, 'faq.title')}</h2>
-          </div>
-          {Array.isArray(faqs) && faqs.slice(0, 4).map((f, i) => (
-            <div key={i} style={{ background: C.bgWhite, borderRadius: 12, border: `1px solid ${C.border}`, padding: '18px 22px', marginBottom: 8 }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, marginBottom: 8 }}>{f.q}</div>
-              <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.7 }}>{f.a}</div>
-            </div>
-          ))}
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Link href={`/${lang}/faq`} style={{ fontSize: 14, fontWeight: 600, color: C.primary }}>{t(lang, 'faq.viewAll')}</Link>
-          </div>
-        </div>
-      </section>
-
-      {/* ── CTA ── */}
-      <section style={{ padding: '80px 24px', background: '#1E3A5F', textAlign: 'center' }}>
-        <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 700, color: '#fff', marginBottom: 16, letterSpacing: '-1px' }}>{t(lang, 'cta.title')}</h2>
-        <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.6)', maxWidth: 420, margin: '0 auto 36px', lineHeight: 1.7 }}>{t(lang, 'cta.subtitle')}</p>
+      {/* CTA */}
+      <section style={{ padding:'72px 24px', background:'#1E3A5F', textAlign:'center' }}>
+        <h2 style={{ fontSize:'clamp(24px,4vw,40px)', fontWeight:700, color:'#fff', letterSpacing:'-1px', marginBottom:12 }}>
+          Ready to book a nurse visit?
+        </h2>
+        <p style={{ fontSize:16, color:'rgba(255,255,255,0.6)', marginBottom:32, maxWidth:400, margin:'0 auto 32px' }}>
+          7-day free trial. A verified nurse at your loved one's door within days.
+        </p>
         <Link href={`/${lang}/signup`}>
-          <button style={{ background: '#fff', color: '#1E3A5F', border: 'none', borderRadius: 10, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>
-            {t(lang, 'cta.btn1')}
+          <button style={{ background:'#fff', color:'#1E3A5F', border:'none', borderRadius:10, padding:'14px 36px', fontSize:15, fontWeight:700, cursor:'pointer' }}>
+            Choose your plan
           </button>
         </Link>
       </section>
