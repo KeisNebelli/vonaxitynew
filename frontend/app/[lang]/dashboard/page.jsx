@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
@@ -332,6 +332,7 @@ function Settings({ user, relative, lang }) {
 }
 
 // ── Main dashboard ────────────────────────────────────────────────────────────
+  const SettingsMemo = React.memo(Settings);
 export default function Dashboard({ params }) {
   const lang = params.lang || 'en';
   const router = useRouter();
@@ -420,7 +421,7 @@ export default function Dashboard({ params }) {
               <button style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:'pointer' }}>Upgrade to Premium</button>
             </div>
           )}
-          {active==='settings' && <Settings key="settings" user={user} relative={relative} lang={lang} />}
+          {active==='settings' && <SettingsMemo user={user} relative={relative} lang={lang} />}
         </main>
       </div>
     </div>
