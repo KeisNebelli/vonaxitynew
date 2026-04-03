@@ -127,9 +127,9 @@ function Visits({ visits }) {
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────────
-function Settings({ user, lang }) {
+function Settings({ user, relative, lang }) {
   const [profile, setProfile] = useState({ name:user.name, email:user.email, phone:user.phone||'', country:user.country||'', city:user.city||'' });
-  const [relative, setRelative] = useState({ name:MOCK.relative.name, city:MOCK.relative.city, address:MOCK.relative.address, phone:MOCK.relative.phone||'', age:MOCK.relative.age||'', healthNotes:MOCK.relative.healthNotes||'' });
+  const [rel, setRel] = useState({ name:relative?.name||'', city:relative?.city||'', address:relative?.address||'', phone:relative?.phone||'', age:relative?.age||'', healthNotes:relative?.healthNotes||'' });
   const [password, setPassword] = useState({ current:'', newPass:'', confirm:'' });
   const [contact, setContact] = useState({ preferredContact:'email', emergencyName:'', emergencyPhone:'' });
   const [saving, setSaving] = useState(false);
@@ -147,7 +147,7 @@ function Settings({ user, lang }) {
     setSaving(true); setProfileStatus(null);
     try {
       await api.updateProfile({ name:profile.name, phone:profile.phone, country:profile.country, city:profile.city });
-      await api.updateRelative(MOCK.relative.id, { name:relative.name, city:relative.city, address:relative.address, phone:relative.phone, age:relative.age||null, healthNotes:relative.healthNotes });
+      await api.updateRelative(relative?.id||'', { name:relative.name, city:relative.city, address:relative.address, phone:relative.phone, age:relative.age||null, healthNotes:relative.healthNotes });
       setProfileStatus('success');
       setTimeout(() => setProfileStatus(null), 4000);
     } catch (err) {
@@ -216,26 +216,26 @@ function Settings({ user, lang }) {
       <SectionCard title="Loved one details" subtitle="The person receiving care in Albania">
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
           <Field label="Their full name">
-            <input style={inp} value={relative.name} onChange={e=>setRelative({...relative,name:e.target.value})} />
+            <input style={inp} value={rel.name} onChange={e=>setRel({...rel,name:e.target.value})} />
           </Field>
           <Field label="Their age">
-            <input style={inp} type="number" value={relative.age} onChange={e=>setRelative({...relative,age:e.target.value})} placeholder="e.g. 74" />
+            <input style={inp} type="number" value={rel.age} onChange={e=>setRel({...rel,age:e.target.value})} placeholder="e.g. 74" />
           </Field>
           <Field label="City in Albania">
-            <select style={{...inp}} value={relative.city} onChange={e=>setRelative({...relative,city:e.target.value})}>
+            <select style={{...inp}} value={rel.city} onChange={e=>setRel({...rel,city:e.target.value})}>
               <option value="">Select city</option>
               {CITIES_AL.map(c=><option key={c}>{c}</option>)}
             </select>
           </Field>
           <Field label="Their phone">
-            <input style={inp} value={relative.phone} onChange={e=>setRelative({...relative,phone:e.target.value})} placeholder="+355 69 000 0000" />
+            <input style={inp} value={rel.phone} onChange={e=>setRel({...rel,phone:e.target.value})} placeholder="+355 69 000 0000" />
           </Field>
         </div>
         <Field label="Home address">
-          <input style={inp} value={relative.address} onChange={e=>setRelative({...relative,address:e.target.value})} placeholder="Street address in Albania" />
+          <input style={inp} value={rel.address} onChange={e=>setRel({...rel,address:e.target.value})} placeholder="Street address in Albania" />
         </Field>
         <Field label="Health notes (optional)">
-          <textarea style={{...inp,minHeight:80,resize:'vertical'}} value={relative.healthNotes} onChange={e=>setRelative({...relative,healthNotes:e.target.value})} placeholder="e.g. Diabetes Type 2, takes Metformin daily..." />
+          <textarea style={{...inp,minHeight:80,resize:'vertical'}} value={rel.healthNotes} onChange={e=>setRel({...rel,healthNotes:e.target.value})} placeholder="e.g. Diabetes Type 2, takes Metformin daily..." />
         </Field>
       </SectionCard>
 
@@ -336,6 +336,42 @@ export default function Dashboard({ params }) {
   const lang = params.lang || 'en';
   const router = useRouter();
   const [active, setActive] = useState('overview');
+  const [realUser, setRealUser] = useState(null);
+  const [realVisits, setRealVisits] = useState([]);
+  const [realRelatives, setRealRelatives] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const [meData, visitsData] = await Promise.all([api.me(), api.getVisits()]);
+        if (meData?.user) setRealUser(meData.user);
+        if (visitsData?.visits) setRealVisits(visitsData.visits);
+        // Extract relatives from visits
+        const relMap = {};
+        (visitsData?.visits || []).forEach(v => { if (v.relative) relMap[v.relative.id] = v.relative; });
+        setRealRelatives(Object.values(relMap));
+      } catch (err) {
+        console.error('Dashboard load error:', err);
+      } finally { setLoading(false); }
+    };
+    load();
+  }, []);
+
+  // Use real data if available, fall back to mock for display
+  const user = realUser ? {
+    name: realUser.name,
+    email: realUser.email,
+    phone: realUser.phone || '',
+    country: realUser.country || '',
+    city: realUser.city || '',
+    plan: realUser.subscription?.plan || 'standard',
+    status: realUser.status,
+  } : MOCK.user;
+
+  const visits = realVisits.length > 0 ? realVisits : MOCK.visits;
+  const subscription = realUser?.subscription || MOCK.subscription;
+  const relative = realRelatives[0] || MOCK.relative;
 
   const logout = () => {
     document.cookie = 'vonaxity-token=;path=/;max-age=0';
@@ -345,29 +381,42 @@ export default function Dashboard({ params }) {
 
   const titles = { overview:'Dashboard', visits:'My Visits', subscription:'Subscription', settings:'Account Settings' };
 
+  if (loading) return (
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:C.bg, fontFamily:"'Inter',system-ui,sans-serif" }}>
+      <div style={{ fontSize:14, color:C.textTertiary }}>Loading your dashboard...</div>
+    </div>
+  );
+
+  const planName = (subscription?.plan || 'standard').charAt(0).toUpperCase() + (subscription?.plan || 'standard').slice(1);
+
   return (
     <div style={{ display:'flex', minHeight:'100vh', fontFamily:"'Inter',system-ui,sans-serif", background:C.bg }}>
-      <Sidebar user={MOCK.user} active={active} setActive={setActive} lang={lang} onLogout={logout} />
+      <Sidebar user={user} active={active} setActive={setActive} lang={lang} onLogout={logout} />
       <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
         <div style={{ padding:'0 28px', height:60, borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'space-between', background:C.bgWhite, flexShrink:0 }}>
           <div style={{ fontSize:16, fontWeight:600, color:C.textPrimary }}>{titles[active]}</div>
           <div style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:12, fontWeight:600, color:C.secondary, background:C.secondaryLight, padding:'5px 12px', borderRadius:99 }}>
             <div style={{ width:6, height:6, borderRadius:'50%', background:C.secondary }} />
-            {MOCK.subscription.plan.charAt(0).toUpperCase()+MOCK.subscription.plan.slice(1)} Plan
+            {planName} Plan
           </div>
         </div>
         <main style={{ flex:1, padding:28, overflowY:'auto', maxWidth:760, width:'100%' }}>
-          {active==='overview' && <Overview user={MOCK.user} visits={MOCK.visits} lang={lang} />}
-          {active==='visits' && <Visits visits={MOCK.visits} />}
+          {active==='overview' && <Overview user={user} visits={visits} lang={lang} />}
+          {active==='visits' && <Visits visits={visits} />}
           {active==='subscription' && (
             <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:28 }}>
-              <div style={{ fontSize:22, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:6 }}>Standard Plan</div>
-              <div style={{ fontSize:15, color:C.primary, fontWeight:500, marginBottom:8 }}>€50/month · 2 visits</div>
-              <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>Status: <strong style={{ color:C.warning }}>TRIAL</strong> · Ends {new Date(MOCK.subscription.trialEndsAt).toLocaleDateString()}</div>
+              <div style={{ fontSize:22, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:6 }}>{planName} Plan</div>
+              <div style={{ fontSize:15, color:C.primary, fontWeight:500, marginBottom:8 }}>
+                {subscription?.visitsPerMonth || 2} visit{subscription?.visitsPerMonth !== 1 ? 's' : ''}/month
+              </div>
+              <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>
+                Status: <strong style={{ color:subscription?.status==='ACTIVE'?C.secondary:C.warning }}>{subscription?.status || 'TRIAL'}</strong>
+                {subscription?.trialEndsAt && ` · Trial ends ${new Date(subscription.trialEndsAt).toLocaleDateString()}`}
+              </div>
               <button style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:'pointer' }}>Upgrade to Premium</button>
             </div>
           )}
-          {active==='settings' && <Settings user={MOCK.user} lang={lang} />}
+          {active==='settings' && <Settings user={user} relative={relative} lang={lang} />}
         </main>
       </div>
     </div>
