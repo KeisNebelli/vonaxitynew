@@ -331,8 +331,9 @@ function Settings({ user, relative, lang }) {
   );
 }
 
+const SettingsMemo = React.memo(Settings);
+
 // ── Main dashboard ────────────────────────────────────────────────────────────
-  const SettingsMemo = React.memo(Settings);
 export default function Dashboard({ params }) {
   const lang = params.lang || 'en';
   const router = useRouter();
