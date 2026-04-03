@@ -19,12 +19,12 @@ const CITIES = ['Tirana','Durrës','Elbasan','Fier','Berat','Sarandë','Kukës',
 const SPECIALTIES_LIST = ['Blood Pressure','Glucose Monitoring','Vitals','Blood Work','Welfare Check','General Nursing','Post-surgical Care','Paediatric Care'];
 
 const NAV_ITEMS = [
-  { id:'dashboard', label:'Dashboard', icon:'📊' },
-  { id:'visits', label:'My Visits', icon:'🗓️' },
-  { id:'map', label:'Navigation', icon:'🗺️' },
-  { id:'complete', label:'Complete Visit', icon:'📝' },
-  { id:'earnings', label:'Earnings', icon:'💰' },
-  { id:'profile', label:'My Profile', icon:'👤' },
+  { id:'dashboard', label:'Dashboard' },
+  { id:'visits', label:'My Visits' },
+  { id:'map', label:'Navigation' },
+  { id:'complete', label:'Complete Visit' },
+  { id:'earnings', label:'Earnings' },
+  { id:'profile', label:'My Profile' },
 ];
 
 function formatVisit(v) {
@@ -66,7 +66,7 @@ function Sidebar({ nurse, collapsed, setCollapsed, active, setActive, onLogout }
       <nav style={{ flex:1, padding:'10px 8px' }}>
         {NAV_ITEMS.map(item => (
           <button key={item.id} onClick={()=>setActive(item.id)} style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:collapsed?'10px 0':'10px 12px', borderRadius:9, border:'none', background:active===item.id?'rgba(37,99,235,0.2)':'transparent', color:active===item.id?'#93C5FD':'rgba(255,255,255,0.4)', cursor:'pointer', fontSize:13, fontWeight:active===item.id?600:400, marginBottom:2, justifyContent:collapsed?'center':'flex-start' }}>
-            <span style={{ fontSize:16 }}>{item.icon}</span>{!collapsed&&<span>{item.label}</span>}
+           {!collapsed&&<span>{item.label}</span>}
           </button>
         ))}
       </nav>
