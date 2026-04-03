@@ -12,6 +12,19 @@ const ROLE_ROUTES = {
   '/sq/dashboard': ['CLIENT', 'ADMIN'],
 };
 
+// Public routes — never redirect to login
+const PUBLIC_ROUTES = [
+  '/en/nurses', '/sq/nurses',
+  '/en/login', '/sq/login',
+  '/en/signup', '/sq/signup',
+  '/en/about', '/sq/about',
+  '/en/services', '/sq/services',
+  '/en/pricing', '/sq/pricing',
+  '/en/how-it-works', '/sq/how-it-works',
+  '/en/faq', '/sq/faq',
+  '/en/contact', '/sq/contact',
+];
+
 export function middleware(request) {
   const { pathname } = request.nextUrl;
 
@@ -35,7 +48,10 @@ export function middleware(request) {
     return NextResponse.redirect(new URL(`/${lang}${pathname}`, request.url));
   }
 
-  // Auth guard
+  // Auth guard — skip for public routes
+  const isPublic = PUBLIC_ROUTES.some(r => pathname.startsWith(r));
+  if (isPublic) return NextResponse.next();
+
   const protectedRoute = Object.keys(ROLE_ROUTES).find((r) =>
     pathname.startsWith(r)
   );
