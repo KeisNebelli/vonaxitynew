@@ -420,7 +420,7 @@ export default function Dashboard({ params }) {
               <button style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:'pointer' }}>Upgrade to Premium</button>
             </div>
           )}
-          {active==='settings' && <Settings user={user} relative={relative} lang={lang} />}
+          {active==='settings' {active==='settings' && <Settings user={user} relative={relative} lang={lang} />}{active==='settings' && <Settings user={user} relative={relative} lang={lang} />} <Settings key="settings" user={user} relative={relative} lang={lang} />}
         </main>
       </div>
     </div>
