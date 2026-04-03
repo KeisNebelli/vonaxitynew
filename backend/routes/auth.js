@@ -63,6 +63,7 @@ router.post('/register', async (req, res) => {
     res.cookie('vonaxity-token', token, COOKIE_OPTIONS);
     res.status(201).json({
       success: true,
+      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
     });
   } catch (err) {
@@ -105,6 +106,7 @@ router.post('/login', async (req, res) => {
     res.cookie('vonaxity-token', token, COOKIE_OPTIONS);
     res.json({
       success: true,
+      token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
     });
   } catch (err) {
@@ -121,17 +123,19 @@ router.post('/logout', (req, res) => {
 
 // GET /auth/me
 router.get('/me', async (req, res) => {
-  const token = req.cookies?.['vonaxity-token'];
+  const token = req.cookies?.['vonaxity-token'] ||
+    req.headers.authorization?.replace('Bearer ', '');
+
   if (!token || token === 'set') return res.status(401).json({ error: 'Not authenticated' });
 
   try {
     const payload = jwt.verify(token, process.env.JWT_SECRET);
     const user = await prisma.user.findUnique({
       where: { id: payload.userId },
-      include: { subscription: true, nurseProfile: true },
+      include: { subscription: true, relatives: true, nurseProfile: true },
     });
     if (!user) return res.status(401).json({ error: 'User not found' });
-    res.json({ user: { id: user.id, name: user.name, email: user.email, role: user.role, status: user.status, subscription: user.subscription } });
+    res.json({ user: { id: user.id, name: user.name, email: user.email, role: user.role, status: user.status, phone: user.phone, country: user.country, city: user.city, subscription: user.subscription, relatives: user.relatives } });
   } catch {
     res.status(401).json({ error: 'Invalid token' });
   }

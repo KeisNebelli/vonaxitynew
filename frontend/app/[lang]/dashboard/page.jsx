@@ -347,10 +347,14 @@ export default function Dashboard({ params }) {
         const [meData, visitsData] = await Promise.all([api.me(), api.getVisits()]);
         if (meData?.user) setRealUser(meData.user);
         if (visitsData?.visits) setRealVisits(visitsData.visits);
-        // Extract relatives from visits
-        const relMap = {};
-        (visitsData?.visits || []).forEach(v => { if (v.relative) relMap[v.relative.id] = v.relative; });
-        setRealRelatives(Object.values(relMap));
+        // Use relatives from /me response
+        if (meData?.user?.relatives?.length > 0) {
+          setRealRelatives(meData.user.relatives);
+        } else {
+          const relMap = {};
+          (visitsData?.visits || []).forEach(v => { if (v.relative) relMap[v.relative.id] = v.relative; });
+          setRealRelatives(Object.values(relMap));
+        }
       } catch (err) {
         console.error('Dashboard load error:', err);
       } finally { setLoading(false); }
