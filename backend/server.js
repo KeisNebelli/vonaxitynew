@@ -6,26 +6,15 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const visitRoutes = require('./routes/visits');
 const nurseRoutes = require('./routes/nurses');
-const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter } = require('./routes/other');
+const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter } = require('./routes/other');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 app.use(cors({
-  origin: function(origin, callback) {
-  const allowed = [
-    process.env.FRONTEND_URL,
-    'http://localhost:3000',
-    /\.vercel\.app$/
-  ];
-  if (!origin || allowed.some(a => typeof a === 'string' ? a === origin : a.test(origin))) {
-    callback(null, true);
-  } else {
-    callback(new Error('Not allowed by CORS'));
-  }
-},
-credentials: true,
+  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  credentials: true,
 }));
 app.use(express.json());
 app.use(cookieParser());
@@ -50,6 +39,7 @@ app.use('/payments', paymentsRouter);
 app.use('/analytics', analyticsRouter);
 app.use('/notifications', notificationsRouter);
 app.use('/settings', settingsRouter);
+app.use('/profile', profileRouter);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
 app.use((req, res) => {

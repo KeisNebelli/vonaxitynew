@@ -45,4 +45,9 @@ export const api = {
   // Settings
   getSettings: () => apiFetch('/settings'),
   updateSettings: (body) => apiFetch('/settings', { method: 'PUT', body: JSON.stringify(body) }),
+
+  // Profile
+  updateProfile: (body) => apiFetch('/profile', { method: 'PUT', body: JSON.stringify(body) }),
+  updatePassword: (body) => apiFetch('/profile/password', { method: 'PUT', body: JSON.stringify(body) }),
+  updateRelative: (id, body) => apiFetch(`/profile/relative/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
 };

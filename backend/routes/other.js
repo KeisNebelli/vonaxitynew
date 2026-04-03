@@ -161,3 +161,72 @@ settingsRouter.put('/', ...requireRole('ADMIN'), (req, res) => {
 });
 
 module.exports.settingsRouter = settingsRouter;
+
+// ── PROFILE UPDATE (added for Phase 3 settings) ───────────────────────────────
+const profileRouter = require('express').Router();
+const bcryptProfile = require('bcryptjs');
+const prismaProfile = require('../lib/db');
+const { authMiddleware: authMw } = require('../middleware/auth');
+
+// PUT /profile — update client profile
+profileRouter.put('/', authMw, async (req, res) => {
+  try {
+    const { name, phone, country, city, emergencyContactName, emergencyContactPhone, preferredContact } = req.body;
+    const updated = await prismaProfile.user.update({
+      where: { id: req.user.userId },
+      data: {
+        ...(name && { name }),
+        ...(phone !== undefined && { phone }),
+        ...(country !== undefined && { country }),
+        ...(city !== undefined && { city }),
+      },
+      include: { subscription: true },
+    });
+    res.json({ success: true, user: { id: updated.id, name: updated.name, email: updated.email, phone: updated.phone, country: updated.country, city: updated.city, role: updated.role, status: updated.status, subscription: updated.subscription } });
+  } catch (err) {
+    console.error('Profile update error:', err);
+    res.status(500).json({ error: 'Failed to update profile' });
+  }
+});
+
+// PUT /profile/password — change password
+profileRouter.put('/password', authMw, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    if (!currentPassword || !newPassword) return res.status(400).json({ error: 'Both passwords required' });
+    if (newPassword.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+
+    const user = await prismaProfile.user.findUnique({ where: { id: req.user.userId } });
+    const valid = await bcryptProfile.compare(currentPassword, user.passwordHash);
+    if (!valid) return res.status(401).json({ error: 'Current password is incorrect' });
+
+    const passwordHash = await bcryptProfile.hash(newPassword, 10);
+    await prismaProfile.user.update({ where: { id: req.user.userId }, data: { passwordHash } });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update password' });
+  }
+});
+
+// PUT /profile/relative/:id — update relative info
+profileRouter.put('/relative/:id', authMw, async (req, res) => {
+  try {
+    const { name, city, address, phone, age, healthNotes } = req.body;
+    const relative = await prismaProfile.relative.update({
+      where: { id: req.params.id, clientId: req.user.userId },
+      data: {
+        ...(name && { name }),
+        ...(city && { city }),
+        ...(address !== undefined && { address }),
+        ...(phone !== undefined && { phone }),
+        ...(age !== undefined && { age: age ? parseInt(age) : null }),
+        ...(healthNotes !== undefined && { healthNotes }),
+      },
+    });
+    res.json({ success: true, relative });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update relative' });
+  }
+});
+
+module.exports.profileRouter = profileRouter;
