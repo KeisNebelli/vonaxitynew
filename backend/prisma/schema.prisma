@@ -1,11 +1,20 @@
+// vonaxity/backend/prisma/schema.prisma
+// SQLite-compatible version (no enums, no String arrays)
+
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider = "sqlite"
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
+
+// Roles: CLIENT | NURSE | ADMIN
+// UserStatus: ACTIVE | TRIAL | SUSPENDED | CANCELLED
+// NurseStatus: PENDING | APPROVED | SUSPENDED
+// VisitStatus: UNASSIGNED | PENDING | ACCEPTED | ON_THE_WAY | ARRIVED | IN_PROGRESS | COMPLETED | NO_SHOW | CANCELLED
+// PaymentStatus: ACTIVE | TRIAL | PAST_DUE | CANCELLED | FAILED
 
 model User {
   id           String   @id @default(cuid())
