@@ -19,6 +19,7 @@ export default function LoginPage({ params }) {
     setLoading(true); setError('');
     try {
       const data = await api.login(form);
+      if (data.token) localStorage.setItem('vonaxity-token', data.token);
       document.cookie = `vonaxity-role=${data.user.role};path=/;max-age=604800`;
       document.cookie = `vonaxity-token=set;path=/;max-age=604800`;
       const redirectMap = { CLIENT:`/${lang}/dashboard`, NURSE:`/${lang}/nurse`, ADMIN:`/${lang}/admin` };
