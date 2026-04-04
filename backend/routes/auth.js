@@ -72,6 +72,73 @@ router.post('/register', async (req, res) => {
   }
 });
 
+// POST /auth/register-nurse
+router.post('/register-nurse', async (req, res) => {
+  try {
+    const {
+      name, email, password, phone,
+      city, bio, experience, languages, services,
+      licenseNumber, issuingAuthority,
+      availability, diplomaUrl, licenseUrl, profilePhotoUrl,
+    } = req.body;
+
+    if (!name || !email || !password) {
+      return res.status(400).json({ error: 'Name, email and password are required' });
+    }
+    if (password.length < 8) {
+      return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    }
+    if (!licenseNumber) {
+      return res.status(400).json({ error: 'License number is required' });
+    }
+
+    const existing = await prisma.user.findUnique({ where: { email } });
+    if (existing) return res.status(409).json({ error: 'Email already registered' });
+
+    const passwordHash = await bcrypt.hash(password, 10);
+
+    const user = await prisma.user.create({
+      data: {
+        name, email, passwordHash, phone,
+        role: 'NURSE', status: 'ACTIVE',
+        nurseProfile: {
+          create: {
+            city: city || '',
+            bio: bio || '',
+            experience: experience || '',
+            languages: JSON.stringify(languages || []),
+            services: JSON.stringify(services || []),
+            licenseNumber,
+            issuingAuthority: issuingAuthority || '',
+            availability: JSON.stringify(availability || []),
+            diplomaUrl: diplomaUrl || null,
+            licenseUrl: licenseUrl || null,
+            profilePhotoUrl: profilePhotoUrl || null,
+            status: 'PENDING',
+            submittedAt: new Date(),
+          },
+        },
+      },
+    });
+
+    const token = jwt.sign(
+      { userId: user.id, role: user.role, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: '7d' }
+    );
+
+    res.cookie('vonaxity-token', token, COOKIE_OPTIONS);
+    res.status(201).json({
+      success: true,
+      token,
+      user: { id: user.id, name: user.name, email: user.email, role: user.role },
+    });
+  } catch (err) {
+    console.error('Nurse register error:', err);
+    res.status(500).json({ error: 'Registration failed' });
+  }
+});
+
 // POST /auth/login
 router.post('/login', async (req, res) => {
   try {

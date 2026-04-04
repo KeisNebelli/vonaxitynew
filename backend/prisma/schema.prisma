@@ -38,20 +38,31 @@ model User {
 }
 
 model Nurse {
-  id              String   @id @default(cuid())
-  userId          String   @unique
-  user            User     @relation(fields: [userId], references: [id])
-  status          String   @default("PENDING")
-  city            String
-  rating          Float    @default(0)
-  totalVisits     Int      @default(0)
-  totalEarnings   Float    @default(0)
-  payRatePerVisit Float    @default(20)
-  availability    String   @default("[]")
-  licenseNumber   String?
-  bio             String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id                String   @id @default(cuid())
+  userId            String   @unique
+  user              User     @relation(fields: [userId], references: [id])
+  status            String   @default("PENDING")
+  city              String   @default("")
+  rating            Float    @default(0)
+  totalVisits       Int      @default(0)
+  totalEarnings     Float    @default(0)
+  payRatePerVisit   Float    @default(20)
+  availability      String   @default("[]")
+  licenseNumber     String?
+  issuingAuthority  String?
+  bio               String?
+  experience        String?
+  languages         String   @default("[]")
+  specialties       String   @default("[]")
+  services          String   @default("[]")
+  diplomaUrl        String?
+  licenseUrl        String?
+  profilePhotoUrl   String?
+  rejectionReason   String?
+  submittedAt       DateTime?
+  approvedAt        DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
 
   visits  Visit[]
   reviews Review[]

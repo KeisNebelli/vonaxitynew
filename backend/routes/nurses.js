@@ -59,7 +59,19 @@ router.put('/:id/suspend', ...requireRole('ADMIN'), async (req, res) => {
   }
 });
 
-// PUT /nurses/:id/availability
+// PUT /nurses/:id/reject
+router.put('/:id/reject', ...requireRole('ADMIN'), async (req, res) => {
+  try {
+    const { reason } = req.body;
+    const nurse = await prisma.nurse.update({
+      where: { id: req.params.id },
+      data: { status: 'SUSPENDED', rejectionReason: reason || 'Application rejected by admin' },
+    });
+    res.json({ success: true, nurse });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to reject nurse' });
+  }
+});
 router.put('/:id/availability', ...requireRole('NURSE', 'ADMIN'), async (req, res) => {
   try {
     const { availability } = req.body;
