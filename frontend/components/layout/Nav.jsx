@@ -3,7 +3,7 @@ import { useState } from 'react';
 import Link from 'next/link';
 import { t } from '@/translations';
 
-const C = { primary:'#2563EB', textPrimary:'#111827', textSecondary:'#6B7280', border:'#E5E7EB', bg:'#FAFAF9' };
+const C = { primary:'#2563EB', textPrimary:'#111827', textSecondary:'#6B7280', border:'#E5E7EB' };
 
 export default function Nav({ lang = 'en' }) {
   const [open, setOpen] = useState(false);
@@ -23,67 +23,217 @@ export default function Nav({ lang = 'en' }) {
   };
 
   return (
-    <nav style={{ position:'sticky', top:0, zIndex:50, background:'rgba(255,255,255,0.96)', backdropFilter:'blur(12px)', borderBottom:`1px solid ${C.border}` }}>
-      <div style={{ maxWidth:1100, margin:'0 auto', padding:'0 20px', display:'flex', alignItems:'center', justifyContent:'space-between', height:64 }}>
-        <Link href={`/${lang}`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px', textDecoration:'none' }}>Vonaxity</Link>
-
-        {/* Desktop nav */}
-        <div style={{ display:'flex', gap:24, alignItems:'center', '@media(max-width:768px)':{display:'none'} }} className="desktop-nav">
-          {links.map(l => (
-            <Link key={l.href} href={l.href} style={{ fontSize:14, color:C.textSecondary, fontWeight:500, textDecoration:'none' }}>{l.label}</Link>
-          ))}
-        </div>
-
-        <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-          <div style={{ display:'flex', background:'#F5F5F4', borderRadius:8, padding:3, border:`1px solid ${C.border}` }}>
-            {['en','sq'].map(l => (
-              <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', letterSpacing:'0.3px', background:lang===l?C.primary:'transparent', color:lang===l?'#fff':C.textSecondary }}>
-                {l.toUpperCase()}
-              </button>
-            ))}
-          </div>
-          <Link href={`/${lang}/login`} className="desktop-only">
-            <button style={{ fontSize:13, fontWeight:600, padding:'8px 16px', borderRadius:8, border:'none', background:'transparent', color:C.textPrimary, cursor:'pointer' }}>{t(lang,'nav.signIn')}</button>
-          </Link>
-          <Link href={`/${lang}/signup`} className="desktop-only">
-            <button style={{ fontSize:13, fontWeight:600, padding:'9px 18px', borderRadius:8, border:'none', background:C.primary, color:'#fff', cursor:'pointer' }}>{t(lang,'nav.getStarted')}</button>
-          </Link>
-          {/* Hamburger */}
-          <button onClick={()=>setOpen(!open)} className="mobile-only" style={{ background:'transparent', border:'none', cursor:'pointer', padding:8, display:'flex', flexDirection:'column', gap:5 }}>
-            <span style={{ display:'block', width:22, height:2, background:C.textPrimary, borderRadius:2, transition:'all 0.2s', transform:open?'rotate(45deg) translate(5px,5px)':'none' }}/>
-            <span style={{ display:'block', width:22, height:2, background:C.textPrimary, borderRadius:2, opacity:open?0:1, transition:'all 0.2s' }}/>
-            <span style={{ display:'block', width:22, height:2, background:C.textPrimary, borderRadius:2, transition:'all 0.2s', transform:open?'rotate(-45deg) translate(5px,-5px)':'none' }}/>
-          </button>
-        </div>
-      </div>
-
-      {/* Mobile menu */}
-      {open && (
-        <div style={{ background:'#fff', borderTop:`1px solid ${C.border}`, padding:'16px 20px 24px' }} className="mobile-only">
-          {links.map(l => (
-            <Link key={l.href} href={l.href} onClick={()=>setOpen(false)} style={{ display:'block', fontSize:16, color:C.textPrimary, fontWeight:500, padding:'12px 0', borderBottom:`1px solid #F3F4F6`, textDecoration:'none' }}>{l.label}</Link>
-          ))}
-          <div style={{ display:'flex', gap:10, marginTop:20 }}>
-            <Link href={`/${lang}/login`} style={{ flex:1 }} onClick={()=>setOpen(false)}>
-              <button style={{ width:'100%', fontSize:14, fontWeight:600, padding:'12px', borderRadius:10, border:`1.5px solid ${C.border}`, background:'transparent', color:C.textPrimary, cursor:'pointer' }}>Sign in</button>
-            </Link>
-            <Link href={`/${lang}/signup`} style={{ flex:1 }} onClick={()=>setOpen(false)}>
-              <button style={{ width:'100%', fontSize:14, fontWeight:600, padding:'12px', borderRadius:10, border:'none', background:C.primary, color:'#fff', cursor:'pointer' }}>Get started</button>
-            </Link>
-          </div>
-        </div>
-      )}
-
+    <>
       <style>{`
-        .desktop-nav { display: flex !important; }
-        .desktop-only { display: flex !important; }
-        .mobile-only { display: none !important; }
+        .vx-nav-bar {
+          position: sticky;
+          top: 0;
+          z-index: 50;
+          background: rgba(255,255,255,0.96);
+          backdrop-filter: blur(12px);
+          border-bottom: 1px solid #E5E7EB;
+          font-family: 'Inter', system-ui, sans-serif;
+        }
+        .vx-nav-inner {
+          max-width: 1100px;
+          margin: 0 auto;
+          padding: 0 20px;
+          display: flex;
+          align-items: center;
+          justify-content: space-between;
+          height: 64px;
+        }
+        .vx-logo {
+          font-size: 20px;
+          font-weight: 700;
+          color: #2563EB;
+          letter-spacing: -0.5px;
+          text-decoration: none;
+          flex-shrink: 0;
+        }
+        .vx-desktop-links {
+          display: flex;
+          gap: 24px;
+          align-items: center;
+        }
+        .vx-desktop-link {
+          font-size: 14px;
+          color: #6B7280;
+          font-weight: 500;
+          text-decoration: none;
+          white-space: nowrap;
+        }
+        .vx-desktop-link:hover { color: #111827; }
+        .vx-right {
+          display: flex;
+          align-items: center;
+          gap: 8px;
+          flex-shrink: 0;
+        }
+        .vx-lang {
+          display: flex;
+          background: #F5F5F4;
+          border-radius: 8px;
+          padding: 3px;
+          border: 1px solid #E5E7EB;
+        }
+        .vx-lang-btn {
+          padding: 4px 10px;
+          border-radius: 6px;
+          border: none;
+          font-size: 11px;
+          font-weight: 700;
+          cursor: pointer;
+          letter-spacing: 0.3px;
+          font-family: inherit;
+        }
+        .vx-signin-btn {
+          font-size: 13px;
+          font-weight: 600;
+          padding: 8px 16px;
+          border-radius: 8px;
+          border: none;
+          background: transparent;
+          color: #111827;
+          cursor: pointer;
+          white-space: nowrap;
+          font-family: inherit;
+        }
+        .vx-getstarted-btn {
+          font-size: 13px;
+          font-weight: 600;
+          padding: 9px 18px;
+          border-radius: 8px;
+          border: none;
+          background: #2563EB;
+          color: #fff;
+          cursor: pointer;
+          white-space: nowrap;
+          font-family: inherit;
+        }
+        .vx-hamburger {
+          display: none;
+          flex-direction: column;
+          gap: 5px;
+          background: transparent;
+          border: none;
+          cursor: pointer;
+          padding: 8px;
+        }
+        .vx-hamburger span {
+          display: block;
+          width: 22px;
+          height: 2px;
+          background: #111827;
+          border-radius: 2px;
+          transition: all 0.2s;
+        }
+        .vx-mobile-menu {
+          display: none;
+          background: #fff;
+          border-top: 1px solid #E5E7EB;
+          padding: 8px 20px 24px;
+        }
+        .vx-mobile-link {
+          display: block;
+          font-size: 16px;
+          color: #111827;
+          font-weight: 500;
+          padding: 14px 0;
+          border-bottom: 1px solid #F3F4F6;
+          text-decoration: none;
+        }
+        .vx-mobile-btns {
+          display: flex;
+          gap: 10px;
+          margin-top: 20px;
+        }
+        .vx-mobile-signin {
+          flex: 1;
+          font-size: 15px;
+          font-weight: 600;
+          padding: 13px;
+          border-radius: 10px;
+          border: 1.5px solid #E5E7EB;
+          background: transparent;
+          color: #111827;
+          cursor: pointer;
+          font-family: inherit;
+        }
+        .vx-mobile-getstarted {
+          flex: 1;
+          font-size: 15px;
+          font-weight: 600;
+          padding: 13px;
+          border-radius: 10px;
+          border: none;
+          background: #2563EB;
+          color: #fff;
+          cursor: pointer;
+          font-family: inherit;
+        }
         @media (max-width: 768px) {
-          .desktop-nav { display: none !important; }
-          .desktop-only { display: none !important; }
-          .mobile-only { display: flex !important; }
+          .vx-desktop-links { display: none !important; }
+          .vx-desktop-cta { display: none !important; }
+          .vx-hamburger { display: flex !important; }
+          .vx-mobile-menu { display: block; }
+          .vx-mobile-menu.closed { display: none; }
         }
       `}</style>
-    </nav>
+
+      <nav className="vx-nav-bar">
+        <div className="vx-nav-inner">
+          <Link href={`/${lang}`} className="vx-logo">Vonaxity</Link>
+
+          {/* Desktop links */}
+          <div className="vx-desktop-links">
+            {links.map(l => (
+              <Link key={l.href} href={l.href} className="vx-desktop-link">{l.label}</Link>
+            ))}
+          </div>
+
+          {/* Right side */}
+          <div className="vx-right">
+            <div className="vx-lang">
+              {['en','sq'].map(l => (
+                <button key={l} onClick={()=>switchLang(l)} className="vx-lang-btn"
+                  style={{ background:lang===l?C.primary:'transparent', color:lang===l?'#fff':C.textSecondary }}>
+                  {l.toUpperCase()}
+                </button>
+              ))}
+            </div>
+            <Link href={`/${lang}/login`} className="vx-desktop-cta">
+              <button className="vx-signin-btn">{t(lang,'nav.signIn')}</button>
+            </Link>
+            <Link href={`/${lang}/signup`} className="vx-desktop-cta">
+              <button className="vx-getstarted-btn">{t(lang,'nav.getStarted')}</button>
+            </Link>
+            {/* Hamburger */}
+            <button className="vx-hamburger" onClick={()=>setOpen(!open)} aria-label="Menu">
+              <span style={{ transform:open?'rotate(45deg) translate(5px,5px)':'none' }}/>
+              <span style={{ opacity:open?0:1 }}/>
+              <span style={{ transform:open?'rotate(-45deg) translate(5px,-5px)':'none' }}/>
+            </button>
+          </div>
+        </div>
+
+        {/* Mobile menu */}
+        <div className={`vx-mobile-menu ${open?'':'closed'}`}>
+          {links.map(l => (
+            <Link key={l.href} href={l.href} className="vx-mobile-link" onClick={()=>setOpen(false)}>
+              {l.label}
+            </Link>
+          ))}
+          <div className="vx-mobile-btns">
+            <Link href={`/${lang}/login`} style={{ flex:1 }} onClick={()=>setOpen(false)}>
+              <button className="vx-mobile-signin" style={{ width:'100%' }}>{t(lang,'nav.signIn')}</button>
+            </Link>
+            <Link href={`/${lang}/signup`} style={{ flex:1 }} onClick={()=>setOpen(false)}>
+              <button className="vx-mobile-getstarted" style={{ width:'100%' }}>{t(lang,'nav.getStarted')}</button>
+            </Link>
+          </div>
+        </div>
+      </nav>
+    </>
   );
 }
