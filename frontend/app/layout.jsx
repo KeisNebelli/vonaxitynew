@@ -7,6 +7,7 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
@@ -17,6 +18,10 @@ export default function RootLayout({ children }) {
           button { font-family: inherit; }
           input, textarea, select { font-family: inherit; }
           h1,h2,h3,h4,h5,h6 { letter-spacing: -0.025em; }
+          img { max-width: 100%; height: auto; }
+          @media (max-width: 640px) {
+            section { padding-left: 16px !important; padding-right: 16px !important; }
+          }
         `}</style>
       </head>
       <body>{children}</body>
