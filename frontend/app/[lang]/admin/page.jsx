@@ -656,7 +656,7 @@ function Payments() {
   return (
     <div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:24 }}>
-        {[['Total revenue',`€${total}`,C.secondary],['Successful',MOCK_PAYMENTS.filter(p=>p.status==='paid').length,C.secondary],['Failed',failed.length,failed.length>0?C.error:C.textTertiary]].map(([label,value,color]) => (
+        {[['Total revenue',`€${total}`,C.secondary],['Successful',payments.filter(p=>p.status==='paid').length,C.secondary],['Failed',failed.length,failed.length>0?C.error:C.textTertiary]].map(([label,value,color]) => (
           <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'18px' }}>
             <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:24, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
@@ -683,8 +683,8 @@ function Payments() {
             </tr>
           </thead>
           <tbody>
-            {MOCK_PAYMENTS.map((p,i) => (
-              <tr key={p.id} style={{ borderBottom:i<MOCK_PAYMENTS.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
+            {payments.map((p,i) => (
+              <tr key={p.id} style={{ borderBottom:i<payments.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
                 <td style={{ padding:'12px 16px', fontWeight:600, color:C.textPrimary }}>{p.clientName}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{p.plan}</td>
                 <td style={{ padding:'12px 16px', fontWeight:700, color:C.textPrimary }}>€{p.amount}</td>
