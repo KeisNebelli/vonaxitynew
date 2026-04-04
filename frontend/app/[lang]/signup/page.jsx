@@ -6,17 +6,71 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
 
-const C = { primary:'#2563EB', primaryLight:'#EFF6FF', bg:'#FAFAF9', bgWhite:'#FFFFFF', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
+const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', bg:'#FAFAF9', bgWhite:'#FFFFFF', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
 const CITIES = ['Tirana','Durrës','Elbasan','Fier','Berat','Sarandë','Kukës','Shkodër'];
 
 function CheckIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 }
 
+function RoleSelect({ lang, onSelect }) {
+  const [hovered, setHovered] = useState(null);
+  return (
+    <div>
+      <Link href={`/${lang}`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px', display:'block', marginBottom:28 }}>Vonaxity</Link>
+      <h2 style={{ fontSize:22, fontWeight:700, color:C.textPrimary, marginBottom:8, letterSpacing:'-0.5px' }}>Create your account</h2>
+      <p style={{ fontSize:14, color:C.textSecondary, marginBottom:28, lineHeight:1.6 }}>Choose the type of account you want to create.</p>
+
+      {/* Client card */}
+      <div onClick={()=>onSelect('client')} onMouseEnter={()=>setHovered('client')} onMouseLeave={()=>setHovered(null)}
+        style={{ border:`2px solid ${hovered==='client'?C.primary:C.border}`, borderRadius:14, padding:20, marginBottom:12, cursor:'pointer', background:hovered==='client'?C.primaryLight:C.bgWhite, transition:'all 0.15s' }}>
+        <div style={{ display:'flex', gap:14, alignItems:'flex-start' }}>
+          <div style={{ width:44, height:44, borderRadius:12, background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div>
+            <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Client account</div>
+            <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6 }}>Book home nurse visits for yourself or a loved one in Albania. Manage appointments, view health reports, and track care from anywhere in the world.</div>
+          </div>
+        </div>
+        <div style={{ marginTop:14, display:'flex', gap:8, flexWrap:'wrap' }}>
+          {['Book visits','View health reports','Manage loved ones'].map(tag=>(
+            <span key={tag} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{tag}</span>
+          ))}
+        </div>
+      </div>
+
+      {/* Nurse card */}
+      <div onClick={()=>onSelect('nurse')} onMouseEnter={()=>setHovered('nurse')} onMouseLeave={()=>setHovered(null)}
+        style={{ border:`2px solid ${hovered==='nurse'?C.secondary:C.border}`, borderRadius:14, padding:20, marginBottom:24, cursor:'pointer', background:hovered==='nurse'?C.secondaryLight:C.bgWhite, transition:'all 0.15s' }}>
+        <div style={{ display:'flex', gap:14, alignItems:'flex-start' }}>
+          <div style={{ width:44, height:44, borderRadius:12, background:C.secondaryLight, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.secondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          </div>
+          <div>
+            <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Nurse account</div>
+            <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6 }}>Join the Vonaxity care team. Upload your credentials, set your availability, and start receiving home visit assignments after approval.</div>
+          </div>
+        </div>
+        <div style={{ marginTop:14, display:'flex', gap:8, flexWrap:'wrap' }}>
+          {['Earn per visit','Flexible schedule','Requires verification'].map(tag=>(
+            <span key={tag} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>{tag}</span>
+          ))}
+        </div>
+      </div>
+
+      <div style={{ textAlign:'center', fontSize:13, color:C.textTertiary }}>
+        Already have an account? <Link href={`/${lang}/login`} style={{ color:C.primary, fontWeight:600 }}>Sign in</Link>
+      </div>
+    </div>
+  );
+}
+
 function SignupContent({ params }) {
   const lang = params.lang || 'en';
   const router = useRouter();
   const searchParams = useSearchParams();
+  const [role, setRole] = useState(null); // null = role select, 'client' = client flow, 'nurse' = redirect
   const [step, setStep] = useState(1);
   const [form, setForm] = useState({ name:'', email:'', password:'', phone:'', country:'', plan:searchParams.get('plan')||'standard', relativeName:'', relativeCity:'', relativeAddress:'', relativePhone:'' });
   const [error, setError] = useState('');
@@ -24,10 +78,19 @@ function SignupContent({ params }) {
 
   const inp = { width:'100%', padding:'11px 14px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box' };
 
+  const handleRoleSelect = (selectedRole) => {
+    if (selectedRole === 'nurse') {
+      router.push(`/${lang}/nurse-signup`);
+    } else {
+      setRole('client');
+    }
+  };
+
   const submit = async () => {
     setLoading(true); setError('');
     try {
-      await api.register(form);
+      const data = await api.register(form);
+      if (data.token) localStorage.setItem('vonaxity-token', data.token);
       document.cookie = `vonaxity-role=CLIENT;path=/;max-age=604800`;
       document.cookie = `vonaxity-token=set;path=/;max-age=604800`;
       window.location.href = `/${lang}/dashboard`;
@@ -37,6 +100,12 @@ function SignupContent({ params }) {
   return (
     <div style={{ minHeight:'100vh', background:C.bg, display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}>
       <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'36px 32px', maxWidth:500, width:'100%', boxShadow:'0 4px 24px rgba(0,0,0,0.06)' }}>
+
+        {/* Show role selection if no role chosen yet */}
+        {!role && <RoleSelect lang={lang} onSelect={handleRoleSelect} />}
+
+        {/* Client signup flow */}
+        {role === 'client' && <>
         <Link href={`/${lang}`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px', display:'block', marginBottom:28 }}>Vonaxity</Link>
 
         <div style={{ display:'flex', gap:6, marginBottom:32 }}>
@@ -119,6 +188,10 @@ function SignupContent({ params }) {
         <div style={{ textAlign:'center', marginTop:20, fontSize:13, color:C.textTertiary }}>
           {t(lang,'signup.alreadyAccount')} <Link href={`/${lang}/login`} style={{ color:C.primary, fontWeight:600 }}>{t(lang,'signup.signIn')}</Link>
         </div>
+        <div style={{ textAlign:'center', marginTop:8 }}>
+          <button onClick={()=>setRole(null)} style={{ fontSize:12, color:C.textTertiary, background:'transparent', border:'none', cursor:'pointer' }}>← Change account type</button>
+        </div>
+        </>}
       </div>
     </div>
   );
