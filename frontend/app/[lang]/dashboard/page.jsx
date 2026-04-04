@@ -1,8 +1,9 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
+import Settings from './settings';
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827' };
 
@@ -126,213 +127,23 @@ function Visits({ visits }) {
   );
 }
 
-// ── Settings ──────────────────────────────────────────────────────────────────
-function Settings({ user, relative, lang }) {
-  const [profile, setProfile] = useState(() => ({ name:user.name, email:user.email, phone:user.phone||'', country:user.country||'', city:user.city||'' }));
-  const [rel, setRel] = useState(() => ({ name:relative?.name||'', city:relative?.city||'', address:relative?.address||'', phone:relative?.phone||'', age:relative?.age||'', healthNotes:relative?.healthNotes||'' }));
-  const [password, setPassword] = useState({ current:'', newPass:'', confirm:'' });
-  const [contact, setContact] = useState({ preferredContact:'email', emergencyName:'', emergencyPhone:'' });
-  const [saving, setSaving] = useState(false);
-  const [savingPass, setSavingPass] = useState(false);
-  const [profileStatus, setProfileStatus] = useState(null); // 'success' | 'error' | null
-  const [passStatus, setPassStatus] = useState(null);
-  const [passError, setPassError] = useState('');
-
-  const inp = { width:'100%', padding:'11px 14px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box' };
-
-  const COUNTRIES = ['United Kingdom','Italy','Germany','Greece','USA','Albania','Other'];
-  const CITIES_AL = ['Tirana','Durrës','Elbasan','Fier','Berat','Sarandë','Kukës','Shkodër'];
-
-  const handleSaveProfile = async () => {
-    setSaving(true); setProfileStatus(null);
-    try {
-      await api.updateProfile({ name:profile.name, phone:profile.phone, country:profile.country, city:profile.city });
-      await api.updateRelative(relative?.id||'', { name:relative.name, city:relative.city, address:relative.address, phone:relative.phone, age:relative.age||null, healthNotes:relative.healthNotes });
-      setProfileStatus('success');
-      setTimeout(() => setProfileStatus(null), 4000);
-    } catch (err) {
-      setProfileStatus('error');
-    } finally { setSaving(false); }
-  };
-
-  const handleChangePassword = async () => {
-    setPassError('');
-    if (!password.current || !password.newPass || !password.confirm) return setPassError('All fields required');
-    if (password.newPass.length < 8) return setPassError('New password must be at least 8 characters');
-    if (password.newPass !== password.confirm) return setPassError('Passwords do not match');
-    setSavingPass(true); setPassStatus(null);
-    try {
-      await api.updatePassword({ currentPassword:password.current, newPassword:password.newPass });
-      setPassword({ current:'', newPass:'', confirm:'' });
-      setPassStatus('success');
-      setTimeout(() => setPassStatus(null), 4000);
-    } catch (err) {
-      setPassError(err.message || 'Failed to update password');
-    } finally { setSavingPass(false); }
-  };
-
-  const SectionCard = ({ title, subtitle, children }) => (
-    <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'24px', marginBottom:20 }}>
-      <div style={{ marginBottom:20 }}>
-        <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{title}</div>
-        {subtitle && <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{subtitle}</div>}
-      </div>
-      {children}
+// ── Reusable components (defined outside to prevent re-renders) ───────────────
+const SectionCard = ({ title, subtitle, children }) => (
+  <div style={{ background:'#FFFFFF', borderRadius:16, border:'1px solid #E5E7EB', padding:'24px', marginBottom:20 }}>
+    <div style={{ marginBottom:20 }}>
+      <div style={{ fontSize:15, fontWeight:700, color:'#111827' }}>{title}</div>
+      {subtitle && <div style={{ fontSize:13, color:'#9CA3AF', marginTop:3 }}>{subtitle}</div>}
     </div>
-  );
+    {children}
+  </div>
+);
 
-  const Field = ({ label, children }) => (
-    <div style={{ marginBottom:16 }}>
-      <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.2px' }}>{label}</label>
-      {children}
-    </div>
-  );
-
-  return (
-    <div style={{ maxWidth:620 }}>
-
-      {/* Profile info */}
-      <SectionCard title="Profile information" subtitle="Your personal account details">
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label="Full name">
-            <input style={inp} value={profile.name} onChange={e=>setProfile({...profile,name:e.target.value})} placeholder="Your full name" />
-          </Field>
-          <Field label="Email address">
-            <input style={{...inp,background:C.bgSubtle,color:C.textTertiary}} value={profile.email} disabled placeholder="Email" />
-          </Field>
-          <Field label="Phone number">
-            <input style={inp} value={profile.phone} onChange={e=>setProfile({...profile,phone:e.target.value})} placeholder="+44 7700 000000" />
-          </Field>
-          <Field label="Country you live in">
-            <select style={{...inp}} value={profile.country} onChange={e=>setProfile({...profile,country:e.target.value})}>
-              <option value="">Select country</option>
-              {COUNTRIES.map(c=><option key={c}>{c}</option>)}
-            </select>
-          </Field>
-        </div>
-      </SectionCard>
-
-      {/* Loved one details */}
-      <SectionCard title="Loved one details" subtitle="The person receiving care in Albania">
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label="Their full name">
-            <input style={inp} value={rel.name} onChange={e=>setRel({...rel,name:e.target.value})} />
-          </Field>
-          <Field label="Their age">
-            <input style={inp} type="number" value={rel.age} onChange={e=>setRel({...rel,age:e.target.value})} placeholder="e.g. 74" />
-          </Field>
-          <Field label="City in Albania">
-            <select style={{...inp}} value={rel.city} onChange={e=>setRel({...rel,city:e.target.value})}>
-              <option value="">Select city</option>
-              {CITIES_AL.map(c=><option key={c}>{c}</option>)}
-            </select>
-          </Field>
-          <Field label="Their phone">
-            <input style={inp} value={rel.phone} onChange={e=>setRel({...rel,phone:e.target.value})} placeholder="+355 69 000 0000" />
-          </Field>
-        </div>
-        <Field label="Home address">
-          <input style={inp} value={rel.address} onChange={e=>setRel({...rel,address:e.target.value})} placeholder="Street address in Albania" />
-        </Field>
-        <Field label="Health notes (optional)">
-          <textarea style={{...inp,minHeight:80,resize:'vertical'}} value={rel.healthNotes} onChange={e=>setRel({...rel,healthNotes:e.target.value})} placeholder="e.g. Diabetes Type 2, takes Metformin daily..." />
-        </Field>
-      </SectionCard>
-
-      {/* Contact preferences */}
-      <SectionCard title="Contact preferences" subtitle="How should we reach you about visits?">
-        <Field label="Preferred contact method">
-          <div style={{ display:'flex', gap:10 }}>
-            {['email','phone','whatsapp'].map(method => (
-              <button key={method} onClick={()=>setContact({...contact,preferredContact:method})} style={{ flex:1, padding:'10px', borderRadius:9, border:`1.5px solid ${contact.preferredContact===method?C.primary:C.border}`, background:contact.preferredContact===method?C.primaryLight:'transparent', color:contact.preferredContact===method?C.primary:C.textSecondary, fontSize:13, fontWeight:600, cursor:'pointer', textTransform:'capitalize' }}>
-                {method}
-              </button>
-            ))}
-          </div>
-        </Field>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label="Emergency contact name">
-            <input style={inp} value={contact.emergencyName} onChange={e=>setContact({...contact,emergencyName:e.target.value})} placeholder="Contact name" />
-          </Field>
-          <Field label="Emergency contact phone">
-            <input style={inp} value={contact.emergencyPhone} onChange={e=>setContact({...contact,emergencyPhone:e.target.value})} placeholder="+44 7700 000000" />
-          </Field>
-        </div>
-      </SectionCard>
-
-      {/* Save button */}
-      {profileStatus==='success' && (
-        <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:10, padding:'12px 16px', marginBottom:16, display:'flex', alignItems:'center', gap:10 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style={{ fontSize:14, fontWeight:600, color:C.secondary }}>Changes saved successfully!</span>
-        </div>
-      )}
-      {profileStatus==='error' && (
-        <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:10, padding:'12px 16px', marginBottom:16 }}>
-          <span style={{ fontSize:14, color:C.error }}>Failed to save. Please try again.</span>
-        </div>
-      )}
-      <button onClick={handleSaveProfile} disabled={saving} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:'pointer', marginBottom:28, opacity:saving?0.7:1, boxShadow:'0 2px 8px rgba(37,99,235,0.2)' }}>
-        {saving ? 'Saving changes...' : 'Save changes'}
-      </button>
-
-      {/* Security */}
-      <SectionCard title="Security" subtitle="Change your account password">
-        <Field label="Current password">
-          <input style={inp} type="password" value={password.current} onChange={e=>setPassword({...password,current:e.target.value})} placeholder="••••••••" />
-        </Field>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label="New password">
-            <input style={inp} type="password" value={password.newPass} onChange={e=>setPassword({...password,newPass:e.target.value})} placeholder="Min 8 characters" />
-          </Field>
-          <Field label="Confirm new password">
-            <input style={inp} type="password" value={password.confirm} onChange={e=>setPassword({...password,confirm:e.target.value})} placeholder="Repeat password" />
-          </Field>
-        </div>
-        {passError && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:8, padding:'10px 14px', marginBottom:12, fontSize:13, color:C.error }}>{passError}</div>}
-        {passStatus==='success' && <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:8, padding:'10px 14px', marginBottom:12, fontSize:13, color:C.secondary, fontWeight:600 }}>Password updated successfully!</div>}
-        <button onClick={handleChangePassword} disabled={savingPass} style={{ background:C.bgSubtle, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:10, padding:'11px 24px', fontSize:14, fontWeight:600, cursor:'pointer', opacity:savingPass?0.7:1 }}>
-          {savingPass ? 'Updating...' : 'Update password'}
-        </button>
-      </SectionCard>
-
-      {/* Subscription overview */}
-      <SectionCard title="Subscription overview" subtitle="Your current plan and billing status">
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:16 }}>
-          {[
-            ['Plan', MOCK.subscription.plan.charAt(0).toUpperCase()+MOCK.subscription.plan.slice(1), C.primary],
-            ['Status', MOCK.subscription.status, MOCK.subscription.status==='ACTIVE'?C.secondary:C.warning],
-            ['Visits/month', MOCK.subscription.visitsPerMonth, C.textPrimary],
-            ['Used this month', MOCK.subscription.visitsUsed, C.textPrimary],
-          ].map(([label,value,color]) => (
-            <div key={label} style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 14px' }}>
-              <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:6 }}>{label}</div>
-              <div style={{ fontSize:16, fontWeight:700, color }}>{value}</div>
-            </div>
-          ))}
-        </div>
-        {MOCK.subscription.trialEndsAt && (
-          <div style={{ background:C.warningLight, border:'1px solid #FDE68A', borderRadius:9, padding:'10px 14px', fontSize:13, color:'#92400E' }}>
-            Trial ends on <strong>{new Date(MOCK.subscription.trialEndsAt).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}</strong>. Add payment method to continue.
-          </div>
-        )}
-      </SectionCard>
-
-      {/* Danger zone */}
-      <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid #FECACA`, padding:'24px', marginBottom:20 }}>
-        <div style={{ fontSize:15, fontWeight:700, color:C.error, marginBottom:6 }}>Danger zone</div>
-        <div style={{ fontSize:13, color:C.textSecondary, marginBottom:16 }}>These actions cannot be undone. Please be certain.</div>
-        <button style={{ background:C.errorLight, color:C.error, border:`1.5px solid #FECACA`, borderRadius:9, padding:'10px 20px', fontSize:13, fontWeight:600, cursor:'pointer' }}>
-          Cancel subscription
-        </button>
-      </div>
-
-    </div>
-  );
-}
-
-const SettingsMemo = React.memo(Settings);
-
+const Field = ({ label, children }) => (
+  <div style={{ marginBottom:16 }}>
+    <label style={{ fontSize:12, fontWeight:600, color:'#111827', display:'block', marginBottom:6, letterSpacing:'0.2px' }}>{label}</label>
+    {children}
+  </div>
+);
 // ── Main dashboard ────────────────────────────────────────────────────────────
 export default function Dashboard({ params }) {
   const lang = params.lang || 'en';
@@ -422,7 +233,7 @@ export default function Dashboard({ params }) {
               <button style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:'pointer' }}>Upgrade to Premium</button>
             </div>
           )}
-          {active==='settings' && <SettingsMemo user={user} relative={relative} lang={lang} />}
+          {active==='settings' && <Settings key="settings-page" initialUser={user} initialRelative={relative} lang={lang} />}
         </main>
       </div>
     </div>
