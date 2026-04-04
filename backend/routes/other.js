@@ -138,9 +138,9 @@ module.exports.notificationsRouter = notificationsRouter;
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────
 const settingsRouter = require('express').Router();
+const prismaSettings = require('../lib/db');
 
-// In-memory settings for test version (use DB in production)
-let systemSettings = {
+const DEFAULT_SETTINGS = {
   payPerVisit: 20,
   trialDays: 7,
   basicPrice: 30,
@@ -151,13 +151,31 @@ let systemSettings = {
   premiumVisits: 4,
 };
 
-settingsRouter.get('/', ...requireRole('ADMIN'), (req, res) => {
-  res.json({ settings: systemSettings });
+settingsRouter.get('/', ...requireRole('ADMIN'), async (req, res) => {
+  try {
+    const record = await prismaSettings.systemSettings.findFirst();
+    const settings = record ? JSON.parse(record.value) : DEFAULT_SETTINGS;
+    res.json({ settings });
+  } catch (err) {
+    res.json({ settings: DEFAULT_SETTINGS });
+  }
 });
 
-settingsRouter.put('/', ...requireRole('ADMIN'), (req, res) => {
-  systemSettings = { ...systemSettings, ...req.body };
-  res.json({ success: true, settings: systemSettings });
+settingsRouter.put('/', ...requireRole('ADMIN'), async (req, res) => {
+  try {
+    const existing = await prismaSettings.systemSettings.findFirst();
+    const current = existing ? JSON.parse(existing.value) : DEFAULT_SETTINGS;
+    const updated = { ...current, ...req.body };
+    if (existing) {
+      await prismaSettings.systemSettings.update({ where: { id: existing.id }, data: { value: JSON.stringify(updated) } });
+    } else {
+      await prismaSettings.systemSettings.create({ data: { key: 'system', value: JSON.stringify(updated) } });
+    }
+    res.json({ success: true, settings: updated });
+  } catch (err) {
+    console.error('Settings save error:', err);
+    res.status(500).json({ error: 'Failed to save settings' });
+  }
 });
 
 module.exports.settingsRouter = settingsRouter;
