@@ -6,6 +6,28 @@ const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', seco
 const CITIES_AL = ['Tirana','Durrës','Elbasan','Fier','Berat','Sarandë','Kukës','Shkodër'];
 const COUNTRIES = ['United Kingdom','Italy','Germany','Greece','USA','Albania','Other'];
 
+// Defined OUTSIDE component to prevent remounting on every keystroke
+function SectionCard({ title, subtitle, children }) {
+  return (
+    <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'24px', marginBottom:20 }}>
+      <div style={{ marginBottom:20 }}>
+        <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{title}</div>
+        {subtitle && <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{subtitle}</div>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function Field({ label, children }) {
+  return (
+    <div style={{ marginBottom:16 }}>
+      <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
 export default function Settings({ initialUser, initialRelative, lang }) {
   const [profile, setProfile] = useState({
     name: initialUser?.name || '',
@@ -62,25 +84,6 @@ export default function Settings({ initialUser, initialRelative, lang }) {
     } finally { setSavingPass(false); }
   };
 
-  const SectionCard = ({ title, subtitle, children }) => (
-    <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'24px', marginBottom:20 }}>
-      <div style={{ marginBottom:20 }}>
-        <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{title}</div>
-        {subtitle && <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{subtitle}</div>}
-      </div>
-      {children}
-    </div>
-  );
-
-  const Field = ({ label, children }) => (
-    <div style={{ marginBottom:16 }}>
-      <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{label}</label>
-      {children}
-    </div>
-  );
-
-  return (
-    <div style={{ maxWidth:620 }}>
       <SectionCard title="Profile information" subtitle="Your personal account details">
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
           <Field label="Full name">
