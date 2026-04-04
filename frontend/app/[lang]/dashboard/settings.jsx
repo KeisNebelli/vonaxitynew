@@ -84,6 +84,8 @@ export default function Settings({ initialUser, initialRelative, lang }) {
     } finally { setSavingPass(false); }
   };
 
+  return (
+    <div style={{ maxWidth:620 }}>
       <SectionCard title="Profile information" subtitle="Your personal account details">
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
           <Field label="Full name">
