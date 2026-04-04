@@ -59,7 +59,59 @@ router.put('/:id/suspend', ...requireRole('ADMIN'), async (req, res) => {
   }
 });
 
-// PUT /nurses/:id/reject
+// PUT /nurses/me/onboarding — nurse submits completed profile for review
+router.put('/me/onboarding', ...requireRole('NURSE'), async (req, res) => {
+  try {
+    const { city, bio, experience, languages, services, licenseNumber, issuingAuthority, availability, diplomaUrl, licenseUrl } = req.body;
+
+    if (!city || !bio || !licenseNumber || !issuingAuthority) {
+      return res.status(400).json({ error: 'Please complete all required fields before submitting.' });
+    }
+
+    const nurse = await prisma.nurse.update({
+      where: { userId: req.user.userId },
+      data: {
+        city, bio, experience: experience || '',
+        languages: JSON.stringify(languages || []),
+        services: JSON.stringify(services || []),
+        licenseNumber, issuingAuthority,
+        availability: JSON.stringify(availability || []),
+        diplomaUrl: diplomaUrl || null,
+        licenseUrl: licenseUrl || null,
+        status: 'PENDING',
+        submittedAt: new Date(),
+      },
+    });
+    res.json({ success: true, nurse });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to submit onboarding' });
+  }
+});
+
+// PUT /nurses/me/profile — nurse saves profile progress
+router.put('/me/profile', ...requireRole('NURSE'), async (req, res) => {
+  try {
+    const { city, bio, experience, languages, services, licenseNumber, issuingAuthority, availability, diplomaUrl, licenseUrl } = req.body;
+    const nurse = await prisma.nurse.update({
+      where: { userId: req.user.userId },
+      data: {
+        ...(city !== undefined && { city }),
+        ...(bio !== undefined && { bio }),
+        ...(experience !== undefined && { experience }),
+        ...(languages !== undefined && { languages: JSON.stringify(languages) }),
+        ...(services !== undefined && { services: JSON.stringify(services) }),
+        ...(licenseNumber !== undefined && { licenseNumber }),
+        ...(issuingAuthority !== undefined && { issuingAuthority }),
+        ...(availability !== undefined && { availability: JSON.stringify(availability) }),
+        ...(diplomaUrl !== undefined && { diplomaUrl }),
+        ...(licenseUrl !== undefined && { licenseUrl }),
+      },
+    });
+    res.json({ success: true, nurse });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to save profile' });
+  }
+});
 router.put('/:id/reject', ...requireRole('ADMIN'), async (req, res) => {
   try {
     const { reason } = req.body;

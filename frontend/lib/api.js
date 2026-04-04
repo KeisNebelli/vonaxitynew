@@ -43,7 +43,10 @@ export const api = {
   getNurses: () => apiFetch('/nurses'),
   approveNurse: (id) => apiFetch(`/nurses/${id}/approve`, { method: 'PUT' }),
   suspendNurse: (id) => apiFetch(`/nurses/${id}/suspend`, { method: 'PUT' }),
+  rejectNurse: (id, body) => apiFetch(`/nurses/${id}/reject`, { method: 'PUT', body: JSON.stringify(body) }),
   updateAvailability: (id, body) => apiFetch(`/nurses/${id}/availability`, { method: 'PUT', body: JSON.stringify(body) }),
+  submitNurseOnboarding: (body) => apiFetch('/nurses/me/onboarding', { method: 'PUT', body: JSON.stringify(body) }),
+  saveNurseProfile: (body) => apiFetch('/nurses/me/profile', { method: 'PUT', body: JSON.stringify(body) }),
 
   // Users
   getUsers: () => apiFetch('/users'),

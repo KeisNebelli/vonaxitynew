@@ -75,21 +75,13 @@ router.post('/register', async (req, res) => {
 // POST /auth/register-nurse
 router.post('/register-nurse', async (req, res) => {
   try {
-    const {
-      name, email, password, phone,
-      city, bio, experience, languages, services,
-      licenseNumber, issuingAuthority,
-      availability, diplomaUrl, licenseUrl, profilePhotoUrl,
-    } = req.body;
+    const { name, email, password, phone } = req.body;
 
     if (!name || !email || !password) {
       return res.status(400).json({ error: 'Name, email and password are required' });
     }
     if (password.length < 8) {
       return res.status(400).json({ error: 'Password must be at least 8 characters' });
-    }
-    if (!licenseNumber) {
-      return res.status(400).json({ error: 'License number is required' });
     }
 
     const existing = await prisma.user.findUnique({ where: { email } });
@@ -99,23 +91,12 @@ router.post('/register-nurse', async (req, res) => {
 
     const user = await prisma.user.create({
       data: {
-        name, email, passwordHash, phone,
+        name, email, passwordHash, phone: phone || null,
         role: 'NURSE', status: 'ACTIVE',
         nurseProfile: {
           create: {
-            city: city || '',
-            bio: bio || '',
-            experience: experience || '',
-            languages: JSON.stringify(languages || []),
-            services: JSON.stringify(services || []),
-            licenseNumber,
-            issuingAuthority: issuingAuthority || '',
-            availability: JSON.stringify(availability || []),
-            diplomaUrl: diplomaUrl || null,
-            licenseUrl: licenseUrl || null,
-            profilePhotoUrl: profilePhotoUrl || null,
-            status: 'PENDING',
-            submittedAt: new Date(),
+            city: '',
+            status: 'INCOMPLETE',
           },
         },
       },
@@ -156,11 +137,8 @@ router.post('/login', async (req, res) => {
     }
 
     if (user.role === 'NURSE') {
-      if (user.nurseProfile?.status === 'PENDING') {
-        return res.status(403).json({ error: 'Your nurse account is pending approval.' });
-      }
       if (user.nurseProfile?.status === 'SUSPENDED') {
-        return res.status(403).json({ error: 'Your nurse account has been suspended.' });
+        return res.status(403).json({ error: 'Your nurse account has been suspended. Contact support.' });
       }
     }
 

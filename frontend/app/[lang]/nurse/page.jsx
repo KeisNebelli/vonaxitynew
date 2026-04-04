@@ -1,5 +1,5 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
@@ -393,6 +393,256 @@ function NurseProfile() {
   );
 }
 
+// ── Onboarding ────────────────────────────────────────────────────────────────
+const CITIES = ['Tirana','Durrës','Elbasan','Fier','Berat','Sarandë','Kukës','Shkodër'];
+const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
+const SERVICES_LIST = ['Blood Pressure Check','Glucose Monitoring','Vitals Monitoring','Blood Work Collection','Welfare Check','Post-surgical Care','Medication Administration','General Nursing'];
+const LANGUAGES_LIST = ['Albanian','English','Italian','Greek','German','French'];
+const EXPERIENCE_LIST = ['Less than 1 year','1-2 years','3-5 years','6-10 years','10+ years'];
+
+function OnboardingBanner({ nurse, onStartOnboarding }) {
+  const status = nurse?.status || 'INCOMPLETE';
+  if (status === 'APPROVED') return null;
+
+  const configs = {
+    INCOMPLETE: { bg:'#FEF3C7', border:'#FDE68A', color:'#92400E', title:'Complete your profile to get started', sub:'You need to complete your profile and submit for verification before you can receive bookings.', btn:'Complete profile', btnColor:C.warning },
+    PENDING: { bg:C.primaryLight, border:'rgba(37,99,235,0.2)', color:'#1E40AF', title:'Application under review', sub:'Our team is reviewing your credentials. You will be notified within 2-3 business days. You cannot receive bookings yet.', btn:null },
+    REJECTED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:'Application rejected', sub:`Your application was not approved. ${nurse?.rejectionReason||'Please review your credentials and resubmit.'} Update your profile and resubmit.`, btn:'Update & resubmit', btnColor:C.error },
+    SUSPENDED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:'Account suspended', sub:'Your account has been suspended. Contact support for assistance.', btn:null },
+  };
+
+  const cfg = configs[status] || configs.INCOMPLETE;
+  return (
+    <div style={{ background:cfg.bg, border:`1px solid ${cfg.border}`, borderRadius:14, padding:'20px 22px', marginBottom:24 }}>
+      <div style={{ fontSize:15, fontWeight:700, color:cfg.color, marginBottom:6 }}>{cfg.title}</div>
+      <div style={{ fontSize:13, color:cfg.color, opacity:0.85, lineHeight:1.6, marginBottom:cfg.btn?14:0 }}>{cfg.sub}</div>
+      {cfg.btn && <button onClick={onStartOnboarding} style={{ fontSize:13, fontWeight:700, padding:'9px 20px', borderRadius:9, border:'none', background:cfg.btnColor, color:'#fff', cursor:'pointer' }}>{cfg.btn}</button>}
+    </div>
+  );
+}
+
+function OnboardingWizard({ nurse, user, onComplete, onSave }) {
+  const [step, setStep] = useState(1);
+  const [saving, setSaving] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+  const [form, setForm] = useState({
+    city: nurse?.city || '',
+    bio: nurse?.bio || '',
+    experience: nurse?.experience || '',
+    languages: tryParse(nurse?.languages, []),
+    services: tryParse(nurse?.services, []),
+    licenseNumber: nurse?.licenseNumber || '',
+    issuingAuthority: nurse?.issuingAuthority || '',
+    availability: tryParse(nurse?.availability, []),
+    diplomaConfirmed: !!nurse?.diplomaUrl,
+    licenseConfirmed: !!nurse?.licenseUrl,
+  });
+
+  function tryParse(val, fallback) {
+    try { return val ? JSON.parse(val) : fallback; } catch { return fallback; }
+  }
+
+  const toggle = (key, val) => setForm(f => ({ ...f, [key]: f[key].includes(val) ? f[key].filter(x=>x!==val) : [...f[key], val] }));
+
+  const inp2 = { width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box' };
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await onSave({
+        city: form.city, bio: form.bio, experience: form.experience,
+        languages: form.languages, services: form.services,
+        licenseNumber: form.licenseNumber, issuingAuthority: form.issuingAuthority,
+        availability: form.availability,
+        diplomaUrl: form.diplomaConfirmed ? 'pending-upload' : null,
+        licenseUrl: form.licenseConfirmed ? 'pending-upload' : null,
+      });
+    } finally { setSaving(false); }
+  };
+
+  const handleSubmit = async () => {
+    if (!form.city || !form.bio || !form.licenseNumber || !form.issuingAuthority) {
+      setError('Please fill in all required fields before submitting.'); return;
+    }
+    if (!form.diplomaConfirmed || !form.licenseConfirmed) {
+      setError('Please confirm both your diploma and license before submitting.'); return;
+    }
+    setSubmitting(true); setError('');
+    try {
+      await onComplete({
+        city: form.city, bio: form.bio, experience: form.experience,
+        languages: form.languages, services: form.services,
+        licenseNumber: form.licenseNumber, issuingAuthority: form.issuingAuthority,
+        availability: form.availability,
+        diplomaUrl: 'pending-upload', licenseUrl: 'pending-upload',
+      });
+    } catch (err) {
+      setError(err.message || 'Failed to submit');
+    } finally { setSubmitting(false); }
+  };
+
+  const STEPS = ['Profile','Services','Verification','Availability','Review'];
+
+  return (
+    <div style={{ maxWidth:620 }}>
+      {/* Step indicator */}
+      <div style={{ display:'flex', gap:4, marginBottom:28 }}>
+        {STEPS.map((s,i) => (
+          <div key={s} style={{ flex:1, textAlign:'center' }}>
+            <div style={{ height:4, borderRadius:99, background:step>i+1?C.secondary:step===i+1?C.primary:C.border, marginBottom:6, transition:'background 0.2s' }}/>
+            <div style={{ fontSize:10, color:step>=i+1?C.textPrimary:C.textTertiary, fontWeight:step===i+1?700:400 }}>{s}</div>
+          </div>
+        ))}
+      </div>
+
+      {/* Step 1: Profile */}
+      {step===1 && (
+        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:16 }}>
+          <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Personal profile</div>
+          <div style={{ fontSize:13, color:C.textTertiary, marginBottom:20 }}>Tell families about yourself and your experience.</div>
+          <div style={{ marginBottom:14 }}>
+            <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>City <span style={{ color:C.error }}>*</span></label>
+            <select style={inp2} value={form.city} onChange={e=>setForm(f=>({...f,city:e.target.value}))}>
+              <option value="">Select your city</option>
+              {CITIES.map(c=><option key={c}>{c}</option>)}
+            </select>
+          </div>
+          <div style={{ marginBottom:14 }}>
+            <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Years of experience</label>
+            <select style={inp2} value={form.experience} onChange={e=>setForm(f=>({...f,experience:e.target.value}))}>
+              <option value="">Select experience</option>
+              {EXPERIENCE_LIST.map(e=><option key={e}>{e}</option>)}
+            </select>
+          </div>
+          <div style={{ marginBottom:14 }}>
+            <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Professional bio <span style={{ color:C.error }}>*</span></label>
+            <textarea style={{...inp2, minHeight:90, resize:'vertical'}} value={form.bio} onChange={e=>setForm(f=>({...f,bio:e.target.value}))} placeholder="Describe your experience, specialties, and approach to patient care..." />
+          </div>
+          <div>
+            <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:8 }}>Languages spoken</label>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+              {LANGUAGES_LIST.map(l=>(
+                <button key={l} type="button" onClick={()=>toggle('languages',l)} style={{ fontSize:12, fontWeight:600, padding:'6px 14px', borderRadius:99, border:`1.5px solid ${form.languages.includes(l)?C.primary:C.border}`, background:form.languages.includes(l)?C.primaryLight:'transparent', color:form.languages.includes(l)?C.primary:C.textSecondary, cursor:'pointer' }}>{l}</button>
+              ))}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Step 2: Services */}
+      {step===2 && (
+        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:16 }}>
+          <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Services offered <span style={{ color:C.error }}>*</span></div>
+          <div style={{ fontSize:13, color:C.textTertiary, marginBottom:20 }}>Select all services you are qualified to perform.</div>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+            {SERVICES_LIST.map(s=>(
+              <button key={s} type="button" onClick={()=>toggle('services',s)} style={{ fontSize:12, fontWeight:600, padding:'8px 16px', borderRadius:99, border:`1.5px solid ${form.services.includes(s)?C.secondary:C.border}`, background:form.services.includes(s)?C.secondaryLight:'transparent', color:form.services.includes(s)?C.secondary:C.textSecondary, cursor:'pointer' }}>{s}</button>
+            ))}
+          </div>
+          {form.services.length===0 && <div style={{ fontSize:12, color:C.textTertiary, marginTop:12 }}>Select at least one service to continue.</div>}
+        </div>
+      )}
+
+      {/* Step 3: Verification */}
+      {step===3 && (
+        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:16 }}>
+          <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Certification & verification</div>
+          <div style={{ fontSize:13, color:C.textTertiary, marginBottom:16 }}>All documents are reviewed only by Vonaxity staff and kept confidential.</div>
+          <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:9, padding:'10px 14px', marginBottom:20, fontSize:12, color:'#92400E' }}>
+            Required before you can receive bookings. We verify your license with the issuing authority.
+          </div>
+          <div style={{ marginBottom:14 }}>
+            <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>License number <span style={{ color:C.error }}>*</span></label>
+            <input style={inp2} value={form.licenseNumber} onChange={e=>setForm(f=>({...f,licenseNumber:e.target.value}))} placeholder="e.g. ALB-NURSE-2024-001" />
+          </div>
+          <div style={{ marginBottom:20 }}>
+            <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Issuing authority <span style={{ color:C.error }}>*</span></label>
+            <input style={inp2} value={form.issuingAuthority} onChange={e=>setForm(f=>({...f,issuingAuthority:e.target.value}))} placeholder="Order of Nurses of Albania (ONA)" />
+          </div>
+          {[['diplomaConfirmed','Nursing diploma','Upload a photo or scan of your nursing degree certificate.'],['licenseConfirmed','Professional license','Upload your current valid nursing license.']].map(([key,title,desc])=>(
+            <div key={key} style={{ background:C.bg, borderRadius:12, border:`1px solid ${C.border}`, padding:16, marginBottom:12 }}>
+              <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:4 }}>{title}</div>
+              <div style={{ fontSize:12, color:C.textSecondary, marginBottom:10 }}>{desc}</div>
+              <div onClick={()=>setForm(f=>({...f,[key]:!f[key]}))} style={{ border:`2px dashed ${form[key]?C.secondary:C.border}`, borderRadius:10, padding:'16px', textAlign:'center', cursor:'pointer', background:form[key]?C.secondaryLight:'transparent' }}>
+                {form[key] ? (
+                  <div style={{ color:C.secondary, fontSize:13, fontWeight:600, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                    Confirmed — ready to submit
+                  </div>
+                ) : (
+                  <div style={{ color:C.textTertiary, fontSize:12 }}>Click to confirm you have this document ready</div>
+                )}
+              </div>
+            </div>
+          ))}
+        </div>
+      )}
+
+      {/* Step 4: Availability */}
+      {step===4 && (
+        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:16 }}>
+          <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Availability</div>
+          <div style={{ fontSize:13, color:C.textTertiary, marginBottom:20 }}>Select which days you are available for home visits.</div>
+          <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+            {DAYS.map(day=>(
+              <button key={day} type="button" onClick={()=>toggle('availability',day)} style={{ padding:'10px 16px', borderRadius:10, border:`1.5px solid ${form.availability.includes(day)?C.primary:C.border}`, background:form.availability.includes(day)?C.primaryLight:'transparent', color:form.availability.includes(day)?C.primary:C.textSecondary, fontSize:13, fontWeight:600, cursor:'pointer' }}>
+                {day.slice(0,3)}
+              </button>
+            ))}
+          </div>
+          {form.availability.length>0 && <div style={{ fontSize:12, color:C.textTertiary, marginTop:10 }}>Available: {form.availability.join(', ')}</div>}
+          <div style={{ background:C.primaryLight, borderRadius:10, padding:'12px 14px', marginTop:16, fontSize:12, color:'#1E40AF' }}>
+            You can update your availability anytime from your profile settings.
+          </div>
+        </div>
+      )}
+
+      {/* Step 5: Review & Submit */}
+      {step===5 && (
+        <div>
+          <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:16 }}>
+            <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>Review your application</div>
+            {[['City',form.city||'Not set'],['Experience',form.experience||'Not set'],['Services',form.services.join(', ')||'None selected'],['Languages',form.languages.join(', ')||'Albanian'],['License number',form.licenseNumber||'Not set'],['Issuing authority',form.issuingAuthority||'Not set'],['Diploma',form.diplomaConfirmed?'Confirmed':'Not confirmed'],['License doc',form.licenseConfirmed?'Confirmed':'Not confirmed'],['Available days',form.availability.join(', ')||'None selected']].map(([k,v])=>(
+              <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle||'#F3F4F6'}`, fontSize:13 }}>
+                <span style={{ color:C.textTertiary }}>{k}</span>
+                <span style={{ color:v.includes('Not')||v==='None selected'||v==='Not confirmed'?C.error:C.textPrimary, fontWeight:500, textAlign:'right', maxWidth:'60%' }}>{v}</span>
+              </div>
+            ))}
+          </div>
+          <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:10, padding:'12px 16px', marginBottom:16, fontSize:13, color:'#92400E' }}>
+            After submission your status becomes <strong>Pending Approval</strong>. Our team will review within 2-3 business days. You cannot receive bookings until approved.
+          </div>
+          {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', marginBottom:14, fontSize:13, color:C.error }}>{error}</div>}
+        </div>
+      )}
+
+      {/* Navigation */}
+      <div style={{ display:'flex', gap:10 }}>
+        {step>1 && <button onClick={()=>{setStep(s=>s-1);setError('');}} style={{ flex:1, background:'transparent', color:C.textSecondary, border:`1.5px solid ${C.border}`, borderRadius:10, padding:'12px', fontSize:14, fontWeight:600, cursor:'pointer' }}>← Back</button>}
+        <button onClick={handleSave} disabled={saving} style={{ padding:'12px 18px', background:C.bgWhite, color:C.textSecondary, border:`1.5px solid ${C.border}`, borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', opacity:saving?0.7:1 }}>
+          {saving?'Saving...':'Save'}
+        </button>
+        {step<5 && (
+          <button onClick={()=>setStep(s=>s+1)} disabled={
+            (step===1 && (!form.city||!form.bio)) ||
+            (step===2 && form.services.length===0) ||
+            (step===3 && (!form.licenseNumber||!form.issuingAuthority)) ||
+            (step===4 && form.availability.length===0)
+          } style={{ flex:2, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:600, cursor:'pointer', opacity:(step===1&&(!form.city||!form.bio))||(step===2&&form.services.length===0)||(step===3&&(!form.licenseNumber||!form.issuingAuthority))||(step===4&&form.availability.length===0)?0.5:1 }}>
+            Continue →
+          </button>
+        )}
+        {step===5 && (
+          <button onClick={handleSubmit} disabled={submitting} style={{ flex:2, background:C.secondary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:700, cursor:'pointer', opacity:submitting?0.7:1 }}>
+            {submitting?'Submitting...':'Submit for approval'}
+          </button>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Main nurse page ────────────────────────────────────────────────────────────
 export default function NursePage({ params }) {
   const lang = params?.lang || 'en';
@@ -400,26 +650,68 @@ export default function NursePage({ params }) {
   const [active, setActive] = useState('dashboard');
   const [collapsed, setCollapsed] = useState(false);
   const [selectedVisit, setSelectedVisit] = useState(null);
+  const [nurse, setNurse] = useState(null);
+  const [showOnboarding, setShowOnboarding] = useState(false);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      try {
+        const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+        const res = await fetch(`${BASE}/nurses/me`, {
+          headers: { 'Authorization': `Bearer ${localStorage.getItem('vonaxity-token')}` }
+        });
+        const data = await res.json();
+        if (data.nurse) {
+          setNurse(data.nurse);
+          if (['INCOMPLETE','REJECTED'].includes(data.nurse.status)) setShowOnboarding(true);
+        }
+      } catch (err) { console.error(err); }
+      finally { setLoading(false); }
+    };
+    load();
+  }, []);
+
+  const handleSave = async (formData) => {
+    await api.saveNurseProfile(formData);
+  };
+
+  const handleComplete = async (formData) => {
+    await api.submitNurseOnboarding(formData);
+    setNurse(prev => ({...prev, status:'PENDING'}));
+    setShowOnboarding(false);
+  };
 
   const logout = () => {
+    localStorage.removeItem('vonaxity-token');
     document.cookie = 'vonaxity-token=;path=/;max-age=0';
     document.cookie = 'vonaxity-role=;path=/;max-age=0';
     router.push(`/${lang}/login`);
   };
 
-  const titles = { dashboard:'Nurse Dashboard', visits:'My Visits', map:'Navigation', complete:'Complete Visit', earnings:'Earnings', profile:'My Profile' };
+  const displayNurse = nurse || MOCK_NURSE;
+  const titles = { dashboard:'Nurse Dashboard', visits:'My Visits', map:'Navigation', complete:'Complete Visit', earnings:'Earnings', profile:'My Profile', onboarding:'Complete Your Profile' };
+
+  if (loading) return (
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:C.bg, fontFamily:"'Inter',system-ui,sans-serif" }}>
+      <div style={{ fontSize:14, color:C.textTertiary }}>Loading...</div>
+    </div>
+  );
 
   return (
     <div style={{ display:'flex', minHeight:'100vh', fontFamily:"'Inter',system-ui,sans-serif", background:C.bg }}>
-      <Sidebar nurse={MOCK_NURSE} collapsed={collapsed} setCollapsed={setCollapsed} active={active} setActive={setActive} onLogout={logout} />
+      <Sidebar nurse={displayNurse} collapsed={collapsed} setCollapsed={setCollapsed} active={active} setActive={setActive} onLogout={logout} />
       <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
         <div style={{ padding:'0 28px', height:60, borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'space-between', background:C.bgWhite, flexShrink:0 }}>
-          <div style={{ fontSize:16, fontWeight:600, color:C.textPrimary }}>{titles[active]}</div>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:12, fontWeight:600, color:C.secondary, background:C.secondaryLight, padding:'5px 12px', borderRadius:99 }}>
-            <div style={{ width:6, height:6, borderRadius:'50%', background:C.secondary }}/>On duty
+          <div style={{ fontSize:16, fontWeight:600, color:C.textPrimary }}>{titles[active] || 'Nurse Dashboard'}</div>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:12, fontWeight:600, color:nurse?.status==='APPROVED'?C.secondary:C.warning, background:nurse?.status==='APPROVED'?C.secondaryLight:'#FFFBEB', padding:'5px 12px', borderRadius:99 }}>
+            <div style={{ width:6, height:6, borderRadius:'50%', background:nurse?.status==='APPROVED'?C.secondary:C.warning }}/>
+            {nurse?.status || 'Incomplete'}
           </div>
         </div>
         <main style={{ flex:1, padding:28, overflowY:'auto', maxWidth:720, width:'100%' }}>
+          <OnboardingBanner nurse={nurse} onStartOnboarding={()=>setActive('onboarding')} />
+          {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
           {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} />}
           {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} />}
           {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} />}
