@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { t } from '@/translations';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#7C3AED', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827' };
@@ -85,7 +86,7 @@ function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen }) {
       </nav>
       <div style={{ padding:'12px 16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
         {mobile ? (
-          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{t(lang,'nurse.signOut')}</button>
+          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{'Sign out'}</button>
         ) : (
           <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>Sign out</button>
         )}
@@ -262,6 +263,28 @@ function Earnings() {
 }
 
 // ── Nurse Profile Settings ────────────────────────────────────────────────────
+// Defined OUTSIDE component to prevent remounting
+function NurseSectionCard({ title, subtitle, children }) {
+  return (
+    <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'24px', marginBottom:20 }}>
+      <div style={{ marginBottom:20 }}>
+        <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{title}</div>
+        {subtitle && <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{subtitle}</div>}
+      </div>
+      {children}
+    </div>
+  );
+}
+
+function NurseField({ label, children }) {
+  return (
+    <div style={{ marginBottom:16 }}>
+      <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{label}</label>
+      {children}
+    </div>
+  );
+}
+
 function NurseProfile() {
   const [profile, setProfile] = useState({ name:MOCK_NURSE.name, email:MOCK_NURSE.email, phone:MOCK_NURSE.phone, city:MOCK_NURSE.city, bio:MOCK_NURSE.bio, licenseNumber:MOCK_NURSE.licenseNumber });
   const [availability, setAvailability] = useState([...MOCK_NURSE.availability]);
@@ -305,54 +328,37 @@ function NurseProfile() {
     } finally { setSavingPass(false); }
   };
 
-  const SectionCard = ({ title, subtitle, children }) => (
-    <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'24px', marginBottom:20 }}>
-      <div style={{ marginBottom:20 }}>
-        <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{title}</div>
-        {subtitle && <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{subtitle}</div>}
-      </div>
-      {children}
-    </div>
-  );
-
-  const Field = ({ label, children }) => (
-    <div style={{ marginBottom:16 }}>
-      <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{label}</label>
-      {children}
-    </div>
-  );
-
   return (
     <div style={{ maxWidth:620 }}>
 
       {/* Profile info */}
-      <SectionCard title="Personal information" subtitle="Your nurse account details">
+      <NurseSectionCard title="Personal information" subtitle="Your nurse account details">
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label="Full name">
+          <NurseField label="Full name">
             <input style={inp} value={profile.name} onChange={e=>setProfile({...profile,name:e.target.value})} />
-          </Field>
-          <Field label="Email address">
+          </NurseField>
+          <NurseField label="Email address">
             <input style={{...inp,background:C.bgSubtle,color:C.textTertiary}} value={profile.email} disabled />
-          </Field>
-          <Field label="Phone number">
+          </NurseField>
+          <NurseField label="Phone number">
             <input style={inp} value={profile.phone} onChange={e=>setProfile({...profile,phone:e.target.value})} placeholder="+355 69 000 0000" />
-          </Field>
-          <Field label="City">
+          </NurseField>
+          <NurseField label="City">
             <select style={{...inp}} value={profile.city} onChange={e=>setProfile({...profile,city:e.target.value})}>
               {CITIES.map(c=><option key={c}>{c}</option>)}
             </select>
-          </Field>
+          </NurseField>
         </div>
-        <Field label="License number">
+        <NurseField label="License number">
           <input style={inp} value={profile.licenseNumber} onChange={e=>setProfile({...profile,licenseNumber:e.target.value})} placeholder="ALB-NURSE-XXXX-XXX" />
-        </Field>
-        <Field label="Professional bio">
+        </NurseField>
+        <NurseField label="Professional bio">
           <textarea style={{...inp,minHeight:90,resize:'vertical'}} value={profile.bio} onChange={e=>setProfile({...profile,bio:e.target.value})} placeholder="Describe your experience and specialties..." />
-        </Field>
-      </SectionCard>
+        </NurseField>
+      </NurseSectionCard>
 
       {/* Availability */}
-      <SectionCard title="Availability" subtitle="Which days are you available for visits?">
+      <NurseSectionCard title="Availability" subtitle="Which days are you available for visits?">
         <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
           {DAYS.map(day => (
             <button key={day} onClick={()=>toggleDay(day)} style={{ fontSize:13, fontWeight:600, padding:'9px 16px', borderRadius:10, border:`1.5px solid ${availability.includes(day)?C.primary:C.border}`, background:availability.includes(day)?C.primaryLight:'transparent', color:availability.includes(day)?C.primary:C.textSecondary, cursor:'pointer', transition:'all 0.15s' }}>
@@ -363,10 +369,10 @@ function NurseProfile() {
         <div style={{ marginTop:12, fontSize:12, color:C.textTertiary }}>
           {availability.length === 0 ? 'No days selected' : `Available: ${availability.join(', ')}`}
         </div>
-      </SectionCard>
+      </NurseSectionCard>
 
       {/* Specialties */}
-      <SectionCard title="Specialties" subtitle="What services can you perform?">
+      <NurseSectionCard title="Specialties" subtitle="What services can you perform?">
         <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
           {SPECIALTIES_LIST.map(s => (
             <button key={s} onClick={()=>toggleSpecialty(s)} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', borderRadius:99, border:`1.5px solid ${specialties.includes(s)?C.secondary:C.border}`, background:specialties.includes(s)?C.secondaryLight:'transparent', color:specialties.includes(s)?C.secondary:C.textSecondary, cursor:'pointer', transition:'all 0.15s' }}>
@@ -374,10 +380,10 @@ function NurseProfile() {
             </button>
           ))}
         </div>
-      </SectionCard>
+      </NurseSectionCard>
 
       {/* Stats overview */}
-      <SectionCard title="Profile stats" subtitle="Your performance on Vonaxity">
+      <NurseSectionCard title="Profile stats" subtitle="Your performance on Vonaxity">
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:12 }}>
           {[['Rating',MOCK_NURSE.rating,C.warning],['Total visits',MOCK_NURSE.totalVisits,C.primary],['Total earned',`€${MOCK_NURSE.totalEarnings}`,C.secondary],['Status','Approved',C.secondary]].map(([label,value,color]) => (
             <div key={label} style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 14px' }}>
@@ -386,7 +392,7 @@ function NurseProfile() {
             </div>
           ))}
         </div>
-      </SectionCard>
+      </NurseSectionCard>
 
       {/* Save button */}
       {profileStatus==='success' && (
@@ -405,24 +411,24 @@ function NurseProfile() {
       </button>
 
       {/* Security */}
-      <SectionCard title="Security" subtitle="Change your account password">
-        <Field label="Current password">
+      <NurseSectionCard title="Security" subtitle="Change your account password">
+        <NurseField label="Current password">
           <input style={inp} type="password" value={password.current} onChange={e=>setPassword({...password,current:e.target.value})} placeholder="••••••••" />
-        </Field>
+        </NurseField>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label="New password">
+          <NurseField label="New password">
             <input style={inp} type="password" value={password.newPass} onChange={e=>setPassword({...password,newPass:e.target.value})} placeholder="Min 8 characters" />
-          </Field>
-          <Field label="Confirm new password">
+          </NurseField>
+          <NurseField label="Confirm new password">
             <input style={inp} type="password" value={password.confirm} onChange={e=>setPassword({...password,confirm:e.target.value})} placeholder="Repeat password" />
-          </Field>
+          </NurseField>
         </div>
         {passError && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:8, padding:'10px 14px', marginBottom:12, fontSize:13, color:C.error }}>{passError}</div>}
         {passStatus==='success' && <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:8, padding:'10px 14px', marginBottom:12, fontSize:13, color:C.secondary, fontWeight:600 }}>Password updated!</div>}
         <button onClick={handleChangePassword} disabled={savingPass} style={{ background:C.bgSubtle, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:10, padding:'11px 24px', fontSize:14, fontWeight:600, cursor:'pointer', opacity:savingPass?0.7:1 }}>
           {savingPass ? 'Updating...' : 'Update password'}
         </button>
-      </SectionCard>
+      </NurseSectionCard>
 
     </div>
   );
@@ -434,12 +440,12 @@ function OnboardingBanner({ nurse, onStartOnboarding, lang='en' }) {
   const status = nurse?.status || 'INCOMPLETE';
   if (status === 'APPROVED') return null;
 
-  const tr = (k) => t(lang, k);
+  const tr = (k) => k;
   const configs = {
-    INCOMPLETE: { bg:'#FEF3C7', border:'#FDE68A', color:'#92400E', title:t(lang,'nurseDash.completeProfile'), sub:t(lang,'nurseDash.reviewMessage'), btn:t(lang,'nurseDash.completeBtn'), btnColor:C.warning },
-    PENDING: { bg:C.primaryLight, border:'rgba(37,99,235,0.2)', color:'#1E40AF', title:t(lang,'nurseDash.pendingReview'), sub:'Our team is reviewing your credentials. You will be notified within 2-3 business days. You cannot receive bookings yet.', btn:null },
-    REJECTED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:t(lang,'nurseDash.rejected'), sub:`Your application was not approved. ${nurse?.rejectionReason||'Please review your credentials and resubmit.'} Update your profile and resubmit.`, btn:t(lang,'nurseDash.resubmitBtn'), btnColor:C.error },
-    SUSPENDED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:t(lang,'nurse.accountSuspended'), sub:t(lang,'nurse.accountSuspended'), btn:null },
+    INCOMPLETE: { bg:'#FEF3C7', border:'#FDE68A', color:'#92400E', title:'Complete your profile to get started', sub:'You need to complete your profile and submit for verification before you can receive bookings.', btn:'Complete profile', btnColor:C.warning },
+    PENDING: { bg:C.primaryLight, border:'rgba(37,99,235,0.2)', color:'#1E40AF', title:'Application under review', sub:'Our team is reviewing your credentials. You will be notified within 2-3 business days. You cannot receive bookings yet.', btn:null },
+    REJECTED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:'Application rejected', sub:`Your application was not approved. ${nurse?.rejectionReason||'Please review your credentials and resubmit.'} Update your profile and resubmit.`, btn:'Update & resubmit', btnColor:C.error },
+    SUSPENDED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:'Account suspended', sub:'Account suspended', btn:null },
   };
 
   const cfg = configs[status] || configs.INCOMPLETE;
@@ -450,6 +456,10 @@ function OnboardingBanner({ nurse, onStartOnboarding, lang='en' }) {
       {cfg.btn && <button onClick={onStartOnboarding} style={{ fontSize:13, fontWeight:700, padding:'9px 20px', borderRadius:9, border:'none', background:cfg.btnColor, color:'#fff', cursor:'pointer' }}>{cfg.btn}</button>}
     </div>
   );
+}
+
+function tryParse(val, fallback) {
+  try { return val ? JSON.parse(val) : fallback; } catch { return fallback; }
 }
 
 function OnboardingWizard({ nurse, user, onComplete, onSave }) {
@@ -469,10 +479,6 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
     diplomaConfirmed: !!nurse?.diplomaUrl,
     licenseConfirmed: !!nurse?.licenseUrl,
   });
-
-  function tryParse(val, fallback) {
-    try { return val ? JSON.parse(val) : fallback; } catch { return fallback; }
-  }
 
   const toggle = (key, val) => setForm(f => ({ ...f, [key]: f[key].includes(val) ? f[key].filter(x=>x!==val) : [...f[key], val] }));
 
