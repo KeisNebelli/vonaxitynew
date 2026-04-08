@@ -132,14 +132,14 @@ function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen }
           <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }}
             style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:`${mobile?'12px':'10px'} 12px`, borderRadius:10, border:'none', background:active===item.id?(item.highlight?'rgba(124,58,237,0.25)':'rgba(37,99,235,0.22)'):'transparent', color:active===item.id?(item.highlight?'#C4B5FD':'#93C5FD'):'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
             {item.icon}
-            <span style={{ flex:1 }}>{item.label}</span>
+            <span style={{ flex:1 }}>{TITLES[item.id]||item.label}</span>
             {item.id==='alerts' && alertCount>0 && <span style={{ fontSize:10,fontWeight:800,background:'#DC2626',color:'#fff',borderRadius:99,padding:'2px 6px',minWidth:18,textAlign:'center' }}>{alertCount}</span>}
           </button>
         ))}
       </nav>
       <div style={{ padding:'12px 16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
         {mobile ? (
-          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>Sign out</button>
+          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{tr('admin.signOut')}</button>
         ) : (
           <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>{'Sign out'}</button>
         )}
@@ -931,6 +931,7 @@ export default function AdminPage({ params }) {
   const lang = params?.lang || 'en';
   const router = useRouter();
   const [uiLang, setUiLang] = useState(lang);
+  const tr = (key) => t(lang, key);
   const switchLang = (l) => { setUiLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; const path = window.location.pathname.replace(/^\/(en|sq)/,`/${l}`); window.location.href = path; };
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -984,7 +985,7 @@ export default function AdminPage({ params }) {
   };
 
   const alertCount = visits.filter(v=>v.status==='UNASSIGNED').length + nurses.filter(n=>n.status==='PENDING').length;
-  const TITLES = { overview:'Admin Overview', clients:'Clients', nurses:'Nurses', visits:'Visits', alerts:'Alerts', payments:'Payments', ai:'AI Assistant', settings:'Settings' };
+  const TITLES = { overview:tr('admin.overview'), clients:tr('admin.clients'), nurses:tr('admin.nurses'), visits:tr('admin.visits'), alerts:tr('admin.alerts'), payments:tr('admin.payments'), ai:tr('admin.ai'), settings:tr('admin.settings') };
   const ADMIN_NAV_BOTTOM = NAV.slice(0,4);
 
   return (
@@ -1050,7 +1051,7 @@ export default function AdminPage({ params }) {
             <button key={item.id} onClick={()=>setActive(item.id)} style={{ flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,border:'none',background:'transparent',color:active===item.id?'#93C5FD':'rgba(255,255,255,0.4)',cursor:'pointer',fontSize:10,fontWeight:active===item.id?700:500,fontFamily:F,padding:'4px 2px',position:'relative' }}>
               {item.icon}
               {item.id==='alerts'&&alertCount>0&&<span style={{ position:'absolute',top:2,right:'50%',marginRight:-14,width:14,height:14,background:'#DC2626',color:'#fff',borderRadius:99,fontSize:8,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center' }}>{alertCount}</span>}
-              <span>{item.label}</span>
+              <span>{TITLES[item.id]||item.label}</span>
             </button>
           ))}
         </div>

@@ -19,11 +19,11 @@ const MOCK = {
   ],
 };
 
-const NAV = [
-  { id:'overview', label:'Overview', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
-  { id:'visits', label:'My Visits', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
-  { id:'subscription', label:'Plan', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
-  { id:'settings', label:'Settings', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
+const makeNAV = (tr) => [
+  { id:'overview', label:tr('dashboard.overview'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
+  { id:'visits', label:tr('dashboard.myVisits'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+  { id:'subscription', label:tr('dashboard.subscription'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+  { id:'settings', label:tr('dashboard.settings'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
 ];
 
 function Badge({ s }) {
@@ -32,7 +32,8 @@ function Badge({ s }) {
   return <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:bg, color:col, textTransform:'uppercase', whiteSpace:'nowrap' }}>{s}</span>;
 }
 
-function Overview({ user, visits, relative }) {
+function Overview({ user, visits, relative, lang }) {
+  const tr = (key) => t(lang, key);
   const upcoming = visits.filter(v=>!['COMPLETED','CANCELLED'].includes(v.status));
   const completed = visits.filter(v=>v.status==='COMPLETED');
   const next = upcoming[0], last = completed[0];
@@ -54,7 +55,7 @@ function Overview({ user, visits, relative }) {
         </div>
       )}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))', gap:12, marginBottom:20 }}>
-        {[['Plan',planLabel,C.primary,''],['Visits used',`${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`,C.textPrimary,'this month'],['Completed',completed.length,C.secondary,'total'],['Last BP',last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—',last?.bpSystolic?C.warning:C.textTertiary,last?.bpSystolic?'mmHg':'']].map(([label,val,color,sub2])=>(
+        {[['Plan',planLabel,C.primary,''],[tr('dashboard.visitsUsed'),`${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`,C.textPrimary,'this month'],[tr('dashboard.completed'),completed.length,C.secondary,'total'],[tr('dashboard.lastBP'),last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—',last?.bpSystolic?C.warning:C.textTertiary,last?.bpSystolic?'mmHg':'']].map(([label,val,color,sub2])=>(
           <div key={label} style={{ background:C.bgWhite, borderRadius:13, border:`1px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM }}>
             <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:24, fontWeight:800, color, letterSpacing:'-0.5px', lineHeight:1 }}>{val}</div>
@@ -68,7 +69,7 @@ function Overview({ user, visits, relative }) {
             <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>Loved one receiving care</div>
             <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>Active</span>
           </div>
-          {[['Full name',relative.name],['City',relative.city],['Address',relative.address||'—'],['Age',relative.age?`${relative.age} years`:'—'],['Nurse',next?.nurse?.user?.name||'Being assigned']].map(([k,v])=>(
+          {[[tr('dashboard.fullName'),relative.name],[tr('dashboard.city'),relative.city],[tr('dashboard.address'),relative.address||'—'],[tr('dashboard.age'),relative.age?`${relative.age} years`:'—'],[tr('dashboard.assignedNurse'),next?.nurse?.user?.name||tr('dashboard.beingAssigned')]].map(([k,v])=>(
             <div key={k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'11px 18px', borderBottom:`1px solid ${C.borderSubtle}` }}>
               <span style={{ fontSize:13, color:C.textSecondary }}>{k}</span>
               <span style={{ fontSize:13, color:C.textPrimary, fontWeight:600, textAlign:'right', maxWidth:'60%' }}>{v}</span>
@@ -80,8 +81,10 @@ function Overview({ user, visits, relative }) {
   );
 }
 
-function Visits({ visits }) {
-  if (!visits.length) return <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary }}>No visits yet</div>;
+function Visits({ visits, lang }) {
+function Visits({ visits, lang }) {
+  const tr = (key) => t(lang, key);
+  if (!visits.length) return <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary }}>{tr('dashboard.noVisits')}</div>;
   return (
     <div>
       {visits.map(v=>(
@@ -89,7 +92,7 @@ function Visits({ visits }) {
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:v.bpSystolic?14:0 }}>
             <div>
               <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>{v.serviceType}</div>
-              <div style={{ fontSize:12, color:C.textTertiary }}>{new Date(v.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · {v.nurse?.user?.name||'Nurse TBC'}</div>
+              <div style={{ fontSize:12, color:C.textTertiary }}>{new Date(v.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · {v.nurse?.user?.name||tr('visits.nurseTBC')}</div>
             </div>
             <Badge s={v.status}/>
           </div>
@@ -110,6 +113,8 @@ export default function Dashboard({ params }) {
   const lang = params?.lang || 'en';
   const router = useRouter();
   const [uiLang, setUiLang] = useState(lang);
+  const tr = (key) => t(lang, key);
+  const NAV = makeNAV(tr);
   const switchLang = (l) => { setUiLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; const path = window.location.pathname.replace(/^\/(en|sq)/,`/${l}`); window.location.href = path; };
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -143,7 +148,7 @@ export default function Dashboard({ params }) {
     router.push(`/${lang}/login`);
   };
 
-  const TITLES = { overview:'Dashboard', visits:'My Visits', subscription:'Subscription', settings:'Account Settings' };
+  const TITLES = { overview:tr('dashboard.title'), visits:tr('dashboard.myVisits'), subscription:tr('dashboard.subscription'), settings:tr('dashboard.settings') };
 
   if (loading) return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:C.bg, fontFamily:F }}>
@@ -192,7 +197,7 @@ export default function Dashboard({ params }) {
             ))}
           </nav>
           <div style={{ padding:'12px 16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
-            <button onClick={logout} style={{ fontSize:12,color:'rgba(255,255,255,0.3)',background:'transparent',border:'none',cursor:'pointer',fontFamily:F,padding:0 }}>Sign out</button>
+            <button onClick={logout} style={{ fontSize:12,color:'rgba(255,255,255,0.3)',background:'transparent',border:'none',cursor:'pointer',fontFamily:F,padding:0 }}>{tr('dashboard.signOut')}</button>
           </div>
         </div>
 
@@ -220,7 +225,7 @@ export default function Dashboard({ params }) {
             ))}
           </nav>
           <div style={{ padding:'16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
-            <button onClick={logout} style={{ width:'100%',padding:'13px',background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:10,color:'#F87171',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:F }}>Sign out</button>
+            <button onClick={logout} style={{ width:'100%',padding:'13px',background:'rgba(239,68,68,0.1)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:10,color:'#F87171',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:F }}>{tr('dashboard.signOut')}</button>
           </div>
         </div>
 
@@ -245,8 +250,8 @@ export default function Dashboard({ params }) {
             </div>
           </div>
           <main className="dash-cont" style={{ flex:1, overflowY:'auto', padding:24, maxWidth:760, width:'100%' }}>
-            {active==='overview' && <Overview user={u} visits={visits} relative={r}/>}
-            {active==='visits' && <Visits visits={visits}/>}
+            {active==='overview' && <Overview user={u} visits={visits} relative={r} lang={lang}/>}
+            {active==='visits' && <Visits visits={visits} lang={lang}/>}
             {active==='subscription' && (
               <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:28, boxShadow:SSM }}>
                 <div style={{ fontSize:24,fontWeight:800,color:C.textPrimary,marginBottom:6 }}>{plan} Plan</div>

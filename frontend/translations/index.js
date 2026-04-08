@@ -51,7 +51,8 @@ const translations = {
     login: {
       title:'Welcome back', subtitle:'Sign in to your Vonaxity account',
       email:'Email address', password:'Password', signIn:'Sign In',
-      noAccount:'Don\'t have an account?', getStarted:'Get started',
+      signUp:'Sign up', submit:'Sign in', fill:'Fill', loading:'Signing in...',
+      noAccount:"Don't have an account?", getStarted:'Get started',
       forgotPassword:'Forgot password?',
     },
     dashboard: {
@@ -99,7 +100,7 @@ const translations = {
       allRequired:'All fields required',
     },
     nurse: {
-      dashboard:'Nurse Dashboard', myVisits:'My Visits', navigation:'Navigation',
+      dashboard:'Nurse Dashboard', myVisits:'My Visits', navigation:'Navigation', profile:'My Profile',
       completeVisit:'Complete Visit', earnings:'Earnings', myProfile:'My Profile',
       onDuty:'On duty', approved:'Approved', incomplete:'Incomplete',
       pending:'Pending Approval', rejected:'Rejected', suspended:'Suspended',
@@ -154,7 +155,7 @@ const translations = {
       visitsToday:'Visits today', unassigned:'Unassigned',
       revenue:'Revenue', pendingNurses:'Pending nurses',
       approve:'Approve', reject:'Reject', suspend:'Suspend', reinstate:'Reinstate',
-      assignNurse:'Assign Nurse', refresh:'Refresh',
+      assignNurse:'Assign Nurse', refresh:'Refresh', menu:'Menu', ai:'AI Assistant',
       searchNurses:'Search nurses...', searchClients:'Search clients...',
       allCities:'All cities', allStatuses:'All statuses', allPlans:'All plans',
       status: {
@@ -234,6 +235,7 @@ const translations = {
     login: {
       title:'Mirë se keni ardhur', subtitle:'Hyni në llogarinë tuaj Vonaxity',
       email:'Adresa e email-it', password:'Fjalëkalimi', signIn:'Hyr',
+      signUp:'Regjistrohu', submit:'Hyr', fill:'Plotëso', loading:'Duke hyrë...',
       noAccount:'Nuk keni llogari?', getStarted:'Regjistrohuni',
       forgotPassword:'Keni harruar fjalëkalimin?',
     },
@@ -282,7 +284,7 @@ const translations = {
       allRequired:'Të gjitha fushat janë të detyrueshme',
     },
     nurse: {
-      dashboard:'Paneli i Infermierit', myVisits:'Vizitat e Mia', navigation:'Navigimi',
+      dashboard:'Paneli i Infermierit', myVisits:'Vizitat e Mia', navigation:'Navigimi', profile:'Profili Im',
       completeVisit:'Përfundo Vizitën', earnings:'Fitimet', myProfile:'Profili Im',
       onDuty:'Në detyrë', approved:'Aprovuar', incomplete:'I paplotë',
       pending:'Në pritje aprovimi', rejected:'I refuzuar', suspended:'I pezulluar',
@@ -349,7 +351,7 @@ const translations = {
       nurseTable:{ nurse:'Infermierja', city:'Qyteti', status:'Statusi', rating:'Vlerësimi', visits:'Vizitat', license:'Licenca', actions:'Veprimet' },
       clientTable:{ client:'Klienti', plan:'Plani', status:'Statusi', relative:'I dashuri', visits:'Vizitat', joined:'U regjistrua' },
       visitTable:{ patient:'Pacienti', service:'Shërbimi', date:'Data', nurse:'Infermierja', status:'Statusi', actions:'Veprimet' },
-      signOut:'Dil',
+      signOut:'Dil', menu:'Menu', ai:'Asistenti AI',
     },
     errors: {
       required:'Kjo fushë është e detyrueshme',
