@@ -288,16 +288,6 @@ export default function Dashboard({ params }) {
           ))}
         </div>
       </div>
-
-      <style>{`
-        @media(max-width:768px){
-          .desk-sidebar{display:none!important;}
-          .mob-sidebar{display:flex!important;}
-          .mob-tabs{display:flex!important;}
-          .mob-ham{display:flex!important;}
-          .dash-cont{padding:16px 16px 140px!important;}
-        }
-      `}</style>
     </>
   );
 }

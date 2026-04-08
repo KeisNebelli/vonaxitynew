@@ -934,8 +934,6 @@ export default function AdminPage({ params }) {
   const router = useRouter();
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [lang, setLang] = useState(params?.lang || 'en');
-  const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; localStorage.setItem('vonaxity-lang',l); };
   const [nurses, setNurses] = useState([]);
   const [visits, setVisits] = useState([]);
   const [clients, setClients] = useState([]);

@@ -787,7 +787,6 @@ export default function NursePage({ params }) {
             </button>
           ))}
         </div>
-        <style>{`@media(max-width:768px){.nurse-tabs{display:flex!important;}}`}</style>
       </div>
     </>
   );
