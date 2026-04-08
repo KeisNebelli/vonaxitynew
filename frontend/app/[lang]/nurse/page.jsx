@@ -784,8 +784,6 @@ export default function NursePage({ params }) {
           ))}
         </div>
       </div>
-    </div>
-  </div>
     </>
   );
 }

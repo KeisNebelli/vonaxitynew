@@ -87,18 +87,18 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
 
   return (
     <div style={{ maxWidth:620 }}>
-      <SectionCard title=tr("settings.profileInfo") subtitle=tr("settings.profileSub")>
+      <SectionCard title={tr("settings.profileInfo")} subtitle={tr("settings.profileSub")}>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label=tr("settings.fullName")>
+          <Field label={tr("settings.fullName")}>
             <input style={inp} value={profile.name} onChange={e => setProfile(p => ({...p, name:e.target.value}))} placeholder="Your full name" />
           </Field>
-          <Field label=tr("settings.email")>
+          <Field label={tr("settings.email")}>
             <input style={{...inp, background:C.bgSubtle, color:C.textTertiary}} value={profile.email} disabled />
           </Field>
-          <Field label=tr("settings.phone")>
+          <Field label={tr("settings.phone")}>
             <input style={inp} value={profile.phone} onChange={e => setProfile(p => ({...p, phone:e.target.value}))} placeholder="+44 7700 000000" />
           </Field>
-          <Field label=tr("settings.country")>
+          <Field label={tr("settings.country")}>
             <select style={inp} value={profile.country} onChange={e => setProfile(p => ({...p, country:e.target.value}))}>
               <option value="">Select country</option>
               {COUNTRIES.map(c => <option key={c}>{c}</option>)}
@@ -107,34 +107,34 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
         </div>
       </SectionCard>
 
-      <SectionCard title=tr("settings.lovedOneTitle") subtitle=tr("settings.lovedOneSub")>
+      <SectionCard title={tr("settings.lovedOneTitle")} subtitle={tr("settings.lovedOneSub")}>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label=tr("settings.theirName")>
+          <Field label={tr("settings.theirName")}>
             <input style={inp} value={rel.name} onChange={e => setRel(r => ({...r, name:e.target.value}))} />
           </Field>
-          <Field label=tr("settings.theirAge")>
+          <Field label={tr("settings.theirAge")}>
             <input style={inp} type="number" value={rel.age} onChange={e => setRel(r => ({...r, age:e.target.value}))} placeholder="e.g. 74" />
           </Field>
-          <Field label=tr("settings.theirCity")>
+          <Field label={tr("settings.theirCity")}>
             <select style={inp} value={rel.city} onChange={e => setRel(r => ({...r, city:e.target.value}))}>
               <option value="">Select city</option>
               {CITIES_AL.map(c => <option key={c}>{c}</option>)}
             </select>
           </Field>
-          <Field label=tr("settings.theirPhone")>
+          <Field label={tr("settings.theirPhone")}>
             <input style={inp} value={rel.phone} onChange={e => setRel(r => ({...r, phone:e.target.value}))} placeholder="+355 69 000 0000" />
           </Field>
         </div>
-        <Field label=tr("settings.homeAddress")>
+        <Field label={tr("settings.homeAddress")}>
           <input style={inp} value={rel.address} onChange={e => setRel(r => ({...r, address:e.target.value}))} placeholder="Street address in Albania" />
         </Field>
-        <Field label=tr("settings.healthNotes")>
+        <Field label={tr("settings.healthNotes")}>
           <textarea style={{...inp, minHeight:80, resize:'vertical'}} value={rel.healthNotes} onChange={e => setRel(r => ({...r, healthNotes:e.target.value}))} placeholder="e.g. Diabetes Type 2, takes Metformin daily..." />
         </Field>
       </SectionCard>
 
-      <SectionCard title=tr("settings.contactPref") subtitle=tr("settings.contactSub")>
-        <Field label=tr("settings.preferredContact")>
+      <SectionCard title={tr("settings.contactPref")} subtitle={tr("settings.contactSub")}>
+        <Field label={tr("settings.preferredContact")}>
           <div style={{ display:'flex', gap:10 }}>
             {['email','phone','whatsapp'].map(method => (
               <button key={method} onClick={() => setContact(c => ({...c, preferredContact:method}))} style={{ flex:1, padding:'10px', borderRadius:9, border:`1.5px solid ${contact.preferredContact===method?C.primary:C.border}`, background:contact.preferredContact===method?C.primaryLight:'transparent', color:contact.preferredContact===method?C.primary:C.textSecondary, fontSize:13, fontWeight:600, cursor:'pointer', textTransform:'capitalize' }}>
@@ -144,10 +144,10 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
           </div>
         </Field>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label=tr("settings.emergencyName")>
+          <Field label={tr("settings.emergencyName")}>
             <input style={inp} value={contact.emergencyName} onChange={e => setContact(c => ({...c, emergencyName:e.target.value}))} placeholder="Contact name" />
           </Field>
-          <Field label=tr("settings.emergencyPhone")>
+          <Field label={tr("settings.emergencyPhone")}>
             <input style={inp} value={contact.emergencyPhone} onChange={e => setContact(c => ({...c, emergencyPhone:e.target.value}))} placeholder="+44 7700 000000" />
           </Field>
         </div>
@@ -168,15 +168,15 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
         {saving ? tr("settings.saving") : tr("settings.saveChanges")}
       </button>
 
-      <SectionCard title=tr("settings.security") subtitle=tr("settings.securitySub")>
-        <Field label=tr("settings.currentPassword")>
+      <SectionCard title={tr("settings.security")} subtitle={tr("settings.securitySub")}>
+        <Field label={tr("settings.currentPassword")}>
           <input style={inp} type="password" value={password.current} onChange={e => setPassword(p => ({...p, current:e.target.value}))} placeholder="••••••••" />
         </Field>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label=tr("settings.newPassword")>
+          <Field label={tr("settings.newPassword")}>
             <input style={inp} type="password" value={password.newPass} onChange={e => setPassword(p => ({...p, newPass:e.target.value}))} placeholder="Min 8 characters" />
           </Field>
-          <Field label=tr("settings.confirmPassword")>
+          <Field label={tr("settings.confirmPassword")}>
             <input style={inp} type="password" value={password.confirm} onChange={e => setPassword(p => ({...p, confirm:e.target.value}))} placeholder="Repeat password" />
           </Field>
         </div>
