@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { t } from '@/translations';
+import LangToggle from '@/components/LangToggle';
 import Settings from './settings';
 
 const C = { primary:'#2563EB',primaryLight:'#EFF6FF',primaryDark:'#1D4ED8',secondary:'#059669',secondaryLight:'#ECFDF5',warning:'#D97706',warningLight:'#FFFBEB',error:'#DC2626',errorLight:'#FEF2F2',purple:'#7C3AED',purpleLight:'#F5F3FF',bg:'#F8FAFC',bgWhite:'#FFFFFF',bgSubtle:'#F1F5F9',textPrimary:'#0F172A',textSecondary:'#475569',textTertiary:'#94A3B8',border:'#E2E8F0',borderSubtle:'#F1F5F9',sidebarBg:'#0F172A' };
@@ -18,11 +20,12 @@ const MOCK = {
   ],
 };
 
-const NAV = [
-  { id:'overview', label:'Overview', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
-  { id:'visits', label:'My Visits', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
-  { id:'subscription', label:'Plan', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
-  { id:'settings', label:'Settings', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
+// NAV labels translated in render using lang state
+const NAV_IDS = [
+  { id:'overview', labelKey:'dash.dashboard', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
+  { id:'visits', labelKey:'dash.myVisits', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+  { id:'subscription', labelKey:'dash.subscription', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+  { id:'settings', labelKey:'dash.settings', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
 ];
 
 function Badge({ s }) {
@@ -31,7 +34,7 @@ function Badge({ s }) {
   return <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:bg, color:col, letterSpacing:'0.3px', textTransform:'uppercase', whiteSpace:'nowrap' }}>{s}</span>;
 }
 
-function Overview({ user, visits, relative }) {
+function Overview({ user, visits, relative, lang="en" }) {
   const upcoming = visits.filter(v=>!['COMPLETED','CANCELLED'].includes(v.status));
   const completed = visits.filter(v=>v.status==='COMPLETED');
   const next = upcoming[0], last = completed[0];
@@ -47,20 +50,20 @@ function Overview({ user, visits, relative }) {
             <svg width="22" height="22" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
           <div style={{ flex:1, minWidth:180 }}>
-            <div style={{ fontSize:10, fontWeight:700, opacity:.65, letterSpacing:'1px', textTransform:'uppercase', marginBottom:4 }}>Next Visit</div>
+            <div style={{ fontSize:10, fontWeight:700, opacity:.65, letterSpacing:'1px', textTransform:'uppercase', marginBottom:4 }}>{t(lang,'dash.nextVisit')}</div>
             <div style={{ fontSize:16, fontWeight:700, marginBottom:3 }}>{new Date(next.scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} at {new Date(next.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>
             <div style={{ fontSize:12, opacity:.8 }}>{next.nurse?.user?.name} · {next.serviceType}</div>
           </div>
-          <div style={{ background:'rgba(255,255,255,0.18)',borderRadius:9,padding:'7px 14px',fontSize:11,fontWeight:700,color:'#fff' }}>Confirmed</div>
+          <div style={{ background:'rgba(255,255,255,0.18)',borderRadius:9,padding:'7px 14px',fontSize:11,fontWeight:700,color:'#fff' }}>{t(lang,'dash.confirmed')}</div>
         </div>
       )}
 
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))', gap:12, marginBottom:20 }}>
         {[
-          ['Plan', planLabel, C.primary, ''],
-          ['Visits used', `${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`, C.textPrimary, 'this month'],
-          ['Completed', completed.length, C.secondary, 'total visits'],
-          ['Last BP', last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—', last?.bpSystolic?C.warning:C.textTertiary, last?.bpSystolic?'mmHg':'no data'],
+          [t(lang,'dash.plan'), planLabel, C.primary, ''],
+          [t(lang,'dash.visitsUsed'), `${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`, C.textPrimary, t(lang,'dash.thisMonth')],
+          [t(lang,'dash.completed'), completed.length, C.secondary, t(lang,'dash.totalVisits')],
+          [t(lang,'dash.lastBP'), last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—', last?.bpSystolic?C.warning:C.textTertiary, last?.bpSystolic?t(lang,'dash.mmHg'):t(lang,'dash.noData')],
         ].map(([label,val,color,sub2])=>(
           <div key={label} style={{ background:C.bgWhite, borderRadius:13, border:`1px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM }}>
             <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
@@ -73,10 +76,10 @@ function Overview({ user, visits, relative }) {
       {relative && (
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
           <div style={{ padding:'14px 18px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-            <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>Loved one receiving care</div>
-            <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>Active</span>
+            <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>{t(lang,'dash.lovedOneCard')}</div>
+            <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>{t(lang,'dash.activeCarePlan')}</span>
           </div>
-          {[['Full name',relative.name],['City',relative.city],['Address',relative.address||'—'],['Age',relative.age?`${relative.age} years`:'—'],['Nurse',next?.nurse?.user?.name||'Being assigned']].map(([k,v])=>(
+          {[[t(lang,'dash.fullName'),relative.name],[t(lang,'dash.city'),relative.city],[t(lang,'dash.address'),relative.address||'—'],[t(lang,'dash.age'),relative.age?`${relative.age} years`:'—'],[t(lang,'dash.assignedNurse'),next?.nurse?.user?.name||t(lang,'dash.beingAssigned')]].map(([k,v])=>(
             <div key={k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'11px 18px', borderBottom:`1px solid ${C.borderSubtle}` }}>
               <span style={{ fontSize:13, color:C.textSecondary }}>{k}</span>
               <span style={{ fontSize:13, color:C.textPrimary, fontWeight:600, textAlign:'right', maxWidth:'60%' }}>{v}</span>
@@ -88,10 +91,10 @@ function Overview({ user, visits, relative }) {
   );
 }
 
-function Visits({ visits }) {
+function Visits({ visits, lang="en" }) {
   if (!visits.length) return (
     <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center' }}>
-      <div style={{ fontSize:14, color:C.textTertiary }}>No visits yet</div>
+      <div style={{ fontSize:14, color:C.textTertiary }}>{t(lang,'dash.noVisitsYet')}</div>
     </div>
   );
   return (
@@ -107,8 +110,8 @@ function Visits({ visits }) {
           </div>
           {v.bpSystolic && (
             <div style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 16px', display:'flex', gap:20, flexWrap:'wrap' }}>
-              <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Blood Pressure</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.bpSystolic}/{v.bpDiastolic} <span style={{ fontSize:10, color:C.textTertiary }}>mmHg</span></div></div>
-              {v.glucose && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Glucose</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.glucose} <span style={{ fontSize:10, color:C.textTertiary }}>mmol/L</span></div></div>}
+              <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'dash.bloodPressure')}</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.bpSystolic}/{v.bpDiastolic} <span style={{ fontSize:10, color:C.textTertiary }}>mmHg</span></div></div>
+              {v.glucose && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'dash.glucose')}</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.glucose} <span style={{ fontSize:10, color:C.textTertiary }}>mmol/L</span></div></div>}
               {v.nurseNotes && <div style={{ width:'100%', borderTop:`1px solid ${C.border}`, paddingTop:8, marginTop:4, fontSize:12, color:C.textSecondary, fontStyle:'italic' }}>"{v.nurseNotes}"</div>}
             </div>
           )}
@@ -119,10 +122,13 @@ function Visits({ visits }) {
 }
 
 export default function Dashboard({ params }) {
-  const lang = params?.lang || 'en';
+  const [lang, setLang] = useState(params?.lang || 'en');
+  const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; };
   const router = useRouter();
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [lang, setLang] = useState(params?.lang || 'en');
+  const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; localStorage.setItem('vonaxity-lang',l); };
   const [user, setUser] = useState(null);
   const [visits, setVisits] = useState([]);
   const [relative, setRelative] = useState(null);
@@ -153,7 +159,7 @@ export default function Dashboard({ params }) {
     router.push(`/${lang}/login`);
   };
 
-  const TITLES = { overview:'Dashboard', visits:'My Visits', subscription:'Subscription', settings:'Account Settings' };
+  const TITLES = { overview:t(lang,'dash.dashboard'), visits:t(lang,'dash.myVisits'), subscription:t(lang,'dash.subscription'), settings:t(lang,'dash.settings') };
 
   if (loading) return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:C.bg, fontFamily:F }}>
@@ -198,14 +204,14 @@ export default function Dashboard({ params }) {
             </div>
           </div>
           <nav style={{ flex:1, padding:'10px' }}>
-            {NAV.map(item=>(
+            {NAV_IDS.map(item=>(
               <button key={item.id} onClick={()=>setActive(item.id)} className="nvbtn" style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:'10px 12px', borderRadius:10, border:'none', background:active===item.id?'rgba(37,99,235,0.22)':'transparent', color:active===item.id?'#93C5FD':'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
-                {item.icon}<span>{item.label}</span>
+                {item.icon}<span>{t(lang, item.labelKey)}</span>
               </button>
             ))}
           </nav>
           <div style={{ padding:'12px 16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
-            <button onClick={logout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>Sign out</button>
+            <button onClick={logout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>{t(lang,'dash.signOut')}</button>
           </div>
         </div>
 
@@ -224,16 +230,18 @@ export default function Dashboard({ params }) {
               <div style={{ fontSize:14, fontWeight:700, color:'#fff' }}>{u.name}</div>
               <div style={{ fontSize:11, color:'rgba(255,255,255,0.4)' }}>Client · {plan}</div>
             </div>
+            <LangSwitcher lang={lang} onSwitch={switchLang} light />
+            </div>
           </div>
           <nav style={{ flex:1, padding:'10px' }}>
-            {NAV.map(item=>(
+            {NAV_IDS.map(item=>(
               <button key={item.id} onClick={()=>{ setActive(item.id); setSidebarOpen(false); }} style={{ width:'100%', display:'flex', alignItems:'center', gap:12, padding:'13px 14px', borderRadius:10, border:'none', background:active===item.id?'rgba(37,99,235,0.22)':'transparent', color:active===item.id?'#93C5FD':'rgba(255,255,255,0.55)', cursor:'pointer', fontSize:14, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F }}>
-                {item.icon}<span>{item.label}</span>
+                {item.icon}<span>{t(lang, item.labelKey)}</span>
               </button>
             ))}
           </nav>
           <div style={{ padding:'16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
-            <button onClick={logout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>Sign out</button>
+            <button onClick={logout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{t(lang,'dash.signOut')}</button>
           </div>
         </div>
 
@@ -249,18 +257,18 @@ export default function Dashboard({ params }) {
               </button>
               <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary }}>{TITLES[active]}</div>
             </div>
-            <span style={{ fontSize:11, fontWeight:700, padding:'4px 11px', borderRadius:99, background:statusColor[0], color:statusColor[1] }}>{u.subscription?.status||'Trial'}</span>
+            <div style={{display:'flex',alignItems:'center',gap:8}}><LangSwitcher lang={lang} onSwitch={switchLang}/><div style={{ display:'flex', alignItems:'center', gap:8 }}><LangToggle lang={lang} onSwitch={switchLang} /><span style={{ fontSize:11, fontWeight:700, padding:'4px 11px', borderRadius:99, background:statusColor[0], color:statusColor[1] }}>{u.subscription?.status||'Trial'}</span></div></div>
           </div>
 
           <main className="dash-cont" style={{ flex:1, overflowY:'auto', padding:24, maxWidth:760, width:'100%' }}>
-            {active==='overview' && <Overview user={u} visits={visits} relative={r}/>}
-            {active==='visits' && <Visits visits={visits}/>}
+            {active==='overview' && <Overview user={u} visits={visits} relative={r} lang={lang}/>}
+            {active==='visits' && <Visits visits={visits} lang={lang}/>}
             {active==='subscription' && (
               <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:28, boxShadow:SSM }}>
                 <div style={{ fontSize:24, fontWeight:800, color:C.textPrimary, marginBottom:6 }}>{plan} Plan</div>
                 <div style={{ fontSize:15, color:C.primary, fontWeight:600, marginBottom:4 }}>{u.subscription?.visitsPerMonth||2} nurse visits per month</div>
                 <div style={{ fontSize:13, color:C.textSecondary, marginBottom:28 }}>Status: <span style={{ fontWeight:700, color:statusColor[1] }}>{u.subscription?.status||'TRIAL'}</span></div>
-                <button style={{ background:`linear-gradient(135deg,${C.primary},${C.primaryDark})`, color:'#fff', border:'none', borderRadius:11, padding:'13px 28px', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>Upgrade to Premium →</button>
+                <button style={{ background:`linear-gradient(135deg,${C.primary},${C.primaryDark})`, color:'#fff', border:'none', borderRadius:11, padding:'13px 28px', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{t(lang,'dash.upgradeBtn')}</button>
               </div>
             )}
             {active==='settings' && <Settings key="settings-page" initialUser={u} initialRelative={r} lang={lang}/>}
@@ -273,9 +281,9 @@ export default function Dashboard({ params }) {
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             Menu
           </button>
-          {NAV.map(item=>(
+          {NAV_IDS.map(item=>(
             <button key={item.id} onClick={()=>setActive(item.id)} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:3, border:'none', background:'transparent', color:active===item.id?'#93C5FD':'rgba(255,255,255,0.4)', cursor:'pointer', fontSize:10, fontWeight:active===item.id?700:500, fontFamily:F, padding:'4px 2px' }}>
-              {item.icon}<span>{item.label}</span>
+              {item.icon}<span>{t(lang, item.labelKey)}</span>
             </button>
           ))}
         </div>

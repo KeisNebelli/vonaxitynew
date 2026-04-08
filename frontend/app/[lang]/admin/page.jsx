@@ -2,6 +2,8 @@
 import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { t } from '@/translations';
+import LangSwitcher from '@/components/ui/LangSwitcher';
 
 const C = {
   primary:'#2563EB', primaryLight:'#EFF6FF', primaryDark:'#1D4ED8',
@@ -140,7 +142,7 @@ function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen }
         {mobile ? (
           <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>Sign out</button>
         ) : (
-          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>Sign out</button>
+          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>{t(lang,'admin.signOut')}</button>
         )}
       </div>
     </>
@@ -432,11 +434,11 @@ function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject }) {
                 <td style={{ padding:'12px 16px' }}>
                   <div style={{ display:'flex', gap:6 }}>
                     {(n.status==='PENDING'||n.status==='INCOMPLETE') && <>
-                      <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>Approve</button>
-                      <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.errorLight, color:C.error, border:'none', borderRadius:6, cursor:'pointer' }}>Reject</button>
+                      <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{t(lang,'adminDash.approve')}</button>
+                      <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.errorLight, color:C.error, border:'none', borderRadius:6, cursor:'pointer' }}>{t(lang,'adminDash.reject')}</button>
                     </>}
-                    {n.status==='APPROVED' && <button onClick={()=>handleSuspend(n.id)} style={{ fontSize:11, padding:'5px 10px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:6, cursor:'pointer' }}>Suspend</button>}
-                    {(n.status==='SUSPENDED'||n.status==='REJECTED') && <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>Reinstate</button>}
+                    {n.status==='APPROVED' && <button onClick={()=>handleSuspend(n.id)} style={{ fontSize:11, padding:'5px 10px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:6, cursor:'pointer' }}>{t(lang,'adminDash.suspend')}</button>}
+                    {(n.status==='SUSPENDED'||n.status==='REJECTED') && <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{t(lang,'adminDash.reinstate')}</button>}
                   </div>
                 </td>
               </tr>
@@ -480,11 +482,11 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
           ))}
           <div style={{ marginTop:16, display:'flex', gap:8 }}>
             {(nurse.status==='PENDING'||nurse.status==='INCOMPLETE') && <>
-              <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondary, color:'#fff', border:'none', borderRadius:9, cursor:'pointer' }}>Approve</button>
-              <button onClick={()=>onReject(nurse.id, 'Rejected by admin')} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>Reject</button>
+              <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondary, color:'#fff', border:'none', borderRadius:9, cursor:'pointer' }}>{t(lang,'adminDash.approve')}</button>
+              <button onClick={()=>onReject(nurse.id, 'Rejected by admin')} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>{t(lang,'adminDash.reject')}</button>
             </>}
-            {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>Suspend</button>}
-            {(nurse.status==='SUSPENDED'||nurse.status==='REJECTED') && <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:9, cursor:'pointer' }}>Reinstate</button>}
+            {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>{t(lang,'adminDash.suspend')}</button>}
+            {(nurse.status==='SUSPENDED'||nurse.status==='REJECTED') && <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:9, cursor:'pointer' }}>{t(lang,'adminDash.reinstate')}</button>}
           </div>
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
@@ -670,8 +672,8 @@ function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, on
               <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{n.city || 'City not set'} · Applied {n.createdAt ? new Date(n.createdAt).toLocaleDateString() : '—'} · {n.licenseNumber || 'License pending'}</div>
             </div>
             <div style={{ display:'flex', gap:8 }}>
-              <button onClick={()=>onApprove(n.id)} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:8, cursor:'pointer' }}>Approve</button>
-              <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.errorLight, color:C.error, border:'none', borderRadius:8, cursor:'pointer' }}>Reject</button>
+              <button onClick={()=>onApprove(n.id)} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:8, cursor:'pointer' }}>{t(lang,'adminDash.approve')}</button>
+              <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.errorLight, color:C.error, border:'none', borderRadius:8, cursor:'pointer' }}>{t(lang,'adminDash.reject')}</button>
             </div>
           </div>
         ))}
@@ -927,10 +929,13 @@ function AdminSettings() {
 
 // ── Main ──────────────────────────────────────────────────────────────────────
 export default function AdminPage({ params }) {
-  const lang = params?.lang || 'en';
+  const [lang, setLang] = useState(params?.lang || 'en');
+  const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; };
   const router = useRouter();
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [lang, setLang] = useState(params?.lang || 'en');
+  const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; localStorage.setItem('vonaxity-lang',l); };
   const [nurses, setNurses] = useState([]);
   const [visits, setVisits] = useState([]);
   const [clients, setClients] = useState([]);
@@ -981,7 +986,7 @@ export default function AdminPage({ params }) {
   };
 
   const alertCount = visits.filter(v=>v.status==='UNASSIGNED').length + nurses.filter(n=>n.status==='PENDING').length;
-  const TITLES = { overview:'Admin Overview', clients:'Clients', nurses:'Nurses', visits:'Visits', alerts:'Alerts', payments:'Payments', ai:'AI Assistant', settings:'Settings' };
+  const TITLES = { overview:t(lang,'admin.overview'), clients:t(lang,'admin.clients'), nurses:t(lang,'admin.nurses'), visits:t(lang,'admin.visits'), alerts:t(lang,'admin.alerts'), payments:t(lang,'admin.payments'), ai:t(lang,'admin.aiAssistant'), settings:t(lang,'admin.settings') };
   const ADMIN_NAV_BOTTOM = NAV.slice(0,4);
 
   return (
@@ -1010,8 +1015,8 @@ export default function AdminPage({ params }) {
             </div>
             <div style={{ display:'flex', gap:8, alignItems:'center' }}>
               {alertCount>0 && <button onClick={()=>setActive('alerts')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#FEF2F2',color:'#DC2626',border:'none',borderRadius:8,cursor:'pointer',fontFamily:F }}>{alertCount} alert{alertCount>1?'s':''}</button>}
-              <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>↻ Refresh</button>
-              <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#F5F3FF',color:'#7C3AED',border:'1px solid rgba(124,58,237,0.2)',borderRadius:8,cursor:'pointer',fontFamily:F }}>AI</button>
+              <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>{t(lang,'adminDash.refresh')}</button>
+              <LangSwitcher lang={lang} onSwitch={switchLang}/><button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#F5F3FF',color:'#7C3AED',border:'1px solid rgba(124,58,237,0.2)',borderRadius:8,cursor:'pointer',fontFamily:F }}>{t(lang,'adminDash.aiAssistant')}</button>
             </div>
           </div>
           <main className="admin-cont" style={{ flex:1, padding:24, overflowY:'auto' }}>

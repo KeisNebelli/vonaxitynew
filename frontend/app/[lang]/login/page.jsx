@@ -10,6 +10,8 @@ const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', seco
 export default function LoginPage({ params }) {
   const lang = params.lang || 'en';
   const router = useRouter();
+  const [uiLang, setUiLang] = useState(lang || 'en');
+  const switchLang = (l) => { setUiLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; localStorage.setItem('vonaxity-lang',l); };
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);

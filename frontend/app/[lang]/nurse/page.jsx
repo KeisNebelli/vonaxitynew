@@ -2,6 +2,8 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { t } from '@/translations';
+import LangSwitcher from '@/components/ui/LangSwitcher';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#7C3AED', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827' };
@@ -85,7 +87,7 @@ function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen }) {
       </nav>
       <div style={{ padding:'12px 16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
         {mobile ? (
-          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>Sign out</button>
+          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{t(lang,'nurse.signOut')}</button>
         ) : (
           <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>Sign out</button>
         )}
@@ -430,15 +432,16 @@ function NurseProfile() {
 
 // ── Onboarding ────────────────────────────────────────────────────────────────
 
-function OnboardingBanner({ nurse, onStartOnboarding }) {
+function OnboardingBanner({ nurse, onStartOnboarding, lang='en' }) {
   const status = nurse?.status || 'INCOMPLETE';
   if (status === 'APPROVED') return null;
 
+  const tr = (k) => t(lang, k);
   const configs = {
-    INCOMPLETE: { bg:'#FEF3C7', border:'#FDE68A', color:'#92400E', title:'Complete your profile to get started', sub:'You need to complete your profile and submit for verification before you can receive bookings.', btn:'Complete profile', btnColor:C.warning },
-    PENDING: { bg:C.primaryLight, border:'rgba(37,99,235,0.2)', color:'#1E40AF', title:'Application under review', sub:'Our team is reviewing your credentials. You will be notified within 2-3 business days. You cannot receive bookings yet.', btn:null },
-    REJECTED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:'Application rejected', sub:`Your application was not approved. ${nurse?.rejectionReason||'Please review your credentials and resubmit.'} Update your profile and resubmit.`, btn:'Update & resubmit', btnColor:C.error },
-    SUSPENDED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:'Account suspended', sub:'Your account has been suspended. Contact support for assistance.', btn:null },
+    INCOMPLETE: { bg:'#FEF3C7', border:'#FDE68A', color:'#92400E', title:t(lang,'nurseDash.completeProfile'), sub:t(lang,'nurseDash.reviewMessage'), btn:t(lang,'nurseDash.completeBtn'), btnColor:C.warning },
+    PENDING: { bg:C.primaryLight, border:'rgba(37,99,235,0.2)', color:'#1E40AF', title:t(lang,'nurseDash.pendingReview'), sub:'Our team is reviewing your credentials. You will be notified within 2-3 business days. You cannot receive bookings yet.', btn:null },
+    REJECTED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:t(lang,'nurseDash.rejected'), sub:`Your application was not approved. ${nurse?.rejectionReason||'Please review your credentials and resubmit.'} Update your profile and resubmit.`, btn:t(lang,'nurseDash.resubmitBtn'), btnColor:C.error },
+    SUSPENDED: { bg:C.errorLight, border:'#FECACA', color:C.error, title:t(lang,'nurse.accountSuspended'), sub:t(lang,'nurse.accountSuspended'), btn:null },
   };
 
   const cfg = configs[status] || configs.INCOMPLETE;
@@ -675,10 +678,13 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
 
 // ── Main nurse page ────────────────────────────────────────────────────────────
 export default function NursePage({ params }) {
-  const lang = params?.lang || 'en';
+  const [lang, setLang] = useState(params?.lang || 'en');
+  const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; };
   const router = useRouter();
   const [active, setActive] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [lang, setLang] = useState(params?.lang || 'en');
+  const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; localStorage.setItem('vonaxity-lang',l); };
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [nurse, setNurse] = useState(null);
   const [loading, setLoading] = useState(true);
@@ -753,14 +759,12 @@ export default function NursePage({ params }) {
               </button>
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]||'Nurse Dashboard'}</div>
             </div>
-            <span style={{ fontSize:11, fontWeight:700, padding:'4px 11px', borderRadius:99, background:sbg, color:scol, display:'flex', alignItems:'center', gap:5 }}>
-              <div style={{ width:5,height:5,borderRadius:'50%',background:scol }}/>{status}
-            </span>
+            <div style={{display:'flex',alignItems:'center',gap:8}}><LangSwitcher lang={lang} onSwitch={switchLang}/><div style={{ display:'flex', alignItems:'center', gap:8 }}><LangToggle lang={lang} onSwitch={switchLang} /><span style={{ fontSize:11, fontWeight:700, padding:'4px 11px', borderRadius:99, background:sbg, color:scol, display:'flex', alignItems:'center', gap:5 }}><div style={{ width:5,height:5,borderRadius:'50%',background:scol }}/>{status}</span></div>
           </div>
 
           {/* Content */}
           <main className="nurse-cont" style={{ flex:1, padding:24, overflowY:'auto', maxWidth:720, width:'100%' }}>
-            <OnboardingBanner nurse={nurse} onStartOnboarding={()=>setActive('onboarding')} />
+            <OnboardingBanner nurse={nurse} onStartOnboarding={()=>setActive('onboarding')} lang={lang} />
             {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
             {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} />}
             {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} />}
