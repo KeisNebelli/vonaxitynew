@@ -12,6 +12,13 @@ export default function LoginPage({ params }) {
   const router = useRouter();
   const [uiLang, setUiLang] = useState(lang || 'en');
   const switchLang = (l) => { setUiLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; localStorage.setItem('vonaxity-lang',l); };
+
+  // Inline translations as fallback in case t() fails
+  const TR = {
+    en: { title:'Welcome back', noAccount:"Don't have an account?", signUp:'Sign up', email:'Email address', password:'Password', submit:'Sign in', loading:'Signing in...', fill:'Fill' },
+    sq: { title:'Mirë se keni ardhur', noAccount:'Nuk keni llogari?', signUp:'Regjistrohu', email:'Adresa e email-it', password:'Fjalëkalimi', submit:'Hyr', loading:'Duke hyrë...', fill:'Plotëso' },
+  };
+  const tr = (key) => TR[uiLang]?.[key] || TR.en[key] || key;
   const [form, setForm] = useState({ email: '', password: '' });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
@@ -47,23 +54,23 @@ export default function LoginPage({ params }) {
           </div>
         </div>
 
-        <h1 style={{ fontSize:24, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:8 }}>{t(uiLang,'login.title')}</h1>
+        <h1 style={{ fontSize:24, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:8 }}>{tr('title')}</h1>
         <p style={{ fontSize:14, color:C.textTertiary, marginBottom:28 }}>
-          {t(uiLang,'login.noAccount')} <Link href={`/${lang}/signup`} style={{ color:C.primary, fontWeight:600 }}>{t(uiLang,'login.signUp')}</Link>
+          {tr('noAccount')} <Link href={`/${lang}/signup`} style={{ color:C.primary, fontWeight:600 }}>{tr('signUp')}</Link>
         </p>
 
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom:16 }}>
-            <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{t(uiLang,'login.email')}</label>
+            <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('email')}</label>
             <input style={inp} type="email" placeholder="you@email.com" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
           </div>
           <div style={{ marginBottom:24 }}>
-            <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{t(uiLang,'login.password')}</label>
+            <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('password')}</label>
             <input style={inp} type="password" placeholder="••••••••" required value={form.password} onChange={e=>setForm({...form,password:e.target.value})} />
           </div>
           {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'11px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
           <button type="submit" disabled={loading} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:loading?0.7:1 }}>
-            {loading ? t(uiLang,'login.loading') : t(uiLang,'login.submit')}
+            {loading ? tr('loading') : tr('submit')}
           </button>
         </form>
 
@@ -73,7 +80,7 @@ export default function LoginPage({ params }) {
             <div key={role} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:C.textSecondary, marginBottom:6 }}>
               <span><strong style={{ color:C.textPrimary }}>{role}</strong> · {email}</span>
               <button onClick={()=>setForm({email,password:pass})} style={{ fontSize:11, padding:'3px 10px', borderRadius:6, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.primary, fontWeight:600 }}>
-                {t(uiLang,'login.fill')}
+                {tr('fill')}
               </button>
             </div>
           ))}
@@ -86,4 +93,3 @@ export default function LoginPage({ params }) {
     </div>
   );
 }
-
