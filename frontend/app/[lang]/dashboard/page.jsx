@@ -82,7 +82,6 @@ function Overview({ user, visits, relative, lang }) {
 }
 
 function Visits({ visits, lang }) {
-function Visits({ visits, lang }) {
   const tr = (key) => t(lang, key);
   if (!visits.length) return <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary }}>{tr('dashboard.noVisits')}</div>;
   return (
