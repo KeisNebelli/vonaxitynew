@@ -930,6 +930,8 @@ function AdminSettings() {
 export default function AdminPage({ params }) {
   const lang = params?.lang || 'en';
   const router = useRouter();
+  const [uiLang, setUiLang] = useState(lang);
+  const switchLang = (l) => { setUiLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; const path = window.location.pathname.replace(/^\/(en|sq)/,`/${l}`); window.location.href = path; };
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [nurses, setNurses] = useState([]);
@@ -1013,6 +1015,11 @@ export default function AdminPage({ params }) {
               {alertCount>0 && <button onClick={()=>setActive('alerts')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#FEF2F2',color:'#DC2626',border:'none',borderRadius:8,cursor:'pointer',fontFamily:F }}>{alertCount} alert{alertCount>1?'s':''}</button>}
               <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>{'↻ Refresh'}</button>
               <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#F5F3FF',color:'#7C3AED',border:'1px solid rgba(124,58,237,0.2)',borderRadius:8,cursor:'pointer',fontFamily:F }}>{'AI Assistant'}</button>
+              <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:'1px solid #E2E8F0' }}>
+                {['en','sq'].map(l=>(
+                  <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:uiLang===l?'#2563EB':'transparent', color:uiLang===l?'#fff':'#475569', fontFamily:F }}>{l.toUpperCase()}</button>
+                ))}
+              </div>
             </div>
           </div>
           <main className="admin-cont" style={{ flex:1, padding:24, overflowY:'auto' }}>

@@ -36,25 +36,34 @@ export default function LoginPage({ params }) {
   return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:C.bg, padding:24 }}>
       <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'40px 36px', maxWidth:420, width:'100%', boxShadow:'0 4px 24px rgba(0,0,0,0.06)' }}>
-        <Link href={`/${lang}`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px', display:'block', marginBottom:32 }}>Vonaxity</Link>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:32 }}>
+          <Link href={`/${uiLang}`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px' }}>Vonaxity</Link>
+          <div style={{ display:'flex', background:'#F5F5F4', borderRadius:8, padding:3, border:`1px solid ${C.border}` }}>
+            {['en','sq'].map(l => (
+              <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:uiLang===l?C.primary:'transparent', color:uiLang===l?'#fff':C.textSecondary, fontFamily:'inherit' }}>
+                {l.toUpperCase()}
+              </button>
+            ))}
+          </div>
+        </div>
 
-        <h1 style={{ fontSize:24, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:8 }}>{t(lang,'login.title')}</h1>
+        <h1 style={{ fontSize:24, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:8 }}>{t(uiLang,'login.title')}</h1>
         <p style={{ fontSize:14, color:C.textTertiary, marginBottom:28 }}>
-          {t(lang,'login.noAccount')} <Link href={`/${lang}/signup`} style={{ color:C.primary, fontWeight:600 }}>{t(lang,'login.signUp')}</Link>
+          {t(uiLang,'login.noAccount')} <Link href={`/${lang}/signup`} style={{ color:C.primary, fontWeight:600 }}>{t(uiLang,'login.signUp')}</Link>
         </p>
 
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom:16 }}>
-            <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{t(lang,'login.email')}</label>
+            <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{t(uiLang,'login.email')}</label>
             <input style={inp} type="email" placeholder="you@email.com" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
           </div>
           <div style={{ marginBottom:24 }}>
-            <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{t(lang,'login.password')}</label>
+            <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{t(uiLang,'login.password')}</label>
             <input style={inp} type="password" placeholder="••••••••" required value={form.password} onChange={e=>setForm({...form,password:e.target.value})} />
           </div>
           {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'11px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
           <button type="submit" disabled={loading} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:loading?0.7:1 }}>
-            {loading ? t(lang,'login.loading') : t(lang,'login.submit')}
+            {loading ? t(uiLang,'login.loading') : t(uiLang,'login.submit')}
           </button>
         </form>
 
@@ -64,7 +73,7 @@ export default function LoginPage({ params }) {
             <div key={role} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:C.textSecondary, marginBottom:6 }}>
               <span><strong style={{ color:C.textPrimary }}>{role}</strong> · {email}</span>
               <button onClick={()=>setForm({email,password:pass})} style={{ fontSize:11, padding:'3px 10px', borderRadius:6, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.primary, fontWeight:600 }}>
-                {t(lang,'login.fill')}
+                {t(uiLang,'login.fill')}
               </button>
             </div>
           ))}

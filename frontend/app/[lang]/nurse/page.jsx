@@ -755,7 +755,14 @@ export default function NursePage({ params }) {
               </button>
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]||'Nurse Dashboard'}</div>
             </div>
-            <span style={{ fontSize:11, fontWeight:700, padding:"4px 11px", borderRadius:99, background:sbg, color:scol, display:"flex", alignItems:"center", gap:5 }}><div style={{ width:5,height:5,borderRadius:"50%",background:scol }}/>{status}</span>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:'1px solid #E2E8F0' }}>
+                {['en','sq'].map(l=>(
+                  <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:lang===l?'#2563EB':'transparent', color:lang===l?'#fff':'#475569', fontFamily:F }}>{l.toUpperCase()}</button>
+                ))}
+              </div>
+              <span style={{ fontSize:11, fontWeight:700, padding:"4px 11px", borderRadius:99, background:sbg, color:scol, display:"flex", alignItems:"center", gap:5 }}><div style={{ width:5,height:5,borderRadius:"50%",background:scol }}/>{status}</span>
+            </div>
           </div>
 
           {/* Content */}

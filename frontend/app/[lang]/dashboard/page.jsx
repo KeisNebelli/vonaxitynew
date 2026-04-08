@@ -2,6 +2,7 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
+import { t } from '@/translations';
 import Settings from './settings';
 
 const C = { primary:'#2563EB',primaryLight:'#EFF6FF',primaryDark:'#1D4ED8',secondary:'#059669',secondaryLight:'#ECFDF5',warning:'#D97706',warningLight:'#FFFBEB',error:'#DC2626',errorLight:'#FEF2F2',purple:'#7C3AED',purpleLight:'#F5F3FF',bg:'#F8FAFC',bgWhite:'#FFFFFF',bgSubtle:'#F1F5F9',textPrimary:'#0F172A',textSecondary:'#475569',textTertiary:'#94A3B8',border:'#E2E8F0',borderSubtle:'#F1F5F9',sidebarBg:'#0F172A' };
@@ -108,6 +109,8 @@ function Visits({ visits }) {
 export default function Dashboard({ params }) {
   const lang = params?.lang || 'en';
   const router = useRouter();
+  const [uiLang, setUiLang] = useState(lang);
+  const switchLang = (l) => { setUiLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; const path = window.location.pathname.replace(/^\/(en|sq)/,`/${l}`); window.location.href = path; };
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [user, setUser] = useState(null);
@@ -232,7 +235,14 @@ export default function Dashboard({ params }) {
               </button>
               <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary }}>{TITLES[active]}</div>
             </div>
-            <span style={{ fontSize:11,fontWeight:700,padding:'4px 11px',borderRadius:99,background:isTrial?C.purpleLight:C.secondaryLight,color:isTrial?C.purple:C.secondary }}>{u.subscription?.status||'Trial'}</span>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:`1px solid ${C.border}` }}>
+                {['en','sq'].map(l=>(
+                  <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:uiLang===l?C.primary:'transparent', color:uiLang===l?'#fff':C.textSecondary, fontFamily:F }}>{l.toUpperCase()}</button>
+                ))}
+              </div>
+              <span style={{ fontSize:11,fontWeight:700,padding:'4px 11px',borderRadius:99,background:isTrial?C.purpleLight:C.secondaryLight,color:isTrial?C.purple:C.secondary }}>{u.subscription?.status||'Trial'}</span>
+            </div>
           </div>
           <main className="dash-cont" style={{ flex:1, overflowY:'auto', padding:24, maxWidth:760, width:'100%' }}>
             {active==='overview' && <Overview user={u} visits={visits} relative={r}/>}
