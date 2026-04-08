@@ -2,8 +2,6 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
-import { t } from '@/translations';
-import LangSwitcher from '@/components/ui/LangSwitcher';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#7C3AED', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827' };
@@ -678,8 +676,6 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
 
 // ── Main nurse page ────────────────────────────────────────────────────────────
 export default function NursePage({ params }) {
-  const [lang, setLang] = useState(params?.lang || 'en');
-  const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; };
   const router = useRouter();
   const [active, setActive] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
@@ -759,7 +755,7 @@ export default function NursePage({ params }) {
               </button>
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]||'Nurse Dashboard'}</div>
             </div>
-            <div style={{display:'flex',alignItems:'center',gap:8}}><LangSwitcher lang={lang} onSwitch={switchLang}/><div style={{ display:'flex', alignItems:'center', gap:8 }}><LangToggle lang={lang} onSwitch={switchLang} /><span style={{ fontSize:11, fontWeight:700, padding:'4px 11px', borderRadius:99, background:sbg, color:scol, display:'flex', alignItems:'center', gap:5 }}><div style={{ width:5,height:5,borderRadius:'50%',background:scol }}/>{status}</span></div>
+            <span style={{ fontSize:11, fontWeight:700, padding:"4px 11px", borderRadius:99, background:sbg, color:scol, display:"flex", alignItems:"center", gap:5 }}><div style={{ width:5,height:5,borderRadius:"50%",background:scol }}/>{status}</span>
           </div>
 
           {/* Content */}
