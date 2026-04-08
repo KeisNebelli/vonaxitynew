@@ -96,35 +96,70 @@ const NAV = [
   { id:'settings', label:'Settings', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
 ];
 
-function Sidebar({ active, setActive, collapsed, setCollapsed, onLogout, alertCount }) {
-  return (
-    <div style={{ width:collapsed?58:220, background:C.dark, display:'flex', flexDirection:'column', minHeight:'100vh', position:'sticky', top:0, transition:'width 0.2s', flexShrink:0 }}>
-      <div style={{ padding:'18px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-        {!collapsed && (
-          <div>
-            <div style={{ fontSize:17, fontWeight:700, color:'#fff', letterSpacing:'-0.5px' }}>Vonaxity</div>
-            <div style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'2px', marginTop:1 }}>ADMIN CRM</div>
+const F = "'DM Sans','Inter',system-ui,sans-serif";
+const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
+const SMD = '0 4px 12px rgba(15,23,42,0.08),0 2px 4px rgba(15,23,42,0.04)';
+
+function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen }) {
+  const SidebarContent = ({ mobile=false }) => (
+    <>
+      <div style={{ padding:'22px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
+        {mobile ? (
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+            <div>
+              <div style={{ fontSize:17, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>Vonaxity</div>
+              <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'2px', marginTop:2 }}>ADMIN CRM</div>
+            </div>
+            <button onClick={()=>setOpen(false)} style={{ background:'rgba(255,255,255,0.08)', border:'none', color:'rgba(255,255,255,0.6)', borderRadius:8, width:30,height:30, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>✕</button>
+          </div>
+        ) : (
+          <div style={{ marginBottom:14 }}>
+            <div style={{ fontSize:17, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>Vonaxity</div>
+            <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'2px', marginTop:2 }}>ADMIN CRM</div>
           </div>
         )}
-        <button onClick={()=>setCollapsed(!collapsed)} style={{ background:'rgba(255,255,255,0.08)', border:'none', color:'rgba(255,255,255,0.5)', borderRadius:7, width:28, height:28, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12 }}>{collapsed?'›':'‹'}</button>
+        <div style={{ display:'flex', alignItems:'center', gap:9 }}>
+          <div style={{ width:32,height:32,borderRadius:9,background:'linear-gradient(135deg,#7C3AED,#5B21B6)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>A</div>
+          <div>
+            <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>Admin</div>
+            <div style={{ fontSize:10, color:'rgba(255,255,255,0.35)' }}>admin@vonaxity.com</div>
+          </div>
+        </div>
       </div>
-      <nav style={{ flex:1, padding:'10px 8px', overflowY:'auto' }}>
-        {NAV.map(item => (
-          <button key={item.id} onClick={()=>setActive(item.id)} style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:collapsed?'10px 0':'10px 12px', borderRadius:9, border:'none', background:active===item.id?(item.highlight?'rgba(124,58,237,0.25)':'rgba(37,99,235,0.2)'):'transparent', color:active===item.id?(item.highlight?'#C4B5FD':'#93C5FD'):'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:13, fontWeight:active===item.id?600:400, marginBottom:2, justifyContent:collapsed?'center':'flex-start', position:'relative' }}>
+      <nav style={{ flex:1, padding:'10px', overflowY:'auto' }}>
+        {NAV.map(item=>(
+          <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }}
+            style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:`${mobile?'12px':'10px'} 12px`, borderRadius:10, border:'none', background:active===item.id?(item.highlight?'rgba(124,58,237,0.25)':'rgba(37,99,235,0.22)'):'transparent', color:active===item.id?(item.highlight?'#C4B5FD':'#93C5FD'):'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
             {item.icon}
-            {!collapsed && <span style={{ flex:1 }}>{item.label}</span>}
-            {!collapsed && item.badge > 0 && <span style={{ fontSize:10, fontWeight:700, background:C.error, color:'#fff', borderRadius:99, padding:'2px 6px', minWidth:18, textAlign:'center' }}>{item.badge}</span>}
-            {collapsed && item.badge > 0 && <span style={{ position:'absolute', top:4, right:4, width:8, height:8, borderRadius:'50%', background:C.error }} />}
+            <span style={{ flex:1 }}>{item.label}</span>
+            {item.id==='alerts' && alertCount>0 && <span style={{ fontSize:10,fontWeight:800,background:'#DC2626',color:'#fff',borderRadius:99,padding:'2px 6px',minWidth:18,textAlign:'center' }}>{alertCount}</span>}
           </button>
         ))}
       </nav>
-      {!collapsed && (
-        <div style={{ padding:'12px 16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
-          <div style={{ fontSize:12, color:'rgba(255,255,255,0.4)', marginBottom:6 }}>admin@vonaxity.com</div>
-          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.25)', background:'transparent', border:'none', cursor:'pointer', padding:0 }}>Sign out</button>
-        </div>
-      )}
-    </div>
+      <div style={{ padding:'12px 16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
+        {mobile ? (
+          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>Sign out</button>
+        ) : (
+          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>Sign out</button>
+        )}
+      </div>
+    </>
+  );
+
+  return (
+    <>
+      {/* Desktop */}
+      <div style={{ width:224, background:'#0F172A', display:'flex', flexDirection:'column', position:'sticky', top:0, height:'100vh', flexShrink:0 }} className="admin-desk-sb">
+        <SidebarContent />
+      </div>
+      {/* Mobile overlay */}
+      {open && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:39 }} onClick={()=>setOpen(false)} />}
+      {/* Mobile drawer */}
+      <div style={{ display:'none', position:'fixed', top:0, left:0, height:'100vh', width:270, background:'#0F172A', flexDirection:'column', zIndex:50, transform:open?'translateX(0)':'translateX(-100%)', transition:'transform 0.25s ease', boxShadow:'4px 0 24px rgba(0,0,0,0.3)' }} className="admin-mob-sb">
+        <SidebarContent mobile />
+      </div>
+      <style>{`@media(max-width:768px){.admin-desk-sb{display:none!important;}.admin-mob-sb{display:flex!important;}}`}</style>
+    </>
   );
 }
 
@@ -895,7 +930,7 @@ export default function AdminPage({ params }) {
   const lang = params?.lang || 'en';
   const router = useRouter();
   const [active, setActive] = useState('overview');
-  const [collapsed, setCollapsed] = useState(false);
+  const [sidebarOpen, setSidebarOpen] = useState(false);
   const [nurses, setNurses] = useState([]);
   const [visits, setVisits] = useState([]);
   const [clients, setClients] = useState([]);
@@ -906,100 +941,112 @@ export default function AdminPage({ params }) {
     setLoading(true);
     try {
       const [nursesData, usersData, visitsData, paymentsData] = await Promise.all([
-        api.getNurses().catch(e => { console.error('Nurses fetch error:', e); return { nurses: [] }; }),
-        api.getUsers().catch(e => { console.error('Users fetch error:', e); return { users: [] }; }),
-        api.getVisits().catch(e => { console.error('Visits fetch error:', e); return { visits: [] }; }),
-        api.getPayments().catch(e => { console.error('Payments fetch error:', e); return { payments: [] }; }),
+        api.getNurses().catch(()=>({ nurses:[] })),
+        api.getUsers().catch(()=>({ users:[] })),
+        api.getVisits().catch(()=>({ visits:[] })),
+        api.getPayments().catch(()=>({ payments:[] })),
       ]);
-      // Always use real data — empty array means DB is empty, not an error
       setNurses(nursesData?.nurses || []);
       setClients(usersData?.users || []);
-      // Normalize visits to consistent shape
       const rawVisits = visitsData?.visits || [];
-      const normalizedVisits = rawVisits.map(v => ({
-        ...v,
-        clientName: v.clientName || v.relative?.name || v.relative?.client?.name || 'Unknown',
-        service: v.service || v.serviceType || 'Unknown',
-        city: v.city || v.relative?.city || '',
-        nurseName: v.nurseName || v.nurse?.user?.name || null,
-        nurseId: v.nurseId || v.nurse?.id || null,
-        bp: v.bp || (v.bpSystolic ? `${v.bpSystolic}/${v.bpDiastolic}` : null),
-      }));
-      setVisits(normalizedVisits);
+      setVisits(rawVisits.map(v=>({ ...v, clientName:v.clientName||v.relative?.name||'Unknown', service:v.service||v.serviceType||'Unknown', nurseName:v.nurseName||v.nurse?.user?.name||null, nurseId:v.nurseId||v.nurse?.id||null })));
       setPayments(paymentsData?.payments || []);
-    } catch (err) {
-      console.error('Admin load error:', err);
-    } finally { setLoading(false); }
+    } catch (err) { console.error('Admin load error:', err); }
+    finally { setLoading(false); }
   };
 
   useEffect(() => { loadData(); }, []);
 
   const handleApprove = async (nurseId) => {
-    try {
-      await api.approveNurse(nurseId);
-      setNurses(prev => prev.map(n => n.id===nurseId ? {...n, status:'APPROVED'} : n));
-    } catch (err) { alert('Failed to approve: ' + err.message); }
+    try { await api.approveNurse(nurseId); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'APPROVED'}:n)); }
+    catch (err) { alert('Failed: '+err.message); }
   };
-
   const handleSuspend = async (nurseId) => {
-    try {
-      await api.suspendNurse(nurseId);
-      setNurses(prev => prev.map(n => n.id===nurseId ? {...n, status:'SUSPENDED'} : n));
-    } catch (err) { alert('Failed to suspend: ' + err.message); }
+    try { await api.suspendNurse(nurseId); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'SUSPENDED'}:n)); }
+    catch (err) { alert('Failed: '+err.message); }
   };
-
   const handleReject = async (nurseId, reason) => {
-    try {
-      await api.rejectNurse(nurseId, { reason });
-      setNurses(prev => prev.map(n => n.id===nurseId ? {...n, status:'REJECTED', rejectionReason:reason} : n));
-    } catch (err) { alert('Failed to reject: ' + err.message); }
+    try { await api.rejectNurse(nurseId, { reason }); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'REJECTED',rejectionReason:reason}:n)); }
+    catch (err) { alert('Failed: '+err.message); }
   };
-
   const handleAssign = async (visitId, nurseId) => {
-    try {
-      await api.updateVisit(visitId, { nurseId, status: 'PENDING' });
-      await loadData();
-    } catch (err) { alert('Failed: ' + err.message); }
+    try { await api.updateVisit(visitId,{nurseId,status:'PENDING'}); await loadData(); }
+    catch (err) { alert('Failed: '+err.message); }
   };
-
   const logout = () => {
     localStorage.removeItem('vonaxity-token');
-    document.cookie = 'vonaxity-token=;path=/;max-age=0';
-    document.cookie = 'vonaxity-role=;path=/;max-age=0';
+    document.cookie='vonaxity-token=;path=/;max-age=0';
+    document.cookie='vonaxity-role=;path=/;max-age=0';
     router.push(`/${lang}/login`);
   };
 
-  const alertCount = visits.filter(v=>v.status==='UNASSIGNED').length + nurses.filter(n=>['PENDING','INCOMPLETE'].includes(n.status)).length;
-  const titles = { overview:'Admin Overview', clients:'Clients', nurses:'Nurses', visits:'Visits', alerts:'Alerts & Issues', payments:'Payments', ai:'AI Assistant', settings:'Settings' };
+  const alertCount = visits.filter(v=>v.status==='UNASSIGNED').length + nurses.filter(n=>n.status==='PENDING').length;
+  const TITLES = { overview:'Admin Overview', clients:'Clients', nurses:'Nurses', visits:'Visits', alerts:'Alerts', payments:'Payments', ai:'AI Assistant', settings:'Settings' };
+  const ADMIN_NAV_BOTTOM = NAV.slice(0,4);
 
   return (
-    <div style={{ display:'flex', minHeight:'100vh', fontFamily:"'Inter',system-ui,sans-serif", background:C.bg }}>
-      <Sidebar active={active} setActive={setActive} collapsed={collapsed} setCollapsed={setCollapsed} onLogout={logout} alertCount={alertCount} />
-      <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
-        <div style={{ padding:'0 28px', height:60, borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'space-between', background:C.bgWhite, flexShrink:0 }}>
-          <div style={{ fontSize:16, fontWeight:600, color:C.textPrimary }}>{titles[active]}</div>
-          <div style={{ display:'flex', gap:10, alignItems:'center' }}>
-            {alertCount > 0 && (
-              <button onClick={()=>setActive('alerts')} style={{ fontSize:12, fontWeight:600, padding:'6px 12px', background:C.errorLight, color:C.error, border:'none', borderRadius:7, cursor:'pointer' }}>
-                {alertCount} alert{alertCount>1?'s':''}
+    <>
+      <style>{`
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+        *{box-sizing:border-box;}body{margin:0;}
+        @keyframes spin{to{transform:rotate(360deg)}}
+        @media(max-width:768px){
+          .admin-cont{padding:16px 16px 140px!important;}
+          .admin-ham{display:flex!important;}
+          .admin-tabs{display:flex!important;}
+        }
+      `}</style>
+      <div style={{ display:'flex', minHeight:'100vh', fontFamily:F, background:'#F8FAFC' }}>
+        <AdminSidebar active={active} setActive={setActive} onLogout={logout} alertCount={alertCount} open={sidebarOpen} setOpen={setSidebarOpen} />
+        <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
+          <div style={{ padding:'0 24px', height:58, borderBottom:'1px solid #E2E8F0', display:'flex', alignItems:'center', justifyContent:'space-between', background:'#FFFFFF', flexShrink:0 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+              <button onClick={()=>setSidebarOpen(true)} className="admin-ham" style={{ display:'none', flexDirection:'column', gap:4, background:'transparent', border:'none', cursor:'pointer', padding:'6px' }}>
+                <span style={{ display:'block',width:20,height:2,background:'#0F172A',borderRadius:2 }}/>
+                <span style={{ display:'block',width:20,height:2,background:'#0F172A',borderRadius:2 }}/>
+                <span style={{ display:'block',width:20,height:2,background:'#0F172A',borderRadius:2 }}/>
               </button>
-            )}
-            <button onClick={loadData} style={{ fontSize:12, fontWeight:600, padding:'6px 12px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:7, cursor:'pointer' }}>Refresh</button>
-            <button onClick={()=>setActive('ai')} style={{ fontSize:12, fontWeight:600, padding:'6px 14px', background:C.purpleLight, color:C.purple, border:`1px solid rgba(124,58,237,0.2)`, borderRadius:7, cursor:'pointer' }}>AI Assistant</button>
-            <div style={{ width:32, height:32, borderRadius:'50%', background:'#1E3A5F', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:'#93C5FD' }}>A</div>
+              <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]}</div>
+            </div>
+            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+              {alertCount>0 && <button onClick={()=>setActive('alerts')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#FEF2F2',color:'#DC2626',border:'none',borderRadius:8,cursor:'pointer',fontFamily:F }}>{alertCount} alert{alertCount>1?'s':''}</button>}
+              <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>↻ Refresh</button>
+              <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#F5F3FF',color:'#7C3AED',border:'1px solid rgba(124,58,237,0.2)',borderRadius:8,cursor:'pointer',fontFamily:F }}>AI</button>
+            </div>
           </div>
+          <main className="admin-cont" style={{ flex:1, padding:24, overflowY:'auto' }}>
+            {loading ? (
+              <div style={{ display:'flex',alignItems:'center',justifyContent:'center',height:200 }}>
+                <div style={{ width:32,height:32,borderRadius:'50%',border:'3px solid #EFF6FF',borderTopColor:'#2563EB',animation:'spin 0.8s linear infinite' }}/>
+              </div>
+            ) : (
+              <>
+                {active==='overview' && <Overview setActive={setActive} nurses={nurses} clients={clients} visits={visits} payments={payments} />}
+                {active==='clients' && <Clients clients={clients} visits={visits} />}
+                {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} />}
+                {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} onAssign={handleAssign} />}
+                {active==='alerts' && <Alerts visits={visits} nurses={nurses} setVisits={setVisits} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onAssign={handleAssign} />}
+                {active==='payments' && <Payments payments={payments} />}
+                {active==='ai' && <AIAssistant clients={clients} nurses={nurses} visits={visits} />}
+                {active==='settings' && <AdminSettings />}
+              </>
+            )}
+          </main>
         </div>
-        <main style={{ flex:1, padding:28, overflowY:'auto' }}>
-          {active==='overview' && <Overview setActive={setActive} nurses={nurses} clients={clients} visits={visits} payments={payments} />}
-          {active==='clients' && <Clients clients={clients} visits={visits} />}
-          {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} />}
-          {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} onAssign={handleAssign} />}
-          {active==='alerts' && <Alerts visits={visits} nurses={nurses} setVisits={setVisits} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onAssign={handleAssign} />}
-          {active==='payments' && <Payments payments={payments} />}
-          {active==='ai' && <AIAssistant clients={clients} nurses={nurses} visits={visits} />}
-          {active==='settings' && <AdminSettings />}
-        </main>
+        <div className="admin-tabs" style={{ display:'none', position:'fixed', bottom:0, left:0, right:0, background:'#0F172A', borderTop:'1px solid rgba(255,255,255,0.08)', zIndex:48, padding:'8px 0 env(safe-area-inset-bottom,8px)' }}>
+          <button onClick={()=>setSidebarOpen(true)} style={{ flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,border:'none',background:'transparent',color:'rgba(255,255,255,0.45)',cursor:'pointer',fontSize:10,fontWeight:500,fontFamily:F,padding:'4px 2px' }}>
+            <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+            Menu
+          </button>
+          {ADMIN_NAV_BOTTOM.map(item=>(
+            <button key={item.id} onClick={()=>setActive(item.id)} style={{ flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,border:'none',background:'transparent',color:active===item.id?'#93C5FD':'rgba(255,255,255,0.4)',cursor:'pointer',fontSize:10,fontWeight:active===item.id?700:500,fontFamily:F,padding:'4px 2px',position:'relative' }}>
+              {item.icon}
+              {item.id==='alerts'&&alertCount>0&&<span style={{ position:'absolute',top:2,right:'50%',marginRight:-14,width:14,height:14,background:'#DC2626',color:'#fff',borderRadius:99,fontSize:8,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center' }}>{alertCount}</span>}
+              <span>{item.label}</span>
+            </button>
+          ))}
+        </div>
       </div>
-    </div>
+    </>
   );
 }
