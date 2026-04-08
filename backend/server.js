@@ -12,8 +12,21 @@ const app = express();
 const PORT = process.env.PORT || 4000;
 
 // ── Middleware ────────────────────────────────────────────────────────────────
+const allowedOrigins = [
+  process.env.FRONTEND_URL || 'http://localhost:3000',
+  'https://vonaxity.com',
+  'https://www.vonaxity.com',
+];
+
 app.use(cors({
-  origin: process.env.FRONTEND_URL || 'http://localhost:3000',
+  origin: (origin, callback) => {
+    // Allow requests with no origin (mobile apps, curl, etc.)
+    if (!origin) return callback(null, true);
+    // Allow any vercel.app preview URL
+    if (origin.endsWith('.vercel.app')) return callback(null, true);
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error(`CORS blocked: ${origin}`));
+  },
   credentials: true,
 }));
 app.use(express.json());
@@ -69,3 +82,30 @@ app.listen(PORT, () => {
 });
 
 module.exports = app;
+
+// ── AI Assistant proxy (Phase 3) ──────────────────────────────────────────────
+app.post('/ai/chat', async (req, res) => {
+  try {
+    const { messages, system } = req.body;
+    const response = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'anthropic-version': '2023-06-01',
+      },
+      body: JSON.stringify({
+        model: 'claude-haiku-4-5-20251001',
+        max_tokens: 1000,
+        system,
+        messages,
+      }),
+    });
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error?.message || 'AI error');
+    res.json({ content: data.content?.[0]?.text || '' });
+  } catch (err) {
+    console.error('AI proxy error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});

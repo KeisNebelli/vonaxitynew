@@ -4,16 +4,25 @@ const { requireRole, authMiddleware } = require('../middleware/auth');
 
 // ── USERS ─────────────────────────────────────────────────────────────────────
 
-// GET /users
+// GET /users — admin gets all clients (role=CLIENT only)
 router.get('/', ...requireRole('ADMIN'), async (req, res) => {
   try {
     const users = await prisma.user.findMany({
       where: { role: 'CLIENT' },
-      include: { subscription: true, relatives: true },
+      include: {
+        subscription: true,
+        relatives: true,
+        visits: {
+          select: { id:true, status:true, scheduledAt:true, serviceType:true },
+          orderBy: { scheduledAt: 'desc' },
+          take: 5,
+        },
+      },
       orderBy: { createdAt: 'desc' },
     });
     res.json({ users });
   } catch (err) {
+    console.error('Get users error:', err);
     res.status(500).json({ error: 'Failed to fetch users' });
   }
 });

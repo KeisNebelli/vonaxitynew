@@ -1,6 +1,7 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
+import { api } from '@/lib/api';
 
 const C = {
   primary:'#2563EB', primaryLight:'#EFF6FF', primaryDark:'#1D4ED8',
@@ -89,14 +90,13 @@ const NAV = [
   { id:'clients', label:'Clients', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> },
   { id:'nurses', label:'Nurses', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
   { id:'visits', label:'Visits', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
-  { id:'alerts', label:'Alerts', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>, badge: MOCK_VISITS.filter(v=>v.status==='UNASSIGNED').length },
+  { id:'alerts', label:'Alerts', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> },
   { id:'payments', label:'Payments', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
   { id:'ai', label:'AI Assistant', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>, highlight:true },
   { id:'settings', label:'Settings', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
 ];
 
-function Sidebar({ active, setActive, collapsed, setCollapsed, onLogout }) {
-  const alertCount = MOCK_VISITS.filter(v=>v.status==='UNASSIGNED').length;
+function Sidebar({ active, setActive, collapsed, setCollapsed, onLogout, alertCount }) {
   return (
     <div style={{ width:collapsed?58:220, background:C.dark, display:'flex', flexDirection:'column', minHeight:'100vh', position:'sticky', top:0, transition:'width 0.2s', flexShrink:0 }}>
       <div style={{ padding:'18px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
@@ -129,19 +129,19 @@ function Sidebar({ active, setActive, collapsed, setCollapsed, onLogout }) {
 }
 
 // ── Overview ──────────────────────────────────────────────────────────────────
-function Overview({ setActive }) {
-  const unassigned = MOCK_VISITS.filter(v=>v.status==='UNASSIGNED');
-  const pending = MOCK_NURSES.filter(n=>n.status==='PENDING');
-  const todayVisits = MOCK_VISITS.filter(v=>['PENDING','IN_PROGRESS','ON_THE_WAY'].includes(v.status));
-  const revenue = MOCK_PAYMENTS.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
+function Overview({ setActive, nurses, clients, visits, payments }) {
+  const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
+  const pending = nurses.filter(n=>['PENDING','INCOMPLETE'].includes(n.status));
+  const todayVisits = visits.filter(v=>['PENDING','IN_PROGRESS','ON_THE_WAY'].includes(v.status));
+  const revenue = payments.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
 
   return (
     <div>
       {/* Metric cards */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:28 }}>
         {[
-          ['Total clients', MOCK_CLIENTS.length, C.primary, 'clients'],
-          ['Active nurses', MOCK_NURSES.filter(n=>n.status==='APPROVED').length, C.secondary, 'nurses'],
+          ['Total clients', clients.length, C.primary, 'clients'],
+          ['Active nurses', nurses.filter(n=>n.status==='APPROVED').length, C.secondary, 'nurses'],
           ['Visits today', todayVisits.length, C.purple, 'visits'],
           ['Unassigned', unassigned.length, unassigned.length>0?C.error:C.textTertiary, 'alerts'],
           ['Revenue', `€${revenue}`, C.secondary, 'payments'],
@@ -176,7 +176,7 @@ function Overview({ setActive }) {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
           <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Recent visits</div>
-          {MOCK_VISITS.slice(0,4).map((v,i) => (
+          {visits.slice(0,4).map((v,i) => (
             <div key={v.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 0', borderBottom:i<3?`1px solid ${C.borderSubtle}`:'none' }}>
               <div>
                 <div style={{ fontSize:13, fontWeight:500, color:C.textPrimary }}>{v.clientName}</div>
@@ -188,7 +188,7 @@ function Overview({ setActive }) {
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
           <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Recent payments</div>
-          {MOCK_PAYMENTS.slice(0,4).map((p,i) => (
+          {payments.slice(0,4).map((p,i) => (
             <div key={p.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 0', borderBottom:i<3?`1px solid ${C.borderSubtle}`:'none' }}>
               <div>
                 <div style={{ fontSize:13, fontWeight:500, color:C.textPrimary }}>{p.clientName}</div>
@@ -207,15 +207,15 @@ function Overview({ setActive }) {
 }
 
 // ── Clients ───────────────────────────────────────────────────────────────────
-function Clients() {
+function Clients({ clients, visits }) {
   const [search, setSearch] = useState('');
   const [filterPlan, setFilterPlan] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selected, setSelected] = useState(null);
 
-  const filtered = useMemo(() => MOCK_CLIENTS.filter(c => {
+  const filtered = useMemo(() => clients.filter(c => {
     const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase()) || c.country.toLowerCase().includes(search.toLowerCase());
-    const matchPlan = filterPlan==='all' || c.plan===filterPlan;
+    const plan = c.subscription?.plan || c.plan || ''; const matchPlan = filterPlan==='all' || plan===filterPlan;
     const matchStatus = filterStatus==='all' || c.status===filterStatus;
     return matchSearch && matchPlan && matchStatus;
   }), [search, filterPlan, filterStatus]);
@@ -257,7 +257,7 @@ function Clients() {
                   <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{c.email}</div>
                 </td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{c.country}</td>
-                <td style={{ padding:'12px 16px' }}><Badge label={c.plan.charAt(0).toUpperCase()+c.plan.slice(1)} type='primary' small /></td>
+                <td style={{ padding:'12px 16px' }}><Badge label={(c.subscription?.plan || c.plan || 'N/A').charAt(0).toUpperCase()+(c.subscription?.plan || c.plan || 'N/A').slice(1)} type='primary' small /></td>
                 <td style={{ padding:'12px 16px' }}>{statusBadge(c.status)}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{c.visitsUsed}/{c.visitsTotal}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary }}>{c.joinedAt}</td>
@@ -273,7 +273,7 @@ function Clients() {
 }
 
 function ClientDetail({ client, onBack }) {
-  const clientVisits = MOCK_VISITS.filter(v=>v.clientId===client.id);
+  const clientVisits = visits.filter(v=>v.clientId===client.id||v.relative?.clientId===client.id);
   return (
     <div>
       <button onClick={onBack} style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:C.textSecondary, background:'transparent', border:'none', cursor:'pointer', marginBottom:20, padding:0, fontWeight:500 }}>
@@ -289,7 +289,7 @@ function ClientDetail({ client, onBack }) {
             </div>
             {statusBadge(client.status)}
           </div>
-          {[['Phone',client.phone],['Country',client.country],['Plan',client.plan.charAt(0).toUpperCase()+client.plan.slice(1)],['Joined',client.joinedAt],['Visits used',`${client.visitsUsed}/${client.visitsTotal}`]].map(([k,v]) => (
+          {[['Phone',client.phone],['Country',client.country],['Plan',(client.subscription?.plan || client.plan || 'N/A').charAt(0).toUpperCase()+(client.subscription?.plan || client.plan || 'N/A').slice(1)],['Joined',client.joinedAt],['Visits used',`${client.subscription?.visitsUsed || 0}/${client.subscription?.visitsPerMonth || 0}`]].map(([k,v]) => (
             <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
               <span style={{ color:C.textTertiary }}>{k}</span>
               <span style={{ color:C.textPrimary, fontWeight:500 }}>{v}</span>
@@ -298,7 +298,13 @@ function ClientDetail({ client, onBack }) {
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
           <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Loved one</div>
-          {[['Name',client.relative.name],['City',client.relative.city],['Address',client.relative.address],['Phone',client.relative.phone],['Age',client.relative.age]].map(([k,v]) => (
+          {(client.relatives?.length > 0 ? [
+            ['Name', client.relatives[0].name],
+            ['City', client.relatives[0].city],
+            ['Address', client.relatives[0].address],
+            ['Phone', client.relatives[0].phone || 'Not set'],
+            ['Age', client.relatives[0].age || 'Not set'],
+          ] : [['Loved one', 'No relative added yet']]).map(([k,v]) => (
             <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
               <span style={{ color:C.textTertiary }}>{k}</span>
               <span style={{ color:C.textPrimary, fontWeight:500 }}>{v}</span>
@@ -323,21 +329,29 @@ function ClientDetail({ client, onBack }) {
 }
 
 // ── Nurses ────────────────────────────────────────────────────────────────────
-function Nurses({ nurses, setNurses }) {
+function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject }) {
   const [search, setSearch] = useState('');
   const [filterCity, setFilterCity] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
   const [selected, setSelected] = useState(null);
 
-  const filtered = useMemo(() => nurses.filter(n => {
-    const matchSearch = !search || n.name.toLowerCase().includes(search.toLowerCase()) || n.email.toLowerCase().includes(search.toLowerCase());
+  const filtered = useMemo(() => nurses.map(n => ({
+    ...n,
+    name: n.name || n.user?.name || 'Unknown',
+    email: n.email || n.user?.email || '',
+    phone: n.phone || n.user?.phone || '',
+    joinedAt: n.joinedAt || n.createdAt,
+  })).filter(n => {
+    const nurseName = n.user?.name || n.name || '';
+    const nurseEmail = n.user?.email || n.email || '';
+    const matchSearch = !search || nurseName.toLowerCase().includes(search.toLowerCase()) || nurseEmail.toLowerCase().includes(search.toLowerCase());
     const matchCity = filterCity==='all' || n.city===filterCity;
     const matchStatus = filterStatus==='all' || n.status===filterStatus;
     return matchSearch && matchCity && matchStatus;
   }), [search, filterCity, filterStatus, nurses]);
 
-  const handleApprove = (id) => setNurses(prev=>prev.map(n=>n.id===id?{...n,status:'APPROVED'}:n));
-  const handleSuspend = (id) => setNurses(prev=>prev.map(n=>n.id===id?{...n,status:'SUSPENDED'}:n));
+  const handleApprove = (id) => onApprove(id);
+  const handleSuspend = (id) => onSuspend(id);
 
   if (selected) return <NurseDetail nurse={nurses.find(n=>n.id===selected)} onBack={()=>setSelected(null)} onApprove={handleApprove} onSuspend={handleSuspend} />;
 
@@ -351,8 +365,10 @@ function Nurses({ nurses, setNurses }) {
         </select>
         <select style={{...inp}} value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
           <option value="all">All statuses</option>
+          <option value="INCOMPLETE">Incomplete</option>
+          <option value="PENDING">Pending review</option>
           <option value="APPROVED">Approved</option>
-          <option value="PENDING">Pending</option>
+          <option value="REJECTED">Rejected</option>
           <option value="SUSPENDED">Suspended</option>
         </select>
         <span style={{ fontSize:12, color:C.textTertiary }}>{filtered.length} nurses</span>
@@ -370,22 +386,22 @@ function Nurses({ nurses, setNurses }) {
             {filtered.map((n,i) => (
               <tr key={n.id} style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
                 <td style={{ padding:'12px 16px', cursor:'pointer' }} onClick={()=>setSelected(n.id)}>
-                  <div style={{ fontWeight:600, color:C.textPrimary }}>{n.name}</div>
-                  <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{n.email}</div>
+                  <div style={{ fontWeight:600, color:C.textPrimary }}>{n.user?.name || n.name || '—'}</div>
+                  <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{n.user?.email || n.email || '—'}</div>
                 </td>
-                <td style={{ padding:'12px 16px', color:C.textSecondary }}>{n.city}</td>
+                <td style={{ padding:'12px 16px', color:C.textSecondary }}>{n.city || '—'}</td>
                 <td style={{ padding:'12px 16px' }}>{statusBadge(n.status)}</td>
                 <td style={{ padding:'12px 16px', color:n.rating>0?C.warning:C.textTertiary, fontWeight:600 }}>{n.rating>0?`${n.rating}`:'N/A'}</td>
-                <td style={{ padding:'12px 16px', color:C.textSecondary }}>{n.totalVisits}</td>
-                <td style={{ padding:'12px 16px', color:C.textTertiary, fontSize:12 }}>{n.licenseNumber}</td>
+                <td style={{ padding:'12px 16px', color:C.textSecondary }}>{n.totalVisits || 0}</td>
+                <td style={{ padding:'12px 16px', color:C.textTertiary, fontSize:12 }}>{n.licenseNumber || '—'}</td>
                 <td style={{ padding:'12px 16px' }}>
                   <div style={{ display:'flex', gap:6 }}>
-                    {n.status==='PENDING' && <>
+                    {(n.status==='PENDING'||n.status==='INCOMPLETE') && <>
                       <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>Approve</button>
-                      <button onClick={()=>handleSuspend(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.errorLight, color:C.error, border:'none', borderRadius:6, cursor:'pointer' }}>Reject</button>
+                      <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.errorLight, color:C.error, border:'none', borderRadius:6, cursor:'pointer' }}>Reject</button>
                     </>}
                     {n.status==='APPROVED' && <button onClick={()=>handleSuspend(n.id)} style={{ fontSize:11, padding:'5px 10px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:6, cursor:'pointer' }}>Suspend</button>}
-                    {n.status==='SUSPENDED' && <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>Reinstate</button>}
+                    {(n.status==='SUSPENDED'||n.status==='REJECTED') && <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>Reinstate</button>}
                   </div>
                 </td>
               </tr>
@@ -400,7 +416,12 @@ function Nurses({ nurses, setNurses }) {
 
 function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
   if (!nurse) return null;
-  const nurseVisits = MOCK_VISITS.filter(v=>v.nurseId===nurse.id);
+  const name = nurse.name || nurse.user?.name || 'Unknown';
+  const email = nurse.email || nurse.user?.email || '';
+  const phone = nurse.phone || nurse.user?.phone || '';
+  const nurseVisits = (nurse.visits || []);
+  let availability = [];
+  try { availability = typeof nurse.availability === 'string' ? JSON.parse(nurse.availability) : (nurse.availability || []); } catch {}
   return (
     <div>
       <button onClick={onBack} style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:C.textSecondary, background:'transparent', border:'none', cursor:'pointer', marginBottom:20, padding:0, fontWeight:500 }}>
@@ -411,24 +432,24 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
             <div>
-              <div style={{ fontSize:20, fontWeight:700, color:C.textPrimary }}>{nurse.name}</div>
-              <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{nurse.email}</div>
+              <div style={{ fontSize:20, fontWeight:700, color:C.textPrimary }}>{name}</div>
+              <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{email}</div>
             </div>
             {statusBadge(nurse.status)}
           </div>
-          {[['Phone',nurse.phone],['City',nurse.city],['License',nurse.licenseNumber],['Rating',nurse.rating>0?nurse.rating:'Not yet rated'],['Total visits',nurse.totalVisits],['Total earnings',`€${nurse.totalEarnings}`],['Joined',nurse.joinedAt]].map(([k,v]) => (
+          {[['Phone',phone],['City',nurse.city||'Not set'],['License',nurse.licenseNumber||'Not set'],['Issuing authority',nurse.issuingAuthority||'Not set'],['Experience',nurse.experience||'Not set'],['Rating',nurse.rating>0?nurse.rating:'Not yet rated'],['Total visits',nurse.totalVisits||0],['Submitted',nurse.submittedAt?new Date(nurse.submittedAt).toLocaleDateString():'Not submitted'],['Joined',nurse.createdAt?new Date(nurse.createdAt).toLocaleDateString():'']].map(([k,v]) => (
             <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
               <span style={{ color:C.textTertiary }}>{k}</span>
-              <span style={{ color:C.textPrimary, fontWeight:500 }}>{v}</span>
+              <span style={{ color:v==='Not set'||v==='Not submitted'?C.warning:C.textPrimary, fontWeight:500 }}>{v}</span>
             </div>
           ))}
           <div style={{ marginTop:16, display:'flex', gap:8 }}>
-            {nurse.status==='PENDING' && <>
-              <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondary, color:'#fff', border:'none', borderRadius:9, cursor:'pointer' }}>Approve nurse</button>
-              <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>Reject</button>
+            {(nurse.status==='PENDING'||nurse.status==='INCOMPLETE') && <>
+              <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondary, color:'#fff', border:'none', borderRadius:9, cursor:'pointer' }}>Approve</button>
+              <button onClick={()=>onReject(nurse.id, 'Rejected by admin')} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>Reject</button>
             </>}
-            {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>Suspend account</button>}
-            {nurse.status==='SUSPENDED' && <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:9, cursor:'pointer' }}>Reinstate</button>}
+            {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>Suspend</button>}
+            {(nurse.status==='SUSPENDED'||nurse.status==='REJECTED') && <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:9, cursor:'pointer' }}>Reinstate</button>}
           </div>
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
@@ -436,7 +457,7 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
           <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:20 }}>
             {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => {
               const full = {Mon:'Monday',Tue:'Tuesday',Wed:'Wednesday',Thu:'Thursday',Fri:'Friday',Sat:'Saturday',Sun:'Sunday'};
-              const active = nurse.availability.includes(full[d]);
+              const active = availability.includes(full[d]);
               return <span key={d} style={{ fontSize:12, fontWeight:600, padding:'5px 10px', borderRadius:8, background:active?C.primaryLight:C.bgSubtle, color:active?C.primary:C.textTertiary, border:`1px solid ${active?'rgba(37,99,235,0.2)':C.border}` }}>{d}</span>;
             })}
           </div>
@@ -462,7 +483,7 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
 }
 
 // ── Visits ────────────────────────────────────────────────────────────────────
-function Visits({ visits, setVisits, nurses }) {
+function Visits({ visits, setVisits, nurses, onAssign }) {
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCity, setFilterCity] = useState('all');
@@ -476,10 +497,7 @@ function Visits({ visits, setVisits, nurses }) {
     return matchSearch && matchStatus && matchCity;
   }), [search, filterStatus, filterCity, visits]);
 
-  const handleAssign = (visitId, nurse) => {
-    setVisits(prev=>prev.map(v=>v.id===visitId?{...v,nurseId:nurse.id,nurseName:nurse.name,status:'PENDING'}:v));
-    setAssigning(null);
-  };
+  const handleAssign = (visitId, nurse) => onAssign(visitId, nurse.id);
 
   if (selected) {
     const v = visits.find(vv=>vv.id===selected);
@@ -509,16 +527,16 @@ function Visits({ visits, setVisits, nurses }) {
           {v.status!=='COMPLETED' && (
             <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
               <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Assign nurse</div>
-              {nurses.filter(n=>n.status==='APPROVED'&&n.city===v.city).map(n => (
+              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).map(n => (
                 <button key={n.id} onClick={()=>handleAssign(v.id,n)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%', padding:'12px 16px', background:v.nurseId===n.id?C.primaryLight:C.bg, border:`1px solid ${v.nurseId===n.id?C.primary:C.border}`, borderRadius:10, cursor:'pointer', marginBottom:8, textAlign:'left' }}>
                   <div>
-                    <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{n.name}</div>
-                    <div style={{ fontSize:12, color:C.textTertiary }}>Rating {n.rating} · {n.totalVisits} visits</div>
+                    <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{n.user?.name || n.name || '—'}</div>
+                    <div style={{ fontSize:12, color:C.textTertiary }}>Rating {n.rating || 'N/A'} · {n.totalVisits || 0} visits</div>
                   </div>
                   {v.nurseId===n.id ? <span style={{ fontSize:12, fontWeight:700, color:C.primary }}>Assigned</span> : <span style={{ fontSize:12, fontWeight:600, color:C.primary }}>Assign →</span>}
                 </button>
               ))}
-              {nurses.filter(n=>n.status==='APPROVED'&&n.city===v.city).length===0 && <div style={{ fontSize:13, color:C.error }}>No approved nurses in {v.city}.</div>}
+              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).length===0 && <div style={{ fontSize:13, color:C.error }}>No approved nurses in {v.city}.</div>}
             </div>
           )}
         </div>
@@ -570,10 +588,10 @@ function Visits({ visits, setVisits, nurses }) {
 }
 
 // ── Alerts ────────────────────────────────────────────────────────────────────
-function Alerts({ visits, nurses, setVisits, setNurses }) {
+function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, onAssign }) {
   const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
   const noShow = visits.filter(v=>v.status==='NO_SHOW');
-  const pendingNurses = nurses.filter(n=>n.status==='PENDING');
+  const pendingNurses = nurses.filter(n=>['PENDING','INCOMPLETE'].includes(n.status));
   const incompleteReports = visits.filter(v=>v.status==='COMPLETED'&&!v.nurseNotes);
 
   const AlertGroup = ({ title, count, color, children }) => (
@@ -586,10 +604,7 @@ function Alerts({ visits, nurses, setVisits, setNurses }) {
     </div>
   );
 
-  const handleAssignAlert = (visitId, nurseId) => {
-    const nurse = nurses.find(n=>n.id===nurseId);
-    setVisits(prev=>prev.map(v=>v.id===visitId?{...v,nurseId,nurseName:nurse?.name,status:'PENDING'}:v));
-  };
+  const handleAssignAlert = (visitId, nurseId) => onAssign(visitId, nurseId);
 
   return (
     <div>
@@ -601,12 +616,12 @@ function Alerts({ visits, nurses, setVisits, setNurses }) {
               <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{v.service} · {v.city} · {new Date(v.scheduledAt).toLocaleDateString()}</div>
             </div>
             <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-              {nurses.filter(n=>n.status==='APPROVED'&&n.city===v.city).slice(0,2).map(n => (
+              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).slice(0,2).map(n => (
                 <button key={n.id} onClick={()=>handleAssignAlert(v.id,n.id)} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.primaryLight, color:C.primary, border:`1px solid rgba(37,99,235,0.2)`, borderRadius:8, cursor:'pointer' }}>
-                  Assign {n.name.split(' ')[0]}
+                  Assign {(n.user?.name || n.name || 'Nurse').split(' ')[0]}
                 </button>
               ))}
-              {nurses.filter(n=>n.status==='APPROVED'&&n.city===v.city).length===0 && <span style={{ fontSize:12, color:C.error }}>No nurses in {v.city}</span>}
+              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).length===0 && <span style={{ fontSize:12, color:C.error }}>No nurses in {v.city}</span>}
             </div>
           </div>
         ))}
@@ -616,12 +631,12 @@ function Alerts({ visits, nurses, setVisits, setNurses }) {
         {pendingNurses.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>No pending applications.</div> : pendingNurses.map(n => (
           <div key={n.id} style={{ padding:'14px 20px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <div>
-              <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{n.name}</div>
-              <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{n.city} · Applied {n.joinedAt} · {n.licenseNumber}</div>
+              <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{n.user?.name || n.name || '—'}</div>
+              <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{n.city || 'City not set'} · Applied {n.createdAt ? new Date(n.createdAt).toLocaleDateString() : '—'} · {n.licenseNumber || 'License pending'}</div>
             </div>
             <div style={{ display:'flex', gap:8 }}>
-              <button onClick={()=>setNurses(prev=>prev.map(nn=>nn.id===n.id?{...nn,status:'APPROVED'}:nn))} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:8, cursor:'pointer' }}>Approve</button>
-              <button onClick={()=>setNurses(prev=>prev.map(nn=>nn.id===n.id?{...nn,status:'SUSPENDED'}:nn))} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.errorLight, color:C.error, border:'none', borderRadius:8, cursor:'pointer' }}>Reject</button>
+              <button onClick={()=>onApprove(n.id)} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:8, cursor:'pointer' }}>Approve</button>
+              <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.errorLight, color:C.error, border:'none', borderRadius:8, cursor:'pointer' }}>Reject</button>
             </div>
           </div>
         ))}
@@ -650,9 +665,9 @@ function Alerts({ visits, nurses, setVisits, setNurses }) {
 }
 
 // ── Payments ──────────────────────────────────────────────────────────────────
-function Payments() {
-  const total = MOCK_PAYMENTS.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
-  const failed = MOCK_PAYMENTS.filter(p=>p.status==='failed');
+function Payments({ payments }) {
+  const total = payments.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
+  const failed = payments.filter(p=>p.status==='failed');
   return (
     <div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:24 }}>
@@ -705,124 +720,129 @@ function Payments() {
 // ── AI Assistant ──────────────────────────────────────────────────────────────
 function AIAssistant({ clients, nurses, visits }) {
   const [messages, setMessages] = useState([
-    { role:'assistant', content:"Hi! I'm the Vonaxity AI assistant. I can help you analyze your platform data, answer questions about clients and nurses, and help you manage day-to-day operations. What would you like to know?" }
+    { role:'assistant', content:"Hi! I'm the Vonaxity smart assistant. I can instantly analyze your platform data and answer operational questions. Try asking me something below or click a quick question!" }
   ]);
   const [input, setInput] = useState('');
-  const [loading, setLoading] = useState(false);
 
-  const CONTEXT = `
-You are the internal AI assistant for Vonaxity, a home nurse visit platform in Albania.
-You have access to the following platform data:
+  // Free rule-based engine — no API costs
+  const analyze = (q) => {
+    const query = q.toLowerCase();
+    const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
+    const pending = nurses.filter(n=>n.status==='PENDING');
+    const approved = nurses.filter(n=>n.status==='APPROVED');
+    const completed = visits.filter(v=>v.status==='COMPLETED');
+    const noShow = visits.filter(v=>v.status==='NO_SHOW');
+    const revenue = payments.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
 
-CLIENTS (${clients.length} total):
-${clients.map(c=>`- ${c.name} (${c.country}, ${c.plan} plan, ${c.status}), relative: ${c.relative.name} in ${c.relative.city}`).join('\n')}
+    if (query.includes('unassigned')) {
+      if (unassigned.length===0) return 'All visits are currently assigned. No action needed.';
+      return `There are ${unassigned.length} unassigned visit${unassigned.length>1?'s':''}:\n\n${unassigned.map(v=>`• ${v.clientName} — ${v.service} in ${v.city} on ${new Date(v.scheduledAt).toLocaleDateString()}`).join('\n')}\n\nGo to the Alerts tab to assign nurses quickly.`;
+    }
+    if (query.includes('tirana') && (query.includes('nurse') || query.includes('available'))) {
+      const tiranaApproved = approved.filter(n=>n.city==='Tirana');
+      return `${tiranaApproved.length} approved nurse${tiranaApproved.length!==1?'s':''} available in Tirana:\n\n${tiranaApproved.map(n=>`• ${n.name} — Rating ${n.rating} · ${n.totalVisits} visits\n  Available: ${n.availability.slice(0,3).join(', ')}${n.availability.length>3?'...':''}`).join('\n\n')}`;
+    }
+    if (query.includes('nurse') && (query.includes('available') || query.includes('approved'))) {
+      const byCity = {};
+      approved.forEach(n=>{ if(!byCity[n.city]) byCity[n.city]=[]; byCity[n.city].push(n.name); });
+      return `${approved.length} approved nurses across ${Object.keys(byCity).length} cities:\n\n${Object.entries(byCity).map(([city,ns])=>`• ${city}: ${ns.join(', ')}`).join('\n')}`;
+    }
+    if (query.includes('premium')) {
+      const premiumClients = clients.filter(c=>c.plan==='premium');
+      return `${premiumClients.length} clients on the Premium plan:\n\n${premiumClients.map(c=>`• ${c.name} (${c.country}) — ${c.status} · ${c.visitsUsed}/${c.visitsTotal} visits used`).join('\n')}`;
+    }
+    if (query.includes('pending') && query.includes('nurse')) {
+      if (pending.length===0) return 'No nurse applications pending. All applications have been reviewed.';
+      return `${pending.length} nurse application${pending.length!==1?'s':''} awaiting review:\n\n${pending.map(n=>`• ${n.name} — ${n.city} · Applied ${n.joinedAt}\n  License: ${n.licenseNumber}`).join('\n\n')}\n\nGo to the Nurses tab or Alerts to approve or reject.`;
+    }
+    if (query.includes('today') || query.includes('scheduled')) {
+      const today = visits.filter(v=>['PENDING','IN_PROGRESS','ON_THE_WAY'].includes(v.status));
+      if (today.length===0) return 'No visits scheduled or in progress right now.';
+      return `${today.length} visit${today.length!==1?'s':''} currently scheduled or in progress:\n\n${today.map(v=>`• ${v.clientName} — ${v.service} in ${v.city}\n  Nurse: ${v.nurseName||'Unassigned'} · ${new Date(v.scheduledAt).toLocaleDateString()}`).join('\n\n')}`;
+    }
+    if (query.includes('city') && query.includes('most')) {
+      const cityCounts = {};
+      visits.forEach(v=>{ cityCounts[v.city]=(cityCounts[v.city]||0)+1; });
+      const sorted = Object.entries(cityCounts).sort((a,b)=>b[1]-a[1]);
+      return `Visit breakdown by city:\n\n${sorted.map(([city,count])=>`• ${city}: ${count} visit${count!==1?'s':''}`).join('\n')}\n\nTirana leads with ${sorted[0][1]} visits.`;
+    }
+    if (query.includes('revenue') || query.includes('payment') || query.includes('money')) {
+      const failed = payments.filter(p=>p.status==='failed');
+      return `Revenue summary:\n\n• Total collected: €${revenue}\n• Successful payments: ${payments.filter(p=>p.status==='paid').length}\n• Failed payments: ${failed.length}${failed.length>0?'\n\nFailed payments:\n'+failed.map(p=>`• ${p.clientName} — €${p.amount} (${p.date})`).join('\n'):''}`;
+    }
+    if (query.includes('no show') || query.includes('no-show') || query.includes('missed')) {
+      if (noShow.length===0) return 'No no-shows recorded. All completed visits went ahead as planned.';
+      return `${noShow.length} no-show${noShow.length!==1?'s':''} recorded:\n\n${noShow.map(v=>`• ${v.clientName} — ${v.service} in ${v.city} on ${new Date(v.scheduledAt).toLocaleDateString()}\n  Nurse: ${v.nurseName}${v.nurseNotes?'\n  Note: '+v.nurseNotes:''}`).join('\n\n')}`;
+    }
+    if (query.includes('client') && (query.includes('total') || query.includes('how many'))) {
+      const byCountry = {};
+      clients.forEach(c=>{ byCountry[c.country]=(byCountry[c.country]||0)+1; });
+      return `${clients.length} total clients:\n\n• Active: ${clients.filter(c=>c.status==='ACTIVE').length}\n• Trial: ${clients.filter(c=>c.status==='TRIAL').length}\n\nBy country:\n${Object.entries(byCountry).map(([country,count])=>`• ${country}: ${count}`).join('\n')}`;
+    }
+    if (query.includes('summary') || query.includes('overview') || query.includes('status')) {
+      return `Platform summary:\n\n• Clients: ${clients.length} (${clients.filter(c=>c.status==='ACTIVE').length} active, ${clients.filter(c=>c.status==='TRIAL').length} trial)\n• Nurses: ${nurses.length} (${approved.length} approved, ${pending.length} pending)\n• Visits: ${visits.length} total (${completed.length} completed, ${unassigned.length} unassigned)\n• Revenue: €${revenue}\n• Alerts: ${unassigned.length} unassigned visit${unassigned.length!==1?'s':''}, ${pending.length} pending nurse${pending.length!==1?'s':''}`;
+    }
+    if (query.includes('rating') || query.includes('best nurse') || query.includes('top nurse')) {
+      const sorted = [...approved].sort((a,b)=>b.rating-a.rating);
+      return `Nurses ranked by rating:\n\n${sorted.map((n,i)=>`${i+1}. ${n.name} (${n.city}) — ${n.rating} rating · ${n.totalVisits} visits`).join('\n')}`;
+    }
 
-NURSES (${nurses.length} total):
-${nurses.map(n=>`- ${n.name} (${n.city}, ${n.status}, rating: ${n.rating}, ${n.totalVisits} visits)`).join('\n')}
+    return `I can answer questions about:\n\n• Unassigned visits — "How many unassigned visits?"\n• Nurse availability — "Which nurses are in Tirana?"\n• Client plans — "Show premium clients"\n• Alerts — "Any pending nurse applications?"\n• Revenue — "What's our total revenue?"\n• City breakdown — "Which city has the most visits?"\n• Platform summary — "Give me an overview"\n\nTry one of the quick questions above or rephrase your question!`;
+  };
 
-VISITS (${visits.length} total):
-${visits.map(v=>`- ${v.clientName} → ${v.service} in ${v.city} on ${new Date(v.scheduledAt).toLocaleDateString()}, nurse: ${v.nurseName||'UNASSIGNED'}, status: ${v.status}`).join('\n')}
-
-ALERTS:
-- Unassigned visits: ${visits.filter(v=>v.status==='UNASSIGNED').length}
-- Pending nurse approvals: ${nurses.filter(n=>n.status==='PENDING').length}
-- No-shows: ${visits.filter(v=>v.status==='NO_SHOW').length}
-
-Answer questions about this data. Be concise, helpful, and operational. Format numbers clearly.
-If asked to take actions, explain what action should be taken and who to contact.
-  `.trim();
-
-  const sendMessage = async () => {
-    if (!input.trim() || loading) return;
+  const sendMessage = () => {
+    if (!input.trim()) return;
     const userMsg = input.trim();
     setInput('');
-    setMessages(prev=>[...prev,{ role:'user', content:userMsg }]);
-    setLoading(true);
-
-    try {
-      const response = await fetch('https://api.anthropic.com/v1/messages', {
-        method:'POST',
-        headers:{ 'Content-Type':'application/json' },
-        body: JSON.stringify({
-          model:'claude-sonnet-4-20250514',
-          max_tokens:1000,
-          system: CONTEXT,
-          messages:[
-            ...messages.filter(m=>m.role!=='assistant'||messages.indexOf(m)>0).map(m=>({ role:m.role, content:m.content })),
-            { role:'user', content:userMsg }
-          ],
-        }),
-      });
-      const data = await response.json();
-      const reply = data.content?.[0]?.text || 'Sorry, I could not generate a response.';
-      setMessages(prev=>[...prev,{ role:'assistant', content:reply }]);
-    } catch (err) {
-      setMessages(prev=>[...prev,{ role:'assistant', content:'Connection error. Please try again.' }]);
-    } finally { setLoading(false); }
+    const reply = analyze(userMsg);
+    setMessages(prev=>[...prev, { role:'user', content:userMsg }, { role:'assistant', content:reply }]);
   };
 
   const QUICK = [
     'How many unassigned visits do we have?',
     'Which nurses are available in Tirana?',
     'Show me clients on the premium plan',
-    'What visits are scheduled for today?',
     'Are there any nurse applications pending?',
     'Which city has the most visits?',
+    'Give me a platform summary',
   ];
 
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 120px)', maxWidth:760 }}>
       <div style={{ background:C.primaryLight, borderRadius:14, border:`1px solid rgba(37,99,235,0.15)`, padding:'16px 20px', marginBottom:20, display:'flex', gap:12, alignItems:'center' }}>
         <div style={{ width:40, height:40, borderRadius:'50%', background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </div>
         <div>
-          <div style={{ fontSize:15, fontWeight:700, color:C.primary }}>Vonaxity AI Assistant</div>
-          <div style={{ fontSize:12, color:'#3B82F6', marginTop:2 }}>Powered by Claude · Has access to all platform data</div>
+          <div style={{ fontSize:15, fontWeight:700, color:C.primary }}>Vonaxity Smart Assistant</div>
+          <div style={{ fontSize:12, color:'#3B82F6', marginTop:2 }}>Instant data analysis · No API cost · Real-time platform insights</div>
         </div>
       </div>
 
-      {/* Quick actions */}
       <div style={{ display:'flex', gap:8, flexWrap:'wrap', marginBottom:16 }}>
         {QUICK.map(q => (
-          <button key={q} onClick={()=>{ setInput(q); }} style={{ fontSize:12, fontWeight:500, padding:'6px 12px', borderRadius:99, border:`1px solid ${C.border}`, background:C.bgWhite, color:C.textSecondary, cursor:'pointer', whiteSpace:'nowrap' }}>
+          <button key={q} onClick={()=>setInput(q)} style={{ fontSize:12, fontWeight:500, padding:'6px 12px', borderRadius:99, border:`1px solid ${C.border}`, background:C.bgWhite, color:C.textSecondary, cursor:'pointer', whiteSpace:'nowrap' }}>
             {q}
           </button>
         ))}
       </div>
 
-      {/* Messages */}
       <div style={{ flex:1, overflowY:'auto', background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20, marginBottom:16, display:'flex', flexDirection:'column', gap:14 }}>
         {messages.map((m,i) => (
           <div key={i} style={{ display:'flex', gap:10, alignItems:'flex-start', flexDirection:m.role==='user'?'row-reverse':'row' }}>
-            <div style={{ width:32, height:32, borderRadius:'50%', background:m.role==='user'?'#1E3A5F':C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:m.role==='user'?'#93C5FD':C.primary, flexShrink:0 }}>
+            <div style={{ width:32, height:32, borderRadius:'50%', background:m.role==='user'?'#1E3A5F':C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:700, color:m.role==='user'?'#93C5FD':C.primary, flexShrink:0 }}>
               {m.role==='user'?'A':'AI'}
             </div>
-            <div style={{ maxWidth:'75%', background:m.role==='user'?C.primary:C.bg, borderRadius:m.role==='user'?'14px 14px 4px 14px':'14px 14px 14px 4px', padding:'12px 16px', fontSize:14, color:m.role==='user'?'#fff':C.textPrimary, lineHeight:1.65, whiteSpace:'pre-wrap' }}>
+            <div style={{ maxWidth:'78%', background:m.role==='user'?C.primary:C.bg, borderRadius:m.role==='user'?'14px 14px 4px 14px':'14px 14px 14px 4px', padding:'12px 16px', fontSize:14, color:m.role==='user'?'#fff':C.textPrimary, lineHeight:1.7, whiteSpace:'pre-wrap' }}>
               {m.content}
             </div>
           </div>
         ))}
-        {loading && (
-          <div style={{ display:'flex', gap:10, alignItems:'center' }}>
-            <div style={{ width:32, height:32, borderRadius:'50%', background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:C.primary }}>AI</div>
-            <div style={{ background:C.bg, borderRadius:'14px 14px 14px 4px', padding:'12px 16px', fontSize:14, color:C.textTertiary }}>Thinking...</div>
-          </div>
-        )}
       </div>
 
-      {/* Input */}
       <div style={{ display:'flex', gap:10 }}>
-        <input
-          value={input}
-          onChange={e=>setInput(e.target.value)}
-          onKeyDown={e=>e.key==='Enter'&&!e.shiftKey&&sendMessage()}
-          placeholder="Ask about clients, nurses, visits, revenue..."
-          style={{ flex:1, padding:'12px 16px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' }}
-        />
-        <button onClick={sendMessage} disabled={!input.trim()||loading} style={{ padding:'12px 20px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:14, fontWeight:600, cursor:'pointer', opacity:!input.trim()||loading?0.5:1 }}>
-          Send
-        </button>
+        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&sendMessage()} placeholder="Ask about clients, nurses, visits, revenue..." style={{ flex:1, padding:'12px 16px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' }} />
+        <button onClick={sendMessage} disabled={!input.trim()} style={{ padding:'12px 20px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:14, fontWeight:600, cursor:'pointer', opacity:!input.trim()?0.5:1 }}>Send</button>
       </div>
     </div>
   );
@@ -876,22 +896,85 @@ export default function AdminPage({ params }) {
   const router = useRouter();
   const [active, setActive] = useState('overview');
   const [collapsed, setCollapsed] = useState(false);
-  const [nurses, setNurses] = useState(MOCK_NURSES);
-  const [visits, setVisits] = useState(MOCK_VISITS);
+  const [nurses, setNurses] = useState([]);
+  const [visits, setVisits] = useState([]);
+  const [clients, setClients] = useState([]);
+  const [payments, setPayments] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  const loadData = async () => {
+    setLoading(true);
+    try {
+      const [nursesData, usersData, visitsData, paymentsData] = await Promise.all([
+        api.getNurses().catch(e => { console.error('Nurses fetch error:', e); return { nurses: [] }; }),
+        api.getUsers().catch(e => { console.error('Users fetch error:', e); return { users: [] }; }),
+        api.getVisits().catch(e => { console.error('Visits fetch error:', e); return { visits: [] }; }),
+        api.getPayments().catch(e => { console.error('Payments fetch error:', e); return { payments: [] }; }),
+      ]);
+      // Always use real data — empty array means DB is empty, not an error
+      setNurses(nursesData?.nurses || []);
+      setClients(usersData?.users || []);
+      // Normalize visits to consistent shape
+      const rawVisits = visitsData?.visits || [];
+      const normalizedVisits = rawVisits.map(v => ({
+        ...v,
+        clientName: v.clientName || v.relative?.name || v.relative?.client?.name || 'Unknown',
+        service: v.service || v.serviceType || 'Unknown',
+        city: v.city || v.relative?.city || '',
+        nurseName: v.nurseName || v.nurse?.user?.name || null,
+        nurseId: v.nurseId || v.nurse?.id || null,
+        bp: v.bp || (v.bpSystolic ? `${v.bpSystolic}/${v.bpDiastolic}` : null),
+      }));
+      setVisits(normalizedVisits);
+      setPayments(paymentsData?.payments || []);
+    } catch (err) {
+      console.error('Admin load error:', err);
+    } finally { setLoading(false); }
+  };
+
+  useEffect(() => { loadData(); }, []);
+
+  const handleApprove = async (nurseId) => {
+    try {
+      await api.approveNurse(nurseId);
+      setNurses(prev => prev.map(n => n.id===nurseId ? {...n, status:'APPROVED'} : n));
+    } catch (err) { alert('Failed to approve: ' + err.message); }
+  };
+
+  const handleSuspend = async (nurseId) => {
+    try {
+      await api.suspendNurse(nurseId);
+      setNurses(prev => prev.map(n => n.id===nurseId ? {...n, status:'SUSPENDED'} : n));
+    } catch (err) { alert('Failed to suspend: ' + err.message); }
+  };
+
+  const handleReject = async (nurseId, reason) => {
+    try {
+      await api.rejectNurse(nurseId, { reason });
+      setNurses(prev => prev.map(n => n.id===nurseId ? {...n, status:'REJECTED', rejectionReason:reason} : n));
+    } catch (err) { alert('Failed to reject: ' + err.message); }
+  };
+
+  const handleAssign = async (visitId, nurseId) => {
+    try {
+      await api.updateVisit(visitId, { nurseId, status: 'PENDING' });
+      await loadData();
+    } catch (err) { alert('Failed: ' + err.message); }
+  };
 
   const logout = () => {
+    localStorage.removeItem('vonaxity-token');
     document.cookie = 'vonaxity-token=;path=/;max-age=0';
     document.cookie = 'vonaxity-role=;path=/;max-age=0';
     router.push(`/${lang}/login`);
   };
 
-  const alertCount = visits.filter(v=>v.status==='UNASSIGNED').length + nurses.filter(n=>n.status==='PENDING').length;
-
-  const titles = { overview:'Admin Overview', clients:'Clients', nurses:'Nurses', visits:'Visits', alerts:`Alerts & Issues`, payments:'Payments', ai:'AI Assistant', settings:'Settings' };
+  const alertCount = visits.filter(v=>v.status==='UNASSIGNED').length + nurses.filter(n=>['PENDING','INCOMPLETE'].includes(n.status)).length;
+  const titles = { overview:'Admin Overview', clients:'Clients', nurses:'Nurses', visits:'Visits', alerts:'Alerts & Issues', payments:'Payments', ai:'AI Assistant', settings:'Settings' };
 
   return (
     <div style={{ display:'flex', minHeight:'100vh', fontFamily:"'Inter',system-ui,sans-serif", background:C.bg }}>
-      <Sidebar active={active} setActive={setActive} collapsed={collapsed} setCollapsed={setCollapsed} onLogout={logout} />
+      <Sidebar active={active} setActive={setActive} collapsed={collapsed} setCollapsed={setCollapsed} onLogout={logout} alertCount={alertCount} />
       <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
         <div style={{ padding:'0 28px', height:60, borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'space-between', background:C.bgWhite, flexShrink:0 }}>
           <div style={{ fontSize:16, fontWeight:600, color:C.textPrimary }}>{titles[active]}</div>
@@ -901,20 +984,19 @@ export default function AdminPage({ params }) {
                 {alertCount} alert{alertCount>1?'s':''}
               </button>
             )}
-            <button onClick={()=>setActive('ai')} style={{ fontSize:12, fontWeight:600, padding:'6px 14px', background:C.purpleLight, color:C.purple, border:`1px solid rgba(124,58,237,0.2)`, borderRadius:7, cursor:'pointer' }}>
-              AI Assistant
-            </button>
+            <button onClick={loadData} style={{ fontSize:12, fontWeight:600, padding:'6px 12px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:7, cursor:'pointer' }}>Refresh</button>
+            <button onClick={()=>setActive('ai')} style={{ fontSize:12, fontWeight:600, padding:'6px 14px', background:C.purpleLight, color:C.purple, border:`1px solid rgba(124,58,237,0.2)`, borderRadius:7, cursor:'pointer' }}>AI Assistant</button>
             <div style={{ width:32, height:32, borderRadius:'50%', background:'#1E3A5F', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:700, color:'#93C5FD' }}>A</div>
           </div>
         </div>
         <main style={{ flex:1, padding:28, overflowY:'auto' }}>
-          {active==='overview' && <Overview setActive={setActive} />}
-          {active==='clients' && <Clients />}
-          {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} />}
-          {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} />}
-          {active==='alerts' && <Alerts visits={visits} nurses={nurses} setVisits={setVisits} setNurses={setNurses} />}
-          {active==='payments' && <Payments />}
-          {active==='ai' && <AIAssistant clients={MOCK_CLIENTS} nurses={nurses} visits={visits} />}
+          {active==='overview' && <Overview setActive={setActive} nurses={nurses} clients={clients} visits={visits} payments={payments} />}
+          {active==='clients' && <Clients clients={clients} visits={visits} />}
+          {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} />}
+          {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} onAssign={handleAssign} />}
+          {active==='alerts' && <Alerts visits={visits} nurses={nurses} setVisits={setVisits} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onAssign={handleAssign} />}
+          {active==='payments' && <Payments payments={payments} />}
+          {active==='ai' && <AIAssistant clients={clients} nurses={nurses} visits={visits} />}
           {active==='settings' && <AdminSettings />}
         </main>
       </div>
