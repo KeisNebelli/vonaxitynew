@@ -21,6 +21,14 @@ const translations = {
       subtitle:'Our certified nurses perform a full range of non-emergency health services at your family\'s door.',
       emergency:'Important: Vonaxity is non-emergency care only. For emergencies in Albania, call',
       immediately:'immediately.',
+      items:[
+        { title:'Blood Pressure Check', desc:'Regular monitoring of systolic and diastolic blood pressure with professional equipment.' },
+        { title:'Glucose Monitoring', desc:'Blood sugar testing and recording for diabetic patients and those at risk.' },
+        { title:'Vitals Monitoring', desc:'Full vital signs check including heart rate, temperature, and oxygen saturation.' },
+        { title:'Blood Work Collection', desc:'On-site blood sample collection sent directly to certified Albanian laboratories.' },
+        { title:'Welfare Check', desc:'A comprehensive visit to assess your loved one\'s general health and wellbeing.' },
+        { title:'Post-surgical Care', desc:'Professional wound care, medication checks, and recovery monitoring after surgery.' },
+      ],
     },
     pricing: {
       tag:'Simple pricing', title:'Plans for every family',
@@ -37,6 +45,14 @@ const translations = {
     },
     faq: {
       tag:'FAQ', title:'Common questions', viewAll:'View all FAQs →',
+      items:[
+        { q:'How do I book a nurse visit?', a:'Sign up, choose a plan, and add your loved one\'s details. We\'ll assign a certified nurse near them within 24 hours.' },
+        { q:'Are the nurses certified?', a:'Yes. All Vonaxity nurses hold a valid Albanian nursing license issued by the Order of Nurses of Albania and are verified by our team.' },
+        { q:'Can I change my plan?', a:'Yes, you can upgrade or downgrade at any time. Changes take effect from the next billing cycle.' },
+        { q:'What happens after a visit?', a:'You receive a detailed health report by email including vitals, nurse notes, and any recommendations.' },
+        { q:'What if there\'s an emergency?', a:'Vonaxity is non-emergency care only. For emergencies in Albania, call 127 immediately.' },
+        { q:'Can I choose a specific nurse?', a:'We assign the best available nurse for your loved one\'s location. You can request a change at any time.' },
+      ],
     },
     howItWorks: {
       tag:'How it works', title:'Simple, transparent care from anywhere',
@@ -257,6 +273,14 @@ const translations = {
       subtitle:'Infermierët tanë certifikuar ofrojnë shërbime jo-urgjente direkt në derën e familjes suaj.',
       emergency:'E rëndësishme: Vonaxity ofron vetëm kujdes jo-urgjent. Për urgjenca mjekësore në Shqipëri, telefononi',
       immediately:'menjëherë.',
+      items:[
+        { title:'Matja e Presionit të Gjakut', desc:'Monitorim i rregullt i presionit sistolik dhe diastolik me pajisje profesionale.' },
+        { title:'Monitorimi i Glukozës', desc:'Testimi dhe regjistrimi i sheqerit në gjak për pacientët diabetikë dhe ata në rrezik.' },
+        { title:'Monitorimi i Shenjave Vitale', desc:'Kontrolli i plotë i shenjave vitale duke përfshirë pulsin, temperaturën dhe ngopjen me oksigjen.' },
+        { title:'Marrja e Mostrave të Gjakut', desc:'Marrja e mostrave të gjakut në vend, dërguar direkt në laboratorë të certifikuar shqiptarë.' },
+        { title:'Vizitë Mirëqenieje', desc:'Vizitë gjithëpërfshirëse për të vlerësuar gjendjen e përgjithshme shëndetësore dhe mirëqenien.' },
+        { title:'Kujdes pas Operacionit', desc:'Kujdes profesional i plagëve, kontrolli i medikamenteve dhe monitorimi i rikuperimit.' },
+      ],
     },
     pricing: {
       tag:'Çmime të qarta', title:'Plane për çdo familje',
@@ -273,6 +297,14 @@ const translations = {
     },
     faq: {
       tag:'Pyetje të shpeshta', title:'Pyetje të zakonshme', viewAll:'Shiko të gjitha pyetjet →',
+      items:[
+        { q:'Si rezervoj një vizitë infermiere?', a:'Regjistrohuni, zgjidhni një plan dhe shtoni të dhënat e të dashurit tuaj. Ne do të caktojmë një infermiere të certifikuar afër tyre brenda 24 orëve.' },
+        { q:'A janë infermierët të certifikuar?', a:'Po. Të gjithë infermierët e Vonaxity-t mbajnë një licencë të vlefshme infermieristike shqiptare të lëshuar nga Urdhri i Infermierëve të Shqipërisë.' },
+        { q:'A mund ta ndryshoj planin tim?', a:'Po, mund të rrisni ose ulni planin në çdo kohë. Ndryshimet hyjnë në fuqi nga cikli i ardhshëm i faturimit.' },
+        { q:'Çfarë ndodh pas një vizite?', a:'Merrni një raport të detajuar shëndetësor me email duke përfshirë shenjat vitale, shënimet e infermierit dhe rekomandimet.' },
+        { q:'Çfarë ndodh nëse ka urgjencë?', a:'Vonaxity ofron vetëm kujdes jo-urgjent. Për urgjenca në Shqipëri, telefononi 127 menjëherë.' },
+        { q:'A mund të zgjedh një infermiere specifike?', a:'Ne caktojmë infermieren më të mirë të disponueshme për vendndodhjen e të dashurit tuaj. Mund të kërkoni ndryshim në çdo kohë.' },
+      ],
     },
     howItWorks: {
       tag:'Si funksionon', title:'Kujdes i thjeshtë dhe transparent nga kudo',
