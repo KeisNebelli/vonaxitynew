@@ -38,6 +38,25 @@ const translations = {
     faq: {
       tag:'FAQ', title:'Common questions', viewAll:'View all FAQs →',
     },
+    howItWorks: {
+      tag:'How it works', title:'Simple, transparent care from anywhere',
+      steps:[
+        { title:'Choose a plan', desc:'Select the plan that fits your family\'s needs. All plans include a 7-day free trial.' },
+        { title:'Tell us about your loved one', desc:'Add your relative\'s details, location, and any health notes for our nurses.' },
+        { title:'We assign a verified nurse', desc:'A certified nurse near your relative is assigned to perform the visits.' },
+        { title:'Receive health reports', desc:'After each visit you receive a full health report with vitals and nurse notes.' },
+      ],
+    },
+    cta: {
+      title:'Start caring for your loved ones today',
+      subtitle:'Join hundreds of families already using Vonaxity to stay close to those they love.',
+      btn1:'Get started free',
+    },
+    footer: {
+      tagline:'Professional nurse home visits across Albania.',
+      services:'Services', company:'Company', contact:'Contact',
+      copyright:'© 2024 Vonaxity. All rights reserved.',
+    },
     about: {
       tag:'Our mission', title:'Healthcare access for every Albanian family abroad',
     },
@@ -66,6 +85,13 @@ const translations = {
       assignedNurse:'Assigned nurse', beingAssigned:'Being assigned',
       upgradeBtn:'Upgrade to Premium →',
       signOut:'Sign out', menu:'Menu',
+      goodMorning:'Good morning', visitsToday:'visits today',
+      today:'Today', totalVisits:'Total', rating:'Rating', thisMonth:'This month',
+      totalEarned:'Total earned', payRate:'Pay rate', paymentHistory:'Payment history',
+      paid:'Paid', pendingPayment:'Pending',
+      personalInfo:'Personal information', personalInfoSub:'Your nurse account details',
+      saveProfile:'Save profile', saving:'Saving...',
+      submitReport:'Submit visit report', reportSubmitted:'Report submitted', backToVisits:'Back to visits',
     },
     visits: {
       status: {
@@ -181,6 +207,29 @@ const translations = {
       serverError:'Something went wrong. Please try again.',
       notAuthenticated:'Please sign in to continue',
     },
+    howItWorks: {
+      tag:'How it works',
+      title:'Simple, trusted care in 3 steps',
+      steps:[
+        { title:'Book online', desc:'Choose a plan, tell us about your loved one, and select the services you need.' },
+        { title:'We assign a nurse', desc:'A verified nurse in your city is assigned and confirmed within 24 hours.' },
+        { title:'Care is delivered', desc:'The nurse visits your loved one at home and sends you a full health report.' },
+      ],
+    },
+    cta: {
+      title:'Ready to care for your loved one?',
+      subtitle:'Join hundreds of families who trust Vonaxity for professional home care in Albania.',
+      btn1:'Get started today',
+      btn2:'See how it works',
+    },
+    footer: {
+      tagline:'Professional home nurse visits across Albania for families living abroad.',
+      services:'Services',
+      company:'Company',
+      contact:'Contact',
+      copyright:'© 2024 Vonaxity. All rights reserved.',
+      companyLinks:['About Us','Pricing','FAQ','Contact'],
+    },
     status: {
       APPROVED:'Approved', PENDING:'Pending', INCOMPLETE:'Incomplete',
       REJECTED:'Rejected', SUSPENDED:'Suspended', COMPLETED:'Completed',
@@ -225,6 +274,25 @@ const translations = {
     faq: {
       tag:'Pyetje të shpeshta', title:'Pyetje të zakonshme', viewAll:'Shiko të gjitha pyetjet →',
     },
+    howItWorks: {
+      tag:'Si funksionon', title:'Kujdes i thjeshtë dhe transparent nga kudo',
+      steps:[
+        { title:'Zgjidhni një plan', desc:'Zgjidhni planin që i përshtatet nevojave të familjes suaj. Të gjitha planet përfshijnë 7 ditë provë falas.' },
+        { title:'Na tregoni për të dashurin tuaj', desc:'Shtoni detajet e të afërmit tuaj, vendndodhjen dhe çdo shënim shëndetësor për infermierët tanë.' },
+        { title:'Ne caktojmë një infermiere të certifikuar', desc:'Një infermiere e certifikuar pranë të afërmit tuaj caktohet për vizitat.' },
+        { title:'Merrni raporte shëndetësore', desc:'Pas çdo vizite merrni një raport të plotë shëndetësor me shenjat jetësore dhe shënimet e infermierit.' },
+      ],
+    },
+    cta: {
+      title:'Filloni të kujdeseni për të dashurit tuaj sot',
+      subtitle:'Bashkohuni me qindra familje që tashmë përdorin Vonaxity për të qëndruar afër atyre që duan.',
+      btn1:'Filloni falas',
+    },
+    footer: {
+      tagline:'Vizita profesionale infermierësh në shtëpi nëpër Shqipëri.',
+      services:'Shërbimet', company:'Kompania', contact:'Kontakti',
+      copyright:'© 2024 Vonaxity. Të gjitha të drejtat të rezervuara.',
+    },
     about: {
       tag:'Misioni ynë', title:'Qasje në shërbime shëndetësore për çdo familje shqiptare jashtë shtetit',
     },
@@ -253,6 +321,13 @@ const translations = {
       assignedNurse:'Infermierja e caktuar', beingAssigned:'Duke u caktuar',
       upgradeBtn:'Kaloni në Premium →',
       signOut:'Dil', menu:'Menu',
+      goodMorning:'Mirëmëngjesi', visitsToday:'vizita sot',
+      today:'Sot', totalVisits:'Gjithsej', rating:'Vlerësimi', thisMonth:'këtë muaj',
+      totalEarned:'Gjithsej fituar', payRate:'Tarifa', paymentHistory:'Historia e pagesave',
+      paid:'Paguar', pendingPayment:'Në pritje',
+      personalInfo:'Informacioni personal', personalInfoSub:'Të dhënat e llogarisë tuaj',
+      saveProfile:'Ruaj profilin', saving:'Duke ruajtur...',
+      submitReport:'Dorëzo raportin e vizitës', reportSubmitted:'Raporti u dorëzua', backToVisits:'Kthehu te vizitat',
     },
     visits: {
       status: {
@@ -367,6 +442,29 @@ const translations = {
       loginFailed:'Email-i ose fjalëkalimi i pavlefshëm',
       serverError:'Diçka shkoi keq. Ju lutemi provoni përsëri.',
       notAuthenticated:'Ju lutemi hyni për të vazhduar',
+    },
+    howItWorks: {
+      tag:'Si funksionon',
+      title:'Kujdes i thjeshtë dhe i besuar në 3 hapa',
+      steps:[
+        { title:'Rezervoni online', desc:'Zgjidhni një plan, tregoni për të dashurin tuaj dhe zgjidhni shërbimet.' },
+        { title:'Ne caktojmë një infermiere', desc:'Një infermiere e verifikuar në qytetin tuaj caktohet brenda 24 orëve.' },
+        { title:'Kujdesi ofrohet', desc:'Infermierja viziton të dashurin tuaj në shtëpi dhe ju dërgon raport shëndetësor.' },
+      ],
+    },
+    cta: {
+      title:'Gati të kujdeseni për të dashurin tuaj?',
+      subtitle:'Bashkohuni me qindra familje që besojnë Vonaxity për kujdes profesional në shtëpi në Shqipëri.',
+      btn1:'Filloni sot',
+      btn2:'Shihni si funksionon',
+    },
+    footer: {
+      tagline:'Vizita profesionale infermierësh në shtëpi nëpër Shqipëri për familjet jashtë.',
+      services:'Shërbime',
+      company:'Kompania',
+      contact:'Kontakt',
+      copyright:'© 2024 Vonaxity. Të gjitha të drejtat e rezervuara.',
+      companyLinks:['Rreth nesh','Çmimet','FAQ','Kontakt'],
     },
     status: {
       APPROVED:'Aprovuar', PENDING:'Në pritje', INCOMPLETE:'I paplotë',
