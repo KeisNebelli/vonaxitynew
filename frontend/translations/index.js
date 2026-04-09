@@ -156,6 +156,9 @@ const translations = {
       revenue:'Revenue', pendingNurses:'Pending nurses',
       approve:'Approve', reject:'Reject', suspend:'Suspend', reinstate:'Reinstate',
       assignNurse:'Assign Nurse', refresh:'Refresh', menu:'Menu', ai:'AI Assistant',
+      totalClients:'Total clients', activeNurses:'Active nurses', visitsToday:'Visits today',
+      unassigned:'Unassigned', revenue:'Revenue', pendingNurses:'Pending nurses',
+      recentVisits:'Recent visits', recentPayments:'Recent payments',
       searchNurses:'Search nurses...', searchClients:'Search clients...',
       allCities:'All cities', allStatuses:'All statuses', allPlans:'All plans',
       status: {
@@ -352,6 +355,9 @@ const translations = {
       clientTable:{ client:'Klienti', plan:'Plani', status:'Statusi', relative:'I dashuri', visits:'Vizitat', joined:'U regjistrua' },
       visitTable:{ patient:'Pacienti', service:'Shërbimi', date:'Data', nurse:'Infermierja', status:'Statusi', actions:'Veprimet' },
       signOut:'Dil', menu:'Menu', ai:'Asistenti AI',
+      totalClients:'Klientë gjithsej', activeNurses:'Infermierë aktivë', visitsToday:'Vizita sot',
+      unassigned:'Pa infermiere', revenue:'Të ardhurat', pendingNurses:'Infermierë në pritje',
+      recentVisits:'Vizitat e fundit', recentPayments:'Pagesat e fundit',
     },
     errors: {
       required:'Kjo fushë është e detyrueshme',

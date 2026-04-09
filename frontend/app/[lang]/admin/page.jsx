@@ -170,7 +170,8 @@ function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen, 
 }
 
 // ── Overview ──────────────────────────────────────────────────────────────────
-function Overview({ setActive, nurses, clients, visits, payments }) {
+function Overview({ setActive, nurses, clients, visits, payments, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
   const pending = nurses.filter(n=>['PENDING','INCOMPLETE'].includes(n.status));
   const todayVisits = visits.filter(v=>['PENDING','IN_PROGRESS','ON_THE_WAY'].includes(v.status));
@@ -181,12 +182,12 @@ function Overview({ setActive, nurses, clients, visits, payments }) {
       {/* Metric cards */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:28 }}>
         {[
-          ['Total clients', clients.length, C.primary, 'clients'],
-          ['Active nurses', nurses.filter(n=>n.status==='APPROVED').length, C.secondary, 'nurses'],
-          ['Visits today', todayVisits.length, C.purple, 'visits'],
-          ['Unassigned', unassigned.length, unassigned.length>0?C.error:C.textTertiary, 'alerts'],
-          ['Revenue', `€${revenue}`, C.secondary, 'payments'],
-          ['Pending nurses', pending.length, pending.length>0?C.warning:C.textTertiary, 'nurses'],
+          [tr('admin.totalClients'), clients.length, C.primary, 'clients'],
+          [tr('admin.activeNurses'), nurses.filter(n=>n.status==='APPROVED').length, C.secondary, 'nurses'],
+          [tr('admin.visitsToday'), todayVisits.length, C.purple, 'visits'],
+          [tr('admin.unassigned'), unassigned.length, unassigned.length>0?C.error:C.textTertiary, 'alerts'],
+          [tr('admin.revenue'), `€${revenue}`, C.secondary, 'payments'],
+          [tr('admin.pendingNurses'), pending.length, pending.length>0?C.warning:C.textTertiary, 'nurses'],
         ].map(([label,value,color,tab]) => (
           <div key={label} onClick={()=>setActive(tab)} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'18px', cursor:'pointer' }}>
             <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
@@ -216,7 +217,7 @@ function Overview({ setActive, nurses, clients, visits, payments }) {
       {/* Recent visits */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
-          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Recent visits</div>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.recentVisits')||'Recent visits'}</div>
           {visits.slice(0,4).map((v,i) => (
             <div key={v.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 0', borderBottom:i<3?`1px solid ${C.borderSubtle}`:'none' }}>
               <div>
@@ -228,7 +229,7 @@ function Overview({ setActive, nurses, clients, visits, payments }) {
           ))}
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
-          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Recent payments</div>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.recentPayments')||'Recent payments'}</div>
           {payments.slice(0,4).map((p,i) => (
             <div key={p.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 0', borderBottom:i<3?`1px solid ${C.borderSubtle}`:'none' }}>
               <div>
@@ -1037,7 +1038,7 @@ export default function AdminPage({ params }) {
               </div>
             ) : (
               <>
-                {active==='overview' && <Overview setActive={setActive} nurses={nurses} clients={clients} visits={visits} payments={payments} />}
+                {active==='overview' && <Overview setActive={setActive} nurses={nurses} clients={clients} visits={visits} payments={payments} lang={lang} />}
                 {active==='clients' && <Clients clients={clients} visits={visits} />}
                 {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} />}
                 {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} onAssign={handleAssign} />}
