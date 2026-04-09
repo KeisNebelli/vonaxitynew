@@ -107,7 +107,6 @@ const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
 const SMD = '0 4px 12px rgba(15,23,42,0.08),0 2px 4px rgba(15,23,42,0.04)';
 
 function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen, lang="en" }) {
-  const AL = ADMIN_LABELS[lang] || ADMIN_LABELS.en;
   const SidebarContent = ({ mobile=false }) => (
     <>
       <div style={{ padding:'22px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
@@ -138,7 +137,7 @@ function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen, 
           <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }}
             style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:`${mobile?'12px':'10px'} 12px`, borderRadius:10, border:'none', background:active===item.id?(item.highlight?'rgba(124,58,237,0.25)':'rgba(37,99,235,0.22)'):'transparent', color:active===item.id?(item.highlight?'#C4B5FD':'#93C5FD'):'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
             {item.icon}
-            <span style={{ flex:1 }}>{AL[item.id]||item.label}</span>
+            <span style={{ flex:1 }}>{(ADMIN_LABELS[lang]||ADMIN_LABELS.en)[item.id]||item.label}</span>
             {item.id==='alerts' && alertCount>0 && <span style={{ fontSize:10,fontWeight:800,background:'#DC2626',color:'#fff',borderRadius:99,padding:'2px 6px',minWidth:18,textAlign:'center' }}>{alertCount}</span>}
           </button>
         ))}
@@ -1057,7 +1056,7 @@ export default function AdminPage({ params }) {
             <button key={item.id} onClick={()=>setActive(item.id)} style={{ flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,border:'none',background:'transparent',color:active===item.id?'#93C5FD':'rgba(255,255,255,0.4)',cursor:'pointer',fontSize:10,fontWeight:active===item.id?700:500,fontFamily:F,padding:'4px 2px',position:'relative' }}>
               {item.icon}
               {item.id==='alerts'&&alertCount>0&&<span style={{ position:'absolute',top:2,right:'50%',marginRight:-14,width:14,height:14,background:'#DC2626',color:'#fff',borderRadius:99,fontSize:8,fontWeight:800,display:'flex',alignItems:'center',justifyContent:'center' }}>{alertCount}</span>}
-              <span>{AL[item.id]||item.label}</span>
+              <span>{(ADMIN_LABELS[lang]||ADMIN_LABELS.en)[item.id]||item.label}</span>
             </button>
           ))}
         </div>
