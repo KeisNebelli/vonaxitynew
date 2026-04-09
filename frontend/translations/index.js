@@ -1,4 +1,4 @@
-// Vonaxity — Complete bilingual translations (EN / SQ)
+// Vonaxity — Complete bilingual translations (EN / SQ) — v2
 // Usage: import { t } from '@/translations'; t(lang, 'nav.signIn')
 
 const translations = {
@@ -75,6 +75,15 @@ const translations = {
     },
     about: {
       tag:'Our mission', title:'Healthcare access for every Albanian family abroad',
+      headline:'We believe every family deserves peace of mind — no matter where they live.',
+      p1:'Vonaxity was founded by Albanians living abroad who experienced the anxiety of being far from aging parents and loved ones. We built the platform we wished existed: a simple, trusted way to ensure professional healthcare reaches your family at home in Albania.',
+      p2:'Our network of verified, licensed nurses provides regular home visits across 8 Albanian cities. Every visit generates a health report sent directly to you — so you always know your loved one is safe and cared for.',
+      values:[
+        { title:'Family first', desc:'Every decision we make starts with one question: does this make families feel more connected and secure?' },
+        { title:'Clinical standards', desc:'All nurses are licensed by the Order of Nurses of Albania and undergo a thorough verification process.' },
+        { title:'Transparency', desc:'You receive a full health report after every visit. No surprises, no hidden information.' },
+        { title:'Built for diaspora', desc:'We understand the unique challenges of caring for loved ones from abroad. Vonaxity bridges that distance.' },
+      ],
     },
     signup: {
       alreadyAccount:'Already have an account?', signIn:'Sign in',
@@ -327,6 +336,15 @@ const translations = {
     },
     about: {
       tag:'Misioni ynë', title:'Qasje në shërbime shëndetësore për çdo familje shqiptare jashtë shtetit',
+      headline:'Besojmë se çdo familje meriton qetësi shpirtërore — pavarësisht ku jetojnë.',
+      p1:'Vonaxity u themelua nga shqiptarë që jetojnë jashtë shtetit dhe përjetuan ankthin e të qenit larg prindërve të moshuar dhe të dashurve. Ne ndërtuam platformën që dëshironim të ekzistonte: një mënyrë e thjeshtë dhe e besuar për të siguruar kujdes profesional shëndetësor për familjen tuaj në Shqipëri.',
+      p2:'Rrjeti ynë i infermierëve të verifikuar dhe të licensuar ofron vizita të rregullta shtëpiake në 8 qytete shqiptare. Çdo vizitë gjeneron një raport shëndetësor që dërgohet direkt te ju — kështu që gjithmonë dini që i dashuri juaj është i sigurt dhe i kujdesur.',
+      values:[
+        { title:'Familja e parë', desc:'Çdo vendim që marrim fillon me një pyetje: a e bën këtë familjet të ndihen më të lidhura dhe të sigurta?' },
+        { title:'Standardet klinike', desc:'Të gjithë infermierët janë të licensuar nga Urdhri i Infermierëve të Shqipërisë dhe kalojnë një proces të plotë verifikimi.' },
+        { title:'Transparencë', desc:'Merrni një raport të plotë shëndetësor pas çdo vizite. Pa surpriza, pa informacione të fshehura.' },
+        { title:'Ndërtuar për diasporën', desc:'Ne kuptojmë sfidat unike të kujdesit për të dashurit nga jashtë shtetit. Vonaxity e mbyll atë distancë.' },
+      ],
     },
     signup: {
       alreadyAccount:'Keni llogari?', signIn:'Hyni',
