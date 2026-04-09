@@ -49,9 +49,15 @@ function formatVisit(v) {
 }
 
 const F = "'DM Sans','Inter',system-ui,sans-serif";
+
+const NURSE_LABELS = {
+  en:{ dashboard:'Dashboard', visits:'My Visits', map:'Navigation', complete:'Complete Visit', earnings:'Earnings', profile:'My Profile' },
+  sq:{ dashboard:'Paneli', visits:'Vizitat e Mia', map:'Navigimi', complete:'Përfundo Vizitën', earnings:'Fitimet', profile:'Profili Im' },
+};
 const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
 
-function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen }) {
+function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen, lang="en" }) {
+  const NL = NURSE_LABELS[lang] || NURSE_LABELS.en;
   const initials = nurse?.name ? nurse.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : 'N';
   const status = nurse?.status || 'INCOMPLETE';
   const statusMap = { APPROVED:['#ECFDF5','#059669'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
@@ -80,7 +86,7 @@ function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen }) {
       <nav style={{ flex:1, padding:'10px', overflow:'auto' }}>
         {NAV_ITEMS.map(item=>(
           <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }} style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:`${mobile?'13px':'10px'} 12px`, borderRadius:10, border:'none', background:active===item.id?'rgba(5,150,105,0.2)':'transparent', color:active===item.id?'#6EE7B7':'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
-            {item.icon}<span>{TITLES[item.label]||item.label}</span>
+            {item.icon}<span>{NL[item.label]||item.label}</span>
           </button>
         ))}
       </nav>
@@ -749,7 +755,7 @@ export default function NursePage({ params }) {
         }
       `}</style>
       <div style={{ display:'flex', minHeight:'100vh', fontFamily:F, background:'#F8FAFC' }}>
-        <NurseSidebar nurse={displayNurse} active={active} setActive={setActive} onLogout={logout} open={sidebarOpen} setOpen={setSidebarOpen} />
+        <NurseSidebar nurse={displayNurse} active={active} setActive={setActive} onLogout={logout} open={sidebarOpen} setOpen={setSidebarOpen} lang={lang} />
 
         <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
           {/* Header */}
@@ -793,7 +799,7 @@ export default function NursePage({ params }) {
           </button>
           {NAV_BOTTOM.map(item=>(
             <button key={item.id} onClick={()=>setActive(item.id)} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:3, border:'none', background:'transparent', color:active===item.id?'#6EE7B7':'rgba(255,255,255,0.4)', cursor:'pointer', fontSize:10, fontWeight:active===item.id?700:500, fontFamily:F, padding:'4px 2px' }}>
-              {item.icon}<span>{TITLES[item.label]||item.label}</span>
+              {item.icon}<span>{NL[item.label]||item.label}</span>
             </button>
           ))}
         </div>
