@@ -4,6 +4,10 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
+// Module-level translation helper - uses 'en' as default
+let _currentLang = 'en';
+const tr = (key) => t(_currentLang, key);
+
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#7C3AED', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827' };
 
@@ -121,7 +125,8 @@ function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen, lang=
   );
 }
 
-function Dashboard({ setActive, setSelectedVisit }) {
+function Dashboard({ setActive, setSelectedVisit, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const today = MOCK_VISITS.filter(v => v.status !== 'COMPLETED');
   return (
     <div>
@@ -135,7 +140,7 @@ function Dashboard({ setActive, setSelectedVisit }) {
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:24 }}>
-        {[["Today",today.length,C.primary],['Total',MOCK_NURSE.totalVisits,C.secondary],['Rating',MOCK_NURSE.rating,C.warning],['This month',`€${MOCK_NURSE.payRatePerVisit * today.length * 4}`,C.purple]].map(([label,value,color]) => (
+        {[["Today",today.length,C.primary],[tr('nurse.totalVisits')||'Total',MOCK_NURSE.totalVisits,C.secondary],[tr('nurse.rating')||'Rating',MOCK_NURSE.rating,C.warning],[tr('nurse.thisMonth')||'This month',`€${MOCK_NURSE.payRatePerVisit * today.length * 4}`,C.purple]].map(([label,value,color]) => (
           <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'16px 18px' }}>
             <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:22, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
@@ -151,7 +156,8 @@ function Dashboard({ setActive, setSelectedVisit }) {
   );
 }
 
-function Visits({ setActive, setSelectedVisit }) {
+function Visits({ setActive, setSelectedVisit, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const [filter, setFilter] = useState('all');
   const filtered = filter==='all'?MOCK_VISITS:MOCK_VISITS.filter(v=>filter==='upcoming'?v.status!=='COMPLETED':v.status==='COMPLETED');
   return (
@@ -191,7 +197,8 @@ function MapView({ selectedVisit, setActive, setSelectedVisit }) {
   );
 }
 
-function CompleteVisit({ visit, setActive }) {
+function CompleteVisit({ visit, setActive, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const v = visit || MOCK_VISITS[0];
   const [form, setForm] = useState({ bp:'', hr:'', glucose:'', temp:'', oxygen:'', notes:'' });
   const [submitted, setSubmitted] = useState(false);
@@ -234,11 +241,12 @@ function CompleteVisit({ visit, setActive }) {
   );
 }
 
-function Earnings() {
+function Earnings({ lang='en' }) {
+  const tr = (key) => t(lang, key);
   return (
     <div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:24 }}>
-        {[['Total earned',`€${MOCK_NURSE.totalEarnings}`,C.secondary],['Total visits',MOCK_NURSE.totalVisits,C.primary],['Rating',MOCK_NURSE.rating,C.warning],['Pay rate',`€${MOCK_NURSE.payRatePerVisit}/visit`,C.purple]].map(([label,value,color]) => (
+        {[[tr('nurse.totalEarned')||'Total earned',`€${MOCK_NURSE.totalEarnings}`,C.secondary],[tr('nurse.totalVisits')||'Total visits',MOCK_NURSE.totalVisits,C.primary],[tr('nurse.rating')||'Rating',MOCK_NURSE.rating,C.warning],[tr('nurse.payRate')||'Pay rate',`€${MOCK_NURSE.payRatePerVisit}/visit`,C.purple]].map(([label,value,color]) => (
           <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'16px 18px' }}>
             <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:22, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
@@ -257,7 +265,7 @@ function Earnings() {
             <div style={{ display:'flex', gap:12, alignItems:'center' }}>
               <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary }}>€{amount}</div>
               <span style={{ fontSize:12, fontWeight:600, padding:'4px 12px', borderRadius:99, background:status==='paid'?C.secondaryLight:C.warningLight, color:status==='paid'?C.secondary:C.warning }}>
-                {status==='paid'?'Paid':'Pending'}
+                {status==='paid'?tr('nurse.paid')||'Paid':tr('nurse.pendingPayment')||'Pending'}
               </span>
             </div>
           </div>
@@ -290,7 +298,8 @@ function NurseField({ label, children }) {
   );
 }
 
-function NurseProfile() {
+function NurseProfile({ lang='en' }) {
+  const tr = (key) => t(lang, key);
   const [profile, setProfile] = useState({ name:MOCK_NURSE.name, email:MOCK_NURSE.email, phone:MOCK_NURSE.phone, city:MOCK_NURSE.city, bio:MOCK_NURSE.bio, licenseNumber:MOCK_NURSE.licenseNumber });
   const [availability, setAvailability] = useState([...MOCK_NURSE.availability]);
   const [specialties, setSpecialties] = useState([...MOCK_NURSE.specialties]);
@@ -320,8 +329,8 @@ function NurseProfile() {
   const handleChangePassword = async () => {
     setPassError('');
     if (!password.current || !password.newPass || !password.confirm) return setPassError('All fields required');
-    if (password.newPass.length < 8) return setPassError('Password must be at least 8 characters');
-    if (password.newPass !== password.confirm) return setPassError('Passwords do not match');
+    if (password.newPass.length < 8) return setPassError(tr('settings.passLength')||'Password must be at least 8 characters');
+    if (password.newPass !== password.confirm) return setPassError(tr('settings.passMismatch')||'Passwords do not match');
     setSavingPass(true);
     try {
       await api.updatePassword({ currentPassword:password.current, newPassword:password.newPass });
@@ -337,7 +346,7 @@ function NurseProfile() {
     <div style={{ maxWidth:620 }}>
 
       {/* Profile info */}
-      <NurseSectionCard title="Personal information" subtitle="Your nurse account details">
+      <NurseSectionCard title={tr('nurse.personalInfo')||'Personal information'} subtitle={tr('nurse.personalInfoSub')||'Your nurse account details'}>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
           <NurseField label="Full name">
             <input style={inp} value={profile.name} onChange={e=>setProfile({...profile,name:e.target.value})} />
@@ -390,7 +399,7 @@ function NurseProfile() {
       {/* Stats overview */}
       <NurseSectionCard title="Profile stats" subtitle="Your performance on Vonaxity">
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:12 }}>
-          {[['Rating',MOCK_NURSE.rating,C.warning],['Total visits',MOCK_NURSE.totalVisits,C.primary],['Total earned',`€${MOCK_NURSE.totalEarnings}`,C.secondary],['Status','Approved',C.secondary]].map(([label,value,color]) => (
+          {[[tr('nurse.rating')||'Rating',MOCK_NURSE.rating,C.warning],[tr('nurse.totalVisits')||'Total visits',MOCK_NURSE.totalVisits,C.primary],[tr('nurse.totalEarned')||'Total earned',`€${MOCK_NURSE.totalEarnings}`,C.secondary],['Status','Approved',C.secondary]].map(([label,value,color]) => (
             <div key={label} style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 14px' }}>
               <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:6 }}>{label}</div>
               <div style={{ fontSize:16, fontWeight:700, color }}>{value}</div>
@@ -412,7 +421,7 @@ function NurseProfile() {
         </div>
       )}
       <button onClick={handleSave} disabled={saving} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:'pointer', marginBottom:28, opacity:saving?0.7:1, boxShadow:'0 2px 8px rgba(37,99,235,0.2)' }}>
-        {saving ? 'Saving...' : 'Save profile'}
+        {saving ? tr('nurse.saving')||'Saving...' : tr('nurse.saveProfile')||'Save profile'}
       </button>
 
       {/* Security */}
@@ -663,7 +672,7 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
       <div style={{ display:'flex', gap:10 }}>
         {step>1 && <button onClick={()=>{setStep(s=>s-1);setError('');}} style={{ flex:1, background:'transparent', color:C.textSecondary, border:`1.5px solid ${C.border}`, borderRadius:10, padding:'12px', fontSize:14, fontWeight:600, cursor:'pointer' }}>← Back</button>}
         <button onClick={handleSave} disabled={saving} style={{ padding:'12px 18px', background:C.bgWhite, color:C.textSecondary, border:`1.5px solid ${C.border}`, borderRadius:10, fontSize:13, fontWeight:600, cursor:'pointer', opacity:saving?0.7:1 }}>
-          {saving?'Saving...':'Save'}
+          {saving?tr('nurse.saving')||'Saving...':'Save'}
         </button>
         {step<5 && (
           <button onClick={()=>setStep(s=>s+1)} disabled={
@@ -691,7 +700,7 @@ export default function NursePage({ params }) {
   const [active, setActive] = useState('dashboard');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [lang, setLang] = useState(params?.lang || 'en');
-  const tr = (key) => t(lang, key);
+  _currentLang = lang; // Update module-level tr
   const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; localStorage.setItem('vonaxity-lang',l); };
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [nurse, setNurse] = useState(null);
@@ -781,12 +790,12 @@ export default function NursePage({ params }) {
           <main className="nurse-cont" style={{ flex:1, padding:24, overflowY:'auto', maxWidth:720, width:'100%' }}>
             <OnboardingBanner nurse={nurse} onStartOnboarding={()=>setActive('onboarding')} lang={lang} />
             {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
-            {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} />}
-            {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} />}
+            {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} />}
+            {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} />}
             {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} />}
-            {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} />}
-            {active==='earnings' && <Earnings />}
-            {active==='profile' && <NurseProfile />}
+            {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} lang={lang} />}
+            {active==='earnings' && <Earnings lang={lang} />}
+            {active==='profile' && <NurseProfile lang={lang} />}
           </main>
         </div>
 
