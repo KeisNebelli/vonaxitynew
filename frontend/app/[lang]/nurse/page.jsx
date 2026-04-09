@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { t } from '@/translations';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
 // Module-level translation helper - uses 'en' as default
-let _currentLang = 'en';
+let _currentLang = "en"; 
 const tr = (key) => t(_currentLang, key);
 
 
