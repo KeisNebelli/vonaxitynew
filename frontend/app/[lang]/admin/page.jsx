@@ -633,13 +633,8 @@ function Visits({ visits, setVisits, nurses, onAssign }) {
 }
 
 // ── Alerts ────────────────────────────────────────────────────────────────────
-function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, onAssign }) {
-  const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
-  const noShow = visits.filter(v=>v.status==='NO_SHOW');
-  const pendingNurses = nurses.filter(n=>['PENDING','INCOMPLETE'].includes(n.status));
-  const incompleteReports = visits.filter(v=>v.status==='COMPLETED'&&!v.nurseNotes);
-
-  const AlertGroup = ({ title, count, color, children }) => (
+function AlertGroup({ title, count, color, children }) {
+  return (
     <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, marginBottom:16, overflow:'hidden' }}>
       <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center', background:count>0?`rgba(${color==='red'?'220,38,38':color==='yellow'?'217,119,6':'37,99,235'},0.04)`:'transparent' }}>
         <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{title}</div>
@@ -648,6 +643,15 @@ function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, on
       <div style={{ padding:'4px 0' }}>{children}</div>
     </div>
   );
+}
+
+function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, onAssign }) {
+  const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
+  const noShow = visits.filter(v=>v.status==='NO_SHOW');
+  const pendingNurses = nurses.filter(n=>['PENDING','INCOMPLETE'].includes(n.status));
+  const incompleteReports = visits.filter(v=>v.status==='COMPLETED'&&!v.nurseNotes);
+
+
 
   const handleAssignAlert = (visitId, nurseId) => onAssign(visitId, nurseId);
 
@@ -907,22 +911,59 @@ function AdminSectionCard({ title, subtitle, children }) {
 }
 
 function AdminSettings() {
-  const [settings, setSettings] = useState({ payPerVisit:20, trialDays:7, basicPrice:30, standardPrice:50, premiumPrice:120 });
-  const [saved, setSaved] = useState(false);
+  const DEFAULT = { payPerVisit:20, trialDays:7, basicPrice:30, standardPrice:50, premiumPrice:120 };
+  const [settings, setSettings] = useState(DEFAULT);
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
+  const [status, setStatus] = useState(null); // 'saved' | 'error'
   const inp2 = { ...inp, width:'100%', boxSizing:'border-box' };
+
+  // Load settings from backend on mount
+  useEffect(() => {
+    api.getSettings()
+      .then(data => {
+        if (data?.settings) setSettings({ ...DEFAULT, ...data.settings });
+      })
+      .catch(() => {}) // keep defaults on error
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleSave = async () => {
+    setSaving(true);
+    setStatus(null);
+    try {
+      await api.updateSettings(settings);
+      setStatus('saved');
+      setTimeout(() => setStatus(null), 3000);
+    } catch (err) {
+      setStatus('error');
+    } finally {
+      setSaving(false);
+    }
+  };
 
   return (
     <div style={{ maxWidth:560 }}>
       <AdminSectionCard title="Platform settings" subtitle="Core operational parameters">
-        {[['Nurse pay per visit (€)','payPerVisit'],['Trial period (days)','trialDays'],['Basic plan price (€)','basicPrice'],['Standard plan price (€)','standardPrice'],['Premium plan price (€)','premiumPrice']].map(([label,key]) => (
-          <div key={key} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0', borderBottom:`1px solid ${C.borderSubtle}` }}>
-            <label style={{ fontSize:14, color:C.textPrimary }}>{label}</label>
-            <input type="number" value={settings[key]} onChange={e=>setSettings({...settings,[key]:Number(e.target.value)})} style={{ ...inp, width:90, textAlign:'center' }} />
-          </div>
-        ))}
-        <button onClick={()=>setSaved(true)} style={{ marginTop:20, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:'pointer' }}>
-          {saved?'Saved':'Save settings'}
-        </button>
+        {loading ? (
+          <div style={{ padding:'20px 0', textAlign:'center', color:C.textTertiary, fontSize:13 }}>Loading settings...</div>
+        ) : (
+          <>
+            {[['Nurse pay per visit (€)','payPerVisit'],['Trial period (days)','trialDays'],['Basic plan price (€)','basicPrice'],['Standard plan price (€)','standardPrice'],['Premium plan price (€)','premiumPrice']].map(([label,key]) => (
+              <div key={key} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0', borderBottom:`1px solid ${C.borderSubtle}` }}>
+                <label style={{ fontSize:14, color:C.textPrimary }}>{label}</label>
+                <input type="number" value={settings[key]} onChange={e=>setSettings({...settings,[key]:Number(e.target.value)})} style={{ ...inp, width:90, textAlign:'center' }} />
+              </div>
+            ))}
+            <div style={{ marginTop:20, display:'flex', alignItems:'center', gap:14 }}>
+              <button onClick={handleSave} disabled={saving} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:saving?'not-allowed':'pointer', opacity:saving?0.7:1 }}>
+                {saving ? 'Saving...' : 'Save settings'}
+              </button>
+              {status==='saved' && <span style={{ fontSize:13, color:C.secondary, fontWeight:600 }}>✓ Settings saved</span>}
+              {status==='error' && <span style={{ fontSize:13, color:C.error, fontWeight:600 }}>✗ Failed to save</span>}
+            </div>
+          </>
+        )}
       </AdminSectionCard>
 
       <AdminSectionCard title="Admin profile" subtitle="Your account details">
