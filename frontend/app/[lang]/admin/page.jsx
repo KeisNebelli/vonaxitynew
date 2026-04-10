@@ -256,13 +256,17 @@ function Clients({ clients, visits }) {
   const [selected, setSelected] = useState(null);
 
   const filtered = useMemo(() => clients.filter(c => {
-    const matchSearch = !search || c.name.toLowerCase().includes(search.toLowerCase()) || c.email.toLowerCase().includes(search.toLowerCase()) || c.country.toLowerCase().includes(search.toLowerCase());
-    const plan = c.subscription?.plan || c.plan || ''; const matchPlan = filterPlan==='all' || plan===filterPlan;
+    const name = (c.name||'').toLowerCase();
+    const email = (c.email||'').toLowerCase();
+    const country = (c.country||'').toLowerCase();
+    const matchSearch = !search || name.includes(search.toLowerCase()) || email.includes(search.toLowerCase()) || country.includes(search.toLowerCase());
+    const plan = c.subscription?.plan || c.plan || '';
+    const matchPlan = filterPlan==='all' || plan===filterPlan;
     const matchStatus = filterStatus==='all' || c.status===filterStatus;
     return matchSearch && matchPlan && matchStatus;
-  }), [search, filterPlan, filterStatus]);
+  }), [search, filterPlan, filterStatus, clients]);
 
-  if (selected) return <ClientDetail client={selected} onBack={()=>setSelected(null)} />;
+  if (selected) return <ClientDetail client={selected} onBack={()=>setSelected(null)} visits={visits} />;
 
   return (
     <div>
@@ -314,7 +318,7 @@ function Clients({ clients, visits }) {
   );
 }
 
-function ClientDetail({ client, onBack }) {
+function ClientDetail({ client, onBack, visits=[] }) {
   const clientVisits = visits.filter(v=>v.clientId===client.id||v.relative?.clientId===client.id);
   return (
     <div>
@@ -957,8 +961,30 @@ export default function AdminPage({ params }) {
         api.getVisits().catch(()=>({ visits:[] })),
         api.getPayments().catch(()=>({ payments:[] })),
       ]);
-      setNurses(nursesData?.nurses || []);
-      setClients(usersData?.users || []);
+      setNurses((nursesData?.nurses || []).map(n => ({
+        ...n,
+        name: n.name || n.user?.name || 'Unknown',
+        email: n.email || n.user?.email || '',
+        phone: n.phone || n.user?.phone || '',
+        city: n.city || '',
+        status: n.status || 'INCOMPLETE',
+        joinedAt: n.joinedAt || (n.createdAt ? new Date(n.createdAt).toLocaleDateString() : 'N/A'),
+        rating: n.rating || 0,
+        totalVisits: n.totalVisits || 0,
+        licenseNumber: n.licenseNumber || '',
+      })));
+      setClients((usersData?.users || []).map(c => ({
+        ...c,
+        name: c.name || 'Unknown',
+        email: c.email || '',
+        phone: c.phone || '',
+        country: c.country || '',
+        status: c.status || 'ACTIVE',
+        joinedAt: c.joinedAt || (c.createdAt ? new Date(c.createdAt).toLocaleDateString() : 'N/A'),
+        plan: c.subscription?.plan || c.plan || 'N/A',
+        visitsUsed: c.subscription?.visitsUsed || 0,
+        visitsTotal: c.subscription?.visitsPerMonth || 0,
+      })));
       const rawVisits = visitsData?.visits || [];
       setVisits(rawVisits.map(v=>({ ...v, clientName:v.clientName||v.relative?.name||'Unknown', service:v.service||v.serviceType||'Unknown', nurseName:v.nurseName||v.nurse?.user?.name||null, nurseId:v.nurseId||v.nurse?.id||null })));
       setPayments(paymentsData?.payments || []);
