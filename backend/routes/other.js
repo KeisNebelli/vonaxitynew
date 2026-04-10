@@ -11,19 +11,37 @@ router.get('/', ...requireRole('ADMIN'), async (req, res) => {
       where: { role: 'CLIENT' },
       include: {
         subscription: true,
-        relatives: true,
-        visits: {
-          select: { id:true, status:true, scheduledAt:true, serviceType:true },
-          orderBy: { scheduledAt: 'desc' },
-          take: 5,
+        relatives: {
+          include: {
+            visits: {
+              select: { id:true, status:true, scheduledAt:true, serviceType:true },
+              orderBy: { scheduledAt: 'desc' },
+              take: 5,
+            },
+          },
         },
       },
       orderBy: { createdAt: 'desc' },
     });
-    res.json({ users });
+    // Normalize for frontend
+    const normalized = users.map(u => ({
+      id: u.id,
+      name: u.name || 'Unknown',
+      email: u.email || '',
+      phone: u.phone || '',
+      country: u.country || '',
+      status: u.status || 'ACTIVE',
+      joinedAt: u.createdAt ? new Date(u.createdAt).toLocaleDateString() : 'N/A',
+      subscription: u.subscription,
+      plan: u.subscription?.plan || 'N/A',
+      visitsUsed: u.subscription?.visitsUsed || 0,
+      visitsTotal: u.subscription?.visitsPerMonth || 0,
+      relatives: u.relatives || [],
+    }));
+    res.json({ users: normalized });
   } catch (err) {
     console.error('Get users error:', err);
-    res.status(500).json({ error: 'Failed to fetch users' });
+    res.status(500).json({ error: 'Failed to fetch users', detail: err.message });
   }
 });
 

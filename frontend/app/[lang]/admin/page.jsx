@@ -106,8 +106,8 @@ const F = "'DM Sans','Inter',system-ui,sans-serif";
 const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
 const SMD = '0 4px 12px rgba(15,23,42,0.08),0 2px 4px rgba(15,23,42,0.04)';
 
-function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen, lang="en" }) {
-  const SidebarContent = ({ mobile=false }) => (
+function SidebarContent({ mobile=false, active, setActive, onLogout, alertCount, setOpen, lang="en" }) {
+  return (
     <>
       <div style={{ padding:'22px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
         {mobile ? (
@@ -135,7 +135,7 @@ function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen, 
       <nav style={{ flex:1, padding:'10px', overflowY:'auto' }}>
         {NAV.map(item=>(
           <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }}
-            style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:`${mobile?'12px':'10px'} 12px`, borderRadius:10, border:'none', background:active===item.id?(item.highlight?'rgba(124,58,237,0.25)':'rgba(37,99,235,0.22)'):'transparent', color:active===item.id?(item.highlight?'#C4B5FD':'#93C5FD'):'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
+            style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:mobile?'12px 12px':'10px 12px', borderRadius:10, border:'none', background:active===item.id?(item.highlight?'rgba(124,58,237,0.25)':'rgba(37,99,235,0.22)'):'transparent', color:active===item.id?(item.highlight?'#C4B5FD':'#93C5FD'):'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
             {item.icon}
             <span style={{ flex:1 }}>{(ADMIN_LABELS[lang]||ADMIN_LABELS.en)[item.id]||item.label}</span>
             {item.id==='alerts' && alertCount>0 && <span style={{ fontSize:10,fontWeight:800,background:'#DC2626',color:'#fff',borderRadius:99,padding:'2px 6px',minWidth:18,textAlign:'center' }}>{alertCount}</span>}
@@ -146,23 +146,22 @@ function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen, 
         {mobile ? (
           <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{(ADMIN_LABELS[lang]||ADMIN_LABELS.en).signOut||'Sign out'}</button>
         ) : (
-          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>{'Sign out'}</button>
+          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>Sign out</button>
         )}
       </div>
     </>
   );
+}
 
+function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen, lang="en" }) {
   return (
     <>
-      {/* Desktop */}
       <div style={{ width:224, background:'#0F172A', display:'flex', flexDirection:'column', position:'sticky', top:0, height:'100vh', flexShrink:0 }} className="admin-desk-sb">
-        <SidebarContent />
+        <SidebarContent active={active} setActive={setActive} onLogout={onLogout} alertCount={alertCount} setOpen={setOpen} lang={lang} />
       </div>
-      {/* Mobile overlay */}
       {open && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:39 }} onClick={()=>setOpen(false)} />}
-      {/* Mobile drawer */}
       <div style={{ display:'none', position:'fixed', top:0, left:0, height:'100vh', width:270, background:'#0F172A', flexDirection:'column', zIndex:50, transform:open?'translateX(0)':'translateX(-100%)', transition:'transform 0.25s ease', boxShadow:'4px 0 24px rgba(0,0,0,0.3)' }} className="admin-mob-sb">
-        <SidebarContent mobile />
+        <SidebarContent mobile active={active} setActive={setActive} onLogout={onLogout} alertCount={alertCount} setOpen={setOpen} lang={lang} />
       </div>
       <style>{`@media(max-width:768px){.admin-desk-sb{display:none!important;}.admin-mob-sb{display:flex!important;}}`}</style>
     </>
