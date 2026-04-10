@@ -25,7 +25,7 @@ export default function ServicesPage({ params }) {
       {/* Hero */}
       <section style={{ position:'relative', height:'400px', overflow:'hidden' }}>
         <img
-          src="https://images.unsplash.com/photo-1559757148-5c350d0d3c56?w=1400&q=80&auto=format&fit=crop"
+          src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1400&q=80&auto=format&fit=crop"
           alt="Professional nurse home care services"
           style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 30%' }}
         />
@@ -44,7 +44,7 @@ export default function ServicesPage({ params }) {
         <div style={{ maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', minHeight:320 }}>
           <div style={{ overflow:'hidden' }}>
             <img
-              src="https://images.unsplash.com/photo-1582750433449-648ed127bb54?w=700&q=80&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=700&q=80&auto=format&fit=crop"
               alt="Nurse with patient"
               style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }}
             />
