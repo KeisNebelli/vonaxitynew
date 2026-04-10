@@ -56,6 +56,7 @@ const translations = {
     },
     howItWorks: {
       tag:'How it works', title:'Simple, transparent care from anywhere',
+      subtitle:'Book online, we assign a nurse, you receive health reports after every visit.',
       steps:[
         { title:'Choose a plan', desc:'Select the plan that fits your family\'s needs. All plans include a 7-day free trial.' },
         { title:'Tell us about your loved one', desc:'Add your relative\'s details, location, and any health notes for our nurses.' },
@@ -317,6 +318,7 @@ const translations = {
     },
     howItWorks: {
       tag:'Si funksionon', title:'Kujdes i thjeshtë dhe transparent nga kudo',
+      subtitle:'Rezervoni online, ne caktojmë infermieren, ju merrni raporte shëndetësore pas çdo vizite.',
       steps:[
         { title:'Zgjidhni një plan', desc:'Zgjidhni planin që i përshtatet nevojave të familjes suaj. Të gjitha planet përfshijnë 7 ditë provë falas.' },
         { title:'Na tregoni për të dashurin tuaj', desc:'Shtoni detajet e të afërmit tuaj, vendndodhjen dhe çdo shënim shëndetësor për infermierët tanë.' },
