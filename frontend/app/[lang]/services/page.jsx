@@ -44,7 +44,7 @@ export default function ServicesPage({ params }) {
         <div style={{ maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', minHeight:320 }}>
           <div style={{ overflow:'hidden' }}>
             <img
-              src="https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=700&q=80&auto=format&fit=crop"
+              src="https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=700&q=80&auto=format&fit=crop"
               alt="Nurse with patient"
               style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }}
             />
