@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { t } from '@/translations';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
 // Module-level translation helper - uses 'en' as default
-let _currentLang = "en"; 
+let _currentLang = 'en';
 const tr = (key) => t(_currentLang, key);
 
 
@@ -60,13 +60,8 @@ const NURSE_LABELS = {
 };
 const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
 
-function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen, lang="en" }) {
-  const initials = nurse?.name ? nurse.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : 'N';
-  const status = nurse?.status || 'INCOMPLETE';
-  const statusMap = { APPROVED:['#ECFDF5','#059669'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
-  const [sbg, scol] = statusMap[status] || statusMap.INCOMPLETE;
-
-  const SidebarInner = ({ mobile=false }) => (
+function NurseSidebarInner({ mobile=false, initials, nurse, status, sbg, scol, active, setActive, onLogout, setOpen, lang="en" }) {
+  return (
     <>
       <div style={{ padding:'22px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
         {mobile && (
@@ -88,32 +83,39 @@ function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen, lang=
       </div>
       <nav style={{ flex:1, padding:'10px', overflow:'auto' }}>
         {NAV_ITEMS.map(item=>(
-          <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }} style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:`${mobile?'13px':'10px'} 12px`, borderRadius:10, border:'none', background:active===item.id?'rgba(5,150,105,0.2)':'transparent', color:active===item.id?'#6EE7B7':'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
+          <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }} style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:mobile?'13px 12px':'10px 12px', borderRadius:10, border:'none', background:active===item.id?'rgba(5,150,105,0.2)':'transparent', color:active===item.id?'#6EE7B7':'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
             {item.icon}<span>{(NURSE_LABELS[lang]||NURSE_LABELS.en)[item.label]||item.label}</span>
           </button>
         ))}
       </nav>
       <div style={{ padding:'12px 16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
         {mobile ? (
-          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{'Sign out'}</button>
+          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>Sign out</button>
         ) : (
-          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>{tr('nurse.signOut')}</button>
+          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>Sign out</button>
         )}
       </div>
     </>
   );
+}
+
+function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen, lang="en" }) {
+  const initials = nurse?.name ? nurse.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : 'N';
+  const status = nurse?.status || 'INCOMPLETE';
+  const statusMap = { APPROVED:['#ECFDF5','#059669'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
+  const [sbg, scol] = statusMap[status] || statusMap.INCOMPLETE;
 
   return (
     <>
       {/* Desktop sidebar */}
       <div style={{ width:220, background:'#0F172A', display:'flex', flexDirection:'column', position:'sticky', top:0, height:'100vh', flexShrink:0 }} className="nurse-desk-sidebar">
-        <SidebarInner />
+        <NurseSidebarInner initials={initials} nurse={nurse} status={status} sbg={sbg} scol={scol} active={active} setActive={setActive} onLogout={onLogout} setOpen={setOpen} lang={lang} />
       </div>
       {/* Mobile overlay */}
       {open && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:39 }} onClick={()=>setOpen(false)} />}
       {/* Mobile sidebar */}
       <div style={{ display:'none', position:'fixed', top:0, left:0, height:'100vh', width:270, background:'#0F172A', flexDirection:'column', zIndex:50, transform:open?'translateX(0)':'translateX(-100%)', transition:'transform 0.25s ease', boxShadow:'4px 0 24px rgba(0,0,0,0.3)' }} className="nurse-mob-sidebar">
-        <SidebarInner mobile />
+        <NurseSidebarInner mobile initials={initials} nurse={nurse} status={status} sbg={sbg} scol={scol} active={active} setActive={setActive} onLogout={onLogout} setOpen={setOpen} lang={lang} />
       </div>
       <style>{`
         @media(max-width:768px){
