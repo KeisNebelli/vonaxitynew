@@ -300,10 +300,15 @@ export default function Dashboard({ params }) {
         if (meData?.user) {
           setU(meData.user);
           if (meData.user.relatives?.length>0) setR(meData.user.relatives[0]);
-        } else setU(MOCK.user);
-        setVisits(visitsData?.visits?.length > 0 ? visitsData.visits : MOCK.visits);
-      } catch { setU(MOCK.user); setVisits(MOCK.visits); }
-      finally { setLoading(false); }
+        } else {
+          // No valid session - redirect to login
+          router.push(`/${lang}/login`);
+          return;
+        }
+        setVisits(visitsData?.visits?.length > 0 ? visitsData.visits : []);
+      } catch {
+        router.push(`/${lang}/login`);
+      } finally { setLoading(false); }
     };
     load();
   }, []);
@@ -326,9 +331,9 @@ export default function Dashboard({ params }) {
 
   if (loading) return <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', fontFamily:F, color:C.textTertiary, fontSize:14 }}>Loading...</div>;
 
-  const userData = u || MOCK.user;
-  const relative = r; // Don't fall back to mock - use null if no real relative
-  const relativeDisplay = r || MOCK.relative; // Only for display purposes
+  const userData = u || { name:'', email:'', subscription:{ plan:'standard', status:'TRIAL', visitsPerMonth:2, visitsUsed:0 } };
+  const relative = r;
+  const relativeDisplay = r || MOCK.relative;
   const plan = (userData.subscription?.plan||'standard').charAt(0).toUpperCase()+(userData.subscription?.plan||'standard').slice(1);
   const isTrial = userData.subscription?.status === 'TRIAL';
   const initials = (userData.name||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
