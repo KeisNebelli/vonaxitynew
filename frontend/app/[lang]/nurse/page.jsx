@@ -158,15 +158,22 @@ function Dashboard({ setActive, setSelectedVisit, lang='en' }) {
   );
 }
 
-function Visits({ setActive, setSelectedVisit, lang='en' }) {
+function Visits({ setActive, setSelectedVisit, lang='en', visits=[] }) {
   const tr = (key) => t(lang, key);
   const [filter, setFilter] = useState('all');
-  const filtered = filter==='all'?MOCK_VISITS:MOCK_VISITS.filter(v=>filter==='upcoming'?v.status!=='COMPLETED':v.status==='COMPLETED');
+  const filtered = filter==='all' ? visits : visits.filter(v=>filter==='upcoming'?!['COMPLETED','CANCELLED'].includes(v.status):v.status==='COMPLETED');
+
+  if (!visits.length) return (
+    <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
+      No visits assigned yet. Browse Jobs to find and apply to open visits.
+    </div>
+  );
+
   return (
     <div>
       <div style={{ display:'flex', gap:8, marginBottom:20 }}>
         {['all','upcoming','completed'].map(f => (
-          <button key={f} onClick={()=>setFilter(f)} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', borderRadius:99, border:'none', cursor:'pointer', background:filter===f?C.primary:C.bgWhite, color:filter===f?'#fff':C.textSecondary, border:filter===f?'none':`1px solid ${C.border}` }}>
+          <button key={f} onClick={()=>setFilter(f)} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', borderRadius:99, cursor:'pointer', background:filter===f?C.primary:C.bgWhite, color:filter===f?'#fff':C.textSecondary, border:filter===f?'none':`1px solid ${C.border}` }}>
             {f.charAt(0).toUpperCase()+f.slice(1)}
           </button>
         ))}
@@ -175,7 +182,7 @@ function Visits({ setActive, setSelectedVisit, lang='en' }) {
         {filtered.map(v => (
           <VisitLocationCard key={v.id} visit={formatVisit(v)} compact={v.status==='COMPLETED'}
             onStatusChange={(id,status)=>console.log('Status:',id,status)}
-            onComplete={(id)=>{ setSelectedVisit(MOCK_VISITS.find(v=>v.id===id)); setActive('complete'); }} />
+            onComplete={(id)=>{ setSelectedVisit(v); setActive('complete'); }} />
         ))}
       </div>
     </div>
@@ -199,12 +206,33 @@ function MapView({ selectedVisit, setActive, setSelectedVisit }) {
   );
 }
 
-function CompleteVisit({ visit, setActive, lang='en' }) {
+function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
   const tr = (key) => t(lang, key);
-  const v = visit || MOCK_VISITS[0];
   const [form, setForm] = useState({ bp:'', hr:'', glucose:'', temp:'', oxygen:'', notes:'' });
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [error, setError] = useState('');
   const inp = { width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box' };
+
+  if (!visit) return (
+    <div style={{ padding:40, textAlign:'center', color:C.textTertiary, fontSize:14 }}>
+      No visit selected. Go to My Visits and click Complete on an active visit.
+    </div>
+  );
+
+  const handleSubmit = async () => {
+    setSubmitting(true); setError('');
+    try {
+      await api.completeVisit(visit.id, {
+        bp: form.bp, hr: form.hr, glucose: form.glucose,
+        temperature: form.temp, oxygenSat: form.oxygen, nurseNotes: form.notes,
+      });
+      setSubmitted(true);
+      onComplete && onComplete();
+    } catch (err) {
+      setError(err.message || 'Failed to submit report. Please try again.');
+    } finally { setSubmitting(false); }
+  };
 
   if (submitted) return (
     <div style={{ textAlign:'center', padding:'80px 20px' }}>
@@ -212,7 +240,7 @@ function CompleteVisit({ visit, setActive, lang='en' }) {
         <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
       </div>
       <h3 style={{ fontSize:22, fontWeight:700, color:C.textPrimary, marginBottom:10 }}>Report submitted</h3>
-      <p style={{ fontSize:14, color:C.textSecondary, marginBottom:24 }}>Health report for <strong>{v.relative?.name}</strong> saved successfully.</p>
+      <p style={{ fontSize:14, color:C.textSecondary, marginBottom:24 }}>Health report saved successfully.</p>
       <button onClick={()=>{ setSubmitted(false); setActive('visits'); }} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 28px', fontSize:14, fontWeight:600, cursor:'pointer' }}>Back to visits</button>
     </div>
   );
@@ -220,8 +248,9 @@ function CompleteVisit({ visit, setActive, lang='en' }) {
   return (
     <div style={{ maxWidth:560 }}>
       <div style={{ background:C.primaryLight, borderRadius:12, padding:'14px 18px', marginBottom:24, border:`1px solid rgba(37,99,235,0.15)` }}>
-        <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>{v.relative?.name}</div>
-        <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{v.serviceType} · {new Date(v.scheduledAt).toLocaleDateString()}</div>
+        <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>{visit.relative?.name || visit.clientName || 'Patient'}</div>
+        <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{visit.serviceType} · {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+        {visit.relative?.address && <div style={{ fontSize:12, color:'#3B82F6', marginTop:2, opacity:0.8 }}>📍 {visit.relative.address}</div>}
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:16 }}>
         <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Vitals</div>
@@ -238,7 +267,10 @@ function CompleteVisit({ visit, setActive, lang='en' }) {
         <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:12 }}>Nurse notes</div>
         <textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} placeholder="Describe the visit, patient condition..." style={{...inp,minHeight:100,resize:'vertical'}} />
       </div>
-      <button onClick={()=>setSubmitted(true)} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:'pointer' }}>Submit visit report</button>
+      {error && <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:9, padding:'11px 14px', fontSize:13, color:'#DC2626', marginBottom:16 }}>{error}</div>}
+      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:submitting?'not-allowed':'pointer', opacity:submitting?0.7:1 }}>
+        {submitting ? 'Submitting...' : 'Submit visit report'}
+      </button>
     </div>
   );
 }
@@ -813,20 +845,27 @@ export default function NursePage({ params }) {
   const switchLang = (l) => { setLang(l); document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; localStorage.setItem('vonaxity-lang',l); };
   const [selectedVisit, setSelectedVisit] = useState(null);
   const [nurse, setNurse] = useState(null);
+  const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    const load = async () => {
-      try {
-        const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
-        const res = await fetch(`${BASE}/nurses/me`, { headers: { 'Authorization': `Bearer ${localStorage.getItem('vonaxity-token')}` } });
-        const data = await res.json();
-        if (data.nurse) setNurse(data.nurse);
-      } catch (err) { console.error(err); }
-      finally { setLoading(false); }
-    };
-    load();
-  }, []);
+  const loadData = async () => {
+    try {
+      const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
+      const token = localStorage.getItem('vonaxity-token');
+      const headers = { 'Authorization': `Bearer ${token}` };
+      const [nurseRes, visitsRes] = await Promise.all([
+        fetch(`${BASE}/nurses/me`, { headers }),
+        fetch(`${BASE}/visits`, { headers }),
+      ]);
+      const nurseData = await nurseRes.json();
+      const visitsData = await visitsRes.json();
+      if (nurseData.nurse) setNurse(nurseData.nurse);
+      if (visitsData.visits) setVisits(visitsData.visits);
+    } catch (err) { console.error(err); }
+    finally { setLoading(false); }
+  };
+
+  useEffect(() => { loadData(); }, []);
 
   const handleSave = async (formData) => { await api.saveNurseProfile(formData); };
   const handleComplete = async (formData) => {
@@ -901,9 +940,9 @@ export default function NursePage({ params }) {
             {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
             {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} />}
             {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
-            {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} />}
+            {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} />}
             {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} />}
-            {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} lang={lang} />}
+            {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
             {active==='earnings' && <Earnings lang={lang} />}
             {active==='profile' && <NurseProfile lang={lang} />}
           </main>
