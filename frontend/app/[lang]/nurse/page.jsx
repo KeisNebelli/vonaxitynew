@@ -362,6 +362,9 @@ function BrowseJobs({ nurse, lang='en' }) {
               <div style={{ fontSize:12, color:C2.textTertiary }}>
                 📍 {job.city} &nbsp;·&nbsp; 📅 {new Date(job.scheduledAt).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} at {new Date(job.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
               </div>
+              <div style={{ fontSize:12, color:C2.textSecondary, marginTop:4 }}>
+                👤 Posted by <strong>{job.postedBy}</strong>{job.clientCountry ? ` · ${job.clientCountry}` : ''}{job.relativeName ? ` · For: ${job.relativeName}` : ''}
+              </div>
               {job.notes && <div style={{ fontSize:12, color:C2.textSecondary, marginTop:6, fontStyle:'italic' }}>"{job.notes}"</div>}
             </div>
             {job.hasApplied ? (

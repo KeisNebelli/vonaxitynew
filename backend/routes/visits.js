@@ -43,16 +43,30 @@ router.get('/open', ...requireRole('NURSE'), async (req, res) => {
     const nurse = await prisma.nurse.findUnique({ where: { userId: req.user.userId } });
     if (!nurse) return res.status(404).json({ error: 'Nurse profile not found' });
     if (nurse.status !== 'APPROVED') return res.status(403).json({ error: 'Profile must be approved to browse jobs' });
+
     const visits = await prisma.visit.findMany({
       where: { status: 'UNASSIGNED', nurseId: null },
-      include: { relative: true, applications: { where: { nurseId: nurse.id } } },
+      include: {
+        relative: { include: { client: { select: { name: true, country: true } } } },
+        applications: { where: { nurseId: nurse.id } },
+      },
       orderBy: { scheduledAt: 'asc' },
     });
+
     const normalized = visits.map(v => ({
-      id: v.id, serviceType: v.serviceType, scheduledAt: v.scheduledAt,
-      city: v.relative?.city || '', notes: v.notes || '', status: v.status,
-      hasApplied: v.applications.length > 0, applicationStatus: v.applications[0]?.status || null,
+      id: v.id,
+      serviceType: v.serviceType,
+      scheduledAt: v.scheduledAt,
+      city: v.relative?.city || '',
+      notes: v.notes || '',
+      status: v.status,
+      hasApplied: v.applications.length > 0,
+      applicationStatus: v.applications[0]?.status || null,
+      postedBy: v.relative?.client?.name || 'A client',
+      clientCountry: v.relative?.client?.country || '',
+      relativeName: v.relative?.name || '',
     }));
+
     res.json({ visits: normalized });
   } catch (err) {
     console.error('Get open visits error:', err);
