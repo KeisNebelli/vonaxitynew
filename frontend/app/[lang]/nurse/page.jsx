@@ -28,8 +28,8 @@ const EXPERIENCE_LIST = ['Less than 1 year','1-2 years','3-5 years','6-10 years'
 
 const NAV_ITEMS = [
   { id:'dashboard', label:'dashboard', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
+  { id:'jobs', label:'jobs', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
   { id:'visits', label:'visits', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
-  { id:'map', label:'map', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
   { id:'complete', label:'complete', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> },
   { id:'earnings', label:'earnings', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
   { id:'profile', label:'profile', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
@@ -55,8 +55,8 @@ function formatVisit(v) {
 const F = "'DM Sans','Inter',system-ui,sans-serif";
 
 const NURSE_LABELS = {
-  en:{ dashboard:'Dashboard', visits:'My Visits', map:'Navigation', complete:'Complete Visit', earnings:'Earnings', profile:'My Profile' },
-  sq:{ dashboard:'Paneli', visits:'Vizitat e Mia', map:'Navigimi', complete:'Përfundo Vizitën', earnings:'Fitimet', profile:'Profili Im' },
+  en:{ dashboard:'Dashboard', jobs:'Browse Jobs', visits:'My Visits', map:'Navigation', complete:'Complete Visit', earnings:'Earnings', profile:'My Profile' },
+  sq:{ dashboard:'Paneli', jobs:'Shfleto Punët', visits:'Vizitat e Mia', map:'Navigimi', complete:'Përfundo Vizitën', earnings:'Fitimet', profile:'Profili Im' },
 };
 const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
 
@@ -296,6 +296,110 @@ function NurseField({ label, children }) {
     <div style={{ marginBottom:16 }}>
       <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{label}</label>
       {children}
+    </div>
+  );
+}
+
+function BrowseJobs({ nurse, lang='en' }) {
+  const [jobs, setJobs] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [applying, setApplying] = useState(null);
+  const [message, setMessage] = useState('');
+  const [showMsg, setShowMsg] = useState(null); // visitId showing message input
+  const [statuses, setStatuses] = useState({}); // visitId -> 'applied'|'error'
+  const C2 = { primary:'#059669', primaryLight:'#ECFDF5', bg:'#F8FAFC', bgWhite:'#FFFFFF', textPrimary:'#0F172A', textSecondary:'#475569', textTertiary:'#94A3B8', border:'#E2E8F0', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2' };
+
+  useEffect(() => {
+    api.getOpenVisits()
+      .then(data => setJobs(data.visits || []))
+      .catch(() => setJobs([]))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const handleApply = async (visitId) => {
+    setApplying(visitId);
+    try {
+      await api.applyToVisit(visitId, { message });
+      setStatuses(s => ({ ...s, [visitId]: 'applied' }));
+      setShowMsg(null);
+      setMessage('');
+      // Refresh jobs list
+      const data = await api.getOpenVisits().catch(() => ({ visits: [] }));
+      setJobs(data.visits || []);
+    } catch (err) {
+      setStatuses(s => ({ ...s, [visitId]: err.message || 'Failed to apply' }));
+    } finally { setApplying(null); }
+  };
+
+  if (nurse?.status !== 'APPROVED') {
+    return (
+      <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:14, padding:'28px 24px', textAlign:'center' }}>
+        <div style={{ fontSize:32, marginBottom:12 }}>🔒</div>
+        <div style={{ fontSize:16, fontWeight:700, color:'#92400E', marginBottom:8 }}>Profile not approved yet</div>
+        <div style={{ fontSize:13, color:'#92400E', opacity:0.8 }}>Your profile needs to be approved by our team before you can browse and apply to jobs.</div>
+      </div>
+    );
+  }
+
+  if (loading) return <div style={{ padding:40, textAlign:'center', color:C2.textTertiary, fontSize:14 }}>Loading available jobs...</div>;
+
+  if (!jobs.length) return (
+    <div style={{ background:C2.bgWhite, borderRadius:14, border:`1px solid ${C2.border}`, padding:'48px 24px', textAlign:'center' }}>
+      <div style={{ fontSize:32, marginBottom:12 }}>✅</div>
+      <div style={{ fontSize:15, fontWeight:700, color:C2.textPrimary, marginBottom:6 }}>No open jobs right now</div>
+      <div style={{ fontSize:13, color:C2.textTertiary }}>Check back soon — new visit requests appear here when clients book.</div>
+    </div>
+  );
+
+  return (
+    <div>
+      <div style={{ fontSize:13, color:C2.textTertiary, marginBottom:16 }}>{jobs.length} open job{jobs.length!==1?'s':''} in your area</div>
+      {jobs.map(job => (
+        <div key={job.id} style={{ background:C2.bgWhite, borderRadius:14, border:`1px solid ${job.hasApplied?'#6EE7B7':C2.border}`, padding:'20px 22px', marginBottom:12, boxShadow:'0 1px 3px rgba(15,23,42,0.06)' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:10 }}>
+            <div>
+              <div style={{ fontSize:15, fontWeight:700, color:C2.textPrimary, marginBottom:4 }}>{job.serviceType}</div>
+              <div style={{ fontSize:12, color:C2.textTertiary }}>
+                📍 {job.city} &nbsp;·&nbsp; 📅 {new Date(job.scheduledAt).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} at {new Date(job.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+              </div>
+              {job.notes && <div style={{ fontSize:12, color:C2.textSecondary, marginTop:6, fontStyle:'italic' }}>"{job.notes}"</div>}
+            </div>
+            {job.hasApplied ? (
+              <span style={{ fontSize:11, fontWeight:700, padding:'4px 12px', borderRadius:99, background:'#ECFDF5', color:'#059669', whiteSpace:'nowrap', flexShrink:0 }}>✓ Applied</span>
+            ) : (
+              <button onClick={()=>setShowMsg(showMsg===job.id?null:job.id)} style={{ fontSize:13, fontWeight:700, padding:'8px 18px', background:`linear-gradient(135deg,#059669,#047857)`, color:'#fff', border:'none', borderRadius:9, cursor:'pointer', flexShrink:0 }}>
+                Apply
+              </button>
+            )}
+          </div>
+
+          {statuses[job.id] === 'applied' && (
+            <div style={{ fontSize:12, color:'#059669', fontWeight:600, marginTop:6 }}>✓ Application sent successfully!</div>
+          )}
+          {statuses[job.id] && statuses[job.id] !== 'applied' && (
+            <div style={{ fontSize:12, color:C2.error, marginTop:6 }}>{statuses[job.id]}</div>
+          )}
+
+          {showMsg === job.id && !job.hasApplied && (
+            <div style={{ marginTop:12, borderTop:`1px solid ${C2.border}`, paddingTop:12 }}>
+              <textarea
+                value={message}
+                onChange={e=>setMessage(e.target.value)}
+                placeholder="Add a short message to the client (optional)..."
+                style={{ width:'100%', padding:'10px 14px', borderRadius:9, border:`1.5px solid ${C2.border}`, fontSize:13, color:C2.textPrimary, background:C2.bg, outline:'none', fontFamily:'inherit', boxSizing:'border-box', resize:'vertical', minHeight:70 }}
+              />
+              <div style={{ display:'flex', gap:8, marginTop:8 }}>
+                <button onClick={()=>handleApply(job.id)} disabled={applying===job.id} style={{ flex:1, padding:'10px', background:`linear-gradient(135deg,#059669,#047857)`, color:'#fff', border:'none', borderRadius:9, fontSize:13, fontWeight:700, cursor:applying===job.id?'not-allowed':'pointer', opacity:applying===job.id?0.7:1 }}>
+                  {applying===job.id ? 'Sending...' : 'Send Application'}
+                </button>
+                <button onClick={()=>setShowMsg(null)} style={{ padding:'10px 16px', background:'transparent', color:C2.textSecondary, border:`1px solid ${C2.border}`, borderRadius:9, fontSize:13, cursor:'pointer' }}>
+                  Cancel
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
+      ))}
     </div>
   );
 }
@@ -736,7 +840,7 @@ export default function NursePage({ params }) {
   };
 
   const displayNurse = nurse ? { ...MOCK_NURSE, ...nurse, initials:(nurse.user?.name||nurse.name||'N').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() } : MOCK_NURSE;
-  const TITLES = { dashboard:tr('nurse.dashboard'), visits:tr('nurse.myVisits'), map:tr('nurse.navigation'), complete:tr('nurse.completeVisit'), earnings:tr('nurse.earnings'), profile:tr('nurse.profile'), onboarding:tr('nurse.completeProfile') };
+  const TITLES = { dashboard:tr('nurse.dashboard'), jobs:'Browse Jobs', visits:tr('nurse.myVisits'), map:tr('nurse.navigation'), complete:tr('nurse.completeVisit'), earnings:tr('nurse.earnings'), profile:tr('nurse.profile'), onboarding:tr('nurse.completeProfile') };
   const status = nurse?.status || 'INCOMPLETE';
   const statusColors = { APPROVED:['#ECFDF5','#059669'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
   const [sbg, scol] = statusColors[status] || statusColors.INCOMPLETE;
@@ -793,6 +897,7 @@ export default function NursePage({ params }) {
             <OnboardingBanner nurse={nurse} onStartOnboarding={()=>setActive('onboarding')} lang={lang} />
             {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
             {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} />}
+            {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
             {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} />}
             {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} />}
             {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} lang={lang} />}
