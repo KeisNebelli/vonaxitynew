@@ -110,7 +110,7 @@ export default function VisitLocationCard({ visit, onStatusChange, onComplete, c
             {activeStatus!=='on_the_way' && <button onClick={()=>updateStatus('on_the_way')} style={sBtn(C.warning,C.warningLight)}>On my way</button>}
             {activeStatus==='on_the_way' && <button onClick={()=>updateStatus('arrived')} style={sBtn(C.secondary,C.secondaryLight)}>Arrived</button>}
             {activeStatus==='arrived' && <button onClick={()=>updateStatus('in_progress')} style={sBtn(C.purple,C.purpleLight)}>Start visit</button>}
-            {['in_progress','arrived'].includes(activeStatus) && <button onClick={()=>onComplete?.(visit.id)} style={sBtn(C.primary,C.primaryLight)}>Complete visit</button>}
+            {['in_progress','arrived','pending','accepted'].includes(activeStatus) && <button onClick={()=>onComplete?.(visit.id)} style={sBtn(C.primary,C.primaryLight)}>Complete visit</button>}
             {activeStatus!=='no_show' && <button onClick={()=>updateStatus('no_show')} style={sBtn(C.error,C.errorLight)}>No show</button>}
           </div>
         </div>
