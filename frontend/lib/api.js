@@ -36,6 +36,10 @@ export const api = {
   // Visits
   getVisits: () => apiFetch('/visits'),
   createVisit: (body) => apiFetch('/visits', { method: 'POST', body: JSON.stringify(body) }),
+  getOpenVisits: () => apiFetch('/visits/open'),
+  applyToVisit: (visitId, body={}) => apiFetch(`/visits/${visitId}/apply`, { method: 'POST', body: JSON.stringify(body) }),
+  getApplicants: (visitId) => apiFetch(`/visits/${visitId}/applicants`),
+  selectNurse: (visitId, nurseId) => apiFetch(`/visits/${visitId}/select/${nurseId}`, { method: 'POST' }),
   updateVisit: (id, body) => apiFetch(`/visits/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   completeVisit: (id, body) => apiFetch(`/visits/${id}/complete`, { method: 'POST', body: JSON.stringify(body) }),
 
