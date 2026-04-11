@@ -294,26 +294,41 @@ export default function Dashboard({ params }) {
     const load = async () => {
       try {
         const [meData, visitsData] = await Promise.all([
-          api.getMe().catch(()=>null),
+          api.me().catch(()=>null),
           api.getVisits().catch(()=>({ visits:[] })),
         ]);
         if (meData?.user) {
           setU(meData.user);
           if (meData.user.relatives?.length>0) setR(meData.user.relatives[0]);
         } else setU(MOCK.user);
-        setVisits(visitsData?.visits || MOCK.visits);
+        setVisits(visitsData?.visits?.length > 0 ? visitsData.visits : MOCK.visits);
       } catch { setU(MOCK.user); setVisits(MOCK.visits); }
       finally { setLoading(false); }
     };
     load();
   }, []);
 
+  const loadData = async () => {
+    try {
+      const [meData, visitsData] = await Promise.all([
+        api.me().catch(()=>null),
+        api.getVisits().catch(()=>({ visits:[] })),
+      ]);
+      if (meData?.user) {
+        setU(meData.user);
+        if (meData.user.relatives?.length>0) setR(meData.user.relatives[0]);
+      }
+      setVisits(visitsData?.visits?.length > 0 ? visitsData.visits : []);
+    } catch {}
+  };
+
   const logout = () => { localStorage.removeItem('vonaxity-token'); document.cookie='vonaxity-token=;path=/;max-age=0'; document.cookie='vonaxity-role=;path=/;max-age=0'; router.push(`/${lang}/login`); };
 
   if (loading) return <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', fontFamily:F, color:C.textTertiary, fontSize:14 }}>Loading...</div>;
 
   const userData = u || MOCK.user;
-  const relative = r || MOCK.relative;
+  const relative = r; // Don't fall back to mock - use null if no real relative
+  const relativeDisplay = r || MOCK.relative; // Only for display purposes
   const plan = (userData.subscription?.plan||'standard').charAt(0).toUpperCase()+(userData.subscription?.plan||'standard').slice(1);
   const isTrial = userData.subscription?.status === 'TRIAL';
   const initials = (userData.name||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
@@ -427,7 +442,7 @@ export default function Dashboard({ params }) {
               />
             ) : (
               <>
-                {active==='overview' && <Overview user={userData} visits={visits} relative={relative} lang={lang} onBook={()=>setActive('book')}/>}
+                {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>setActive('book')}/>}
                 {active==='book' && <BookVisit relative={relative} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} />}
                 {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} />}
                 {active==='subscription' && (
