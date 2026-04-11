@@ -192,33 +192,7 @@ model Notification {
   createdAt DateTime @default(now())
 }
 
-model VisitApplication {
-  id        String   @id @default(cuid())
-  visitId   String
-  visit     Visit    @relation(fields: [visitId], references: [id])
-  nurseId   String
-  nurse     Nurse    @relation(fields: [nurseId], references: [id])
-  status    String   @default("PENDING") // PENDING | ACCEPTED | REJECTED
-  message   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
 
-  @@unique([visitId, nurseId])
-}
-
-model VisitApplication {
-  id        String   @id @default(cuid())
-  visitId   String
-  visit     Visit    @relation(fields: [visitId], references: [id])
-  nurseId   String
-  nurse     Nurse    @relation(fields: [nurseId], references: [id])
-  status    String   @default("PENDING") // PENDING | ACCEPTED | REJECTED
-  message   String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@unique([visitId, nurseId])
-}
 
 model SystemSettings {
   id        String   @id @default(cuid())
@@ -226,3 +200,4 @@ model SystemSettings {
   value     String
   updatedAt DateTime @updatedAt
 }
+
