@@ -208,6 +208,65 @@ router.post('/:id/select/:nurseId', ...requireRole('CLIENT', 'ADMIN'), async (re
   }
 });
 
+
+// PUT /visits/:id/client — client edits their own UNASSIGNED ticket
+router.put('/:id/client', ...requireRole('CLIENT'), async (req, res) => {
+  try {
+    const { serviceType, scheduledAt, notes } = req.body;
+    const visit = await prisma.visit.findUnique({
+      where: { id: req.params.id },
+      include: { relative: true },
+    });
+    if (!visit) return res.status(404).json({ error: 'Visit not found' });
+    if (visit.relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Not your visit' });
+    if (!['UNASSIGNED'].includes(visit.status)) return res.status(400).json({ error: 'Only unassigned visits can be edited. Contact support for changes to active visits.' });
+
+    const updated = await prisma.visit.update({
+      where: { id: req.params.id },
+      data: {
+        ...(serviceType && { serviceType }),
+        ...(scheduledAt && { scheduledAt: new Date(scheduledAt) }),
+        ...(notes !== undefined && { notes }),
+      },
+      include: { relative: true, nurse: { include: { user: { select: { name: true } } } } },
+    });
+    console.log(`✏️ Visit ${req.params.id} edited by client ${req.user.userId}`);
+    res.json({ success: true, visit: updated });
+  } catch (err) {
+    console.error('Edit visit error:', err);
+    res.status(500).json({ error: 'Failed to update visit' });
+  }
+});
+
+// DELETE /visits/:id — client deletes their own ticket
+router.delete('/:id', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
+  try {
+    const visit = await prisma.visit.findUnique({
+      where: { id: req.params.id },
+      include: { relative: true },
+    });
+    if (!visit) return res.status(404).json({ error: 'Visit not found' });
+
+    // Authorization — only owner or admin
+    if (req.user.role === 'CLIENT') {
+      if (visit.relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Not your visit' });
+      if (['COMPLETED'].includes(visit.status)) return res.status(400).json({ error: 'Completed visits cannot be deleted' });
+      if (['PENDING', 'ACCEPTED'].includes(visit.status)) return res.status(400).json({ error: 'A nurse has already been assigned. Please contact support to cancel.' });
+    }
+
+    await prisma.visit.delete({ where: { id: req.params.id } });
+
+    // Restore visit count — only if it was UNASSIGNED (not yet completed)
+    // visitsUsed is only incremented on COMPLETE, so no need to decrement here
+    // But if we want to track "booked" separately we would. For now: no decrement on delete.
+    console.log(`🗑️ Visit ${req.params.id} deleted — status was ${visit.status}`);
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Delete visit error:', err);
+    res.status(500).json({ error: 'Failed to delete visit' });
+  }
+});
+
 // PUT /visits/:id — admin updates
 router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
   try {

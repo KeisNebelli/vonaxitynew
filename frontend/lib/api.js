@@ -36,6 +36,8 @@ export const api = {
   // Visits
   getVisits: () => apiFetch('/visits'),
   createVisit: (body) => apiFetch('/visits', { method: 'POST', body: JSON.stringify(body) }),
+  editVisit: (id, body) => apiFetch(`/visits/${id}/client`, { method: 'PUT', body: JSON.stringify(body) }),
+  deleteVisit: (id) => apiFetch(`/visits/${id}`, { method: 'DELETE' }),
   forgotPassword: (email) => apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
   resetPassword: (token, password) => apiFetch('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) }),
   createCheckout: (plan) => apiFetch('/payments/create-checkout', { method: 'POST', body: JSON.stringify({ plan }) }),

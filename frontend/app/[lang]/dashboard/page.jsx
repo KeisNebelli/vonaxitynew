@@ -242,13 +242,109 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
   );
 }
 
-function Visits({ visits, lang, onViewApplicants }) {
+
+// ── Edit Visit Modal ────────────────────────────────────────────────────────
+function EditVisit({ visit, onSave, onCancel }) {
+  const SERVICES = ['Blood Pressure Check','Glucose Monitoring','Vitals Monitoring','Blood Work Collection','Welfare Check','Post-surgical Care','Medication Administration','General Nursing'];
+  const [form, setForm] = useState({
+    serviceType: visit.serviceType || '',
+    scheduledAt: visit.scheduledAt ? new Date(visit.scheduledAt).toISOString().slice(0,16) : '',
+    notes: visit.notes || '',
+  });
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+  const inp = { width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:F, boxSizing:'border-box' };
+
+  const handleSave = async () => {
+    if (!form.serviceType || !form.scheduledAt) return setError('Service type and date are required.');
+    setLoading(true); setError('');
+    try {
+      await api.editVisit(visit.id, form);
+      onSave();
+    } catch (err) { setError(err.message || 'Failed to save changes.'); }
+    finally { setLoading(false); }
+  };
+
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:9000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>
+      <div style={{ background:C.bgWhite, borderRadius:20, padding:28, maxWidth:480, width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.15)' }}>
+        <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:4 }}>Edit visit</div>
+        <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>Only unassigned visits can be edited.</div>
+        <div style={{ marginBottom:16 }}>
+          <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Service type</label>
+          <select value={form.serviceType} onChange={e=>setForm(f=>({...f,serviceType:e.target.value}))} style={{...inp}}>
+            <option value="">Select a service</option>
+            {SERVICES.map(s=><option key={s} value={s}>{s}</option>)}
+          </select>
+        </div>
+        <div style={{ marginBottom:16 }}>
+          <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Date & time</label>
+          <input type="datetime-local" value={form.scheduledAt} onChange={e=>setForm(f=>({...f,scheduledAt:e.target.value}))} style={inp} />
+        </div>
+        <div style={{ marginBottom:24 }}>
+          <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Notes for nurse</label>
+          <textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} placeholder="Any special instructions..." style={{...inp, minHeight:80, resize:'vertical'}} />
+        </div>
+        {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
+        <div style={{ display:'flex', gap:10 }}>
+          <button onClick={onCancel} style={{ flex:1, padding:'12px', borderRadius:10, border:`1px solid ${C.border}`, background:'transparent', fontSize:14, fontWeight:600, cursor:'pointer', color:C.textSecondary }}>Cancel</button>
+          <button onClick={handleSave} disabled={loading} style={{ flex:2, padding:'12px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer', opacity:loading?0.7:1, fontFamily:F }}>
+            {loading ? 'Saving...' : 'Save changes'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Delete Confirmation Modal ────────────────────────────────────────────────
+function DeleteConfirm({ visit, onConfirm, onCancel }) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleDelete = async () => {
+    setLoading(true); setError('');
+    try {
+      await api.deleteVisit(visit.id);
+      onConfirm();
+    } catch (err) { setError(err.message || 'Failed to delete visit.'); setLoading(false); }
+  };
+
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:9000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>
+      <div style={{ background:C.bgWhite, borderRadius:20, padding:28, maxWidth:420, width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.15)' }}>
+        <div style={{ width:48, height:48, borderRadius:'50%', background:C.errorLight, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:16 }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+        </div>
+        <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:8 }}>Delete this visit?</div>
+        <div style={{ fontSize:14, color:C.textSecondary, marginBottom:6 }}>
+          <strong>{visit.serviceType}</strong> — {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+        </div>
+        <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>This cannot be undone. The visit slot will be removed.</div>
+        {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
+        <div style={{ display:'flex', gap:10 }}>
+          <button onClick={onCancel} style={{ flex:1, padding:'12px', borderRadius:10, border:`1px solid ${C.border}`, background:'transparent', fontSize:14, fontWeight:600, cursor:'pointer', color:C.textSecondary }}>Cancel</button>
+          <button onClick={handleDelete} disabled={loading} style={{ flex:1, padding:'12px', borderRadius:10, border:'none', background:C.error, color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer', opacity:loading?0.7:1, fontFamily:F }}>
+            {loading ? 'Deleting...' : 'Delete'}
+          </button>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Visits({ visits, lang, onViewApplicants, onRefresh }) {
   const tr = (key) => t(lang, key);
   const [reviewing, setReviewing] = useState(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
   const [reviewed, setReviewed] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [editing, setEditing] = useState(null); // visit object
+  const [deleting, setDeleting] = useState(null); // visit object
+
+  const canEdit = (v) => v.status === 'UNASSIGNED';
+  const canDelete = (v) => !['COMPLETED'].includes(v.status) && !['PENDING','ACCEPTED'].includes(v.status);
 
   const submitReview = async (visitId) => {
     if (!rating) return;
@@ -275,7 +371,17 @@ function Visits({ visits, lang, onViewApplicants }) {
               <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>{v.serviceType}</div>
               <div style={{ fontSize:12, color:C.textTertiary }}>{new Date(v.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · {v.nurse?.user?.name||tr('visits.nurseTBC')}</div>
             </div>
-            <Badge s={v.status}/>
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 }}>
+              <Badge s={v.status}/>
+              <div style={{ display:'flex', gap:6 }}>
+                {canEdit(v) && (
+                  <button onClick={()=>setEditing(v)} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:6, border:`1px solid ${C.border}`, background:'transparent', cursor:'pointer', color:C.textSecondary }}>Edit</button>
+                )}
+                {canDelete(v) && (
+                  <button onClick={()=>setDeleting(v)} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:6, border:`1px solid #FECACA`, background:C.errorLight, cursor:'pointer', color:C.error }}>Delete</button>
+                )}
+              </div>
+            </div>
           </div>
           {v.bpSystolic && (
             <div style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 16px', display:'flex', gap:20, flexWrap:'wrap', marginBottom:8 }}>
@@ -316,6 +422,8 @@ function Visits({ visits, lang, onViewApplicants }) {
         </div>
       ))}
     </div>
+    {editing && <EditVisit visit={editing} onSave={()=>{ setEditing(null); onRefresh?.(); }} onCancel={()=>setEditing(null)} />}
+    {deleting && <DeleteConfirm visit={deleting} onConfirm={()=>{ setDeleting(null); onRefresh?.(); }} onCancel={()=>setDeleting(null)} />}
   );
 }
 
@@ -480,8 +588,7 @@ export default function Dashboard({ params }) {
   const initials = (userData.name||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 
   const handleBookSuccess = async () => {
-    const visitsData = await api.getVisits().catch(()=>({ visits:[] }));
-    setVisits(visitsData?.visits || []);
+    await loadData(); // full sync — updates visits AND subscription count
     setActive('visits');
   };
 
@@ -590,7 +697,7 @@ export default function Dashboard({ params }) {
               <>
                 {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>setActive('book')}/>}
                 {active==='book' && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} />}
-                {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} />}
+                {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} onRefresh={loadData} />}
                 {active==='subscription' && (
                   <SubscriptionSection userData={userData} lang={lang} />
                 )}
