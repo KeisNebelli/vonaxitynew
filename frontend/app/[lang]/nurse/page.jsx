@@ -72,7 +72,7 @@ function NurseSidebarInner({ mobile=false, initials, nurse, status, sbg, scol, a
         )}
         {!mobile && <div style={{ fontSize:18, fontWeight:800, color:'#fff', letterSpacing:'-0.5px', marginBottom:18 }}>Vonaxity</div>}
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <div style={{ width:34,height:34,borderRadius:10,background:'linear-gradient(135deg,#059669,#047857)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
+          <div style={{ width:34,height:34,borderRadius:10,background:'#059669',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
           <div style={{ minWidth:0 }}>
             <div style={{ fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{nurse?.name||'Nurse'}</div>
             <div style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10, fontWeight:700, color:scol, background:sbg, padding:'2px 8px', borderRadius:99, marginTop:3 }}>
@@ -356,11 +356,10 @@ function BrowseJobs({ nurse, lang='en' }) {
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(null);
   const [message, setMessage] = useState('');
-  const [showMsg, setShowMsg] = useState(null);
+  const [expandedJob, setExpandedJob] = useState(null);
   const [statuses, setStatuses] = useState({});
   const [allCities, setAllCities] = useState(false);
   const [nurseCity, setNurseCity] = useState('');
-  const C2 = { primary:'#059669', primaryLight:'#ECFDF5', bg:'#F8FAFC', bgWhite:'#FFFFFF', textPrimary:'#0F172A', textSecondary:'#475569', textTertiary:'#94A3B8', border:'#E2E8F0', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2' };
 
   const loadJobs = (showAll) => {
     setLoading(true);
@@ -372,107 +371,165 @@ function BrowseJobs({ nurse, lang='en' }) {
 
   useEffect(() => { loadJobs(false); }, []);
 
-  const handleToggleCity = () => {
-    const newVal = !allCities;
-    setAllCities(newVal);
-    loadJobs(newVal);
-  };
-
   const handleApply = async (visitId) => {
     setApplying(visitId);
     try {
       await api.applyToVisit(visitId, { message });
       setStatuses(s => ({ ...s, [visitId]: 'applied' }));
-      setShowMsg(null);
+      setExpandedJob(null);
       setMessage('');
-      // Refresh jobs list
-      const data = await api.getOpenVisits().catch(() => ({ visits: [] }));
-      setJobs(data.visits || []);
+      loadJobs(allCities);
     } catch (err) {
       setStatuses(s => ({ ...s, [visitId]: err.message || 'Failed to apply' }));
     } finally { setApplying(null); }
   };
 
+  const iconPin = <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>;
+  const iconCal = <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>;
+  const iconUser = <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>;
+  const iconNote = <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>;
+
   if (nurse?.status !== 'APPROVED') {
     return (
-      <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:14, padding:'28px 24px', textAlign:'center' }}>
-        <div style={{ fontSize:32, marginBottom:12 }}>&#x1F512;</div>
-        <div style={{ fontSize:16, fontWeight:700, color:'#92400E', marginBottom:8 }}>Profile not approved yet</div>
-        <div style={{ fontSize:13, color:'#92400E', opacity:0.8 }}>Your profile needs to be approved by our team before you can browse and apply to jobs.</div>
+      <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'40px 32px', textAlign:'center' }}>
+        <div style={{ width:48, height:48, borderRadius:12, background:C.warningLight, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px' }}>
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+        </div>
+        <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:8 }}>Profile pending approval</div>
+        <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6, maxWidth:320, margin:'0 auto' }}>Your profile is being reviewed by our team. You will receive an email once approved and can then browse and apply to visits.</div>
       </div>
     );
   }
 
-  if (loading) return <div style={{ padding:40, textAlign:'center', color:C2.textTertiary, fontSize:14 }}>Loading available jobs...</div>;
+  if (loading) return (
+    <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+      {[1,2,3].map(i => (
+        <div key={i} style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'20px 22px', animation:'pulse 1.5s ease-in-out infinite' }}>
+          <div style={{ height:16, background:C.bgSubtle, borderRadius:6, width:'40%', marginBottom:12 }} />
+          <div style={{ height:12, background:C.bgSubtle, borderRadius:6, width:'65%', marginBottom:8 }} />
+          <div style={{ height:12, background:C.bgSubtle, borderRadius:6, width:'50%' }} />
+        </div>
+      ))}
+      <style>{`@keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}`}</style>
+    </div>
+  );
 
   if (!jobs.length) return (
-    <div style={{ background:C2.bgWhite, borderRadius:14, border:`1px solid ${C2.border}`, padding:'48px 24px', textAlign:'center' }}>
-      <div style={{ fontSize:32, marginBottom:12 }}>&#x2705;</div>
-      <div style={{ fontSize:15, fontWeight:700, color:C2.textPrimary, marginBottom:6 }}>No open jobs right now</div>
-      <div style={{ fontSize:13, color:C2.textTertiary }}>Check back soon — new visit requests appear here when clients book.</div>
+    <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'56px 24px', textAlign:'center' }}>
+      <div style={{ width:48, height:48, borderRadius:12, background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px' }}>
+        <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+      </div>
+      <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:6 }}>No open visits {allCities ? 'right now' : `in ${nurseCity||'your city'}`}</div>
+      <div style={{ fontSize:13, color:C.textTertiary, marginBottom:16 }}>New requests appear here when clients book visits.</div>
+      {!allCities && <button onClick={()=>{ setAllCities(true); loadJobs(true); }} style={{ fontSize:13, fontWeight:600, color:C.primary, background:C.primaryLight, border:'none', borderRadius:8, padding:'8px 18px', cursor:'pointer' }}>Show all cities</button>}
     </div>
   );
 
   return (
     <div>
-      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
-        <div style={{ fontSize:13, color:C2.textTertiary }}>{jobs.length} open job{jobs.length!==1?'s':''} {allCities ? 'across all cities' : `in ${nurseCity||'your city'}`}</div>
-        <button onClick={handleToggleCity} style={{ fontSize:12, fontWeight:600, padding:'6px 12px', borderRadius:99, border:`1px solid ${C2.border}`, background:allCities?C2.primaryLight:C2.bgWhite, color:allCities?C2.primary:C2.textSecondary, cursor:'pointer' }}>
-          {allCities ? `📍 ${nurseCity||'My city'} only` : '🌍 All cities'}
+      {/* Header */}
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20 }}>
+        <div>
+          <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{jobs.length} open visit{jobs.length!==1?'s':''}</div>
+          <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{allCities ? 'Showing all cities' : `Filtered to ${nurseCity||'your city'}`}</div>
+        </div>
+        <button onClick={()=>{ const v=!allCities; setAllCities(v); loadJobs(v); }} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', borderRadius:8, border:`1px solid ${C.border}`, background:C.bgWhite, color:allCities?C.primary:C.textSecondary, cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+          {allCities ? `${nurseCity||'My city'} only` : 'All cities'}
         </button>
       </div>
-      {jobs.map(job => (
-        <div key={job.id} style={{ background:C2.bgWhite, borderRadius:14, border:`1px solid ${job.hasApplied?'#6EE7B7':C2.border}`, padding:'20px 22px', marginBottom:12, boxShadow:'0 1px 3px rgba(15,23,42,0.06)' }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:10 }}>
-            <div>
-              <div style={{ fontSize:15, fontWeight:700, color:C2.textPrimary, marginBottom:4 }}>{job.serviceType}</div>
-              <div style={{ fontSize:12, color:C2.textTertiary }}>
-                📍 {job.city} &nbsp;·&nbsp; 📅 {new Date(job.scheduledAt).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'})} at {new Date(job.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
-              </div>
-              <div style={{ fontSize:12, color:C2.textSecondary, marginTop:4 }}>
-                👤 Posted by <strong>{job.postedBy}</strong>{job.clientCountry ? ` · ${job.clientCountry}` : ''}{job.relativeName ? ` · For: ${job.relativeName}` : ''}
-              </div>
-              {job.notes && <div style={{ fontSize:12, color:C2.textSecondary, marginTop:6, fontStyle:'italic' }}>"{job.notes}"</div>}
-            </div>
-            {job.hasApplied ? (
-              <span style={{ fontSize:11, fontWeight:700, padding:'4px 12px', borderRadius:99, background:'#ECFDF5', color:'#059669', whiteSpace:'nowrap', flexShrink:0 }}>✓ Applied</span>
-            ) : (
-              <button onClick={()=>setShowMsg(showMsg===job.id?null:job.id)} style={{ fontSize:13, fontWeight:700, padding:'8px 18px', background:`linear-gradient(135deg,#059669,#047857)`, color:'#fff', border:'none', borderRadius:9, cursor:'pointer', flexShrink:0 }}>
-                Apply
-              </button>
-            )}
-          </div>
 
-          {statuses[job.id] === 'applied' && (
-            <div style={{ fontSize:12, color:'#059669', fontWeight:600, marginTop:6 }}>✓ Application sent successfully!</div>
-          )}
-          {statuses[job.id] && statuses[job.id] !== 'applied' && (
-            <div style={{ fontSize:12, color:C2.error, marginTop:6 }}>{statuses[job.id]}</div>
-          )}
+      {/* Job cards */}
+      <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+        {jobs.map(job => {
+          const isExpanded = expandedJob === job.id;
+          const applied = job.hasApplied || statuses[job.id] === 'applied';
+          const failed = statuses[job.id] && statuses[job.id] !== 'applied';
+          const dateStr = new Date(job.scheduledAt).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+          const timeStr = new Date(job.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
 
-          {showMsg === job.id && !job.hasApplied && (
-            <div style={{ marginTop:12, borderTop:`1px solid ${C2.border}`, paddingTop:12 }}>
-              <textarea
-                value={message}
-                onChange={e=>setMessage(e.target.value)}
-                placeholder="Add a short message to the client (optional)..."
-                style={{ width:'100%', padding:'10px 14px', borderRadius:9, border:`1.5px solid ${C2.border}`, fontSize:13, color:C2.textPrimary, background:C2.bg, outline:'none', fontFamily:'inherit', boxSizing:'border-box', resize:'vertical', minHeight:70 }}
-              />
-              <div style={{ display:'flex', gap:8, marginTop:8 }}>
-                <button onClick={()=>handleApply(job.id)} disabled={applying===job.id} style={{ flex:1, padding:'10px', background:`linear-gradient(135deg,#059669,#047857)`, color:'#fff', border:'none', borderRadius:9, fontSize:13, fontWeight:700, cursor:applying===job.id?'not-allowed':'pointer', opacity:applying===job.id?0.7:1 }}>
-                  {applying===job.id ? 'Sending...' : 'Send Application'}
-                </button>
-                <button onClick={()=>setShowMsg(null)} style={{ padding:'10px 16px', background:'transparent', color:C2.textSecondary, border:`1px solid ${C2.border}`, borderRadius:9, fontSize:13, cursor:'pointer' }}>
-                  Cancel
-                </button>
+          return (
+            <div key={job.id} style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${applied?'#6EE7B7':isExpanded?C.primary:C.border}`, overflow:'hidden', transition:'border-color 0.15s' }}>
+              {/* Card main */}
+              <div style={{ padding:'18px 20px' }}>
+                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    {/* Service badge + title */}
+                    <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
+                      <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.2px' }}>{job.serviceType}</div>
+                      {applied && <span style={{ fontSize:11, fontWeight:700, padding:'2px 8px', borderRadius:99, background:'#ECFDF5', color:'#059669', flexShrink:0 }}>Applied</span>}
+                    </div>
+                    {/* Meta row */}
+                    <div style={{ display:'flex', flexWrap:'wrap', gap:'6px 16px' }}>
+                      <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:C.textSecondary }}>
+                        <span style={{ color:C.textTertiary }}>{iconPin}</span>{job.city||'Albania'}
+                      </div>
+                      <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:C.textSecondary }}>
+                        <span style={{ color:C.textTertiary }}>{iconCal}</span>{dateStr} at {timeStr}
+                      </div>
+                      <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:C.textSecondary }}>
+                        <span style={{ color:C.textTertiary }}>{iconUser}</span>{job.postedBy}{job.clientCountry?` · ${job.clientCountry}`:''}
+                      </div>
+                      {job.relativeName && (
+                        <div style={{ fontSize:12, color:C.textTertiary }}>For: <span style={{ color:C.textSecondary, fontWeight:500 }}>{job.relativeName}</span></div>
+                      )}
+                    </div>
+                    {/* Notes preview */}
+                    {job.notes && (
+                      <div style={{ display:'flex', alignItems:'flex-start', gap:5, marginTop:8, fontSize:12, color:C.textSecondary }}>
+                        <span style={{ color:C.textTertiary, marginTop:1, flexShrink:0 }}>{iconNote}</span>
+                        <span style={{ fontStyle:'italic', lineHeight:1.5 }}>"{job.notes}"</span>
+                      </div>
+                    )}
+                  </div>
+
+                  {/* Action */}
+                  <div style={{ flexShrink:0 }}>
+                    {applied ? (
+                      <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:600, color:'#059669' }}>
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                        Applied
+                      </div>
+                    ) : (
+                      <button onClick={()=>setExpandedJob(isExpanded?null:job.id)} style={{ fontSize:13, fontWeight:700, padding:'9px 20px', background:isExpanded?C.bgSubtle:C.primary, color:isExpanded?C.textSecondary:'#fff', border:'none', borderRadius:9, cursor:'pointer', transition:'all 0.15s', fontFamily:F }}>
+                        {isExpanded ? 'Cancel' : 'Apply'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+
+                {/* Error */}
+                {failed && <div style={{ marginTop:10, fontSize:12, color:C.error, background:C.errorLight, borderRadius:7, padding:'8px 12px' }}>{statuses[job.id]}</div>}
               </div>
+
+              {/* Apply panel */}
+              {isExpanded && !applied && (
+                <div style={{ borderTop:`1px solid ${C.border}`, padding:'16px 20px', background:C.bgSubtle }}>
+                  <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>Message to client <span style={{ fontWeight:400, color:C.textTertiary }}>(optional)</span></div>
+                  <textarea
+                    value={message}
+                    onChange={e=>setMessage(e.target.value)}
+                    placeholder="Briefly introduce yourself or mention relevant experience..."
+                    style={{ width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:13, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box', resize:'vertical', minHeight:72, lineHeight:1.5 }}
+                  />
+                  <div style={{ display:'flex', gap:8, marginTop:10 }}>
+                    <button onClick={()=>{ setExpandedJob(null); setMessage(''); }} style={{ padding:'10px 16px', background:'transparent', color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:F }}>
+                      Cancel
+                    </button>
+                    <button onClick={()=>handleApply(job.id)} disabled={applying===job.id} style={{ flex:1, padding:'10px', background:C.primary, color:'#fff', border:'none', borderRadius:9, fontSize:13, fontWeight:700, cursor:applying===job.id?'not-allowed':'pointer', opacity:applying===job.id?0.7:1, fontFamily:F }}>
+                      {applying===job.id ? 'Sending application...' : 'Submit application'}
+                    </button>
+                  </div>
+                </div>
+              )}
             </div>
-          )}
-        </div>
-      ))}
+          );
+        })}
+      </div>
     </div>
   );
 }
+
 
 function NurseProfile({ lang='en', nurse=null }) {
   const tr = (key) => t(lang, key);

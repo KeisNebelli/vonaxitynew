@@ -45,7 +45,7 @@ function Overview({ user, visits, relative, lang, onBook }) {
   return (
     <div>
       {next ? (
-        <div style={{ background:`linear-gradient(135deg,${C.primary},${C.primaryDark})`, borderRadius:16, padding:'20px 22px', marginBottom:20, color:'#fff', boxShadow:SMD, display:'flex', gap:14, alignItems:'center', flexWrap:'wrap' }}>
+        <div style={{ background:C.primary, borderRadius:16, padding:'20px 22px', marginBottom:20, color:'#fff', boxShadow:SMD, display:'flex', gap:14, alignItems:'center', flexWrap:'wrap' }}>
           <div style={{ width:46,height:46,borderRadius:13,background:'rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
             <svg width="22" height="22" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
@@ -209,7 +209,7 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
         <div key={a.id} style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'20px', marginBottom:12, boxShadow:SSM }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:16 }}>
             <div style={{ display:'flex', gap:14, alignItems:'center' }}>
-              <div style={{ width:48, height:48, borderRadius:13, background:`linear-gradient(135deg,${C.primary},${C.primaryDark})`, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, fontWeight:800, color:'#fff', flexShrink:0 }}>
+              <div style={{ width:48, height:48, borderRadius:13, background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, fontWeight:800, color:'#fff', flexShrink:0 }}>
                 {(a.nurse.name||'N').charAt(0).toUpperCase()}
               </div>
               <div>
@@ -235,7 +235,7 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
               {selecting===a.nurse.id ? 'Selecting...' : `Select ${a.nurse.name} →`}
             </button>
           )}
-          {a.status === 'ACCEPTED' && <div style={{ background:C.secondaryLight, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.secondary, fontWeight:600, textAlign:'center' }}>✓ You selected this nurse</div>}
+          {a.status === 'ACCEPTED' && <div style={{ background:C.secondaryLight, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.secondary, fontWeight:600, textAlign:'center' }}>Nurse selected</div>}
         </div>
       ))}
     </div>
@@ -510,7 +510,7 @@ function SubscriptionSection({ userData, lang }) {
             <button
               onClick={()=>handleCheckout(p.id)}
               disabled={loading===p.id || p.id===currentPlan}
-              style={{ width:'100%', padding:'10px', borderRadius:9, border:'none', background:p.id===currentPlan?C.bgSubtle:`linear-gradient(135deg,${C.primary},${C.primaryDark})`, color:p.id===currentPlan?C.textTertiary:'#fff', fontSize:13, fontWeight:700, cursor:p.id===currentPlan?'not-allowed':'pointer', opacity:loading===p.id?0.7:1, fontFamily:F }}
+              style={{ width:'100%', padding:'10px', borderRadius:9, border:'none', background:p.id===currentPlan?C.bgSubtle:C.primary, color:p.id===currentPlan?C.textTertiary:'#fff', fontSize:13, fontWeight:700, cursor:p.id===currentPlan?'not-allowed':'pointer', opacity:loading===p.id?0.7:1, fontFamily:F }}
             >
               {loading===p.id ? 'Loading...' : p.id===currentPlan ? 'Current plan' : 'Select →'}
             </button>
@@ -624,7 +624,7 @@ export default function Dashboard({ params }) {
           <div style={{ padding:'22px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
             <div style={{ fontSize:17,fontWeight:800,color:'#fff',letterSpacing:'-0.5px',marginBottom:14 }}>Vonaxity</div>
             <div style={{ display:'flex',alignItems:'center',gap:9 }}>
-              <div style={{ width:32,height:32,borderRadius:9,background:`linear-gradient(135deg,${C.primary},${C.primaryDark})`,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
+              <div style={{ width:32,height:32,borderRadius:9,background:C.primary,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
               <div>
                 <div style={{ fontSize:12,fontWeight:700,color:'#fff' }}>{userData.name}</div>
                 <div style={{ fontSize:10,color:'rgba(255,255,255,0.35)' }}>Client · {plan}</div>
