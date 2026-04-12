@@ -127,9 +127,10 @@ function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen, lang=
   );
 }
 
-function Dashboard({ setActive, setSelectedVisit, lang='en' }) {
+function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=null }) {
   const tr = (key) => t(lang, key);
-  const today = MOCK_VISITS.filter(v => v.status !== 'COMPLETED');
+  const today = visits.filter(v => !['COMPLETED','CANCELLED'].includes(v.status));
+  const nurseName = nurse?.user?.name || nurse?.name || 'Nurse';
   return (
     <div>
       <div style={{ background:C.primaryLight, borderRadius:14, border:`1px solid rgba(37,99,235,0.15)`, padding:'18px 22px', marginBottom:28, display:'flex', gap:14, alignItems:'center' }}>
@@ -137,19 +138,25 @@ function Dashboard({ setActive, setSelectedVisit, lang='en' }) {
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
         <div>
-          <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>Good morning, {MOCK_NURSE.name.split(' ')[0]}</div>
-          <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{today.length} visits today · {MOCK_NURSE.city}</div>
+          <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>Good morning, {nurseName.split(' ')[0]}</div>
+          <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{today.length} active visit{today.length!==1?'s':''} · {nurse?.city||''}</div>
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:24 }}>
-        {[["Today",today.length,C.primary],[tr('nurse.totalVisits')||'Total',MOCK_NURSE.totalVisits,C.secondary],[tr('nurse.rating')||'Rating',MOCK_NURSE.rating,C.warning],[tr('nurse.thisMonth')||'This month',`€${MOCK_NURSE.payRatePerVisit * today.length * 4}`,C.purple]].map(([label,value,color]) => (
+        {[['Today',today.length,C.primary],['Total visits',nurse?.totalVisits||0,C.secondary],['Rating',nurse?.rating>0?nurse.rating:'N/A',C.warning],['Earnings',`€${nurse?.totalEarnings||0}`,C.purple]].map(([label,value,color]) => (
           <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'16px 18px' }}>
             <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:22, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
           </div>
         ))}
       </div>
-      <DailyRouteCard visits={today.map(formatVisit)} onVisitSelect={(v)=>{ setSelectedVisit(MOCK_VISITS.find(vv=>vv.id===v.id)); setActive('map'); }} />
+      {today.length > 0 ? (
+        <DailyRouteCard visits={today.map(formatVisit)} onVisitSelect={(v)=>{ setSelectedVisit(today.find(vv=>vv.id===v.id)); setActive('map'); }} />
+      ) : (
+        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'32px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
+          No active visits. Browse Jobs to find open visits.
+        </div>
+      )}
       <div style={{ marginTop:16, background:C.warningLight, border:`1px solid #FDE68A`, borderRadius:10, padding:'12px 16px', display:'flex', gap:10, alignItems:'center' }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         <span style={{ fontSize:13, color:'#92400E' }}>Non-emergency care only. Emergency: call <strong>127</strong></span>
@@ -189,19 +196,27 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[] }) {
   );
 }
 
-function MapView({ selectedVisit, setActive, setSelectedVisit }) {
-  const upcoming = MOCK_VISITS.filter(v=>v.status!=='COMPLETED');
-  const [selected, setSelected] = useState(selectedVisit||upcoming[0]);
+function MapView({ selectedVisit, setActive, setSelectedVisit, visits=[] }) {
+  const upcoming = visits.filter(v=>!['COMPLETED','CANCELLED'].includes(v.status));
+  const [selected, setSelected] = useState(selectedVisit||upcoming[0]||null);
   return (
     <div>
-      <div style={{ display:'flex', gap:8, marginBottom:20, flexWrap:'wrap' }}>
-        {upcoming.map(v => (
-          <button key={v.id} onClick={()=>setSelected(v)} style={{ fontSize:13, fontWeight:600, padding:'8px 18px', borderRadius:10, border:'none', cursor:'pointer', background:selected?.id===v.id?C.primary:C.bgWhite, color:selected?.id===v.id?'#fff':C.textSecondary, border:selected?.id===v.id?'none':`1px solid ${C.border}` }}>
-            {new Date(v.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · {v.relative?.name?.split(' ')[0]}
-          </button>
-        ))}
-      </div>
-      {selected && <VisitLocationCard visit={formatVisit(selected)} onStatusChange={(id,status)=>console.log(id,status)} onComplete={(id)=>{ setSelectedVisit(MOCK_VISITS.find(v=>v.id===id)); setActive('complete'); }} />}
+      {upcoming.length > 0 && (
+        <div style={{ display:'flex', gap:8, marginBottom:20, flexWrap:'wrap' }}>
+          {upcoming.map(v => (
+            <button key={v.id} onClick={()=>setSelected(v)} style={{ fontSize:13, fontWeight:600, padding:'8px 18px', borderRadius:10, cursor:'pointer', background:selected?.id===v.id?C.primary:C.bgWhite, color:selected?.id===v.id?'#fff':C.textSecondary, border:selected?.id===v.id?'none':`1px solid ${C.border}` }}>
+              {new Date(v.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})} · {v.relative?.name?.split(' ')[0] || 'Patient'}
+            </button>
+          ))}
+        </div>
+      )}
+      {selected ? (
+        <VisitLocationCard visit={formatVisit(selected)} onStatusChange={(id,status)=>console.log(id,status)} onComplete={(id)=>{ setSelectedVisit(selected); setActive('complete'); }} />
+      ) : (
+        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
+          No active visits to navigate to.
+        </div>
+      )}
     </div>
   );
 }
@@ -938,10 +953,10 @@ export default function NursePage({ params }) {
           <main className="nurse-cont" style={{ flex:1, padding:24, overflowY:'auto', maxWidth:720, width:'100%' }}>
             <OnboardingBanner nurse={nurse} onStartOnboarding={()=>setActive('onboarding')} lang={lang} />
             {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
-            {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} />}
+            {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} />}
             {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
             {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} />}
-            {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} />}
+            {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} />}
             {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
             {active==='earnings' && <Earnings lang={lang} />}
             {active==='profile' && <NurseProfile lang={lang} />}
