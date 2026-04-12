@@ -55,6 +55,7 @@ export const api = {
     return data;
   },
   getOpenVisits: (allCities=false) => apiFetch(`/visits/open${allCities ? '?allCities=true' : ''}`),
+  reviewVisit: (visitId, body) => apiFetch(`/visits/${visitId}/review`, { method: 'POST', body: JSON.stringify(body) }),
   applyToVisit: (visitId, body={}) => apiFetch(`/visits/${visitId}/apply`, { method: 'POST', body: JSON.stringify(body) }),
   getApplicants: (visitId) => apiFetch(`/visits/${visitId}/applicants`),
   selectNurse: (visitId, nurseId) => apiFetch(`/visits/${visitId}/select/${nurseId}`, { method: 'POST' }),

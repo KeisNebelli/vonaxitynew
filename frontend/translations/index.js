@@ -73,6 +73,7 @@ const translations = {
       tagline:'Professional nurse home visits across Albania.',
       services:'Services', company:'Company', contact:'Contact',
       copyright:'© 2024 Vonaxity. All rights reserved.',
+      terms:'Terms of Service', privacy:'Privacy Policy',
     },
     about: {
       tag:'Our mission', title:'Healthcare access for every Albanian family abroad',
@@ -274,6 +275,7 @@ const translations = {
     howItWorks: {
       tag:'How it works',
       title:'Simple, trusted care in 3 steps',
+      subtitle:'Book online, we assign a nurse, you receive health reports after every visit.',
       steps:[
         { title:'Book online', desc:'Choose a plan, tell us about your loved one, and select the services you need.' },
         { title:'We assign a nurse', desc:'A verified nurse in your city is assigned and confirmed within 24 hours.' },
@@ -292,6 +294,7 @@ const translations = {
       company:'Company',
       contact:'Contact',
       copyright:'© 2024 Vonaxity. All rights reserved.',
+      terms:'Terms of Service', privacy:'Privacy Policy',
       companyLinks:['About Us','Pricing','FAQ','Contact'],
     },
     status: {
@@ -373,6 +376,7 @@ const translations = {
       tagline:'Vizita profesionale infermierësh në shtëpi nëpër Shqipëri.',
       services:'Shërbimet', company:'Kompania', contact:'Kontakti',
       copyright:'© 2024 Vonaxity. Të gjitha të drejtat të rezervuara.',
+      terms:'Kushtet e Shërbimit', privacy:'Politika e Privatësisë',
     },
     about: {
       tag:'Misioni ynë', title:'Qasje në shërbime shëndetësore për çdo familje shqiptare jashtë shtetit',
@@ -574,6 +578,7 @@ const translations = {
     howItWorks: {
       tag:'Si funksionon',
       title:'Kujdes i thjeshtë dhe i besuar në 3 hapa',
+      subtitle:'Rezervoni online, ne caktojmë infermieren, ju merrni raporte shëndetësore pas çdo vizite.',
       steps:[
         { title:'Rezervoni online', desc:'Zgjidhni një plan, tregoni për të dashurin tuaj dhe zgjidhni shërbimet.' },
         { title:'Ne caktojmë një infermiere', desc:'Një infermiere e verifikuar në qytetin tuaj caktohet brenda 24 orëve.' },

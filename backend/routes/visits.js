@@ -253,3 +253,33 @@ router.post('/:id/complete', ...requireRole('NURSE'), async (req, res) => {
 });
 
 module.exports = router;
+
+// POST /visits/:id/review — client submits review after completed visit
+router.post('/:id/review', ...requireRole('CLIENT'), async (req, res) => {
+  try {
+    const { rating, comment } = req.body;
+    if (!rating || rating < 1 || rating > 5) return res.status(400).json({ error: 'Rating must be between 1 and 5' });
+    const visit = await prisma.visit.findUnique({
+      where: { id: req.params.id },
+      include: { relative: true },
+    });
+    if (!visit) return res.status(404).json({ error: 'Visit not found' });
+    if (visit.relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Not your visit' });
+    if (visit.status !== 'COMPLETED') return res.status(400).json({ error: 'Can only review completed visits' });
+    if (!visit.nurseId) return res.status(400).json({ error: 'No nurse assigned to this visit' });
+    // Check if already reviewed
+    const existing = await prisma.review.findUnique({ where: { visitId: req.params.id } });
+    if (existing) return res.status(400).json({ error: 'You have already reviewed this visit' });
+    const review = await prisma.review.create({
+      data: { visitId: req.params.id, nurseId: visit.nurseId, rating: parseInt(rating), comment: comment || null },
+    });
+    // Update nurse average rating
+    const allReviews = await prisma.review.findMany({ where: { nurseId: visit.nurseId } });
+    const avg = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+    await prisma.nurse.update({ where: { id: visit.nurseId }, data: { rating: Math.round(avg * 10) / 10 } });
+    res.status(201).json({ success: true, review });
+  } catch (err) {
+    console.error('Review error:', err);
+    res.status(500).json({ error: 'Failed to submit review' });
+  }
+});

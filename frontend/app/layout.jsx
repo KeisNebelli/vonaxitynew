@@ -1,3 +1,5 @@
+import CookieBanner from '@/components/CookieBanner';
+
 export const metadata = {
   title: 'Vonaxity — Home Nurse Visits in Albania',
   description: 'Professional nurse home visits across Albania. Book from anywhere in the world.',
@@ -31,7 +33,10 @@ export default function RootLayout({ children }) {
           }
         `}</style>
       </head>
-      <body>{children}</body>
+      <body>
+        {children}
+        <CookieBanner />
+      </body>
     </html>
   );
 }

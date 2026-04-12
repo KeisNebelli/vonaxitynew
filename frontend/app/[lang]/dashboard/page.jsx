@@ -244,6 +244,23 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
 
 function Visits({ visits, lang, onViewApplicants }) {
   const tr = (key) => t(lang, key);
+  const [reviewing, setReviewing] = useState(null);
+  const [rating, setRating] = useState(0);
+  const [comment, setComment] = useState('');
+  const [reviewed, setReviewed] = useState({});
+  const [submitting, setSubmitting] = useState(false);
+
+  const submitReview = async (visitId) => {
+    if (!rating) return;
+    setSubmitting(true);
+    try {
+      await api.reviewVisit(visitId, { rating, comment });
+      setReviewed(r => ({ ...r, [visitId]: rating }));
+      setReviewing(null); setRating(0); setComment('');
+    } catch (err) { console.error(err); }
+    finally { setSubmitting(false); }
+  };
+
   if (!visits.length) return (
     <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary }}>
       {tr('dashboard.noVisits')}
@@ -261,7 +278,7 @@ function Visits({ visits, lang, onViewApplicants }) {
             <Badge s={v.status}/>
           </div>
           {v.bpSystolic && (
-            <div style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 16px', display:'flex', gap:20, flexWrap:'wrap', marginBottom:v.status==='UNASSIGNED'?12:0 }}>
+            <div style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 16px', display:'flex', gap:20, flexWrap:'wrap', marginBottom:8 }}>
               <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Blood Pressure</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.bpSystolic}/{v.bpDiastolic} <span style={{ fontSize:10, color:C.textTertiary }}>mmHg</span></div></div>
               {v.glucose && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Glucose</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.glucose} <span style={{ fontSize:10, color:C.textTertiary }}>mmol/L</span></div></div>}
               {v.nurseNotes && <div style={{ width:'100%', borderTop:`1px solid ${C.border}`, paddingTop:8, marginTop:4, fontSize:12, color:C.textSecondary, fontStyle:'italic' }}>"{v.nurseNotes}"</div>}
@@ -271,6 +288,30 @@ function Visits({ visits, lang, onViewApplicants }) {
             <button onClick={()=>onViewApplicants(v)} style={{ width:'100%', background:C.primaryLight, color:C.primary, border:`1px solid rgba(37,99,235,0.2)`, borderRadius:9, padding:'10px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, marginTop:4 }}>
               View applicants →
             </button>
+          )}
+          {v.status === 'COMPLETED' && !v.review && !reviewed[v.id] && (
+            reviewing === v.id ? (
+              <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:12, marginTop:8 }}>
+                <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>Rate your nurse</div>
+                <div style={{ display:'flex', gap:4, marginBottom:10 }}>
+                  {[1,2,3,4,5].map(s => (
+                    <button key={s} onClick={()=>setRating(s)} style={{ fontSize:24, background:'none', border:'none', cursor:'pointer', color:s<=rating?'#F59E0B':'#D1D5DB', padding:'0 2px' }}>&#9733;</button>
+                  ))}
+                </div>
+                <input value={comment} onChange={e=>setComment(e.target.value)} placeholder="Leave a comment (optional)" style={{ width:'100%', padding:'9px 12px', borderRadius:8, border:`1px solid ${C.border}`, fontSize:13, fontFamily:F, marginBottom:10, boxSizing:'border-box' }} />
+                <div style={{ display:'flex', gap:8 }}>
+                  <button onClick={()=>setReviewing(null)} style={{ flex:1, padding:'9px', borderRadius:8, border:`1px solid ${C.border}`, background:'transparent', fontSize:13, cursor:'pointer', color:C.textSecondary }}>Cancel</button>
+                  <button onClick={()=>submitReview(v.id)} disabled={!rating||submitting} style={{ flex:2, padding:'9px', borderRadius:8, border:'none', background:C.primary, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity:!rating||submitting?0.6:1 }}>{submitting?'Submitting...':'Submit review'}</button>
+                </div>
+              </div>
+            ) : (
+              <button onClick={()=>{ setReviewing(v.id); setRating(0); setComment(''); }} style={{ marginTop:8, fontSize:12, fontWeight:600, color:C.warning, background:C.warningLight, border:`1px solid #FDE68A`, borderRadius:8, padding:'7px 14px', cursor:'pointer' }}>
+                &#9733; Rate this visit
+              </button>
+            )
+          )}
+          {(v.review || reviewed[v.id]) && v.status === 'COMPLETED' && (
+            <div style={{ marginTop:8, fontSize:12, color:C.secondary, fontWeight:600 }}>&#9733; Reviewed</div>
           )}
         </div>
       ))}

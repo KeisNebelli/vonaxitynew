@@ -20,6 +20,8 @@ const PUBLIC_ROUTES = [
   '/en/nurse-signup', '/sq/nurse-signup',
   '/en/forgot-password', '/sq/forgot-password',
   '/en/reset-password', '/sq/reset-password',
+  '/en/terms', '/sq/terms',
+  '/en/privacy', '/sq/privacy',
   '/en/about', '/sq/about',
   '/en/services', '/sq/services',
   '/en/pricing', '/sq/pricing',
