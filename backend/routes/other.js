@@ -290,3 +290,28 @@ publicSettingsRouter.get('/', async (req, res) => {
   }
 });
 module.exports.publicSettingsRouter = publicSettingsRouter;
+
+// POST /admin/cleanup-duplicates — one-time cleanup, admin only
+const cleanupRouter = require('express').Router();
+const prismaCleanup = require('../lib/db');
+cleanupRouter.post('/', ...require('../middleware/auth').requireRole('ADMIN'), async (req, res) => {
+  try {
+    // Find all visits grouped by relativeId + serviceType + scheduledAt
+    const visits = await prismaCleanup.visit.findMany({ orderBy: { createdAt: 'asc' } });
+    const seen = new Map();
+    const toDelete = [];
+    visits.forEach(v => {
+      const key = `${v.relativeId}|${v.serviceType}|${v.scheduledAt?.toISOString()}`;
+      if (seen.has(key)) { toDelete.push(v.id); }
+      else seen.set(key, v.id);
+    });
+    if (toDelete.length > 0) {
+      await prismaCleanup.visit.deleteMany({ where: { id: { in: toDelete } } });
+    }
+    res.json({ success: true, deleted: toDelete.length, message: `Removed ${toDelete.length} duplicate visit${toDelete.length!==1?'s':''}` });
+  } catch (err) {
+    console.error('Cleanup error:', err);
+    res.status(500).json({ error: err.message });
+  }
+});
+module.exports.cleanupRouter = cleanupRouter;

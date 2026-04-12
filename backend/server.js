@@ -8,7 +8,7 @@ const visitRoutes = require('./routes/visits');
 const nurseRoutes = require('./routes/nurses');
 const paymentsRoute = null; // Stripe payments - coming soon
 const uploadsRoute = require('./routes/uploads');
-const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter, publicSettingsRouter } = require('./routes/other');
+const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter, publicSettingsRouter, cleanupRouter } = require('./routes/other');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -61,6 +61,7 @@ app.use('/analytics', analyticsRouter);
 app.use('/notifications', notificationsRouter);
 app.use('/settings/public', publicSettingsRouter);
 app.use('/settings', settingsRouter);
+app.use('/admin/cleanup-duplicates', cleanupRouter);
 app.use('/profile', profileRouter);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
