@@ -145,7 +145,16 @@ router.put('/:id/approve', ...requireRole('ADMIN'), async (req, res) => {
     const nurse = await prisma.nurse.update({
       where: { id: req.params.id },
       data: { status: 'APPROVED', approvedAt: new Date() },
+      include: { user: { select: { name: true, email: true } } },
     });
+    // Email nurse
+    try {
+      if (nurse.user?.email) {
+        const { sendEmail, emailTemplates } = require('../lib/email');
+        const tmpl = emailTemplates.nurseApproved({ nurseName: nurse.user.name });
+        sendEmail({ to: nurse.user.email, ...tmpl });
+      }
+    } catch (e) { console.error('Email error:', e); }
     res.json({ success: true, nurse });
   } catch (err) {
     res.status(500).json({ error: 'Failed to approve nurse' });
@@ -172,7 +181,16 @@ router.put('/:id/reject', ...requireRole('ADMIN'), async (req, res) => {
     const nurse = await prisma.nurse.update({
       where: { id: req.params.id },
       data: { status: 'REJECTED', rejectionReason: reason || 'Application rejected by admin' },
+      include: { user: { select: { name: true, email: true } } },
     });
+    // Email nurse
+    try {
+      if (nurse.user?.email) {
+        const { sendEmail, emailTemplates } = require('../lib/email');
+        const tmpl = emailTemplates.nurseRejected({ nurseName: nurse.user.name, reason });
+        sendEmail({ to: nurse.user.email, ...tmpl });
+      }
+    } catch (e) { console.error('Email error:', e); }
     res.json({ success: true, nurse });
   } catch (err) {
     res.status(500).json({ error: 'Failed to reject nurse' });

@@ -61,6 +61,14 @@ router.post('/register', async (req, res) => {
     );
 
     res.cookie('vonaxity-token', token, COOKIE_OPTIONS);
+
+    // Welcome email
+    try {
+      const { sendEmail, emailTemplates } = require('../lib/email');
+      const tmpl = emailTemplates.welcomeClient({ name: user.name });
+      sendEmail({ to: user.email, ...tmpl });
+    } catch (e) { console.error('Welcome email error:', e); }
+
     res.status(201).json({
       success: true,
       token,

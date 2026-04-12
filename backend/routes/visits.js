@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const prisma = require('../lib/db');
 const { authMiddleware, requireRole } = require('../middleware/auth');
+const { sendEmail, emailTemplates } = require('../lib/email');
 
 // GET /visits — role-based
 router.get('/', authMiddleware, async (req, res) => {
@@ -43,30 +44,19 @@ router.get('/open', ...requireRole('NURSE'), async (req, res) => {
     const nurse = await prisma.nurse.findUnique({ where: { userId: req.user.userId } });
     if (!nurse) return res.status(404).json({ error: 'Nurse profile not found' });
     if (nurse.status !== 'APPROVED') return res.status(403).json({ error: 'Profile must be approved to browse jobs' });
-
     const visits = await prisma.visit.findMany({
       where: { status: 'UNASSIGNED', nurseId: null },
-      include: {
-        relative: { include: { client: { select: { name: true, country: true } } } },
-        applications: { where: { nurseId: nurse.id } },
-      },
+      include: { relative: { include: { client: { select: { name: true, country: true } } } }, applications: { where: { nurseId: nurse.id } } },
       orderBy: { scheduledAt: 'asc' },
     });
-
     const normalized = visits.map(v => ({
-      id: v.id,
-      serviceType: v.serviceType,
-      scheduledAt: v.scheduledAt,
-      city: v.relative?.city || '',
-      notes: v.notes || '',
-      status: v.status,
-      hasApplied: v.applications.length > 0,
-      applicationStatus: v.applications[0]?.status || null,
+      id: v.id, serviceType: v.serviceType, scheduledAt: v.scheduledAt,
+      city: v.relative?.city || '', notes: v.notes || '', status: v.status,
+      hasApplied: v.applications.length > 0, applicationStatus: v.applications[0]?.status || null,
       postedBy: v.relative?.client?.name || 'A client',
       clientCountry: v.relative?.client?.country || '',
       relativeName: v.relative?.name || '',
     }));
-
     res.json({ visits: normalized });
   } catch (err) {
     console.error('Get open visits error:', err);
@@ -87,6 +77,25 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
       data: { relativeId, serviceType, scheduledAt: new Date(scheduledAt), notes, status: 'UNASSIGNED' },
       include: { relative: true },
     });
+
+    // Notify approved nurses in the same city
+    try {
+      const city = visit.relative?.city;
+      if (city) {
+        const nurses = await prisma.nurse.findMany({
+          where: { status: 'APPROVED', city },
+          include: { user: { select: { name: true, email: true } } },
+        });
+        for (const nurse of nurses) {
+          if (nurse.user?.email) {
+            const tmpl = emailTemplates.newJobPosted({ nurseName: nurse.user.name, serviceType, city, scheduledAt, visitId: visit.id });
+            sendEmail({ to: nurse.user.email, ...tmpl }); // fire and forget
+          }
+        }
+        console.log(`📧 Notified ${nurses.length} nurses in ${city} about new job`);
+      }
+    } catch (emailErr) { console.error('Email notification error:', emailErr); }
+
     console.log(`📋 New work order: ${visit.id} — ${serviceType}`);
     res.status(201).json({ success: true, visit });
   } catch (err) {
@@ -98,10 +107,10 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
 // POST /visits/:id/apply — nurse applies to job
 router.post('/:id/apply', ...requireRole('NURSE'), async (req, res) => {
   try {
-    const nurse = await prisma.nurse.findUnique({ where: { userId: req.user.userId } });
+    const nurse = await prisma.nurse.findUnique({ where: { userId: req.user.userId }, include: { user: { select: { name: true, email: true } } } });
     if (!nurse) return res.status(404).json({ error: 'Nurse profile not found' });
     if (nurse.status !== 'APPROVED') return res.status(403).json({ error: 'Profile must be approved to apply' });
-    const visit = await prisma.visit.findUnique({ where: { id: req.params.id } });
+    const visit = await prisma.visit.findUnique({ where: { id: req.params.id }, include: { relative: { include: { client: { select: { name: true, email: true } } } } } });
     if (!visit) return res.status(404).json({ error: 'Visit not found' });
     if (visit.status !== 'UNASSIGNED') return res.status(400).json({ error: 'This job is no longer open' });
     const existing = await prisma.visitApplication.findFirst({ where: { visitId: req.params.id, nurseId: nurse.id } });
@@ -109,6 +118,16 @@ router.post('/:id/apply', ...requireRole('NURSE'), async (req, res) => {
     const application = await prisma.visitApplication.create({
       data: { visitId: req.params.id, nurseId: nurse.id, message: req.body.message || '', status: 'PENDING' },
     });
+
+    // Notify client that a nurse applied
+    try {
+      const client = visit.relative?.client;
+      if (client?.email) {
+        const tmpl = emailTemplates.nurseApplied({ clientName: client.name, nurseName: nurse.user.name, nurseCity: nurse.city, serviceType: visit.serviceType, visitId: visit.id });
+        sendEmail({ to: client.email, ...tmpl });
+      }
+    } catch (emailErr) { console.error('Email notification error:', emailErr); }
+
     console.log(`✅ Nurse ${nurse.id} applied to visit ${req.params.id}`);
     res.status(201).json({ success: true, application });
   } catch (err) {
@@ -144,16 +163,27 @@ router.get('/:id/applicants', ...requireRole('CLIENT', 'ADMIN'), async (req, res
 router.post('/:id/select/:nurseId', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
   try {
     const { id: visitId, nurseId } = req.params;
+    const visit = await prisma.visit.findUnique({ where: { id: visitId }, include: { relative: { include: { client: true } } } });
+    if (!visit) return res.status(404).json({ error: 'Visit not found' });
     if (req.user.role === 'CLIENT') {
-      const visit = await prisma.visit.findUnique({ where: { id: visitId }, include: { relative: true } });
-      if (!visit || visit.relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Not your visit' });
+      if (visit.relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Not your visit' });
       if (visit.status !== 'UNASSIGNED') return res.status(400).json({ error: 'Visit already assigned' });
     }
     const application = await prisma.visitApplication.findFirst({ where: { visitId, nurseId } });
     if (!application) return res.status(400).json({ error: 'This nurse did not apply to this visit' });
-    const visit = await prisma.visit.update({ where: { id: visitId }, data: { nurseId, status: 'PENDING' } });
+    const nurse = await prisma.nurse.findUnique({ where: { id: nurseId }, include: { user: { select: { name: true, email: true } } } });
+    await prisma.visit.update({ where: { id: visitId }, data: { nurseId, status: 'PENDING' } });
     await prisma.visitApplication.update({ where: { id: application.id }, data: { status: 'ACCEPTED' } });
     await prisma.visitApplication.updateMany({ where: { visitId, id: { not: application.id } }, data: { status: 'REJECTED' } });
+
+    // Notify nurse they were selected
+    try {
+      if (nurse?.user?.email) {
+        const tmpl = emailTemplates.nurseSelected({ nurseName: nurse.user.name, clientName: visit.relative?.client?.name || 'A client', serviceType: visit.serviceType, city: visit.relative?.city || '', scheduledAt: visit.scheduledAt, relativeName: visit.relative?.name || 'Patient' });
+        sendEmail({ to: nurse.user.email, ...tmpl });
+      }
+    } catch (emailErr) { console.error('Email notification error:', emailErr); }
+
     console.log(`✅ Nurse ${nurseId} selected for visit ${visitId}`);
     res.json({ success: true, visit });
   } catch (err) {
@@ -177,17 +207,28 @@ router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
 router.post('/:id/complete', ...requireRole('NURSE'), async (req, res) => {
   try {
     const { bp, hr, glucose, temperature, oxygenSat, nurseNotes } = req.body;
-    const nurse = await prisma.nurse.findUnique({ where: { userId: req.user.userId } });
+    const nurse = await prisma.nurse.findUnique({ where: { userId: req.user.userId }, include: { user: { select: { name: true } } } });
     if (!nurse) return res.status(404).json({ error: 'Nurse not found' });
     let bpSystolic = null, bpDiastolic = null;
     if (bp && bp.includes('/')) { const p = bp.split('/'); bpSystolic = parseInt(p[0]); bpDiastolic = parseInt(p[1]); }
     const visit = await prisma.visit.update({
       where: { id: req.params.id, nurseId: nurse.id },
-      data: { status: 'COMPLETED', completedAt: new Date(), bpSystolic, bpDiastolic, heartRate: hr ? parseInt(hr) : null, glucose: glucose ? parseFloat(glucose) : null, temperature: temperature ? parseFloat(temperature) : null, oxygenSat: oxygenSat ? parseFloat(oxygenSat) : null, nurseNotes: nurseNotes || null, reportSent: false },
+      data: { status: 'COMPLETED', completedAt: new Date(), bpSystolic, bpDiastolic, heartRate: hr ? parseInt(hr) : null, glucose: glucose ? parseFloat(glucose) : null, temperature: temperature ? parseFloat(temperature) : null, oxygenSat: oxygenSat ? parseFloat(oxygenSat) : null, nurseNotes: nurseNotes || null, reportSent: true },
+      include: { relative: { include: { client: { select: { name: true, email: true } } } } },
     });
     await prisma.nurse.update({ where: { id: nurse.id }, data: { totalVisits: { increment: 1 }, totalEarnings: { increment: nurse.payRatePerVisit } } });
     const relative = await prisma.relative.findUnique({ where: { id: visit.relativeId } });
     await prisma.subscription.updateMany({ where: { userId: relative.clientId }, data: { visitsUsed: { increment: 1 } } });
+
+    // Send health report to client
+    try {
+      const client = visit.relative?.client;
+      if (client?.email) {
+        const tmpl = emailTemplates.visitCompleted({ clientName: client.name, nurseName: nurse.user.name, relativeName: visit.relative?.name || 'your loved one', serviceType: visit.serviceType, scheduledAt: visit.scheduledAt, bp: bpSystolic ? `${bpSystolic}/${bpDiastolic}` : null, glucose, notes: nurseNotes });
+        sendEmail({ to: client.email, ...tmpl });
+      }
+    } catch (emailErr) { console.error('Email notification error:', emailErr); }
+
     res.json({ success: true, visit });
   } catch (err) {
     console.error('Complete visit error:', err);
