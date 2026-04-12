@@ -54,7 +54,7 @@ export const api = {
     if (!res.ok) throw new Error(data.error || 'Upload failed');
     return data;
   },
-  getOpenVisits: () => apiFetch('/visits/open'),
+  getOpenVisits: (allCities=false) => apiFetch(`/visits/open${allCities ? '?allCities=true' : ''}`),
   applyToVisit: (visitId, body={}) => apiFetch(`/visits/${visitId}/apply`, { method: 'POST', body: JSON.stringify(body) }),
   getApplicants: (visitId) => apiFetch(`/visits/${visitId}/applicants`),
   selectNurse: (visitId, nurseId) => apiFetch(`/visits/${visitId}/select/${nurseId}`, { method: 'POST' }),

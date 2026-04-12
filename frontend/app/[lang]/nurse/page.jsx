@@ -356,16 +356,27 @@ function BrowseJobs({ nurse, lang='en' }) {
   const [loading, setLoading] = useState(true);
   const [applying, setApplying] = useState(null);
   const [message, setMessage] = useState('');
-  const [showMsg, setShowMsg] = useState(null); // visitId showing message input
-  const [statuses, setStatuses] = useState({}); // visitId -> 'applied'|'error'
+  const [showMsg, setShowMsg] = useState(null);
+  const [statuses, setStatuses] = useState({});
+  const [allCities, setAllCities] = useState(false);
+  const [nurseCity, setNurseCity] = useState('');
   const C2 = { primary:'#059669', primaryLight:'#ECFDF5', bg:'#F8FAFC', bgWhite:'#FFFFFF', textPrimary:'#0F172A', textSecondary:'#475569', textTertiary:'#94A3B8', border:'#E2E8F0', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2' };
 
-  useEffect(() => {
-    api.getOpenVisits()
-      .then(data => setJobs(data.visits || []))
+  const loadJobs = (showAll) => {
+    setLoading(true);
+    api.getOpenVisits(showAll)
+      .then(data => { setJobs(data.visits || []); setNurseCity(data.nurseCity || ''); })
       .catch(() => setJobs([]))
       .finally(() => setLoading(false));
-  }, []);
+  };
+
+  useEffect(() => { loadJobs(false); }, []);
+
+  const handleToggleCity = () => {
+    const newVal = !allCities;
+    setAllCities(newVal);
+    loadJobs(newVal);
+  };
 
   const handleApply = async (visitId) => {
     setApplying(visitId);
@@ -404,7 +415,12 @@ function BrowseJobs({ nurse, lang='en' }) {
 
   return (
     <div>
-      <div style={{ fontSize:13, color:C2.textTertiary, marginBottom:16 }}>{jobs.length} open job{jobs.length!==1?'s':''} in your area</div>
+      <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+        <div style={{ fontSize:13, color:C2.textTertiary }}>{jobs.length} open job{jobs.length!==1?'s':''} {allCities ? 'across all cities' : `in ${nurseCity||'your city'}`}</div>
+        <button onClick={handleToggleCity} style={{ fontSize:12, fontWeight:600, padding:'6px 12px', borderRadius:99, border:`1px solid ${C2.border}`, background:allCities?C2.primaryLight:C2.bgWhite, color:allCities?C2.primary:C2.textSecondary, cursor:'pointer' }}>
+          {allCities ? `📍 ${nurseCity||'My city'} only` : '🌍 All cities'}
+        </button>
+      </div>
       {jobs.map(job => (
         <div key={job.id} style={{ background:C2.bgWhite, borderRadius:14, border:`1px solid ${job.hasApplied?'#6EE7B7':C2.border}`, padding:'20px 22px', marginBottom:12, boxShadow:'0 1px 3px rgba(15,23,42,0.06)' }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:10 }}>

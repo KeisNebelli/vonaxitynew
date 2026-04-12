@@ -44,8 +44,16 @@ router.get('/open', ...requireRole('NURSE'), async (req, res) => {
     const nurse = await prisma.nurse.findUnique({ where: { userId: req.user.userId } });
     if (!nurse) return res.status(404).json({ error: 'Nurse profile not found' });
     if (nurse.status !== 'APPROVED') return res.status(403).json({ error: 'Profile must be approved to browse jobs' });
+
+    // Default to nurse's city, unless ?allCities=true is passed
+    const filterByCity = req.query.allCities !== 'true' && nurse.city;
+    const whereClause = {
+      status: 'UNASSIGNED', nurseId: null,
+      ...(filterByCity && { relative: { city: nurse.city } }),
+    };
+
     const visits = await prisma.visit.findMany({
-      where: { status: 'UNASSIGNED', nurseId: null },
+      where: whereClause,
       include: { relative: { include: { client: { select: { name: true, country: true } } } }, applications: { where: { nurseId: nurse.id } } },
       orderBy: { scheduledAt: 'asc' },
     });
@@ -57,7 +65,7 @@ router.get('/open', ...requireRole('NURSE'), async (req, res) => {
       clientCountry: v.relative?.client?.country || '',
       relativeName: v.relative?.name || '',
     }));
-    res.json({ visits: normalized });
+    res.json({ visits: normalized, nurseCity: nurse.city || null, filtered: !!filterByCity });
   } catch (err) {
     console.error('Get open visits error:', err);
     res.status(500).json({ error: 'Failed to fetch open jobs' });
