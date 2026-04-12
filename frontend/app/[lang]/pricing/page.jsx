@@ -7,8 +7,8 @@ const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', seco
 
 async function getPricing() {
   try {
-    const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://vonaxitynew-production.up.railway.app';
-    const res = await fetch(`${BASE}/settings/public`, { next: { revalidate: 300 } }); // cache 5 min
+    const BASE = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'https://vonaxitynew-production.up.railway.app';
+    const res = await fetch(`${BASE}/settings/public`, { next: { revalidate: 300 } });
     if (!res.ok) throw new Error('Failed');
     return await res.json();
   } catch {

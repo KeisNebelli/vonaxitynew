@@ -59,8 +59,8 @@ app.use('/uploads', uploadsRoute);
 app.use('/users', usersRouter);
 app.use('/analytics', analyticsRouter);
 app.use('/notifications', notificationsRouter);
-app.use('/settings', settingsRouter);
 app.use('/settings/public', publicSettingsRouter);
+app.use('/settings', settingsRouter);
 app.use('/profile', profileRouter);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
