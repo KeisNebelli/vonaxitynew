@@ -92,7 +92,7 @@ function Overview({ user, visits, relative, lang, onBook }) {
   );
 }
 
-function BookVisit({ relative, onSuccess, onCancel }) {
+function BookVisit({ relative, subscription, onSuccess, onCancel }) {
   const [form, setForm] = useState({ serviceType: SERVICES[0], scheduledAt: '', notes: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -118,6 +118,11 @@ function BookVisit({ relative, onSuccess, onCancel }) {
           <div style={{ fontSize:13, color:C.textSecondary, marginTop:3 }}>
             {relative ? `For ${relative.name} in ${relative.city}` : 'Add a loved one in Settings first'}
           </div>
+          {subscription && (
+            <div style={{ fontSize:12, fontWeight:600, marginTop:4, color: subscription.visitsUsed >= subscription.visitsPerMonth ? '#DC2626' : '#059669' }}>
+              {subscription.visitsPerMonth - subscription.visitsUsed} visit{subscription.visitsPerMonth - subscription.visitsUsed !== 1 ? 's' : ''} remaining this month
+            </div>
+          )}
         </div>
         <button onClick={onCancel} style={{ background:C.bgSubtle, border:'none', borderRadius:8, width:32, height:32, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary, fontSize:16 }}>✕</button>
       </div>
@@ -147,7 +152,7 @@ function BookVisit({ relative, onSuccess, onCancel }) {
 
       <div style={{ display:'flex', gap:10 }}>
         <button onClick={onCancel} style={{ flex:1, background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:10, padding:'12px', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:F }}>Cancel</button>
-        <button onClick={handleSubmit} disabled={loading||!relative} style={{ flex:2, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:700, cursor:loading||!relative?'not-allowed':'pointer', opacity:loading||!relative?0.7:1, fontFamily:F }}>
+        <button onClick={handleSubmit} disabled={loading||!relative||(subscription&&subscription.visitsUsed>=subscription.visitsPerMonth)} style={{ flex:2, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:700, cursor:(loading||!relative||(subscription&&subscription.visitsUsed>=subscription.visitsPerMonth))?'not-allowed':'pointer', opacity:(loading||!relative||(subscription&&subscription.visitsUsed>=subscription.visitsPerMonth))?0.7:1, fontFamily:F }}>
           {loading ? 'Booking...' : 'Book visit →'}
         </button>
       </div>
@@ -448,7 +453,7 @@ export default function Dashboard({ params }) {
             ) : (
               <>
                 {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>setActive('book')}/>}
-                {active==='book' && <BookVisit relative={relative} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} />}
+                {active==='book' && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} />}
                 {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} />}
                 {active==='subscription' && (
                   <div style={{ background:C.bgWhite,borderRadius:16,border:`1px solid ${C.border}`,padding:28,boxShadow:SSM }}>

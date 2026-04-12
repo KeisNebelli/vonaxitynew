@@ -72,6 +72,14 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
     if (req.user.role === 'CLIENT') {
       const relative = await prisma.relative.findUnique({ where: { id: relativeId } });
       if (!relative || relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Relative not found or not yours' });
+
+      // Check subscription limits
+      const subscription = await prisma.subscription.findUnique({ where: { userId: req.user.userId } });
+      if (!subscription) return res.status(403).json({ error: 'No active subscription. Please choose a plan first.' });
+      if (subscription.status === 'CANCELLED') return res.status(403).json({ error: 'Your subscription has been cancelled. Please reactivate to book visits.' });
+      if (subscription.visitsUsed >= subscription.visitsPerMonth) {
+        return res.status(403).json({ error: `You have used all ${subscription.visitsPerMonth} visits for this month. Upgrade your plan for more visits.` });
+      }
     }
     const visit = await prisma.visit.create({
       data: { relativeId, serviceType, scheduledAt: new Date(scheduledAt), notes, status: 'UNASSIGNED' },
