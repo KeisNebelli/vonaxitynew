@@ -363,6 +363,7 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
     </div>
   );
   return (
+    <>
     <div>
       {visits.map(v=>(
         <div key={v.id} style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'18px 20px', marginBottom:12, boxShadow:SSM }}>
@@ -424,6 +425,7 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
     </div>
     {editing && <EditVisit visit={editing} onSave={()=>{ setEditing(null); onRefresh?.(); }} onCancel={()=>setEditing(null)} />}
     {deleting && <DeleteConfirm visit={deleting} onConfirm={()=>{ setDeleting(null); onRefresh?.(); }} onCancel={()=>setDeleting(null)} />}
+    </>
   );
 }
 
