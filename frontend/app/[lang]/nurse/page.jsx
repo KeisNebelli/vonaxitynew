@@ -385,7 +385,7 @@ function BrowseJobs({ nurse, lang='en' }) {
   if (nurse?.status !== 'APPROVED') {
     return (
       <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:14, padding:'28px 24px', textAlign:'center' }}>
-        <div style={{ fontSize:32, marginBottom:12 }}>🔒</div>
+        <div style={{ fontSize:32, marginBottom:12 }}>&#x1F512;</div>
         <div style={{ fontSize:16, fontWeight:700, color:'#92400E', marginBottom:8 }}>Profile not approved yet</div>
         <div style={{ fontSize:13, color:'#92400E', opacity:0.8 }}>Your profile needs to be approved by our team before you can browse and apply to jobs.</div>
       </div>
@@ -396,7 +396,7 @@ function BrowseJobs({ nurse, lang='en' }) {
 
   if (!jobs.length) return (
     <div style={{ background:C2.bgWhite, borderRadius:14, border:`1px solid ${C2.border}`, padding:'48px 24px', textAlign:'center' }}>
-      <div style={{ fontSize:32, marginBottom:12 }}>✅</div>
+      <div style={{ fontSize:32, marginBottom:12 }}>&#x2705;</div>
       <div style={{ fontSize:15, fontWeight:700, color:C2.textPrimary, marginBottom:6 }}>No open jobs right now</div>
       <div style={{ fontSize:13, color:C2.textTertiary }}>Check back soon — new visit requests appear here when clients book.</div>
     </div>
