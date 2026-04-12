@@ -195,3 +195,57 @@ router.get('/me', async (req, res) => {
 });
 
 module.exports = router;
+
+// POST /auth/forgot-password
+router.post('/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    if (!email) return res.status(400).json({ error: 'Email required' });
+    const user = await prisma.user.findUnique({ where: { email } });
+    // Always return success to prevent email enumeration
+    if (!user) return res.json({ success: true });
+    // Invalidate old tokens
+    await prisma.passwordReset.updateMany({ where: { userId: user.id, used: false }, data: { used: true } });
+    const crypto = require('crypto');
+    const token = crypto.randomBytes(32).toString('hex');
+    const expiresAt = new Date(Date.now() + 1000 * 60 * 60); // 1 hour
+    await prisma.passwordReset.create({ data: { userId: user.id, token, expiresAt } });
+    const BASE_URL = process.env.FRONTEND_URL || 'https://vonaxity.com';
+    const resetUrl = `${BASE_URL}/en/reset-password?token=${token}`;
+    const { sendEmail } = require('../lib/email');
+    await sendEmail({
+      to: email,
+      subject: 'Reset your Vonaxity password',
+      html: `<div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
+        <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Reset your password</h2>
+        <p style="color:#475569;margin-bottom:24px">Click the button below to reset your password. This link expires in 1 hour.</p>
+        <a href="${resetUrl}" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">Reset password →</a>
+        <p style="color:#94A3B8;font-size:12px;margin-top:32px">If you didn't request this, ignore this email.</p>
+      </div>`,
+    });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Forgot password error:', err);
+    res.status(500).json({ error: 'Failed to send reset email' });
+  }
+});
+
+// POST /auth/reset-password
+router.post('/reset-password', async (req, res) => {
+  try {
+    const { token, password } = req.body;
+    if (!token || !password) return res.status(400).json({ error: 'Token and password required' });
+    if (password.length < 8) return res.status(400).json({ error: 'Password must be at least 8 characters' });
+    const reset = await prisma.passwordReset.findUnique({ where: { token } });
+    if (!reset || reset.used || reset.expiresAt < new Date()) return res.status(400).json({ error: 'Invalid or expired reset link' });
+    const bcrypt = require('bcryptjs');
+    const passwordHash = await bcrypt.hash(password, 10);
+    await prisma.user.update({ where: { id: reset.userId }, data: { passwordHash } });
+    await prisma.passwordReset.update({ where: { id: reset.id }, data: { used: true } });
+    res.json({ success: true });
+  } catch (err) {
+    console.error('Reset password error:', err);
+    res.status(500).json({ error: 'Failed to reset password' });
+  }
+});

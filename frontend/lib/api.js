@@ -36,7 +36,8 @@ export const api = {
   // Visits
   getVisits: () => apiFetch('/visits'),
   createVisit: (body) => apiFetch('/visits', { method: 'POST', body: JSON.stringify(body) }),
-  getOpenVisits: () => apiFetch('/visits/open'),
+  forgotPassword: (email) => apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
+  resetPassword: (token, password) => apiFetch('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) }),
   applyToVisit: (visitId, body={}) => apiFetch(`/visits/${visitId}/apply`, { method: 'POST', body: JSON.stringify(body) }),
   getApplicants: (visitId) => apiFetch(`/visits/${visitId}/applicants`),
   selectNurse: (visitId, nurseId) => apiFetch(`/visits/${visitId}/select/${nurseId}`, { method: 'POST' }),

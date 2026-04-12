@@ -67,6 +67,9 @@ export default function LoginPage({ params }) {
           <div style={{ marginBottom:24 }}>
             <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('password')}</label>
             <input style={inp} type="password" placeholder="••••••••" required value={form.password} onChange={e=>setForm({...form,password:e.target.value})} />
+            <div style={{ textAlign:'right', marginTop:6 }}>
+              <Link href={`/${lang}/forgot-password`} style={{ fontSize:12, color:C.primary, fontWeight:500 }}>Forgot password?</Link>
+            </div>
           </div>
           {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'11px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
           <button type="submit" disabled={loading} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:loading?0.7:1 }}>
