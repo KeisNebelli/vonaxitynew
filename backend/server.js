@@ -6,6 +6,8 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const visitRoutes = require('./routes/visits');
 const nurseRoutes = require('./routes/nurses');
+const paymentsRoute = require('./routes/payments');
+const uploadsRoute = require('./routes/uploads');
 const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter } = require('./routes/other');
 
 const app = express();
@@ -20,15 +22,20 @@ const allowedOrigins = [
 
 app.use(cors({
   origin: (origin, callback) => {
-    // Allow requests with no origin (mobile apps, curl, etc.)
     if (!origin) return callback(null, true);
-    // Allow any vercel.app preview URL
     if (origin.endsWith('.vercel.app')) return callback(null, true);
     if (allowedOrigins.includes(origin)) return callback(null, true);
     callback(new Error(`CORS blocked: ${origin}`));
   },
   credentials: true,
 }));
+
+// Raw body for Stripe webhooks — must be before express.json()
+app.use('/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
+  req.rawBody = req.body;
+  next();
+});
+
 app.use(express.json());
 app.use(cookieParser());
 
@@ -47,8 +54,9 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/visits', visitRoutes);
 app.use('/nurses', nurseRoutes);
+app.use('/payments', paymentsRoute);
+app.use('/uploads', uploadsRoute);
 app.use('/users', usersRouter);
-app.use('/payments', paymentsRouter);
 app.use('/analytics', analyticsRouter);
 app.use('/notifications', notificationsRouter);
 app.use('/settings', settingsRouter);

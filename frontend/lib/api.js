@@ -38,6 +38,22 @@ export const api = {
   createVisit: (body) => apiFetch('/visits', { method: 'POST', body: JSON.stringify(body) }),
   forgotPassword: (email) => apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
   resetPassword: (token, password) => apiFetch('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) }),
+  createCheckout: (plan) => apiFetch('/payments/create-checkout', { method: 'POST', body: JSON.stringify({ plan }) }),
+  createPortal: () => apiFetch('/payments/create-portal', { method: 'POST' }),
+  uploadNurseDoc: async (file, type) => {
+    const token = typeof window !== 'undefined' ? localStorage.getItem('vonaxity-token') : null;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('type', type);
+    const res = await fetch(`${BASE}/uploads/nurse-doc`, {
+      method: 'POST',
+      headers: { ...(token ? { 'Authorization': `Bearer ${token}` } : {}) },
+      body: formData,
+    });
+    const data = await res.json();
+    if (!res.ok) throw new Error(data.error || 'Upload failed');
+    return data;
+  },
   applyToVisit: (visitId, body={}) => apiFetch(`/visits/${visitId}/apply`, { method: 'POST', body: JSON.stringify(body) }),
   getApplicants: (visitId) => apiFetch(`/visits/${visitId}/applicants`),
   selectNurse: (visitId, nurseId) => apiFetch(`/visits/${visitId}/select/${nurseId}`, { method: 'POST' }),

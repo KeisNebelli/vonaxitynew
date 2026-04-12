@@ -652,6 +652,8 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
     availability: tryParse(nurse?.availability, []),
     diplomaConfirmed: !!nurse?.diplomaUrl,
     licenseConfirmed: !!nurse?.licenseUrl,
+    diplomaUrl: nurse?.diplomaUrl || null,
+    licenseUrl: nurse?.licenseUrl || null,
   });
 
   const toggle = (key, val) => setForm(f => ({ ...f, [key]: f[key].includes(val) ? f[key].filter(x=>x!==val) : [...f[key], val] }));
@@ -666,8 +668,8 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
         languages: form.languages, services: form.services,
         licenseNumber: form.licenseNumber, issuingAuthority: form.issuingAuthority,
         availability: form.availability,
-        diplomaUrl: form.diplomaConfirmed ? 'pending-upload' : null,
-        licenseUrl: form.licenseConfirmed ? 'pending-upload' : null,
+        diplomaUrl: form.diplomaUrl || null,
+        licenseUrl: form.licenseUrl || null,
       });
     } finally { setSaving(false); }
   };
@@ -676,7 +678,7 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
     if (!form.city || !form.bio || !form.licenseNumber || !form.issuingAuthority) {
       setError('Please fill in all required fields before submitting.'); return;
     }
-    if (!form.diplomaConfirmed || !form.licenseConfirmed) {
+    if (!form.diplomaUrl || !form.licenseUrl) {
       setError('Please confirm both your diploma and license before submitting.'); return;
     }
     setSubmitting(true); setError('');
@@ -686,7 +688,7 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
         languages: form.languages, services: form.services,
         licenseNumber: form.licenseNumber, issuingAuthority: form.issuingAuthority,
         availability: form.availability,
-        diplomaUrl: 'pending-upload', licenseUrl: 'pending-upload',
+        diplomaUrl: form.diplomaUrl, licenseUrl: form.licenseUrl,
       });
     } catch (err) {
       setError(err.message || 'Failed to submit');
@@ -771,20 +773,35 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
             <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Issuing authority <span style={{ color:C.error }}>*</span></label>
             <input style={inp2} value={form.issuingAuthority} onChange={e=>setForm(f=>({...f,issuingAuthority:e.target.value}))} placeholder="Order of Nurses of Albania (ONA)" />
           </div>
-          {[['diplomaConfirmed','Nursing diploma','Upload a photo or scan of your nursing degree certificate.'],['licenseConfirmed','Professional license','Upload your current valid nursing license.']].map(([key,title,desc])=>(
-            <div key={key} style={{ background:C.bg, borderRadius:12, border:`1px solid ${C.border}`, padding:16, marginBottom:12 }}>
+          {[['diploma','Nursing diploma','Upload a photo or scan of your nursing degree certificate.'],['license','Professional license','Upload your current valid nursing license.']].map(([docType,title,desc])=>(
+            <div key={docType} style={{ background:C.bg, borderRadius:12, border:`1px solid ${C.border}`, padding:16, marginBottom:12 }}>
               <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:4 }}>{title}</div>
               <div style={{ fontSize:12, color:C.textSecondary, marginBottom:10 }}>{desc}</div>
-              <div onClick={()=>setForm(f=>({...f,[key]:!f[key]}))} style={{ border:`2px dashed ${form[key]?C.secondary:C.border}`, borderRadius:10, padding:'16px', textAlign:'center', cursor:'pointer', background:form[key]?C.secondaryLight:'transparent' }}>
-                {form[key] ? (
-                  <div style={{ color:C.secondary, fontSize:13, fontWeight:600, display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
-                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
-                    Confirmed — ready to submit
+              {form[`${docType}Url`] && form[`${docType}Url`] !== 'pending-upload' ? (
+                <div style={{ display:'flex', alignItems:'center', gap:8, padding:'12px', background:C.secondaryLight, borderRadius:10, border:'1px solid #6EE7B7' }}>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <span style={{ fontSize:13, color:C.secondary, fontWeight:600 }}>Uploaded successfully</span>
+                  <a href={form[`${docType}Url`]} target="_blank" rel="noopener noreferrer" style={{ fontSize:12, color:C.primary, marginLeft:'auto' }}>View →</a>
+                </div>
+              ) : (
+                <label style={{ display:'block', border:`2px dashed ${C.border}`, borderRadius:10, padding:'16px', textAlign:'center', cursor:'pointer' }}>
+                  <input type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" style={{ display:'none' }} onChange={async (e)=>{
+                    const file = e.target.files[0];
+                    if (!file) return;
+                    setError('');
+                    try {
+                      setSaving(true);
+                      const data = await api.uploadNurseDoc(file, docType);
+                      setForm(f=>({...f,[`${docType}Url`]:data.url,[`${docType}Confirmed`]:true}));
+                    } catch(err) { setError(err.message||'Upload failed'); }
+                    finally { setSaving(false); }
+                  }} />
+                  <div style={{ color:C.textTertiary, fontSize:12 }}>
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" style={{display:'block',margin:'0 auto 6px'}}><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+                    Click to upload (JPG, PNG, PDF · max 10MB)
                   </div>
-                ) : (
-                  <div style={{ color:C.textTertiary, fontSize:12 }}>Click to confirm you have this document ready</div>
-                )}
-              </div>
+                </label>
+              )}
             </div>
           ))}
         </div>
@@ -814,7 +831,7 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
         <div>
           <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:16 }}>
             <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>Review your application</div>
-            {[['City',form.city||'Not set'],['Experience',form.experience||'Not set'],['Services',form.services.join(', ')||'None selected'],['Languages',form.languages.join(', ')||'Albanian'],['License number',form.licenseNumber||'Not set'],['Issuing authority',form.issuingAuthority||'Not set'],['Diploma',form.diplomaConfirmed?'Confirmed':'Not confirmed'],['License doc',form.licenseConfirmed?'Confirmed':'Not confirmed'],['Available days',form.availability.join(', ')||'None selected']].map(([k,v])=>(
+            {[['City',form.city||'Not set'],['Experience',form.experience||'Not set'],['Services',form.services.join(', ')||'None selected'],['Languages',form.languages.join(', ')||'Albanian'],['License number',form.licenseNumber||'Not set'],['Issuing authority',form.issuingAuthority||'Not set'],['Diploma',form.diplomaUrl&&form.diplomaUrl!=='pending-upload'?'Uploaded':'Not uploaded'],['License doc',form.licenseUrl&&form.licenseUrl!=='pending-upload'?'Uploaded':'Not uploaded'],['Available days',form.availability.join(', ')||'None selected']].map(([k,v])=>(
               <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle||'#F3F4F6'}`, fontSize:13 }}>
                 <span style={{ color:C.textTertiary }}>{k}</span>
                 <span style={{ color:v.includes('Not')||v==='None selected'||v==='Not confirmed'?C.error:C.textPrimary, fontWeight:500, textAlign:'right', maxWidth:'60%' }}>{v}</span>
