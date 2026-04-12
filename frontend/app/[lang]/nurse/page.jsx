@@ -290,12 +290,16 @@ function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
   );
 }
 
-function Earnings({ lang='en' }) {
+function Earnings({ lang='en', nurse=null }) {
   const tr = (key) => t(lang, key);
+  const payRate = nurse?.payRatePerVisit || 20;
+  const totalEarnings = nurse?.totalEarnings || 0;
+  const totalVisits = nurse?.totalVisits || 0;
+  const rating = nurse?.rating || 0;
   return (
     <div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:24 }}>
-        {[[tr('nurse.totalEarned')||'Total earned',`€${MOCK_NURSE.totalEarnings}`,C.secondary],[tr('nurse.totalVisits')||'Total visits',MOCK_NURSE.totalVisits,C.primary],[tr('nurse.rating')||'Rating',MOCK_NURSE.rating,C.warning],[tr('nurse.payRate')||'Pay rate',`€${MOCK_NURSE.payRatePerVisit}/visit`,C.purple]].map(([label,value,color]) => (
+        {[[tr('nurse.totalEarned')||'Total earned',`€${totalEarnings}`,C.secondary],[tr('nurse.totalVisits')||'Total visits',totalVisits,C.primary],[tr('nurse.rating')||'Rating',rating>0?rating:'N/A',C.warning],[tr('nurse.payRate')||'Pay rate',`€${payRate}/visit`,C.purple]].map(([label,value,color]) => (
           <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'16px 18px' }}>
             <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:22, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
@@ -304,12 +308,12 @@ function Earnings({ lang='en' }) {
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
         <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:6 }}>Payment history</div>
-        <div style={{ fontSize:12, color:C.textTertiary, marginBottom:20 }}>Pay rate: <strong style={{ color:C.textPrimary }}>€{MOCK_NURSE.payRatePerVisit} per visit</strong> · Processed weekly</div>
+        <div style={{ fontSize:12, color:C.textTertiary, marginBottom:20 }}>Pay rate: <strong style={{ color:C.textPrimary }}>€{payRate} per visit</strong> · Processed weekly</div>
         {[['Dec 10–14',4,80,'paid'],['Dec 3–7',3,60,'paid'],['Nov 26–30',4,80,'pending']].map(([period,visits,amount,status],i) => (
           <div key={i} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'14px 0', borderBottom:`1px solid ${C.borderSubtle}` }}>
             <div>
               <div style={{ fontSize:14, fontWeight:500, color:C.textPrimary }}>{period}</div>
-              <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{visits} visits · €{MOCK_NURSE.payRatePerVisit}/visit</div>
+              <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{visits} visits · €{payRate}/visit</div>
             </div>
             <div style={{ display:'flex', gap:12, alignItems:'center' }}>
               <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary }}>€{amount}</div>
@@ -454,11 +458,11 @@ function BrowseJobs({ nurse, lang='en' }) {
   );
 }
 
-function NurseProfile({ lang='en' }) {
+function NurseProfile({ lang='en', nurse=null }) {
   const tr = (key) => t(lang, key);
-  const [profile, setProfile] = useState({ name:MOCK_NURSE.name, email:MOCK_NURSE.email, phone:MOCK_NURSE.phone, city:MOCK_NURSE.city, bio:MOCK_NURSE.bio, licenseNumber:MOCK_NURSE.licenseNumber });
-  const [availability, setAvailability] = useState([...MOCK_NURSE.availability]);
-  const [specialties, setSpecialties] = useState([...MOCK_NURSE.specialties]);
+  const [profile, setProfile] = useState({ name:nurse?.user?.name||nurse?.name||'', email:nurse?.user?.email||nurse?.email||'', phone:nurse?.user?.phone||nurse?.phone||'', city:nurse?.city||'', bio:nurse?.bio||'', licenseNumber:nurse?.licenseNumber||'' });
+  const [availability, setAvailability] = useState(nurse?.availability ? JSON.parse(nurse.availability) : []);
+  const [specialties, setSpecialties] = useState(nurse?.specialties ? JSON.parse(nurse.specialties) : []);
   const [password, setPassword] = useState({ current:'', newPass:'', confirm:'' });
   const [saving, setSaving] = useState(false);
   const [savingPass, setSavingPass] = useState(false);
@@ -555,7 +559,7 @@ function NurseProfile({ lang='en' }) {
       {/* Stats overview */}
       <NurseSectionCard title="Profile stats" subtitle="Your performance on Vonaxity">
         <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(120px,1fr))', gap:12 }}>
-          {[[tr('nurse.rating')||'Rating',MOCK_NURSE.rating,C.warning],[tr('nurse.totalVisits')||'Total visits',MOCK_NURSE.totalVisits,C.primary],[tr('nurse.totalEarned')||'Total earned',`€${MOCK_NURSE.totalEarnings}`,C.secondary],['Status','Approved',C.secondary]].map(([label,value,color]) => (
+          {[[tr('nurse.rating')||'Rating',nurse?.rating>0?nurse.rating:'N/A',C.warning],[tr('nurse.totalVisits')||'Total visits',nurse?.totalVisits||0,C.primary],[tr('nurse.totalEarned')||'Total earned',`€${nurse?.totalEarnings||0}`,C.secondary],['Status',nurse?.status||'PENDING',C.secondary]].map(([label,value,color]) => (
             <div key={label} style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 14px' }}>
               <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:6 }}>{label}</div>
               <div style={{ fontSize:16, fontWeight:700, color }}>{value}</div>
@@ -958,8 +962,8 @@ export default function NursePage({ params }) {
             {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} />}
             {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} />}
             {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
-            {active==='earnings' && <Earnings lang={lang} />}
-            {active==='profile' && <NurseProfile lang={lang} />}
+            {active==='earnings' && <Earnings lang={lang} nurse={nurse} />}
+            {active==='profile' && <NurseProfile lang={lang} nurse={nurse} />}
           </main>
         </div>
 
