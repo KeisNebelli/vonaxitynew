@@ -4,10 +4,23 @@ import { Suspense } from 'react';
 export const metadata = {
   title: 'Vonaxity — Home Nurse Visits in Albania',
   description: 'Professional nurse home visits across Albania. Book from anywhere in the world.',
+  keywords: 'home nurse Albania, nurse visits Tirana, healthcare Albania diaspora, home care Albania',
   icons: {
     icon: '/favicon.svg',
     shortcut: '/favicon.svg',
     apple: '/favicon.svg',
+  },
+  openGraph: {
+    title: 'Vonaxity — Home Nurse Visits in Albania',
+    description: 'Professional nurse home visits across Albania. Book from anywhere in the world.',
+    url: 'https://vonaxity.com',
+    siteName: 'Vonaxity',
+    type: 'website',
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: 'Vonaxity — Home Nurse Visits in Albania',
+    description: 'Professional nurse home visits across Albania.',
   },
 };
 

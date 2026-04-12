@@ -13,17 +13,31 @@ export function setToken(token) {
 
 export async function apiFetch(path, options = {}) {
   const token = getToken();
-  const res = await fetch(`${BASE}${path}`, {
-    headers: {
-      'Content-Type': 'application/json',
-      ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
-      ...options.headers,
-    },
-    ...options,
-  });
-  const data = await res.json();
-  if (!res.ok) throw new Error(data.error || 'Request failed');
-  return data;
+  try {
+    const res = await fetch(`${BASE}${path}`, {
+      headers: {
+        'Content-Type': 'application/json',
+        ...(token ? { 'Authorization': `Bearer ${token}` } : {}),
+        ...options.headers,
+      },
+      ...options,
+    });
+    const data = await res.json();
+    if (res.status === 401) {
+      // Clear invalid token and redirect to login
+      if (typeof window !== 'undefined') {
+        localStorage.removeItem('vonaxity-token');
+        document.cookie = 'vonaxity-token=;path=/;max-age=0';
+      }
+    }
+    if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
+    return data;
+  } catch (err) {
+    if (err.name === 'TypeError' && err.message.includes('fetch')) {
+      throw new Error('Unable to connect. Please check your internet connection.');
+    }
+    throw err;
+  }
 }
 
 export const api = {

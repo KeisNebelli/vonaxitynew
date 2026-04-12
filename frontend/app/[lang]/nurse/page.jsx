@@ -188,7 +188,8 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[] }) {
       <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
         {filtered.map(v => (
           <VisitLocationCard key={v.id} visit={formatVisit(v)} compact={v.status==='COMPLETED'}
-            onStatusChange={(id,status)=>console.log('Status:',id,status)}
+            onStatusChange={(id,status)=>
+}
             onComplete={(id)=>{ setSelectedVisit(v); setActive('complete'); }} />
         ))}
       </div>
@@ -211,7 +212,8 @@ function MapView({ selectedVisit, setActive, setSelectedVisit, visits=[] }) {
         </div>
       )}
       {selected ? (
-        <VisitLocationCard visit={formatVisit(selected)} onStatusChange={(id,status)=>console.log(id,status)} onComplete={(id)=>{ setSelectedVisit(selected); setActive('complete'); }} />
+        <VisitLocationCard visit={formatVisit(selected)} onStatusChange={(id,status)=>
+} onComplete={(id)=>{ setSelectedVisit(selected); setActive('complete'); }} />
       ) : (
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
           No active visits to navigate to.

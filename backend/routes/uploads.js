@@ -50,8 +50,6 @@ router.post('/nurse-doc', ...requireRole('NURSE'), upload.single('file'), async 
     }[type];
 
     await prisma.nurse.update({ where: { id: nurse.id }, data: updateData });
-
-    console.log(`📎 Uploaded ${type} for nurse ${nurse.id}: ${result.secure_url}`);
     res.json({ success: true, url: result.secure_url });
   } catch (err) {
     console.error('Upload error:', err);

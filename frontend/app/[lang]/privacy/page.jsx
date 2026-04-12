@@ -1,3 +1,5 @@
+import Nav from '@/components/layout/Nav';
+import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 
 const S = { page:{ minHeight:'100vh', background:'#FAFAF9', fontFamily:"'Inter',system-ui,sans-serif" }, nav:{ background:'#fff', borderBottom:'1px solid #E2E8F0', padding:'0 24px', height:56, display:'flex', alignItems:'center', justifyContent:'space-between' }, body:{ maxWidth:720, margin:'0 auto', padding:'48px 24px 80px' }, h1:{ fontSize:32, fontWeight:800, color:'#0F172A', letterSpacing:'-0.5px', marginBottom:8 }, h2:{ fontSize:18, fontWeight:700, color:'#0F172A', marginTop:36, marginBottom:12 }, p:{ fontSize:15, color:'#475569', lineHeight:1.8, marginBottom:16 }, date:{ fontSize:13, color:'#94A3B8', marginBottom:40 } };
@@ -44,6 +46,7 @@ export default function PrivacyPage({ params }) {
         <h2 style={S.h2}>10. Contact</h2>
         <p style={S.p}>For privacy questions or to exercise your rights, contact us at <a href="mailto:hello@vonaxity.com" style={{ color:'#2563EB' }}>hello@vonaxity.com</a>.</p>
       </div>
+      <Footer lang={lang} />
     </div>
   );
 }

@@ -89,6 +89,17 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
         return res.status(403).json({ error: `You have used all ${subscription.visitsPerMonth} visits for this month. Upgrade your plan for more visits.` });
       }
     }
+    // Dedup guard — prevent double submissions within 10 seconds
+    const recent = await prisma.visit.findFirst({
+      where: {
+        relativeId,
+        serviceType,
+        scheduledAt: new Date(scheduledAt),
+        createdAt: { gte: new Date(Date.now() - 10000) },
+      },
+    });
+    if (recent) return res.status(409).json({ error: 'This visit was already booked. Please refresh your dashboard.' });
+
     const visit = await prisma.visit.create({
       data: { relativeId, serviceType, scheduledAt: new Date(scheduledAt), notes, status: 'UNASSIGNED' },
       include: { relative: true },
@@ -108,11 +119,8 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
             sendEmail({ to: nurse.user.email, ...tmpl }); // fire and forget
           }
         }
-        console.log(`📧 Notified ${nurses.length} nurses in ${city} about new job`);
       }
     } catch (emailErr) { console.error('Email notification error:', emailErr); }
-
-    console.log(`📋 New work order: ${visit.id} — ${serviceType}`);
     res.status(201).json({ success: true, visit });
   } catch (err) {
     console.error('Create visit error:', err);
@@ -143,8 +151,6 @@ router.post('/:id/apply', ...requireRole('NURSE'), async (req, res) => {
         sendEmail({ to: client.email, ...tmpl });
       }
     } catch (emailErr) { console.error('Email notification error:', emailErr); }
-
-    console.log(`✅ Nurse ${nurse.id} applied to visit ${req.params.id}`);
     res.status(201).json({ success: true, application });
   } catch (err) {
     console.error('Apply error:', err);
@@ -199,8 +205,6 @@ router.post('/:id/select/:nurseId', ...requireRole('CLIENT', 'ADMIN'), async (re
         sendEmail({ to: nurse.user.email, ...tmpl });
       }
     } catch (emailErr) { console.error('Email notification error:', emailErr); }
-
-    console.log(`✅ Nurse ${nurseId} selected for visit ${visitId}`);
     res.json({ success: true, visit });
   } catch (err) {
     console.error('Select nurse error:', err);
@@ -230,7 +234,6 @@ router.put('/:id/client', ...requireRole('CLIENT'), async (req, res) => {
       },
       include: { relative: true, nurse: { include: { user: { select: { name: true } } } } },
     });
-    console.log(`✏️ Visit ${req.params.id} edited by client ${req.user.userId}`);
     res.json({ success: true, visit: updated });
   } catch (err) {
     console.error('Edit visit error:', err);
@@ -259,7 +262,6 @@ router.delete('/:id', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
     // Restore visit count — only if it was UNASSIGNED (not yet completed)
     // visitsUsed is only incremented on COMPLETE, so no need to decrement here
     // But if we want to track "booked" separately we would. For now: no decrement on delete.
-    console.log(`🗑️ Visit ${req.params.id} deleted — status was ${visit.status}`);
     res.json({ success: true });
   } catch (err) {
     console.error('Delete visit error:', err);

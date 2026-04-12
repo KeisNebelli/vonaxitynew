@@ -1090,6 +1090,7 @@ export default function AdminPage({ params }) {
   const switchLang = (l) => { document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; const path = window.location.pathname.replace(/^\/(en|sq)/,`/${l}`); window.location.href = path; };
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [actionError, setActionError] = useState('');
   const [nurses, setNurses] = useState([]);
   const [visits, setVisits] = useState([]);
   const [clients, setClients] = useState([]);
@@ -1140,19 +1141,19 @@ export default function AdminPage({ params }) {
 
   const handleApprove = async (nurseId) => {
     try { await api.approveNurse(nurseId); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'APPROVED'}:n)); }
-    catch (err) { alert('Failed: '+err.message); }
+    catch (err) { setActionError(err.message || 'Action failed. Please try again.'); }
   };
   const handleSuspend = async (nurseId) => {
     try { await api.suspendNurse(nurseId); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'SUSPENDED'}:n)); }
-    catch (err) { alert('Failed: '+err.message); }
+    catch (err) { setActionError(err.message || 'Action failed. Please try again.'); }
   };
   const handleReject = async (nurseId, reason) => {
     try { await api.rejectNurse(nurseId, { reason }); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'REJECTED',rejectionReason:reason}:n)); }
-    catch (err) { alert('Failed: '+err.message); }
+    catch (err) { setActionError(err.message || 'Action failed. Please try again.'); }
   };
   const handleAssign = async (visitId, nurseId) => {
     try { await api.updateVisit(visitId,{nurseId,status:'PENDING'}); await loadData(); }
-    catch (err) { alert('Failed: '+err.message); }
+    catch (err) { setActionError(err.message || 'Action failed. Please try again.'); }
   };
   const logout = () => {
     localStorage.removeItem('vonaxity-token');
@@ -1162,6 +1163,8 @@ export default function AdminPage({ params }) {
   };
 
   const alertCount = visits.filter(v=>v.status==='UNASSIGNED').length + nurses.filter(n=>n.status==='PENDING').length;
+  // Auto-clear action errors
+  if (actionError) setTimeout(() => setActionError(''), 4000);
   const _AL = ADMIN_LABELS[lang] || ADMIN_LABELS.en;
   const TITLES = { overview:_AL.overview, clients:_AL.clients, nurses:_AL.nurses, visits:_AL.visits, alerts:_AL.alerts, payments:_AL.payments, ai:_AL.ai, settings:_AL.settings };
   const ADMIN_NAV_BOTTOM = NAV.slice(0,4);
@@ -1191,6 +1194,9 @@ export default function AdminPage({ params }) {
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]}</div>
             </div>
             <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+              {actionError && (
+                <div style={{ fontSize:12, fontWeight:600, padding:'6px 12px', background:'#FEF2F2', color:'#DC2626', borderRadius:8, border:'1px solid #FECACA' }}>{actionError}</div>
+              )}
               {alertCount>0 && <button onClick={()=>setActive('alerts')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#FEF2F2',color:'#DC2626',border:'none',borderRadius:8,cursor:'pointer',fontFamily:F }}>{alertCount} alert{alertCount>1?'s':''}</button>}
               <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>{'↻ Refresh'}</button>
               <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#F5F3FF',color:'#7C3AED',border:'1px solid rgba(124,58,237,0.2)',borderRadius:8,cursor:'pointer',fontFamily:F }}>{'AI Assistant'}</button>

@@ -77,17 +77,6 @@ export default function LoginPage({ params }) {
           </button>
         </form>
 
-        <div style={{ marginTop:24, background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'14px 16px' }}>
-          <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', marginBottom:10 }}>TEST ACCOUNTS</div>
-          {[['client@test.com','test123','Client'],['nurse@test.com','test123','Nurse'],['admin@test.com','test123','Admin']].map(([email,pass,role]) => (
-            <div key={role} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', fontSize:12, color:C.textSecondary, marginBottom:6 }}>
-              <span><strong style={{ color:C.textPrimary }}>{role}</strong> · {email}</span>
-              <button onClick={()=>setForm({email,password:pass})} style={{ fontSize:11, padding:'3px 10px', borderRadius:6, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.primary, fontWeight:600 }}>
-                {tr('fill')}
-              </button>
-            </div>
-          ))}
-        </div>
 
         <div style={{ marginTop:16, background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:9, padding:'11px 14px', fontSize:12, color:'#92400E' }}>
           Non-emergency care only. Emergency in Albania: <strong>127</strong>

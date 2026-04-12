@@ -7,6 +7,7 @@ export default function Footer({ lang = 'en' }) {
     [t(lang, 'footer.companyLinks')[1] || 'Pricing', `/${lang}/pricing`],
     [t(lang, 'footer.companyLinks')[2] || 'FAQ', `/${lang}/faq`],
     [t(lang, 'footer.companyLinks')[3] || 'Contact', `/${lang}/contact`],
+    ['Our Nurses', `/${lang}/nurses`],
   ];
   const services = ['Blood Pressure Check', 'Glucose Monitoring', 'Vitals Check', 'Blood Work', 'Welfare Check'];
 
@@ -45,7 +46,8 @@ export default function Footer({ lang = 'en' }) {
         <div style={{ borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 24, display: 'flex', justifyContent: 'space-between', flexWrap: 'wrap', gap: 12 }}>
           <div style={{ fontSize: 12, color: 'rgba(255,255,255,0.25)' }}>{t(lang, 'footer.copyright')}</div>
           <div style={{ display: 'flex', gap: 20, fontSize: 12 }}>
-            {['Privacy Policy', 'Terms of Service'].map(l => <span key={l} style={{ color: 'rgba(255,255,255,0.25)', cursor: 'pointer' }}>{l}</span>)}
+            <Link href={`/${lang}/privacy`} style={{ color:'rgba(255,255,255,0.35)', textDecoration:'none' }}>Privacy Policy</Link>
+            <Link href={`/${lang}/terms`} style={{ color:'rgba(255,255,255,0.35)', textDecoration:'none' }}>Terms of Service</Link>
           </div>
         </div>
       </div>
