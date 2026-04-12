@@ -184,6 +184,7 @@ settingsRouter.get('/', ...requireRole('ADMIN'), async (req, res) => {
     const settings = record ? JSON.parse(record.value) : DEFAULT_SETTINGS;
     res.json({ settings });
   } catch (err) {
+    console.error('Settings fetch error (table may not exist):', err.message);
     res.json({ settings: DEFAULT_SETTINGS });
   }
 });
@@ -194,14 +195,14 @@ settingsRouter.put('/', ...requireRole('ADMIN'), async (req, res) => {
     const current = existing ? JSON.parse(existing.value) : DEFAULT_SETTINGS;
     const updated = { ...current, ...req.body };
     if (existing) {
-      await prismaSettings.systemSettings.update({ where: { id: existing.id }, data: { value: JSON.stringify(updated) } });
+      await prismaSettings.systemSettings.update({ where: { id: existing.id }, data: { value: JSON.stringify(updated), updatedAt: new Date() } });
     } else {
       await prismaSettings.systemSettings.create({ data: { key: 'system', value: JSON.stringify(updated) } });
     }
     res.json({ success: true, settings: updated });
   } catch (err) {
-    console.error('Settings save error:', err);
-    res.status(500).json({ error: 'Failed to save settings' });
+    console.error('Settings save error:', err.message);
+    res.status(500).json({ error: 'Failed to save settings. The settings table may not exist yet. Run: npx prisma db push' });
   }
 });
 
@@ -275,3 +276,17 @@ profileRouter.put('/relative/:id', authMw, async (req, res) => {
 });
 
 module.exports.profileRouter = profileRouter;
+
+// GET /settings/public — pricing data for landing page (no auth required)
+const publicSettingsRouter = require('express').Router();
+const prismaPublic = require('../lib/db');
+publicSettingsRouter.get('/', async (req, res) => {
+  try {
+    const record = await prismaPublic.systemSettings.findFirst();
+    const settings = record ? JSON.parse(record.value) : DEFAULT_SETTINGS;
+    res.json({ basicPrice: settings.basicPrice||30, standardPrice: settings.standardPrice||50, premiumPrice: settings.premiumPrice||120, basicVisits: settings.basicVisits||1, standardVisits: settings.standardVisits||2, premiumVisits: settings.premiumVisits||4 });
+  } catch (err) {
+    res.json({ basicPrice:30, standardPrice:50, premiumPrice:120, basicVisits:1, standardVisits:2, premiumVisits:4 });
+  }
+});
+module.exports.publicSettingsRouter = publicSettingsRouter;

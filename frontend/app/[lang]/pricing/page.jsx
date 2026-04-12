@@ -5,23 +5,36 @@ import { t } from '@/translations';
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
 
-const PLANS = [
-  { name:'Basic', price:30, visits:1, featured:false, features:['Blood pressure checks','Glucose monitoring','Full vitals','Post-visit health report','Email support'] },
-  { name:'Standard', price:50, visits:2, featured:true, features:['Blood pressure checks','Glucose monitoring','Full vitals','Post-visit health reports','Priority scheduling','WhatsApp support'] },
-  { name:'Premium', price:120, visits:4, featured:false, features:['Blood pressure checks','Glucose monitoring','Full vitals','Priority nurse matching','Monthly health summary','Multi-relative profiles','24/7 WhatsApp support'] },
-];
-const PLANS_SQ = [
-  { name:'Basic', price:30, visits:1, featured:false, features:['Kontrolli i presionit','Monitorimi i glukozës','Shenjat vitale','Raport shëndetësor','Mbështetje email'] },
-  { name:'Standard', price:50, visits:2, featured:true, features:['Kontrolli i presionit','Monitorimi i glukozës','Shenjat vitale','Planifikim prioritar','Mbështetje WhatsApp'] },
-  { name:'Premium', price:120, visits:4, featured:false, features:['Kontrolli i presionit','Monitorimi i glukozës','Shenjat vitale','Caktim prioritar infermiereje','Përmbledhje mujore','Profilet e shumta'] },
-];
+async function getPricing() {
+  try {
+    const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://vonaxitynew-production.up.railway.app';
+    const res = await fetch(`${BASE}/settings/public`, { next: { revalidate: 300 } }); // cache 5 min
+    if (!res.ok) throw new Error('Failed');
+    return await res.json();
+  } catch {
+    return { basicPrice:30, standardPrice:50, premiumPrice:120, basicVisits:1, standardVisits:2, premiumVisits:4 };
+  }
+}
 
 function CheckIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 }
 
-export default function PricingPage({ params }) {
+export default async function PricingPage({ params }) {
   const lang = params.lang || 'en';
+  const pricing = await getPricing();
+
+  const PLANS = [
+    { name:'Basic', price:pricing.basicPrice, visits:pricing.basicVisits, featured:false, features:['Blood pressure checks','Glucose monitoring','Full vitals','Post-visit health report','Email support'] },
+    { name:'Standard', price:pricing.standardPrice, visits:pricing.standardVisits, featured:true, features:['Blood pressure checks','Glucose monitoring','Full vitals','Post-visit health reports','Priority scheduling','WhatsApp support'] },
+    { name:'Premium', price:pricing.premiumPrice, visits:pricing.premiumVisits, featured:false, features:['Blood pressure checks','Glucose monitoring','Full vitals','Priority nurse matching','Monthly health summary','Multi-relative profiles','24/7 WhatsApp support'] },
+  ];
+  const PLANS_SQ = [
+    { name:'Basic', price:pricing.basicPrice, visits:pricing.basicVisits, featured:false, features:['Kontrolli i presionit','Monitorimi i glukozës','Shenjat vitale','Raport shëndetësor','Mbështetje email'] },
+    { name:'Standard', price:pricing.standardPrice, visits:pricing.standardVisits, featured:true, features:['Kontrolli i presionit','Monitorimi i glukozës','Shenjat vitale','Planifikim prioritar','Mbështetje WhatsApp'] },
+    { name:'Premium', price:pricing.premiumPrice, visits:pricing.premiumVisits, featured:false, features:['Kontrolli i presionit','Monitorimi i glukozës','Shenjat vitale','Caktim prioritar infermiereje','Përmbledhje mujore','Profilet e shumta'] },
+  ];
+
   const plans = lang === 'sq' ? PLANS_SQ : PLANS;
 
   return (

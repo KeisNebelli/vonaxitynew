@@ -139,3 +139,23 @@ const emailTemplates = {
 };
 
 module.exports = { sendEmail, emailTemplates };
+
+// Nurse nudge - remind nurse about upcoming visit
+module.exports.sendNurseNudge = async ({ nurseEmail, nurseName, serviceType, scheduledAt, city }) => {
+  const { sendEmail } = module.exports;
+  return sendEmail({
+    to: nurseEmail,
+    subject: `Reminder: Visit tomorrow — ${serviceType} in ${city}`,
+    html: `<div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
+      <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
+      <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Visit reminder</h2>
+      <p style="color:#475569;margin-bottom:24px">Hi ${nurseName}, you have a visit scheduled tomorrow.</p>
+      <div style="background:#F8FAFC;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #E2E8F0">
+        <div style="margin-bottom:10px"><strong>Service:</strong> ${serviceType}</div>
+        <div style="margin-bottom:10px"><strong>City:</strong> ${city}</div>
+        <div><strong>Date:</strong> ${new Date(scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div>
+      </div>
+      <a href="${process.env.FRONTEND_URL||'https://vonaxity.com'}/en/nurse" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">View visit details →</a>
+    </div>`,
+  });
+};

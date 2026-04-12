@@ -6,9 +6,9 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const visitRoutes = require('./routes/visits');
 const nurseRoutes = require('./routes/nurses');
-const paymentsRoute = require('./routes/payments');
+const paymentsRoute = null; // Stripe payments - coming soon
 const uploadsRoute = require('./routes/uploads');
-const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter } = require('./routes/other');
+const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter, publicSettingsRouter } = require('./routes/other');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -54,12 +54,13 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/visits', visitRoutes);
 app.use('/nurses', nurseRoutes);
-app.use('/payments', paymentsRoute);
+// app.use('/payments', paymentsRoute); // Stripe - coming soon
 app.use('/uploads', uploadsRoute);
 app.use('/users', usersRouter);
 app.use('/analytics', analyticsRouter);
 app.use('/notifications', notificationsRouter);
 app.use('/settings', settingsRouter);
+app.use('/settings/public', publicSettingsRouter);
 app.use('/profile', profileRouter);
 
 // ── 404 ───────────────────────────────────────────────────────────────────────
