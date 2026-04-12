@@ -40,7 +40,7 @@ function Overview({ user, visits, relative, lang, onBook }) {
   const upcoming = visits.filter(v=>!['COMPLETED','CANCELLED'].includes(v.status));
   const completed = visits.filter(v=>v.status==='COMPLETED');
   const next = upcoming[0], last = completed[0];
-  const sub = user?.subscription || MOCK.user.subscription;
+  const sub = user?.subscription || { plan:'standard', status:'TRIAL', visitsPerMonth:2, visitsUsed:0 };
   const planLabel = (sub?.plan||'standard').charAt(0).toUpperCase()+(sub?.plan||'standard').slice(1);
   return (
     <div>
@@ -278,6 +278,101 @@ function Visits({ visits, lang, onViewApplicants }) {
   );
 }
 
+const PLANS_INFO = [
+  { id:'basic',    name:'Basic',    price:'€30', visits:1, desc:'1 nurse visit per month' },
+  { id:'standard', name:'Standard', price:'€50', visits:2, desc:'2 nurse visits per month', popular:true },
+  { id:'premium',  name:'Premium',  price:'€120', visits:4, desc:'4 nurse visits per month' },
+];
+
+function SubscriptionSection({ userData, lang }) {
+  const [loading, setLoading] = useState(null);
+  const [portalLoading, setPortalLoading] = useState(false);
+  const [error, setError] = useState('');
+  const sub = userData?.subscription;
+  const currentPlan = sub?.plan || null;
+  const status = sub?.status || 'TRIAL';
+  const visitsUsed = sub?.visitsUsed || 0;
+  const visitsTotal = sub?.visitsPerMonth || 0;
+
+  const handleCheckout = async (planId) => {
+    setLoading(planId); setError('');
+    try {
+      const data = await api.createCheckout(planId);
+      if (data.url) window.location.href = data.url;
+    } catch (err) {
+      setError(err.message || 'Failed to start checkout. Please try again.');
+    } finally { setLoading(null); }
+  };
+
+  const handlePortal = async () => {
+    setPortalLoading(true); setError('');
+    try {
+      const data = await api.createPortal();
+      if (data.url) window.location.href = data.url;
+    } catch (err) {
+      setError(err.message || 'Failed to open billing portal.');
+    } finally { setPortalLoading(false); }
+  };
+
+  return (
+    <div style={{ maxWidth:680 }}>
+      {/* Current plan */}
+      <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:24, marginBottom:24, boxShadow:SSM }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:12 }}>
+          <div>
+            <div style={{ fontSize:13, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:6 }}>Current plan</div>
+            <div style={{ fontSize:22, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px' }}>{currentPlan ? currentPlan.charAt(0).toUpperCase()+currentPlan.slice(1) : 'Trial'}</div>
+            <div style={{ fontSize:13, color:C.textSecondary, marginTop:4 }}>
+              {visitsTotal > 0 ? `${visitsUsed}/${visitsTotal} visits used this month` : '7-day free trial'}
+            </div>
+          </div>
+          <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+            <span style={{ fontSize:12, fontWeight:700, padding:'4px 12px', borderRadius:99, background:status==='ACTIVE'?C.secondaryLight:status==='TRIAL'?C.purpleLight:C.warningLight, color:status==='ACTIVE'?C.secondary:status==='TRIAL'?C.purple:C.warning }}>{status}</span>
+            {sub?.stripeSubId && (
+              <button onClick={handlePortal} disabled={portalLoading} style={{ fontSize:13, fontWeight:600, padding:'8px 16px', borderRadius:9, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.textSecondary }}>
+                {portalLoading ? 'Opening...' : 'Manage billing'}
+              </button>
+            )}
+          </div>
+        </div>
+        {visitsTotal > 0 && (
+          <div style={{ marginTop:16, background:C.bgSubtle, borderRadius:8, height:8, overflow:'hidden' }}>
+            <div style={{ height:'100%', background:visitsUsed>=visitsTotal?C.error:C.primary, width:`${Math.min(100,(visitsUsed/visitsTotal)*100)}%`, borderRadius:8, transition:'width 0.3s' }} />
+          </div>
+        )}
+      </div>
+
+      {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:10, padding:'12px 16px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
+
+      {/* Plan cards */}
+      <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>
+        {currentPlan ? 'Change plan' : 'Choose a plan'}
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:12 }}>
+        {PLANS_INFO.map(p => (
+          <div key={p.id} style={{ background:C.bgWhite, borderRadius:14, border:`2px solid ${p.id===currentPlan?C.primary:p.popular?'rgba(37,99,235,0.2)':C.border}`, padding:20, position:'relative' }}>
+            {p.popular && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.primary, color:'#fff', whiteSpace:'nowrap' }}>MOST POPULAR</div>}
+            {p.id===currentPlan && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondary, color:'#fff', whiteSpace:'nowrap' }}>CURRENT</div>}
+            <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:4 }}>{p.name}</div>
+            <div style={{ fontSize:24, fontWeight:800, color:C.primary, letterSpacing:'-0.5px', marginBottom:4 }}>{p.price}<span style={{ fontSize:13, fontWeight:500, color:C.textTertiary }}>/mo</span></div>
+            <div style={{ fontSize:13, color:C.textSecondary, marginBottom:16, lineHeight:1.5 }}>{p.desc}</div>
+            <button
+              onClick={()=>handleCheckout(p.id)}
+              disabled={loading===p.id || p.id===currentPlan}
+              style={{ width:'100%', padding:'10px', borderRadius:9, border:'none', background:p.id===currentPlan?C.bgSubtle:`linear-gradient(135deg,${C.primary},${C.primaryDark})`, color:p.id===currentPlan?C.textTertiary:'#fff', fontSize:13, fontWeight:700, cursor:p.id===currentPlan?'not-allowed':'pointer', opacity:loading===p.id?0.7:1, fontFamily:F }}
+            >
+              {loading===p.id ? 'Loading...' : p.id===currentPlan ? 'Current plan' : 'Select →'}
+            </button>
+          </div>
+        ))}
+      </div>
+      <div style={{ marginTop:16, fontSize:12, color:C.textTertiary, textAlign:'center' }}>
+        Secure payments by Stripe · Cancel anytime · 7-day free trial on all plans
+      </div>
+    </div>
+  );
+}
+
 export default function Dashboard({ params }) {
   const lang = params?.lang || 'en';
   const router = useRouter();
@@ -338,7 +433,7 @@ export default function Dashboard({ params }) {
 
   const userData = u || { name:'', email:'', subscription:{ plan:'standard', status:'TRIAL', visitsPerMonth:2, visitsUsed:0 } };
   const relative = r;
-  const relativeDisplay = r || MOCK.relative;
+  const relativeDisplay = r || null;
   const plan = (userData.subscription?.plan||'standard').charAt(0).toUpperCase()+(userData.subscription?.plan||'standard').slice(1);
   const isTrial = userData.subscription?.status === 'TRIAL';
   const initials = (userData.name||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
@@ -456,12 +551,7 @@ export default function Dashboard({ params }) {
                 {active==='book' && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} />}
                 {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} />}
                 {active==='subscription' && (
-                  <div style={{ background:C.bgWhite,borderRadius:16,border:`1px solid ${C.border}`,padding:28,boxShadow:SSM }}>
-                    <div style={{ fontSize:24,fontWeight:800,color:C.textPrimary,marginBottom:6 }}>{plan} Plan</div>
-                    <div style={{ fontSize:15,color:C.primary,fontWeight:600,marginBottom:4 }}>{userData.subscription?.visitsPerMonth||2} nurse visits per month</div>
-                    <div style={{ fontSize:13,color:C.textSecondary,marginBottom:28 }}>Status: <span style={{ fontWeight:700,color:isTrial?C.purple:C.secondary }}>{userData.subscription?.status||'TRIAL'}</span></div>
-                    <button style={{ background:`linear-gradient(135deg,${C.primary},${C.primaryDark})`,color:'#fff',border:'none',borderRadius:11,padding:'13px 28px',fontSize:14,fontWeight:700,cursor:'pointer',fontFamily:F }}>Upgrade to Premium →</button>
-                  </div>
+                  <SubscriptionSection userData={userData} lang={lang} />
                 )}
                 {active==='settings' && <Settings key="settings-page" initialUser={userData} initialRelative={relative} lang={lang}/>}
               </>

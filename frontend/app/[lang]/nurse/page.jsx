@@ -917,7 +917,7 @@ export default function NursePage({ params }) {
     router.push(`/${lang}/login`);
   };
 
-  const displayNurse = nurse ? { ...MOCK_NURSE, ...nurse, initials:(nurse.user?.name||nurse.name||'N').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() } : MOCK_NURSE;
+  const displayNurse = { name: nurse?.user?.name||nurse?.name||'Nurse', email: nurse?.user?.email||'', city: nurse?.city||'', rating: nurse?.rating||0, totalVisits: nurse?.totalVisits||0, totalEarnings: nurse?.totalEarnings||0, status: nurse?.status||'INCOMPLETE', ...nurse, initials:(nurse?.user?.name||nurse?.name||'N').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() };
   const TITLES = { dashboard:tr('nurse.dashboard'), jobs:'Browse Jobs', visits:tr('nurse.myVisits'), map:tr('nurse.navigation'), complete:tr('nurse.completeVisit'), earnings:tr('nurse.earnings'), profile:tr('nurse.profile'), onboarding:tr('nurse.completeProfile') };
   const status = nurse?.status || 'INCOMPLETE';
   const statusColors = { APPROVED:['#ECFDF5','#059669'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
