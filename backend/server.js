@@ -54,7 +54,8 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/visits', visitRoutes);
 app.use('/nurses', nurseRoutes);
-// app.use('/payments', paymentsRoute); // Stripe - coming soon
+// app.use('/payments', paymentsRoute); // Stripe checkout - coming soon
+app.use('/payments', paymentsRouter); // Admin payments list
 app.use('/uploads', uploadsRoute);
 app.use('/users', usersRouter);
 app.use('/analytics', analyticsRouter);

@@ -1,4 +1,5 @@
 import CookieBanner from '@/components/CookieBanner';
+import { Suspense } from 'react';
 
 export const metadata = {
   title: 'Vonaxity — Home Nurse Visits in Albania',
@@ -12,7 +13,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="en">
+    <html lang="en" suppressHydrationWarning>
       <head>
         <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1" />
         <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
@@ -35,7 +36,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         {children}
-        <CookieBanner />
+        <Suspense fallback={null}><CookieBanner /></Suspense>
       </body>
     </html>
   );
