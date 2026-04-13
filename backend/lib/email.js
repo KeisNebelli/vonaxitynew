@@ -124,6 +124,25 @@ const emailTemplates = {
       </div>`,
   }),
 
+  // ── To client: booking confirmation ────────────────────────────────────────
+  bookingConfirmed: ({ clientName, serviceType, city, scheduledAt, relativeName }) => ({
+    subject: `Visit booked — ${serviceType} on ${new Date(scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`,
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
+        <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Visit booked successfully</h2>
+        <p style="color:#475569;margin-bottom:24px">Hi ${clientName}, your visit has been booked. Nurses in ${city} are being notified and will apply soon.</p>
+        <div style="background:#F8FAFC;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #E2E8F0">
+          <div style="margin-bottom:10px"><strong>Service:</strong> ${serviceType}</div>
+          <div style="margin-bottom:10px"><strong>For:</strong> ${relativeName}</div>
+          <div style="margin-bottom:10px"><strong>City:</strong> ${city}</div>
+          <div><strong>Date:</strong> ${new Date(scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+        </div>
+        <p style="color:#475569;margin-bottom:24px">You will receive another email when a nurse applies. You can then review and select your preferred nurse from your dashboard.</p>
+        <a href="${process.env.FRONTEND_URL||'https://vonaxity.com'}/en/dashboard" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">View dashboard →</a>
+        <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
+      </div>`,
+  }),
   // ── Welcome email to new client ─────────────────────────────────────────────
   welcomeClient: ({ name }) => ({
     subject: 'Welcome to Vonaxity',

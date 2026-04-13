@@ -10,14 +10,6 @@ const F = "'DM Sans','Inter',system-ui,sans-serif";
 const SSM = '0 1px 3px rgba(15,23,42,0.06)';
 const SMD = '0 4px 12px rgba(15,23,42,0.08)';
 
-const MOCK = {
-  user:{ name:'Keis Nebelli', email:'client@test.com', phone:'+44 7700 000000', country:'United Kingdom', subscription:{ plan:'standard', status:'TRIAL', visitsPerMonth:2, visitsUsed:1 } },
-  relative:{ id:'rel1', name:'Fatmira Murati', city:'Tirana', address:'Rruga e Elbasanit 14', phone:'+355690001111', age:74 },
-  visits:[
-    { id:'v1', serviceType:'Blood Pressure + Glucose Check', scheduledAt:'2024-12-20T10:00:00Z', status:'PENDING', nurse:{ user:{ name:'Elona Berberi' } } },
-    { id:'v2', serviceType:'Blood Pressure Check', scheduledAt:'2024-11-28T10:00:00Z', status:'COMPLETED', nurse:{ user:{ name:'Elona Berberi' } }, bpSystolic:128, bpDiastolic:82, glucose:5.4, nurseNotes:'Patient in good spirits.' },
-  ],
-};
 
 const SERVICES = ['Blood Pressure Check','Glucose Monitoring','Vitals Check','Blood Work Collection','Welfare Check','Post-surgical Care'];
 
@@ -98,15 +90,18 @@ function BookVisit({ relative, subscription, onSuccess, onCancel }) {
   const [error, setError] = useState('');
   const inp = { width:'100%', padding:'11px 14px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box' };
 
+  const [submitted, setSubmitted] = useState(false);
   const handleSubmit = async () => {
+    if (loading || submitted) return; // prevent double submit
     if (!form.scheduledAt) return setError('Please select a date and time.');
     if (!relative) return setError('You need to add a loved one first in Settings.');
-    setLoading(true); setError('');
+    setLoading(true); setSubmitted(true); setError('');
     try {
       await api.createVisit({ relativeId: relative.id, serviceType: form.serviceType, scheduledAt: form.scheduledAt, notes: form.notes });
       onSuccess();
     } catch (err) {
       setError(err.message || 'Failed to book visit. Please try again.');
+      setSubmitted(false); // allow retry on error
     } finally { setLoading(false); }
   };
 
@@ -209,8 +204,12 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
         <div key={a.id} style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'20px', marginBottom:12, boxShadow:SSM }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:16 }}>
             <div style={{ display:'flex', gap:14, alignItems:'center' }}>
-              <div style={{ width:48, height:48, borderRadius:13, background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, fontWeight:800, color:'#fff', flexShrink:0 }}>
-                {(a.nurse.name||'N').charAt(0).toUpperCase()}
+              <div style={{ width:48, height:48, borderRadius:13, background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, fontWeight:800, color:'#fff', flexShrink:0, overflow:'hidden' }}>
+                {a.nurse.profilePhotoUrl ? (
+                  <img src={a.nurse.profilePhotoUrl} alt={a.nurse.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                ) : (
+                  (a.nurse.name||'N').charAt(0).toUpperCase()
+                )}
               </div>
               <div>
                 <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{a.nurse.name}</div>

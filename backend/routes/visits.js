@@ -116,9 +116,22 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
         for (const nurse of nurses) {
           if (nurse.user?.email) {
             const tmpl = emailTemplates.newJobPosted({ nurseName: nurse.user.name, serviceType, city, scheduledAt, visitId: visit.id });
-            sendEmail({ to: nurse.user.email, ...tmpl }); // fire and forget
+            sendEmail({ to: nurse.user.email, ...tmpl });
           }
         }
+      }
+
+      // Send booking confirmation to client
+      const clientUser = await prisma.user.findUnique({ where: { id: req.user.userId }, select: { name: true, email: true } });
+      if (clientUser?.email) {
+        const tmpl = emailTemplates.bookingConfirmed({
+          clientName: clientUser.name,
+          serviceType,
+          city: visit.relative?.city || '',
+          scheduledAt,
+          relativeName: visit.relative?.name || 'your loved one',
+        });
+        sendEmail({ to: clientUser.email, ...tmpl });
       }
     } catch (emailErr) { console.error('Email notification error:', emailErr); }
     res.status(201).json({ success: true, visit });

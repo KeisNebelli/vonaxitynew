@@ -38,8 +38,8 @@ export default function Footer({ lang = 'en' }) {
 
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: 16 }}>{t(lang, 'footer.contact')}</div>
-            <div style={{ fontSize: 13, marginBottom: 10, color: 'rgba(255,255,255,0.4)' }}>hello@vonaxity.com</div>
-            <div style={{ fontSize: 13, color: 'rgba(255,255,255,0.4)' }}>WhatsApp</div>
+            <a href="mailto:hello@vonaxity.com" style={{ display:'block', fontSize: 13, marginBottom: 10, color: 'rgba(255,255,255,0.4)', textDecoration:'none' }}>hello@vonaxity.com</a>
+            <a href="https://wa.me/message/vonaxity" target="_blank" rel="noopener noreferrer" style={{ display:'block', fontSize: 13, color: 'rgba(255,255,255,0.4)', textDecoration:'none' }}>WhatsApp Support</a>
           </div>
         </div>
 
