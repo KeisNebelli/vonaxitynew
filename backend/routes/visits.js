@@ -64,6 +64,10 @@ router.get('/open', ...requireRole('NURSE'), async (req, res) => {
       postedBy: v.relative?.client?.name || 'A client',
       clientCountry: v.relative?.client?.country || '',
       relativeName: v.relative?.name || '',
+      relativeAge: v.relative?.age || null,
+      relativeAddress: v.relative?.address || '',
+      relativePhone: v.relative?.phone || '',
+      createdAt: v.createdAt,
     }));
     res.json({ visits: normalized, nurseCity: nurse.city || null, filtered: !!filterByCity });
   } catch (err) {

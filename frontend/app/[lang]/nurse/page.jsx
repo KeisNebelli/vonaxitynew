@@ -308,21 +308,21 @@ function Earnings({ lang='en', nurse=null }) {
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
         <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:6 }}>Payment history</div>
-        <div style={{ fontSize:12, color:C.textTertiary, marginBottom:20 }}>Pay rate: <strong style={{ color:C.textPrimary }}>€{payRate} per visit</strong> · Processed weekly</div>
-        {[['Dec 10–14',4,80,'paid'],['Dec 3–7',3,60,'paid'],['Nov 26–30',4,80,'pending']].map(([period,visits,amount,status],i) => (
-          <div key={i} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'14px 0', borderBottom:`1px solid ${C.borderSubtle}` }}>
-            <div>
-              <div style={{ fontSize:14, fontWeight:500, color:C.textPrimary }}>{period}</div>
-              <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{visits} visits · €{payRate}/visit</div>
-            </div>
-            <div style={{ display:'flex', gap:12, alignItems:'center' }}>
-              <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary }}>€{amount}</div>
-              <span style={{ fontSize:12, fontWeight:600, padding:'4px 12px', borderRadius:99, background:status==='paid'?C.secondaryLight:C.warningLight, color:status==='paid'?C.secondary:C.warning }}>
-                {status==='paid'?tr('nurse.paid')||'Paid':tr('nurse.pendingPayment')||'Pending'}
-              </span>
+        <div style={{ fontSize:12, color:C.textTertiary, marginBottom:20 }}>Pay rate: <strong style={{ color:C.textPrimary }}>€{payRate} per visit</strong> · Processed weekly via Wise</div>
+        {totalVisits > 0 ? (
+          <div style={{ background:C.bgSubtle, borderRadius:10, padding:'16px 18px' }}>
+            <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:4 }}>Total earned to date</div>
+            <div style={{ fontSize:28, fontWeight:800, color:C.secondary, letterSpacing:'-0.5px' }}>€{totalEarnings}</div>
+            <div style={{ fontSize:12, color:C.textTertiary, marginTop:6 }}>From {totalVisits} completed visit{totalVisits!==1?'s':''} · €{payRate} per visit</div>
+            <div style={{ marginTop:16, fontSize:12, color:C.textTertiary, background:C.primaryLight, borderRadius:8, padding:'10px 14px', border:`1px solid rgba(37,99,235,0.15)` }}>
+              Payouts are processed weekly to your registered bank account via Wise. Contact <strong>hello@vonaxity.com</strong> for payout queries.
             </div>
           </div>
-        ))}
+        ) : (
+          <div style={{ textAlign:'center', padding:'24px 0', color:C.textTertiary, fontSize:13 }}>
+            Complete your first visit to start earning.
+          </div>
+        )}
       </div>
     </div>
   );
@@ -450,78 +450,91 @@ function BrowseJobs({ nurse, lang='en' }) {
 
           return (
             <div key={job.id} style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${applied?'#6EE7B7':isExpanded?C.primary:C.border}`, overflow:'hidden', transition:'border-color 0.15s' }}>
-              {/* Card main */}
-              <div style={{ padding:'18px 20px' }}>
-                <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
-                  <div style={{ flex:1, minWidth:0 }}>
-                    {/* Service badge + title */}
-                    <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:8 }}>
-                      <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.2px' }}>{job.serviceType}</div>
-                      {applied && <span style={{ fontSize:11, fontWeight:700, padding:'2px 8px', borderRadius:99, background:'#ECFDF5', color:'#059669', flexShrink:0 }}>Applied</span>}
-                    </div>
-                    {/* Meta row */}
-                    <div style={{ display:'flex', flexWrap:'wrap', gap:'6px 16px' }}>
-                      <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:C.textSecondary }}>
-                        <span style={{ color:C.textTertiary }}>{iconPin}</span>{job.city||'Albania'}
-                      </div>
-                      <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:C.textSecondary }}>
-                        <span style={{ color:C.textTertiary }}>{iconCal}</span>{dateStr} at {timeStr}
-                      </div>
-                      <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:C.textSecondary }}>
-                        <span style={{ color:C.textTertiary }}>{iconUser}</span>{job.postedBy}{job.clientCountry?` · ${job.clientCountry}`:''}
-                      </div>
-                      {job.relativeName && (
-                        <div style={{ fontSize:12, color:C.textTertiary }}>For: <span style={{ color:C.textSecondary, fontWeight:500 }}>{job.relativeName}</span></div>
-                      )}
-                    </div>
-                    {/* Notes preview */}
-                    {job.notes && (
-                      <div style={{ display:'flex', alignItems:'flex-start', gap:5, marginTop:8, fontSize:12, color:C.textSecondary }}>
-                        <span style={{ color:C.textTertiary, marginTop:1, flexShrink:0 }}>{iconNote}</span>
-                        <span style={{ fontStyle:'italic', lineHeight:1.5 }}>"{job.notes}"</span>
-                      </div>
-                    )}
-                  </div>
 
-                  {/* Action */}
-                  <div style={{ flexShrink:0 }}>
-                    {applied ? (
-                      <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:600, color:'#059669' }}>
-                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                        Applied
-                      </div>
-                    ) : (
-                      <button onClick={()=>setExpandedJob(isExpanded?null:job.id)} style={{ fontSize:13, fontWeight:700, padding:'9px 20px', background:isExpanded?C.bgSubtle:C.primary, color:isExpanded?C.textSecondary:'#fff', border:'none', borderRadius:9, cursor:'pointer', transition:'all 0.15s', fontFamily:F }}>
-                        {isExpanded ? 'Cancel' : 'Apply'}
-                      </button>
-                    )}
+              {/* ── Summary row (always visible) ── */}
+              <div style={{ padding:'16px 18px', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
+                    <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{job.serviceType}</div>
+                    {applied && <span style={{ fontSize:11, fontWeight:700, padding:'2px 8px', borderRadius:99, background:'#ECFDF5', color:'#059669', flexShrink:0 }}>Applied</span>}
+                  </div>
+                  <div style={{ display:'flex', flexWrap:'wrap', gap:'4px 14px', fontSize:12, color:C.textSecondary }}>
+                    <span style={{ display:'flex', alignItems:'center', gap:4 }}><span style={{ color:C.textTertiary }}>{iconPin}</span>{job.city||'Albania'}</span>
+                    <span style={{ display:'flex', alignItems:'center', gap:4 }}><span style={{ color:C.textTertiary }}>{iconCal}</span>{dateStr} · {timeStr}</span>
+                    {job.relativeName && <span style={{ display:'flex', alignItems:'center', gap:4 }}><span style={{ color:C.textTertiary }}>{iconUser}</span>{job.relativeName}</span>}
                   </div>
                 </div>
 
-                {/* Error */}
-                {failed && <div style={{ marginTop:10, fontSize:12, color:C.error, background:C.errorLight, borderRadius:7, padding:'8px 12px' }}>{statuses[job.id]}</div>}
+                {/* Buttons */}
+                <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, flexShrink:0 }}>
+                  {applied ? (
+                    <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:13, fontWeight:600, color:'#059669' }}>
+                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                      Applied
+                    </div>
+                  ) : (
+                    <button onClick={()=>setExpandedJob(isExpanded?null:job.id)} style={{ fontSize:13, fontWeight:700, padding:'8px 18px', background:isExpanded?C.bgSubtle:C.primary, color:isExpanded?C.textSecondary:'#fff', border:'none', borderRadius:9, cursor:'pointer', fontFamily:F }}>
+                      {isExpanded ? 'Close' : 'Apply →'}
+                    </button>
+                  )}
+                  <button
+                    onClick={()=>setExpandedJob(expandedJob===`details-${job.id}`?null:`details-${job.id}`)}
+                    style={{ fontSize:11, fontWeight:600, padding:'5px 10px', borderRadius:7, border:`1px solid ${C.border}`, background:'transparent', color:C.textTertiary, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
+                    {expandedJob===`details-${job.id}` ? 'Hide details' : 'View details'}
+                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                      {expandedJob===`details-${job.id}` ? <polyline points="18 15 12 9 6 15"/> : <polyline points="6 9 12 15 18 9"/>}
+                    </svg>
+                  </button>
+                </div>
               </div>
 
-              {/* Apply panel */}
-              {isExpanded && !applied && (
-                <div style={{ borderTop:`1px solid ${C.border}`, padding:'16px 20px', background:C.bgSubtle }}>
+              {/* ── Expanded details panel ── */}
+              {expandedJob===`details-${job.id}` && (
+                <div style={{ borderTop:`1px solid ${C.border}`, padding:'14px 18px', background:C.bgSubtle, display:'flex', flexDirection:'column', gap:10 }}>
+                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+                    <div>
+                      <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Patient</div>
+                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{job.relativeName||'—'}</div>
+                      {job.relativeAge && <div style={{ fontSize:11, color:C.textTertiary }}>Age {job.relativeAge}</div>}
+                    </div>
+                    <div>
+                      <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Address</div>
+                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{job.relativeAddress||job.city||'—'}</div>
+                    </div>
+                    <div>
+                      <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Posted by</div>
+                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{job.postedBy}</div>
+                      {job.clientCountry && <div style={{ fontSize:11, color:C.textTertiary }}>{job.clientCountry}</div>}
+                    </div>
+                    <div>
+                      <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Posted</div>
+                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{job.createdAt ? new Date(job.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
+                    </div>
+                  </div>
+                  {job.notes && (
+                    <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:9, padding:'10px 13px' }}>
+                      <div style={{ fontSize:10, fontWeight:700, color:'#92400E', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:4 }}>Client instructions</div>
+                      <div style={{ fontSize:13, color:'#78350F', lineHeight:1.6 }}>{job.notes}</div>
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* ── Apply panel ── */}
+              {expandedJob === job.id && !applied && (
+                <div style={{ borderTop:`1px solid ${C.border}`, padding:'16px 18px', background:C.bgSubtle }}>
                   <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>Message to client <span style={{ fontWeight:400, color:C.textTertiary }}>(optional)</span></div>
-                  <textarea
-                    value={message}
-                    onChange={e=>setMessage(e.target.value)}
-                    placeholder="Briefly introduce yourself or mention relevant experience..."
-                    style={{ width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:13, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box', resize:'vertical', minHeight:72, lineHeight:1.5 }}
-                  />
+                  <textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder="Briefly introduce yourself or mention relevant experience..." style={{ width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:13, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box', resize:'vertical', minHeight:70, lineHeight:1.5 }} />
                   <div style={{ display:'flex', gap:8, marginTop:10 }}>
-                    <button onClick={()=>{ setExpandedJob(null); setMessage(''); }} style={{ padding:'10px 16px', background:'transparent', color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:F }}>
-                      Cancel
-                    </button>
+                    <button onClick={()=>{ setExpandedJob(null); setMessage(''); }} style={{ padding:'10px 16px', background:'transparent', color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:F }}>Cancel</button>
                     <button onClick={()=>handleApply(job.id)} disabled={applying===job.id} style={{ flex:1, padding:'10px', background:C.primary, color:'#fff', border:'none', borderRadius:9, fontSize:13, fontWeight:700, cursor:applying===job.id?'not-allowed':'pointer', opacity:applying===job.id?0.7:1, fontFamily:F }}>
-                      {applying===job.id ? 'Sending application...' : 'Submit application'}
+                      {applying===job.id ? 'Sending...' : 'Submit application'}
                     </button>
                   </div>
                 </div>
               )}
+
+              {failed && <div style={{ margin:'0 18px 14px', fontSize:12, color:C.error, background:C.errorLight, borderRadius:7, padding:'8px 12px' }}>{statuses[job.id]}</div>}
             </div>
           );
         })}
