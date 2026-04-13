@@ -1,28 +1,28 @@
+'use client';
+import { useState, useEffect } from 'react';
 import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { t } from '@/translations';
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
-
-async function getPricing() {
-  try {
-    const BASE = process.env.NEXT_PUBLIC_API_URL || process.env.API_URL || 'https://vonaxitynew-production.up.railway.app';
-    const res = await fetch(`${BASE}/settings/public`, { next: { revalidate: 300 } });
-    if (!res.ok) throw new Error('Failed');
-    return await res.json();
-  } catch {
-    return { basicPrice:30, standardPrice:50, premiumPrice:120, basicVisits:1, standardVisits:2, premiumVisits:4 };
-  }
-}
+const DEFAULT_PRICING = { basicPrice:30, standardPrice:50, premiumPrice:120, basicVisits:1, standardVisits:2, premiumVisits:4 };
 
 function CheckIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 }
 
-export default async function PricingPage({ params }) {
+export default function PricingPage({ params }) {
   const lang = params.lang || 'en';
-  const pricing = await getPricing();
+  const [pricing, setPricing] = useState(DEFAULT_PRICING);
+
+  useEffect(() => {
+    const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://vonaxitynew-production.up.railway.app';
+    fetch(`${BASE}/settings/public`)
+      .then(r => r.json())
+      .then(data => setPricing(data))
+      .catch(() => setPricing(DEFAULT_PRICING));
+  }, []);
 
   const PLANS = [
     { name:'Basic', price:pricing.basicPrice, visits:pricing.basicVisits, featured:false, features:['Blood pressure checks','Glucose monitoring','Full vitals','Post-visit health report','Email support'] },
