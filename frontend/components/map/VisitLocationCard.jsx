@@ -82,9 +82,9 @@ export default function VisitLocationCard({ visit, onStatusChange, onComplete, c
       </div>
 
       {/* Map */}
-      {mapVisible && visit.lat && visit.lng && (
+      {mapVisible && (visit.lat || visit.address) && (
         <div style={{ padding:'0 18px 14px' }}>
-          <MapComponent patientLat={visit.lat} patientLng={visit.lng} nurseLat={location?.lat} nurseLng={location?.lng} patientName={visit.clientName} height="240px" />
+          <MapComponent patientLat={visit.lat} patientLng={visit.lng} nurseLat={location?.lat} nurseLng={location?.lng} patientName={visit.clientName} patientAddress={visit.address} height="240px" />
         </div>
       )}
 
