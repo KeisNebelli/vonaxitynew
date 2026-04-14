@@ -15,11 +15,13 @@ function CheckIcon() {
 
 function RoleSelect({ lang, onSelect }) {
   const [hovered, setHovered] = useState(null);
+  const clientFeatures = t(lang,'signup.clientFeatures');
+  const nurseFeatures = t(lang,'signup.nurseFeatures');
   return (
     <div>
       <Link href={`/${lang}`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px', display:'block', marginBottom:28 }}>Vonaxity</Link>
-      <h2 style={{ fontSize:22, fontWeight:700, color:C.textPrimary, marginBottom:8, letterSpacing:'-0.5px' }}>Create your account</h2>
-      <p style={{ fontSize:14, color:C.textSecondary, marginBottom:28, lineHeight:1.6 }}>Choose the type of account you want to create.</p>
+      <h2 style={{ fontSize:22, fontWeight:700, color:C.textPrimary, marginBottom:8, letterSpacing:'-0.5px' }}>{t(lang,'signup.createAccount')}</h2>
+      <p style={{ fontSize:14, color:C.textSecondary, marginBottom:28, lineHeight:1.6 }}>{t(lang,'signup.chooseDesc')}</p>
 
       {/* Client card */}
       <div onClick={()=>onSelect('client')} onMouseEnter={()=>setHovered('client')} onMouseLeave={()=>setHovered(null)}
@@ -29,12 +31,12 @@ function RoleSelect({ lang, onSelect }) {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
           </div>
           <div>
-            <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Client account</div>
-            <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6 }}>Book home nurse visits for yourself or a loved one in Albania. Manage appointments, view health reports, and track care from anywhere in the world.</div>
+            <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>{t(lang,'signup.clientTitle')}</div>
+            <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6 }}>{t(lang,'signup.clientFullDesc')}</div>
           </div>
         </div>
         <div style={{ marginTop:14, display:'flex', gap:8, flexWrap:'wrap' }}>
-          {['Book visits','View health reports','Manage loved ones'].map(tag=>(
+          {Array.isArray(clientFeatures) && clientFeatures.map(tag=>(
             <span key={tag} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{tag}</span>
           ))}
         </div>
@@ -48,19 +50,19 @@ function RoleSelect({ lang, onSelect }) {
             <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke={C.secondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
           </div>
           <div>
-            <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>Nurse account</div>
-            <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6 }}>Join the Vonaxity care team. Upload your credentials, set your availability, and start receiving home visit assignments after approval.</div>
+            <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>{t(lang,'signup.nurseTitle')}</div>
+            <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6 }}>{t(lang,'signup.nurseFullDesc')}</div>
           </div>
         </div>
         <div style={{ marginTop:14, display:'flex', gap:8, flexWrap:'wrap' }}>
-          {['Earn per visit','Flexible schedule','Requires verification'].map(tag=>(
+          {Array.isArray(nurseFeatures) && nurseFeatures.map(tag=>(
             <span key={tag} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>{tag}</span>
           ))}
         </div>
       </div>
 
       <div style={{ textAlign:'center', fontSize:13, color:C.textTertiary }}>
-        Already have an account? <Link href={`/${lang}/login`} style={{ color:C.primary, fontWeight:600 }}>Sign in</Link>
+        {t(lang,'signup.alreadyAccount')} <Link href={`/${lang}/login`} style={{ color:C.primary, fontWeight:600 }}>{t(lang,'signup.signIn')}</Link>
       </div>
     </div>
   );
@@ -136,7 +138,7 @@ function SignupContent({ params }) {
         {step===2 && (
           <div>
             <h2 style={{ fontSize:22, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:24 }}>{t(lang,'signup.step2Title')}</h2>
-            {[['Full name','name','text',t(lang,'signup.fullName')],['Email','email','email','you@email.com'],['Password','password','password','••••••••'],['Phone (WhatsApp)','phone','tel','+44 7700 000000']].map(([label,key,type,ph]) => (
+            {[[t(lang,'signup.fullName'),'name','text',t(lang,'signup.fullName')],[t(lang,'signup.email'),'email','email','you@email.com'],[t(lang,'signup.password'),'password','password','••••••••'],[t(lang,'signup.phone'),'phone','tel','+44 7700 000000']].map(([label,key,type,ph]) => (
               <div key={key} style={{ marginBottom:16 }}>
                 <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{label}</label>
                 <input style={inp} type={type} placeholder={ph} value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value})} />
@@ -159,7 +161,7 @@ function SignupContent({ params }) {
         {step===3 && (
           <div>
             <h2 style={{ fontSize:22, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:24 }}>{t(lang,'signup.step3Title')}</h2>
-            {[['Their full name','relativeName','text',t(lang,'signup.theirName')],['Their address','relativeAddress','text',t(lang,'signup.theirAddress')],['Their phone','relativePhone','tel','+355 69 000 0000']].map(([label,key,type,ph]) => (
+            {[[t(lang,'signup.theirName'),'relativeName','text',t(lang,'signup.theirName')],[t(lang,'signup.theirAddress'),'relativeAddress','text',t(lang,'signup.theirAddress')],[t(lang,'signup.theirPhone'),'relativePhone','tel','+355 69 000 0000']].map(([label,key,type,ph]) => (
               <div key={key} style={{ marginBottom:14 }}>
                 <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{label}</label>
                 <input style={inp} type={type} placeholder={ph} value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value})} />
@@ -174,7 +176,7 @@ function SignupContent({ params }) {
             </div>
             {error && <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:9, padding:'11px 14px', fontSize:13, color:'#DC2626', marginBottom:14 }}>{error}</div>}
             <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:9, padding:'11px 14px', fontSize:12, color:'#92400E', marginBottom:20 }}>
-              Non-emergency care only. Emergency in Albania: <strong>127</strong>
+              {t(lang,'signup.nonEmergency')} <strong>127</strong>
             </div>
             <div style={{ display:'flex', gap:10 }}>
               <button onClick={()=>setStep(2)} style={{ flex:'0 0 auto', padding:'12px 20px', borderRadius:10, border:`2px solid ${C.border}`, background:'#fff', cursor:'pointer', fontWeight:600, fontSize:14 }}>{t(lang,'signup.back')}</button>
@@ -189,7 +191,7 @@ function SignupContent({ params }) {
           {t(lang,'signup.alreadyAccount')} <Link href={`/${lang}/login`} style={{ color:C.primary, fontWeight:600 }}>{t(lang,'signup.signIn')}</Link>
         </div>
         <div style={{ textAlign:'center', marginTop:8 }}>
-          <button onClick={()=>setRole(null)} style={{ fontSize:12, color:C.textTertiary, background:'transparent', border:'none', cursor:'pointer' }}>← Change account type</button>
+          <button onClick={()=>setRole(null)} style={{ fontSize:12, color:C.textTertiary, background:'transparent', border:'none', cursor:'pointer' }}>{t(lang,'signup.changeAccountType')}</button>
         </div>
         </>}
       </div>
@@ -198,5 +200,6 @@ function SignupContent({ params }) {
 }
 
 export default function SignupPage({ params }) {
-  return <Suspense fallback={<div>Loading...</div>}><SignupContent params={params} /></Suspense>;
+  const lang = params?.lang || 'en';
+  return <Suspense fallback={<div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', color:'#6B7280', fontSize:14 }}>{lang === 'sq' ? 'Duke ngarkuar...' : 'Loading...'}</div>}><SignupContent params={params} /></Suspense>;
 }

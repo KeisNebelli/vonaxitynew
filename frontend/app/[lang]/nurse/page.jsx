@@ -138,8 +138,8 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
         </div>
         <div>
-          <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>Good morning, {nurseName.split(' ')[0]}</div>
-          <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{today.length} active visit{today.length!==1?'s':''} · {nurse?.city||''}</div>
+          <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>{t(lang,'dashboard.goodMorning')}, {nurseName.split(' ')[0]}</div>
+          <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{today.length} {t(lang,'nurse.todayVisits')} · {nurse?.city||''}</div>
         </div>
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:24 }}>
@@ -154,25 +154,29 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
         <DailyRouteCard visits={today.map(formatVisit)} onVisitSelect={(v)=>{ setSelectedVisit(today.find(vv=>vv.id===v.id)); setActive('map'); }} />
       ) : (
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'32px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
-          No active visits. Browse Jobs to find open visits.
+          {t(lang,'dashboard.noVisits')}
         </div>
       )}
       <div style={{ marginTop:16, background:C.warningLight, border:`1px solid #FDE68A`, borderRadius:10, padding:'12px 16px', display:'flex', gap:10, alignItems:'center' }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span style={{ fontSize:13, color:'#92400E' }}>Non-emergency care only. Emergency: call <strong>127</strong></span>
+        <span style={{ fontSize:13, color:'#92400E' }}>{t(lang,'nurse.emergencyWarning')} <strong>127</strong></span>
       </div>
     </div>
   );
 }
 
-function Visits({ setActive, setSelectedVisit, lang='en', visits=[] }) {
+function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusChange }) {
   const tr = (key) => t(lang, key);
   const [filter, setFilter] = useState('all');
   const filtered = filter==='all' ? visits : visits.filter(v=>filter==='upcoming'?!['COMPLETED','CANCELLED'].includes(v.status):v.status==='COMPLETED');
 
+  const filterLabels = lang === 'sq'
+    ? { all:'Të gjitha', upcoming:'Të ardhshme', completed:'Të përfunduara' }
+    : { all:'All', upcoming:'Upcoming', completed:'Completed' };
+
   if (!visits.length) return (
     <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
-      No visits assigned yet. Browse Jobs to find and apply to open visits.
+      {lang === 'sq' ? 'Nuk keni vizita ende. Shfleto Vizitat e Hapura për të gjetur dhe aplikuar.' : 'No visits assigned yet. Browse Jobs to find and apply to open visits.'}
     </div>
   );
 
@@ -181,14 +185,14 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[] }) {
       <div style={{ display:'flex', gap:8, marginBottom:20 }}>
         {['all','upcoming','completed'].map(f => (
           <button key={f} onClick={()=>setFilter(f)} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', borderRadius:99, cursor:'pointer', background:filter===f?C.primary:C.bgWhite, color:filter===f?'#fff':C.textSecondary, border:filter===f?'none':`1px solid ${C.border}` }}>
-            {f.charAt(0).toUpperCase()+f.slice(1)}
+            {filterLabels[f]}
           </button>
         ))}
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
         {filtered.map(v => (
           <VisitLocationCard key={v.id} visit={formatVisit(v)} compact={v.status==='COMPLETED'}
-            onStatusChange={(id,status)=>{}}
+            onStatusChange={onStatusChange || ((id,status)=>{})}
             onComplete={(id)=>{ setSelectedVisit(v); setActive('complete'); }} />
         ))}
       </div>
@@ -196,7 +200,7 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[] }) {
   );
 }
 
-function MapView({ selectedVisit, setActive, setSelectedVisit, visits=[] }) {
+function MapView({ selectedVisit, setActive, setSelectedVisit, visits=[], onStatusChange }) {
   const upcoming = visits.filter(v=>!['COMPLETED','CANCELLED'].includes(v.status));
   const [selected, setSelected] = useState(selectedVisit||upcoming[0]||null);
   return (
@@ -211,7 +215,7 @@ function MapView({ selectedVisit, setActive, setSelectedVisit, visits=[] }) {
         </div>
       )}
       {selected ? (
-        <VisitLocationCard visit={formatVisit(selected)} onStatusChange={(id,status)=>{}} onComplete={(id)=>{ setSelectedVisit(selected); setActive('complete'); }} />
+        <VisitLocationCard visit={formatVisit(selected)} onStatusChange={onStatusChange || ((id,status)=>{})} onComplete={(id)=>{ setSelectedVisit(selected); setActive('complete'); }} />
       ) : (
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
           No active visits to navigate to.
@@ -989,6 +993,14 @@ export default function NursePage({ params }) {
 
   useEffect(() => { loadData(); }, []);
 
+  const handleStatusChange = async (visitId, status) => {
+    try {
+      const apiStatus = status.toUpperCase().replace(/ /g, '_');
+      await api.updateVisitStatus(visitId, apiStatus);
+      setVisits(prev => prev.map(v => v.id === visitId ? { ...v, status: apiStatus } : v));
+    } catch (err) { console.error('Status update error:', err); }
+  };
+
   const handleSave = async (formData) => { await api.saveNurseProfile(formData); };
   const handleComplete = async (formData) => {
     await api.submitNurseOnboarding(formData);
@@ -1062,8 +1074,8 @@ export default function NursePage({ params }) {
             {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
             {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} />}
             {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
-            {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} />}
-            {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} />}
+            {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} />}
+            {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} onStatusChange={handleStatusChange} />}
             {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
             {active==='earnings' && <Earnings lang={lang} nurse={nurse} />}
             {active==='profile' && <NurseProfile lang={lang} nurse={nurse} />}

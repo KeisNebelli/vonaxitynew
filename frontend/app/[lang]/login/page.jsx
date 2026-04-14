@@ -15,8 +15,8 @@ export default function LoginPage({ params }) {
 
   // Inline translations as fallback in case t() fails
   const TR = {
-    en: { title:'Welcome back', noAccount:"Don't have an account?", signUp:'Sign up', email:'Email address', password:'Password', submit:'Sign in', loading:'Signing in...', fill:'Fill' },
-    sq: { title:'Mirë se keni ardhur', noAccount:'Nuk keni llogari?', signUp:'Regjistrohu', email:'Adresa e email-it', password:'Fjalëkalimi', submit:'Hyr', loading:'Duke hyrë...', fill:'Plotëso' },
+    en: { title:'Welcome back', noAccount:"Don't have an account?", signUp:'Sign up', email:'Email address', password:'Password', submit:'Sign in', loading:'Signing in...', fill:'Fill', forgotPassword:'Forgot password?', nonEmergency:'Non-emergency care only. Emergency in Albania:' },
+    sq: { title:'Mirë se keni ardhur', noAccount:'Nuk keni llogari?', signUp:'Regjistrohu', email:'Adresa e email-it', password:'Fjalëkalimi', submit:'Hyr', loading:'Duke hyrë...', fill:'Plotëso', forgotPassword:'Keni harruar fjalëkalimin?', nonEmergency:'Vetëm kujdes jo-urgjent. Urgjencë në Shqipëri:' },
   };
   const tr = (key) => TR[uiLang]?.[key] || TR.en[key] || key;
   const [form, setForm] = useState({ email: '', password: '' });
@@ -68,7 +68,7 @@ export default function LoginPage({ params }) {
             <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('password')}</label>
             <input style={inp} type="password" placeholder="••••••••" required value={form.password} onChange={e=>setForm({...form,password:e.target.value})} />
             <div style={{ textAlign:'right', marginTop:6 }}>
-              <Link href={`/${lang}/forgot-password`} style={{ fontSize:12, color:C.primary, fontWeight:500 }}>Forgot password?</Link>
+              <Link href={`/${lang}/forgot-password`} style={{ fontSize:12, color:C.primary, fontWeight:500 }}>{tr('forgotPassword')}</Link>
             </div>
           </div>
           {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'11px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
@@ -79,7 +79,7 @@ export default function LoginPage({ params }) {
 
 
         <div style={{ marginTop:16, background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:9, padding:'11px 14px', fontSize:12, color:'#92400E' }}>
-          Non-emergency care only. Emergency in Albania: <strong>127</strong>
+          {tr('nonEmergency')} <strong>127</strong>
         </div>
       </div>
     </div>

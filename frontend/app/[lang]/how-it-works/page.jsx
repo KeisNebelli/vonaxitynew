@@ -6,18 +6,12 @@ import { StepIcon, TrustIcon } from '@/components/visuals/StepIcons';
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', bg:'#FAFAF9', bgWhite:'#FFFFFF', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
 
-const TRUST = [
-  { type:'shield', title:'Licensed nurses', sub:'Every nurse holds a valid Albanian nursing license' },
-  { type:'check', title:'Background checked', sub:'Criminal record check before joining Vonaxity' },
-  { type:'heart', title:'Compassionate care', sub:'Trained to work with elderly and vulnerable patients' },
-  { type:'star', title:'Rated by families', sub:'Average rating of 4.8 stars from client families' },
-  { type:'globe', title:'International families', sub:'Supporting diaspora from UK, Italy, Germany & more' },
-  { type:'home', title:'Home visits only', sub:'We come to your loved one. No travel required.' },
-];
+const TRUST_TYPES = ['shield','check','heart','star','globe','home'];
 
 export default function HowItWorksPage({ params }) {
   const lang = params.lang || 'en';
   const steps = t(lang, 'howItWorks.steps');
+  const trustItems = t(lang, 'howItWorks.trust');
 
   return (
     <div style={{ fontFamily:"'Inter',system-ui,sans-serif" }}>
@@ -45,7 +39,7 @@ export default function HowItWorksPage({ params }) {
             <p style={{ fontSize:17, color:'rgba(255,255,255,0.65)', lineHeight:1.75, marginBottom:32, maxWidth:440 }}>{(()=>{const v=t(lang,'howItWorks.subtitle');return v&&v!=='howItWorks.subtitle'?v:lang==='sq'?'Rezervoni online, ne caktojmë infermieren, ju merrni raporte shëndetësore pas çdo vizite.':'Book online, we assign a nurse, you receive health reports after every visit.';})()}</p>
             <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
               <Link href={`/${lang}/signup`}><button style={{ background:'#2563EB', color:'#fff', border:'none', borderRadius:10, padding:'13px 28px', fontSize:14, fontWeight:700, cursor:'pointer', boxShadow:'0 4px 20px rgba(37,99,235,0.4)' }}>{t(lang,'cta.btn1')}</button></Link>
-              <Link href={`/${lang}/pricing`}><button style={{ background:'rgba(255,255,255,0.08)', color:'#fff', border:'1px solid rgba(255,255,255,0.2)', borderRadius:10, padding:'13px 28px', fontSize:14, fontWeight:600, cursor:'pointer' }}>View plans</button></Link>
+              <Link href={`/${lang}/pricing`}><button style={{ background:'rgba(255,255,255,0.08)', color:'#fff', border:'1px solid rgba(255,255,255,0.2)', borderRadius:10, padding:'13px 28px', fontSize:14, fontWeight:600, cursor:'pointer' }}>{t(lang,'howItWorks.viewPlans')}</button></Link>
             </div>
           </div>
 
@@ -161,13 +155,13 @@ export default function HowItWorksPage({ params }) {
           {/* Trust section */}
           <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'40px', marginBottom:40 }}>
             <div style={{ textAlign:'center', marginBottom:36 }}>
-              <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.secondary, background:C.secondaryLight, padding:'5px 12px', borderRadius:99, marginBottom:12 }}>Why trust us</div>
-              <h2 style={{ fontSize:28, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', margin:0 }}>Built on trust, verified at every step</h2>
+              <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.secondary, background:C.secondaryLight, padding:'5px 12px', borderRadius:99, marginBottom:12 }}>{t(lang,'howItWorks.trustTag')}</div>
+              <h2 style={{ fontSize:28, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', margin:0 }}>{t(lang,'howItWorks.trustTitle')}</h2>
             </div>
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:20 }}>
-              {TRUST.map((item,i) => (
+              {Array.isArray(trustItems) && trustItems.map((item,i) => (
                 <div key={i} style={{ display:'flex', gap:14, alignItems:'flex-start' }}>
-                  <TrustIcon type={item.type} size={44} />
+                  <TrustIcon type={TRUST_TYPES[i]} size={44} />
                   <div>
                     <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:4 }}>{item.title}</div>
                     <div style={{ fontSize:12, color:C.textTertiary, lineHeight:1.6 }}>{item.sub}</div>

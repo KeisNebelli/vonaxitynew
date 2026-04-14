@@ -30,7 +30,7 @@ export default function FAQPage({ params }) {
             </div>
           ))}
           <div style={{ marginTop:28, background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:12, padding:'14px 18px', fontSize:13, color:'#92400E', textAlign:'center' }}>
-            Non-emergency care only. Emergency in Albania: <strong>127</strong>
+            {lang === 'sq' ? 'Vetëm kujdes jo-urgjent. Urgjencë në Shqipëri:' : 'Non-emergency care only. Emergency in Albania:'} <strong>127</strong>
           </div>
         </div>
       </section>

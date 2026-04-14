@@ -297,6 +297,33 @@ router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
   }
 });
 
+// PUT /visits/:id/status — nurse updates visit status (ON_THE_WAY, ARRIVED, IN_PROGRESS)
+router.put('/:id/status', ...requireRole('NURSE'), async (req, res) => {
+  try {
+    const { status } = req.body;
+    const allowed = ['ON_THE_WAY', 'ARRIVED', 'IN_PROGRESS', 'ACCEPTED'];
+    if (!allowed.includes(status)) {
+      return res.status(400).json({ error: `Status must be one of: ${allowed.join(', ')}` });
+    }
+    const nurse = await prisma.nurse.findUnique({ where: { userId: req.user.userId } });
+    if (!nurse) return res.status(404).json({ error: 'Nurse not found' });
+    // Verify this visit belongs to this nurse
+    const visit = await prisma.visit.findFirst({ where: { id: req.params.id, nurseId: nurse.id } });
+    if (!visit) return res.status(403).json({ error: 'Visit not found or not assigned to you' });
+    const updated = await prisma.visit.update({
+      where: { id: req.params.id },
+      data: {
+        status,
+        ...(status === 'IN_PROGRESS' ? { startedAt: new Date() } : {}),
+      },
+    });
+    res.json({ success: true, visit: updated });
+  } catch (err) {
+    console.error('Nurse status update error:', err);
+    res.status(500).json({ error: 'Failed to update status' });
+  }
+});
+
 // POST /visits/:id/complete — nurse submits report
 router.post('/:id/complete', ...requireRole('NURSE'), async (req, res) => {
   try {

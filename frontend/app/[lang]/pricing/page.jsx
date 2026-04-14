@@ -75,7 +75,7 @@ export default function PricingPage({ params }) {
           </div>
           <div style={{ marginTop:32, background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:12, padding:'14px 18px', display:'flex', gap:12, alignItems:'center' }}>
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-            <p style={{ fontSize:13, color:'#92400E', margin:0 }}>Non-emergency care only. Emergency in Albania: <strong>127</strong></p>
+            <p style={{ fontSize:13, color:'#92400E', margin:0 }}>{lang==='sq'?'Vetëm kujdes jo-urgjent. Urgjencë në Shqipëri:':'Non-emergency care only. Emergency in Albania:'} <strong>127</strong></p>
           </div>
         </div>
       </section>

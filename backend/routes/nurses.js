@@ -116,6 +116,87 @@ router.put('/me/profile', ...requireRole('NURSE'), async (req, res) => {
   }
 });
 
+// GET /nurses/public — public listing of approved nurses (no auth required)
+router.get('/public', async (req, res) => {
+  try {
+    const nurses = await prisma.nurse.findMany({
+      where: { status: 'APPROVED' },
+      include: {
+        user: { select: { name: true } },
+        reviews: { select: { rating: true }, orderBy: { createdAt: 'desc' } },
+      },
+      orderBy: { totalVisits: 'desc' },
+    });
+    const normalized = nurses.map(n => ({
+      id: n.id,
+      name: n.user?.name || 'Unknown',
+      city: n.city || '',
+      rating: n.rating || 0,
+      totalVisits: n.totalVisits || 0,
+      reviewCount: n.reviews?.length || 0,
+      bio: n.bio || '',
+      specialties: n.specialties ? JSON.parse(n.specialties) : [],
+      services: n.services ? JSON.parse(n.services) : [],
+      languages: n.languages ? JSON.parse(n.languages) : [],
+      availability: n.availability ? JSON.parse(n.availability) : [],
+      experience: n.experience || '',
+      profilePhotoUrl: n.profilePhotoUrl || null,
+      approvedAt: n.approvedAt,
+    }));
+    res.json({ nurses: normalized });
+  } catch (err) {
+    console.error('Get public nurses error:', err);
+    res.status(500).json({ error: 'Failed to fetch nurses' });
+  }
+});
+
+// GET /nurses/public/:id — public single nurse profile (no auth required)
+router.get('/public/:id', async (req, res) => {
+  try {
+    const nurse = await prisma.nurse.findFirst({
+      where: { id: req.params.id, status: 'APPROVED' },
+      include: {
+        user: { select: { name: true, createdAt: true } },
+        reviews: {
+          include: { visit: { include: { relative: { include: { client: { select: { name: true, country: true } } } } } } },
+          orderBy: { createdAt: 'desc' },
+          take: 10,
+        },
+      },
+    });
+    if (!nurse) return res.status(404).json({ error: 'Nurse not found' });
+    res.json({
+      nurse: {
+        id: nurse.id,
+        name: nurse.user?.name || 'Unknown',
+        city: nurse.city || '',
+        rating: nurse.rating || 0,
+        totalVisits: nurse.totalVisits || 0,
+        bio: nurse.bio || '',
+        specialties: nurse.specialties ? JSON.parse(nurse.specialties) : [],
+        services: nurse.services ? JSON.parse(nurse.services) : [],
+        languages: nurse.languages ? JSON.parse(nurse.languages) : [],
+        availability: nurse.availability ? JSON.parse(nurse.availability) : [],
+        experience: nurse.experience || '',
+        licenseNumber: nurse.licenseNumber || '',
+        profilePhotoUrl: nurse.profilePhotoUrl || null,
+        approvedAt: nurse.approvedAt,
+        joinedAt: nurse.user?.createdAt,
+        reviews: nurse.reviews.map(r => ({
+          rating: r.rating,
+          comment: r.comment || '',
+          clientName: r.visit?.relative?.client?.name || 'Client',
+          clientCountry: r.visit?.relative?.client?.country || '',
+          date: new Date(r.createdAt).toLocaleDateString('en-GB', { month: 'short', day: 'numeric' }),
+        })),
+      },
+    });
+  } catch (err) {
+    console.error('Get public nurse error:', err);
+    res.status(500).json({ error: 'Failed to fetch nurse' });
+  }
+});
+
 // GET /nurses/:id — admin gets single nurse with full details
 router.get('/:id', ...requireRole('ADMIN'), async (req, res) => {
   try {

@@ -76,7 +76,12 @@ export const api = {
   getApplicants: (visitId) => apiFetch(`/visits/${visitId}/applicants`),
   selectNurse: (visitId, nurseId) => apiFetch(`/visits/${visitId}/select/${nurseId}`, { method: 'POST' }),
   updateVisit: (id, body) => apiFetch(`/visits/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  updateVisitStatus: (id, status) => apiFetch(`/visits/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
   completeVisit: (id, body) => apiFetch(`/visits/${id}/complete`, { method: 'POST', body: JSON.stringify(body) }),
+
+  // Public nurses (no auth)
+  getPublicNurses: () => apiFetch('/nurses/public'),
+  getPublicNurse: (id) => apiFetch(`/nurses/public/${id}`),
 
   // Nurses
   getNurses: () => apiFetch('/nurses'),
