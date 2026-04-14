@@ -15,16 +15,17 @@ const SERVICES = ['Blood Pressure Check','Glucose Monitoring','Vitals Check','Bl
 
 const makeNAV = (tr) => [
   { id:'overview', label:tr('dashboard.overview'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
-  { id:'book', label:'Book Visit', icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> },
+  { id:'book', label:tr('dashboard.bookVisit'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> },
   { id:'visits', label:tr('dashboard.myVisits'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
   { id:'subscription', label:tr('dashboard.subscription'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
   { id:'settings', label:tr('dashboard.settings'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
 ];
 
-function Badge({ s }) {
+function Badge({ s, lang='en' }) {
   const m = { COMPLETED:[C.secondaryLight,'#059669'], PENDING:[C.primaryLight,C.primary], ACCEPTED:[C.secondaryLight,C.secondary], CANCELLED:[C.bgSubtle,C.textTertiary], UNASSIGNED:[C.warningLight,C.warning], REJECTED:[C.errorLight,C.error] };
   const [bg,col] = m[s]||[C.bgSubtle,C.textTertiary];
-  return <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:bg, color:col, textTransform:'uppercase', whiteSpace:'nowrap' }}>{s}</span>;
+  const label = t(lang,'visits.status.'+s) || s;
+  return <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:bg, color:col, textTransform:'uppercase', whiteSpace:'nowrap' }}>{label}</span>;
 }
 
 function Overview({ user, visits, relative, lang, onBook }) {
@@ -42,23 +43,23 @@ function Overview({ user, visits, relative, lang, onBook }) {
             <svg width="22" height="22" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
           <div style={{ flex:1, minWidth:160 }}>
-            <div style={{ fontSize:10, fontWeight:700, opacity:.65, letterSpacing:'1px', textTransform:'uppercase', marginBottom:4 }}>Next Visit</div>
+            <div style={{ fontSize:10, fontWeight:700, opacity:.65, letterSpacing:'1px', textTransform:'uppercase', marginBottom:4 }}>{tr('dashboard.nextVisit')}</div>
             <div style={{ fontSize:16, fontWeight:700, marginBottom:3 }}>{new Date(next.scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} at {new Date(next.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>
-            <div style={{ fontSize:12, opacity:.8 }}>{next.nurse?.user?.name||'Nurse TBC'} · {next.serviceType}</div>
+            <div style={{ fontSize:12, opacity:.8 }}>{next.nurse?.user?.name||tr('dashboard.nurseTBCLabel')} · {next.serviceType}</div>
           </div>
-          <Badge s={next.status} />
+          <Badge s={next.status} lang={lang} />
         </div>
       ) : (
         <div style={{ background:C.primaryLight, border:`1px solid rgba(37,99,235,0.15)`, borderRadius:16, padding:'20px 22px', marginBottom:20, display:'flex', alignItems:'center', justifyContent:'space-between', gap:16 }}>
           <div>
-            <div style={{ fontSize:14, fontWeight:700, color:C.primary, marginBottom:4 }}>No upcoming visits</div>
-            <div style={{ fontSize:13, color:C.textSecondary }}>Book a nurse visit for your loved one in Albania.</div>
+            <div style={{ fontSize:14, fontWeight:700, color:C.primary, marginBottom:4 }}>{tr('dashboard.noUpcomingVisits')}</div>
+            <div style={{ fontSize:13, color:C.textSecondary }}>{tr('dashboard.bookNurseDesc')}</div>
           </div>
-          <button onClick={onBook} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'11px 20px', fontSize:13, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', fontFamily:F }}>Book a visit →</button>
+          <button onClick={onBook} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'11px 20px', fontSize:13, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', fontFamily:F }}>{tr('dashboard.bookVisitBtn')}</button>
         </div>
       )}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))', gap:12, marginBottom:20 }}>
-        {[['Plan',planLabel,C.primary,''],[tr('dashboard.visitsUsed'),`${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`,C.textPrimary,'this month'],[tr('dashboard.completed'),completed.length,C.secondary,'total'],[tr('dashboard.lastBP'),last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—',last?.bpSystolic?C.warning:C.textTertiary,last?.bpSystolic?'mmHg':'']].map(([label,val,color,sub2])=>(
+        {[[tr('dashboard.plan'),planLabel,C.primary,''],[tr('dashboard.visitsUsed'),`${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`,C.textPrimary,tr('dashboard.thisMonth')],[tr('dashboard.completed'),completed.length,C.secondary,tr('dashboard.total')],[tr('dashboard.lastBP'),last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—',last?.bpSystolic?C.warning:C.textTertiary,last?.bpSystolic?'mmHg':'']].map(([label,val,color,sub2])=>(
           <div key={label} style={{ background:C.bgWhite, borderRadius:13, border:`1px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM }}>
             <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:24, fontWeight:800, color, letterSpacing:'-0.5px', lineHeight:1 }}>{val}</div>
@@ -69,8 +70,8 @@ function Overview({ user, visits, relative, lang, onBook }) {
       {relative && (
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
           <div style={{ padding:'14px 18px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-            <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>Loved one receiving care</div>
-            <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>Active</span>
+            <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>{tr('dashboard.lovedOne')}</div>
+            <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>{tr('dashboard.activeCare')}</span>
           </div>
           {[[tr('dashboard.fullName'),relative.name],[tr('dashboard.city'),relative.city],[tr('dashboard.address'),relative.address||'—'],[tr('dashboard.age'),relative.age?`${relative.age} years`:'—'],[tr('dashboard.assignedNurse'),next?.nurse?.user?.name||tr('dashboard.beingAssigned')]].map(([k,v])=>(
             <div key={k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'11px 18px', borderBottom:`1px solid ${C.borderSubtle}` }}>
@@ -84,7 +85,8 @@ function Overview({ user, visits, relative, lang, onBook }) {
   );
 }
 
-function BookVisit({ relative, subscription, onSuccess, onCancel }) {
+function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const [form, setForm] = useState({ serviceType: SERVICES[0], scheduledAt: '', notes: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -93,14 +95,14 @@ function BookVisit({ relative, subscription, onSuccess, onCancel }) {
   const [submitted, setSubmitted] = useState(false);
   const handleSubmit = async () => {
     if (loading || submitted) return; // prevent double submit
-    if (!form.scheduledAt) return setError('Please select a date and time.');
-    if (!relative) return setError('You need to add a loved one first in Settings.');
+    if (!form.scheduledAt) return setError(tr('dashboard.bookSelectDate'));
+    if (!relative) return setError(tr('dashboard.bookAddLovedFirst'));
     setLoading(true); setSubmitted(true); setError('');
     try {
       await api.createVisit({ relativeId: relative.id, serviceType: form.serviceType, scheduledAt: form.scheduledAt, notes: form.notes });
       onSuccess();
     } catch (err) {
-      setError(err.message || 'Failed to book visit. Please try again.');
+      setError(err.message || tr('dashboard.bookFailed'));
       setSubmitted(false); // allow retry on error
     } finally { setLoading(false); }
   };
@@ -109,13 +111,13 @@ function BookVisit({ relative, subscription, onSuccess, onCancel }) {
     <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:28, boxShadow:SSM, maxWidth:520 }}>
       <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24 }}>
         <div>
-          <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.3px' }}>Book a nurse visit</div>
+          <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.3px' }}>{tr('dashboard.bookVisitTitle')}</div>
           <div style={{ fontSize:13, color:C.textSecondary, marginTop:3 }}>
-            {relative ? `For ${relative.name} in ${relative.city}` : 'Add a loved one in Settings first'}
+            {relative ? `${tr('dashboard.bookForPrefix')} ${relative.name} ${tr('dashboard.bookIn')} ${relative.city}` : tr('dashboard.bookAddLoved')}
           </div>
           {subscription && (
             <div style={{ fontSize:12, fontWeight:600, marginTop:4, color: subscription.visitsUsed >= subscription.visitsPerMonth ? '#DC2626' : '#059669' }}>
-              {subscription.visitsPerMonth - subscription.visitsUsed} visit{subscription.visitsPerMonth - subscription.visitsUsed !== 1 ? 's' : ''} remaining this month
+              {subscription.visitsPerMonth - subscription.visitsUsed} {subscription.visitsPerMonth - subscription.visitsUsed !== 1 ? tr('dashboard.bookVisitsLeftPlural') : tr('dashboard.bookVisitsLeft')}
             </div>
           )}
         </div>
@@ -123,39 +125,40 @@ function BookVisit({ relative, subscription, onSuccess, onCancel }) {
       </div>
 
       <div style={{ marginBottom:16 }}>
-        <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>Service type</label>
+        <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>{tr('dashboard.bookServiceType')}</label>
         <select style={inp} value={form.serviceType} onChange={e=>setForm({...form, serviceType:e.target.value})}>
           {SERVICES.map(s=><option key={s} value={s}>{s}</option>)}
         </select>
       </div>
 
       <div style={{ marginBottom:16 }}>
-        <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>Date & time</label>
+        <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>{tr('dashboard.bookDateTime')}</label>
         <input type="datetime-local" style={inp} value={form.scheduledAt} onChange={e=>setForm({...form, scheduledAt:e.target.value})} min={new Date().toISOString().slice(0,16)} />
       </div>
 
       <div style={{ marginBottom:24 }}>
-        <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>Notes for the nurse (optional)</label>
-        <textarea style={{ ...inp, height:90, resize:'vertical' }} value={form.notes} onChange={e=>setForm({...form, notes:e.target.value})} placeholder="Any specific health concerns, medication info, access instructions..." />
+        <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>{tr('dashboard.bookNotes')} <span style={{ fontWeight:400, color:C.textTertiary }}>({tr('dashboard.bookNotesOpt')})</span></label>
+        <textarea style={{ ...inp, height:90, resize:'vertical' }} value={form.notes} onChange={e=>setForm({...form, notes:e.target.value})} placeholder={tr('dashboard.bookNotesPh')} />
       </div>
 
       {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
 
       <div style={{ background:C.warningLight, border:'1px solid #FDE68A', borderRadius:9, padding:'10px 14px', fontSize:12, color:'#92400E', marginBottom:20 }}>
-        After booking, approved nurses in {relative?.city||'your city'} will apply. You choose who gets the job.
+        {tr('dashboard.bookAfterInfo').replace('{city}', relative?.city || '')}
       </div>
 
       <div style={{ display:'flex', gap:10 }}>
-        <button onClick={onCancel} style={{ flex:1, background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:10, padding:'12px', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:F }}>Cancel</button>
+        <button onClick={onCancel} style={{ flex:1, background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:10, padding:'12px', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:F }}>{tr('dashboard.cancel')}</button>
         <button onClick={handleSubmit} disabled={loading||!relative||(subscription&&subscription.visitsUsed>=subscription.visitsPerMonth)} style={{ flex:2, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:700, cursor:(loading||!relative||(subscription&&subscription.visitsUsed>=subscription.visitsPerMonth))?'not-allowed':'pointer', opacity:(loading||!relative||(subscription&&subscription.visitsUsed>=subscription.visitsPerMonth))?0.7:1, fontFamily:F }}>
-          {loading ? 'Booking...' : 'Book visit →'}
+          {loading ? tr('dashboard.booking') : tr('dashboard.bookVisitBtn')}
         </button>
       </div>
     </div>
   );
 }
 
-function Applicants({ visitId, visitInfo, onBack, onSelect }) {
+function Applicants({ visitId, visitInfo, onBack, onSelect, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const [applicants, setApplicants] = useState([]);
   const [loading, setLoading] = useState(true);
   const [selecting, setSelecting] = useState(null);
@@ -164,7 +167,7 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
   useEffect(() => {
     api.getApplicants(visitId)
       .then(d => setApplicants(d.applications||[]))
-      .catch(() => setError('Failed to load applicants'))
+      .catch(() => setError(tr('dashboard.failedLoadApplicants')))
       .finally(() => setLoading(false));
   }, [visitId]);
 
@@ -174,7 +177,7 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
       await api.selectNurse(visitId, nurseId);
       onSelect();
     } catch (err) {
-      setError(err.message || 'Failed to select nurse');
+      setError(err.message || tr('dashboard.failedSelectNurse'));
       setSelecting(null);
     }
   };
@@ -183,7 +186,7 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
     <div>
       <button onClick={onBack} style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:C.textSecondary, background:'transparent', border:'none', cursor:'pointer', marginBottom:20, padding:0, fontWeight:500, fontFamily:F }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        Back to visits
+        {tr('dashboard.backToVisits')}
       </button>
 
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'16px 20px', marginBottom:20, boxShadow:SSM }}>
@@ -191,13 +194,13 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
         <div style={{ fontSize:12, color:C.textTertiary, marginTop:3 }}>{visitInfo?.scheduledAt ? new Date(visitInfo.scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : ''}</div>
       </div>
 
-      {loading && <div style={{ textAlign:'center', padding:40, color:C.textTertiary, fontSize:14 }}>Loading applicants...</div>}
+      {loading && <div style={{ textAlign:'center', padding:40, color:C.textTertiary, fontSize:14 }}>{tr('dashboard.applicantsLoading')}</div>}
       {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
       {!loading && applicants.length === 0 && (
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'40px 24px', textAlign:'center' }}>
           <div style={{ fontSize:32, marginBottom:12 }}>⏳</div>
-          <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:6 }}>No applicants yet</div>
-          <div style={{ fontSize:13, color:C.textSecondary }}>Nurses in the area will apply soon. Check back in a few hours.</div>
+          <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:6 }}>{tr('dashboard.noApplicants')}</div>
+          <div style={{ fontSize:13, color:C.textSecondary }}>{tr('dashboard.noApplicantsSub')}</div>
         </div>
       )}
       {applicants.map(a => (
@@ -213,13 +216,13 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
               </div>
               <div>
                 <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{a.nurse.name}</div>
-                <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{a.nurse.city} · License: {a.nurse.licenseNumber||'Verified'}</div>
+                <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{a.nurse.city} · {tr('dashboard.licenseLabel')}: {a.nurse.licenseNumber||'Verified'}</div>
               </div>
             </div>
-            <Badge s={a.status} />
+            <Badge s={a.status} lang={lang} />
           </div>
           <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:8, marginBottom:16 }}>
-            {[['Rating', a.nurse.rating>0?`${a.nurse.rating}/5`:'New',''],['Visits', a.nurse.totalVisits||0,'completed'],['Experience', a.nurse.experience||'—','']].map(([k,v,sub])=>(
+            {[[tr('dashboard.ratingLabel'), a.nurse.rating>0?`${a.nurse.rating}/5`:tr('dashboard.newNurse'),''],[tr('dashboard.visitsApplicantLabel'), a.nurse.totalVisits||0,tr('dashboard.completedSub')],[tr('dashboard.experienceLabel'), a.nurse.experience||'—','']].map(([k,v,sub])=>(
               <div key={k} style={{ background:C.bg, borderRadius:9, padding:'10px 12px' }}>
                 <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase' }}>{k}</div>
                 <div style={{ fontSize:16, fontWeight:800, color:C.textPrimary, marginTop:2 }}>{v}</div>
@@ -231,10 +234,10 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
           {a.message && <div style={{ fontSize:13, color:C.textSecondary, fontStyle:'italic', marginBottom:16 }}>"{a.message}"</div>}
           {a.status === 'PENDING' && (
             <button onClick={()=>handleSelect(a.nurse.id)} disabled={selecting===a.nurse.id} style={{ width:'100%', background:C.secondary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:700, cursor:selecting===a.nurse.id?'not-allowed':'pointer', opacity:selecting===a.nurse.id?0.7:1, fontFamily:F }}>
-              {selecting===a.nurse.id ? 'Selecting...' : `Select ${a.nurse.name} →`}
+              {selecting===a.nurse.id ? tr('dashboard.selecting') : `${a.nurse.name} →`}
             </button>
           )}
-          {a.status === 'ACCEPTED' && <div style={{ background:C.secondaryLight, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.secondary, fontWeight:600, textAlign:'center' }}>Nurse selected</div>}
+          {a.status === 'ACCEPTED' && <div style={{ background:C.secondaryLight, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.secondary, fontWeight:600, textAlign:'center' }}>{tr('dashboard.nurseSelected')}</div>}
         </div>
       ))}
     </div>
@@ -243,7 +246,8 @@ function Applicants({ visitId, visitInfo, onBack, onSelect }) {
 
 
 // ── Edit Visit Modal ────────────────────────────────────────────────────────
-function EditVisit({ visit, onSave, onCancel }) {
+function EditVisit({ visit, onSave, onCancel, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const SERVICES = ['Blood Pressure Check','Glucose Monitoring','Vitals Monitoring','Blood Work Collection','Welfare Check','Post-surgical Care','Medication Administration','General Nursing'];
   const [form, setForm] = useState({
     serviceType: visit.serviceType || '',
@@ -255,40 +259,40 @@ function EditVisit({ visit, onSave, onCancel }) {
   const inp = { width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:F, boxSizing:'border-box' };
 
   const handleSave = async () => {
-    if (!form.serviceType || !form.scheduledAt) return setError('Service type and date are required.');
+    if (!form.serviceType || !form.scheduledAt) return setError(tr('dashboard.editRequired'));
     setLoading(true); setError('');
     try {
       await api.editVisit(visit.id, form);
       onSave();
-    } catch (err) { setError(err.message || 'Failed to save changes.'); }
+    } catch (err) { setError(err.message || tr('dashboard.editFailed')); }
     finally { setLoading(false); }
   };
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:9000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>
       <div style={{ background:C.bgWhite, borderRadius:20, padding:28, maxWidth:480, width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.15)' }}>
-        <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:4 }}>Edit visit</div>
-        <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>Only unassigned visits can be edited.</div>
+        <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:4 }}>{tr('dashboard.editVisitTitle')}</div>
+        <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>{tr('dashboard.editVisitSub')}</div>
         <div style={{ marginBottom:16 }}>
-          <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Service type</label>
+          <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('dashboard.bookServiceType')}</label>
           <select value={form.serviceType} onChange={e=>setForm(f=>({...f,serviceType:e.target.value}))} style={{...inp}}>
-            <option value="">Select a service</option>
+            <option value="">{tr('dashboard.selectService')}</option>
             {SERVICES.map(s=><option key={s} value={s}>{s}</option>)}
           </select>
         </div>
         <div style={{ marginBottom:16 }}>
-          <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Date & time</label>
+          <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('dashboard.bookDateTime')}</label>
           <input type="datetime-local" value={form.scheduledAt} onChange={e=>setForm(f=>({...f,scheduledAt:e.target.value}))} style={inp} />
         </div>
         <div style={{ marginBottom:24 }}>
-          <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>Notes for nurse</label>
-          <textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} placeholder="Any special instructions..." style={{...inp, minHeight:80, resize:'vertical'}} />
+          <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('dashboard.notesForNurse')}</label>
+          <textarea value={form.notes} onChange={e=>setForm(f=>({...f,notes:e.target.value}))} placeholder={tr('dashboard.specialInstructions')} style={{...inp, minHeight:80, resize:'vertical'}} />
         </div>
         {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
         <div style={{ display:'flex', gap:10 }}>
-          <button onClick={onCancel} style={{ flex:1, padding:'12px', borderRadius:10, border:`1px solid ${C.border}`, background:'transparent', fontSize:14, fontWeight:600, cursor:'pointer', color:C.textSecondary }}>Cancel</button>
+          <button onClick={onCancel} style={{ flex:1, padding:'12px', borderRadius:10, border:`1px solid ${C.border}`, background:'transparent', fontSize:14, fontWeight:600, cursor:'pointer', color:C.textSecondary }}>{tr('dashboard.cancel')}</button>
           <button onClick={handleSave} disabled={loading} style={{ flex:2, padding:'12px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer', opacity:loading?0.7:1, fontFamily:F }}>
-            {loading ? 'Saving...' : 'Save changes'}
+            {loading ? tr('dashboard.saving') : tr('dashboard.saveChanges')}
           </button>
         </div>
       </div>
@@ -297,7 +301,8 @@ function EditVisit({ visit, onSave, onCancel }) {
 }
 
 // ── Delete Confirmation Modal ────────────────────────────────────────────────
-function DeleteConfirm({ visit, onConfirm, onCancel }) {
+function DeleteConfirm({ visit, onConfirm, onCancel, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
 
@@ -306,7 +311,7 @@ function DeleteConfirm({ visit, onConfirm, onCancel }) {
     try {
       await api.deleteVisit(visit.id);
       onConfirm();
-    } catch (err) { setError(err.message || 'Failed to delete visit.'); setLoading(false); }
+    } catch (err) { setError(err.message || tr('dashboard.deleteFailed')); setLoading(false); }
   };
 
   return (
@@ -315,16 +320,16 @@ function DeleteConfirm({ visit, onConfirm, onCancel }) {
         <div style={{ width:48, height:48, borderRadius:'50%', background:C.errorLight, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:16 }}>
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
         </div>
-        <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:8 }}>Delete this visit?</div>
+        <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:8 }}>{tr('dashboard.deleteVisitTitle')}</div>
         <div style={{ fontSize:14, color:C.textSecondary, marginBottom:6 }}>
           <strong>{visit.serviceType}</strong> — {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
         </div>
-        <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>This cannot be undone. The visit slot will be removed.</div>
+        <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>{tr('dashboard.deleteCannotUndo')}</div>
         {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
         <div style={{ display:'flex', gap:10 }}>
-          <button onClick={onCancel} style={{ flex:1, padding:'12px', borderRadius:10, border:`1px solid ${C.border}`, background:'transparent', fontSize:14, fontWeight:600, cursor:'pointer', color:C.textSecondary }}>Cancel</button>
+          <button onClick={onCancel} style={{ flex:1, padding:'12px', borderRadius:10, border:`1px solid ${C.border}`, background:'transparent', fontSize:14, fontWeight:600, cursor:'pointer', color:C.textSecondary }}>{tr('dashboard.cancel')}</button>
           <button onClick={handleDelete} disabled={loading} style={{ flex:1, padding:'12px', borderRadius:10, border:'none', background:C.error, color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer', opacity:loading?0.7:1, fontFamily:F }}>
-            {loading ? 'Deleting...' : 'Delete'}
+            {loading ? tr('dashboard.deleting') : tr('dashboard.delete')}
           </button>
         </div>
       </div>
@@ -372,58 +377,58 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
               <div style={{ fontSize:12, color:C.textTertiary }}>{new Date(v.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · {v.nurse?.user?.name||tr('visits.nurseTBC')}</div>
             </div>
             <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 }}>
-              <Badge s={v.status}/>
+              <Badge s={v.status} lang={lang}/>
               <div style={{ display:'flex', gap:6 }}>
                 {canEdit(v) && (
-                  <button onClick={()=>setEditing(v)} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:6, border:`1px solid ${C.border}`, background:'transparent', cursor:'pointer', color:C.textSecondary }}>Edit</button>
+                  <button onClick={()=>setEditing(v)} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:6, border:`1px solid ${C.border}`, background:'transparent', cursor:'pointer', color:C.textSecondary }}>{tr('dashboard.edit')}</button>
                 )}
                 {canDelete(v) && (
-                  <button onClick={()=>setDeleting(v)} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:6, border:`1px solid #FECACA`, background:C.errorLight, cursor:'pointer', color:C.error }}>Delete</button>
+                  <button onClick={()=>setDeleting(v)} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:6, border:`1px solid #FECACA`, background:C.errorLight, cursor:'pointer', color:C.error }}>{tr('dashboard.delete')}</button>
                 )}
               </div>
             </div>
           </div>
           {v.bpSystolic && (
             <div style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 16px', display:'flex', gap:20, flexWrap:'wrap', marginBottom:8 }}>
-              <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Blood Pressure</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.bpSystolic}/{v.bpDiastolic} <span style={{ fontSize:10, color:C.textTertiary }}>mmHg</span></div></div>
-              {v.glucose && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>Glucose</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.glucose} <span style={{ fontSize:10, color:C.textTertiary }}>mmol/L</span></div></div>}
+              <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'visits.bloodPressure')}</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.bpSystolic}/{v.bpDiastolic} <span style={{ fontSize:10, color:C.textTertiary }}>mmHg</span></div></div>
+              {v.glucose && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'visits.glucose')}</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.glucose} <span style={{ fontSize:10, color:C.textTertiary }}>mmol/L</span></div></div>}
               {v.nurseNotes && <div style={{ width:'100%', borderTop:`1px solid ${C.border}`, paddingTop:8, marginTop:4, fontSize:12, color:C.textSecondary, fontStyle:'italic' }}>"{v.nurseNotes}"</div>}
             </div>
           )}
           {v.status === 'UNASSIGNED' && (
             <button onClick={()=>onViewApplicants(v)} style={{ width:'100%', background:C.primaryLight, color:C.primary, border:`1px solid rgba(37,99,235,0.2)`, borderRadius:9, padding:'10px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, marginTop:4 }}>
-              View applicants →
+              {tr('dashboard.viewApplicants')}
             </button>
           )}
           {v.status === 'COMPLETED' && !v.review && !reviewed[v.id] && (
             reviewing === v.id ? (
               <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:12, marginTop:8 }}>
-                <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>Rate your nurse</div>
+                <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>{tr('dashboard.rateNurse')}</div>
                 <div style={{ display:'flex', gap:4, marginBottom:10 }}>
                   {[1,2,3,4,5].map(s => (
                     <button key={s} onClick={()=>setRating(s)} style={{ fontSize:24, background:'none', border:'none', cursor:'pointer', color:s<=rating?'#F59E0B':'#D1D5DB', padding:'0 2px' }}>&#9733;</button>
                   ))}
                 </div>
-                <input value={comment} onChange={e=>setComment(e.target.value)} placeholder="Leave a comment (optional)" style={{ width:'100%', padding:'9px 12px', borderRadius:8, border:`1px solid ${C.border}`, fontSize:13, fontFamily:F, marginBottom:10, boxSizing:'border-box' }} />
+                <input value={comment} onChange={e=>setComment(e.target.value)} placeholder={tr('dashboard.leaveComment')} style={{ width:'100%', padding:'9px 12px', borderRadius:8, border:`1px solid ${C.border}`, fontSize:13, fontFamily:F, marginBottom:10, boxSizing:'border-box' }} />
                 <div style={{ display:'flex', gap:8 }}>
-                  <button onClick={()=>setReviewing(null)} style={{ flex:1, padding:'9px', borderRadius:8, border:`1px solid ${C.border}`, background:'transparent', fontSize:13, cursor:'pointer', color:C.textSecondary }}>Cancel</button>
-                  <button onClick={()=>submitReview(v.id)} disabled={!rating||submitting} style={{ flex:2, padding:'9px', borderRadius:8, border:'none', background:C.primary, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity:!rating||submitting?0.6:1 }}>{submitting?'Submitting...':'Submit review'}</button>
+                  <button onClick={()=>setReviewing(null)} style={{ flex:1, padding:'9px', borderRadius:8, border:`1px solid ${C.border}`, background:'transparent', fontSize:13, cursor:'pointer', color:C.textSecondary }}>{tr('dashboard.cancel')}</button>
+                  <button onClick={()=>submitReview(v.id)} disabled={!rating||submitting} style={{ flex:2, padding:'9px', borderRadius:8, border:'none', background:C.primary, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity:!rating||submitting?0.6:1 }}>{submitting?tr('dashboard.submitting'):tr('dashboard.submitReview')}</button>
                 </div>
               </div>
             ) : (
               <button onClick={()=>{ setReviewing(v.id); setRating(0); setComment(''); }} style={{ marginTop:8, fontSize:12, fontWeight:600, color:C.warning, background:C.warningLight, border:`1px solid #FDE68A`, borderRadius:8, padding:'7px 14px', cursor:'pointer' }}>
-                &#9733; Rate this visit
+                &#9733; {tr('dashboard.rateVisit')}
               </button>
             )
           )}
           {(v.review || reviewed[v.id]) && v.status === 'COMPLETED' && (
-            <div style={{ marginTop:8, fontSize:12, color:C.secondary, fontWeight:600 }}>&#9733; Reviewed</div>
+            <div style={{ marginTop:8, fontSize:12, color:C.secondary, fontWeight:600 }}>&#9733; {tr('dashboard.reviewed')}</div>
           )}
         </div>
       ))}
     </div>
-    {editing && <EditVisit visit={editing} onSave={()=>{ setEditing(null); onRefresh?.(); }} onCancel={()=>setEditing(null)} />}
-    {deleting && <DeleteConfirm visit={deleting} onConfirm={()=>{ setDeleting(null); onRefresh?.(); }} onCancel={()=>setDeleting(null)} />}
+    {editing && <EditVisit visit={editing} onSave={()=>{ setEditing(null); onRefresh?.(); }} onCancel={()=>setEditing(null)} lang={lang} />}
+    {deleting && <DeleteConfirm visit={deleting} onConfirm={()=>{ setDeleting(null); onRefresh?.(); }} onCancel={()=>setDeleting(null)} lang={lang} />}
     </>
   );
 }
@@ -435,6 +440,7 @@ const PLANS_INFO = [
 ];
 
 function SubscriptionSection({ userData, lang }) {
+  const tr = (key) => t(lang, key);
   const [loading, setLoading] = useState(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [error, setError] = useState('');
@@ -450,7 +456,7 @@ function SubscriptionSection({ userData, lang }) {
       const data = await api.createCheckout(planId);
       if (data.url) window.location.href = data.url;
     } catch (err) {
-      setError(err.message || 'Failed to start checkout. Please try again.');
+      setError(err.message || tr('dashboard.checkoutFailed'));
     } finally { setLoading(null); }
   };
 
@@ -460,7 +466,7 @@ function SubscriptionSection({ userData, lang }) {
       const data = await api.createPortal();
       if (data.url) window.location.href = data.url;
     } catch (err) {
-      setError(err.message || 'Failed to open billing portal.');
+      setError(err.message || tr('dashboard.portalFailed'));
     } finally { setPortalLoading(false); }
   };
 
@@ -470,17 +476,17 @@ function SubscriptionSection({ userData, lang }) {
       <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:24, marginBottom:24, boxShadow:SSM }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', flexWrap:'wrap', gap:12 }}>
           <div>
-            <div style={{ fontSize:13, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:6 }}>Current plan</div>
-            <div style={{ fontSize:22, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px' }}>{currentPlan ? currentPlan.charAt(0).toUpperCase()+currentPlan.slice(1) : 'Trial'}</div>
+            <div style={{ fontSize:13, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:6 }}>{tr('dashboard.currentPlan')}</div>
+            <div style={{ fontSize:22, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px' }}>{currentPlan ? currentPlan.charAt(0).toUpperCase()+currentPlan.slice(1) : tr('dashboard.trialLabel')}</div>
             <div style={{ fontSize:13, color:C.textSecondary, marginTop:4 }}>
-              {visitsTotal > 0 ? `${visitsUsed}/${visitsTotal} visits used this month` : '7-day free trial'}
+              {visitsTotal > 0 ? `${visitsUsed}/${visitsTotal} ${tr('dashboard.visitsUsedMonth')}` : tr('dashboard.freeTrial')}
             </div>
           </div>
           <div style={{ display:'flex', gap:8, alignItems:'center' }}>
             <span style={{ fontSize:12, fontWeight:700, padding:'4px 12px', borderRadius:99, background:status==='ACTIVE'?C.secondaryLight:status==='TRIAL'?C.purpleLight:C.warningLight, color:status==='ACTIVE'?C.secondary:status==='TRIAL'?C.purple:C.warning }}>{status}</span>
             {sub?.stripeSubId && (
               <button onClick={handlePortal} disabled={portalLoading} style={{ fontSize:13, fontWeight:600, padding:'8px 16px', borderRadius:9, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.textSecondary }}>
-                {portalLoading ? 'Opening...' : 'Manage billing'}
+                {portalLoading ? tr('dashboard.opening') : tr('dashboard.manageBilling')}
               </button>
             )}
           </div>
@@ -496,28 +502,28 @@ function SubscriptionSection({ userData, lang }) {
 
       {/* Plan cards */}
       <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>
-        {currentPlan ? 'Change plan' : 'Choose a plan'}
+        {currentPlan ? tr('dashboard.changePlan') : tr('dashboard.choosePlan')}
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:12 }}>
         {PLANS_INFO.map(p => (
           <div key={p.id} style={{ background:C.bgWhite, borderRadius:14, border:`2px solid ${p.id===currentPlan?C.primary:p.popular?'rgba(37,99,235,0.2)':C.border}`, padding:20, position:'relative' }}>
-            {p.popular && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.primary, color:'#fff', whiteSpace:'nowrap' }}>MOST POPULAR</div>}
-            {p.id===currentPlan && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondary, color:'#fff', whiteSpace:'nowrap' }}>CURRENT</div>}
+            {p.popular && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.primary, color:'#fff', whiteSpace:'nowrap' }}>{tr('dashboard.mostPopular')}</div>}
+            {p.id===currentPlan && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondary, color:'#fff', whiteSpace:'nowrap' }}>{tr('dashboard.currentBadge')}</div>}
             <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:4 }}>{p.name}</div>
-            <div style={{ fontSize:24, fontWeight:800, color:C.primary, letterSpacing:'-0.5px', marginBottom:4 }}>{p.price}<span style={{ fontSize:13, fontWeight:500, color:C.textTertiary }}>/mo</span></div>
+            <div style={{ fontSize:24, fontWeight:800, color:C.primary, letterSpacing:'-0.5px', marginBottom:4 }}>{p.price}<span style={{ fontSize:13, fontWeight:500, color:C.textTertiary }}>{tr('dashboard.perMonth')}</span></div>
             <div style={{ fontSize:13, color:C.textSecondary, marginBottom:16, lineHeight:1.5 }}>{p.desc}</div>
             <button
               onClick={()=>handleCheckout(p.id)}
               disabled={loading===p.id || p.id===currentPlan}
               style={{ width:'100%', padding:'10px', borderRadius:9, border:'none', background:p.id===currentPlan?C.bgSubtle:C.primary, color:p.id===currentPlan?C.textTertiary:'#fff', fontSize:13, fontWeight:700, cursor:p.id===currentPlan?'not-allowed':'pointer', opacity:loading===p.id?0.7:1, fontFamily:F }}
             >
-              {loading===p.id ? 'Loading...' : p.id===currentPlan ? 'Current plan' : 'Select →'}
+              {loading===p.id ? tr('dashboard.loadingPlan') : p.id===currentPlan ? tr('dashboard.currentPlanBtn') : tr('dashboard.selectPlanBtn')}
             </button>
           </div>
         ))}
       </div>
       <div style={{ marginTop:16, fontSize:12, color:C.textTertiary, textAlign:'center' }}>
-        Secure payments by Stripe · Cancel anytime · 7-day free trial on all plans
+        {tr('dashboard.stripeInfo')}
       </div>
     </div>
   );
@@ -538,7 +544,7 @@ export default function Dashboard({ params }) {
   const [loading, setLoading] = useState(true);
   const [viewingApplicants, setViewingApplicants] = useState(null); // visit object
 
-  const TITLES = { overview:tr('dashboard.title'), book:'Book a Visit', visits:tr('dashboard.myVisits'), subscription:tr('dashboard.subscription'), settings:tr('dashboard.settings') };
+  const TITLES = { overview:tr('dashboard.title'), book:tr('dashboard.bookVisitTitle'), visits:tr('dashboard.myVisits'), subscription:tr('dashboard.subscription'), settings:tr('dashboard.settings') };
 
   useEffect(() => {
     const load = async () => {
@@ -626,7 +632,7 @@ export default function Dashboard({ params }) {
               <div style={{ width:32,height:32,borderRadius:9,background:C.primary,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
               <div>
                 <div style={{ fontSize:12,fontWeight:700,color:'#fff' }}>{userData.name}</div>
-                <div style={{ fontSize:10,color:'rgba(255,255,255,0.35)' }}>Client · {plan}</div>
+                <div style={{ fontSize:10,color:'rgba(255,255,255,0.35)' }}>{tr('dashboard.clientRole')} · {plan}</div>
               </div>
             </div>
           </div>
@@ -673,7 +679,7 @@ export default function Dashboard({ params }) {
                 <span style={{ display:'block',width:20,height:2,background:C.textPrimary,borderRadius:2 }}/>
                 <span style={{ display:'block',width:20,height:2,background:C.textPrimary,borderRadius:2 }}/>
               </button>
-              <div style={{ fontSize:16,fontWeight:700,color:C.textPrimary }}>{viewingApplicants ? 'Nurse Applicants' : TITLES[active]}</div>
+              <div style={{ fontSize:16,fontWeight:700,color:C.textPrimary }}>{viewingApplicants ? tr('dashboard.applicantsTitle') : TITLES[active]}</div>
             </div>
             <div style={{ display:'flex',alignItems:'center',gap:8 }}>
               <div style={{ display:'flex',background:'#F1F5F9',borderRadius:8,padding:3,border:`1px solid ${C.border}` }}>
@@ -693,11 +699,12 @@ export default function Dashboard({ params }) {
                 visitInfo={viewingApplicants}
                 onBack={()=>setViewingApplicants(null)}
                 onSelect={handleApplicantSelect}
+                lang={lang}
               />
             ) : (
               <>
                 {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>setActive('book')}/>}
-                {active==='book' && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} />}
+                {active==='book' && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
                 {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} onRefresh={loadData} />}
                 {active==='subscription' && (
                   <SubscriptionSection userData={userData} lang={lang} />

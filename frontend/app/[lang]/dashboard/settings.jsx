@@ -81,7 +81,7 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
       setPassStatus('success');
       setTimeout(() => setPassStatus(null), 4000);
     } catch (err) {
-      setPassError(err.message || 'Failed to update password');
+      setPassError(err.message || tr('settings.savedError'));
     } finally { setSavingPass(false); }
   };
 
@@ -100,7 +100,7 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
           </Field>
           <Field label={tr("settings.country")}>
             <select style={inp} value={profile.country} onChange={e => setProfile(p => ({...p, country:e.target.value}))}>
-              <option value="">Select country</option>
+              <option value="">{tr('settings.selectCountry')}</option>
               {COUNTRIES.map(c => <option key={c}>{c}</option>)}
             </select>
           </Field>
@@ -117,7 +117,7 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
           </Field>
           <Field label={tr("settings.theirCity")}>
             <select style={inp} value={rel.city} onChange={e => setRel(r => ({...r, city:e.target.value}))}>
-              <option value="">Select city</option>
+              <option value="">{tr('settings.selectCity')}</option>
               {CITIES_AL.map(c => <option key={c}>{c}</option>)}
             </select>
           </Field>
@@ -156,12 +156,12 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
       {profileStatus==='success' && (
         <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:10, padding:'12px 16px', marginBottom:16, display:'flex', alignItems:'center', gap:10 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style={{ fontSize:14, fontWeight:600, color:C.secondary }}>Changes saved successfully!</span>
+          <span style={{ fontSize:14, fontWeight:600, color:C.secondary }}>{tr('settings.savedSuccess')}</span>
         </div>
       )}
       {profileStatus==='error' && (
         <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:10, padding:'12px 16px', marginBottom:16 }}>
-          <span style={{ fontSize:14, color:C.error }}>Failed to save. Please try again.</span>
+          <span style={{ fontSize:14, color:C.error }}>{tr('settings.savedError')}</span>
         </div>
       )}
       <button onClick={handleSaveProfile} disabled={saving} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:'pointer', marginBottom:28, opacity:saving?0.7:1 }}>
@@ -181,17 +181,17 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
           </Field>
         </div>
         {passError && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:8, padding:'10px 14px', marginBottom:12, fontSize:13, color:C.error }}>{passError}</div>}
-        {passStatus==='success' && <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:8, padding:'10px 14px', marginBottom:12, fontSize:13, color:C.secondary, fontWeight:600 }}>Password updated successfully!</div>}
+        {passStatus==='success' && <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:8, padding:'10px 14px', marginBottom:12, fontSize:13, color:C.secondary, fontWeight:600 }}>{tr('settings.passSuccess')}</div>}
         <button onClick={handleChangePassword} disabled={savingPass} style={{ background:C.bgSubtle, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:10, padding:'11px 24px', fontSize:14, fontWeight:600, cursor:'pointer', opacity:savingPass?0.7:1 }}>
           {savingPass ? tr("settings.updating") : tr("settings.updatePassword")}
         </button>
       </SectionCard>
 
       <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid #FECACA`, padding:'24px', marginBottom:20 }}>
-        <div style={{ fontSize:15, fontWeight:700, color:C.error, marginBottom:6 }}>Danger zone</div>
-        <div style={{ fontSize:13, color:C.textSecondary, marginBottom:16 }}>These actions cannot be undone.</div>
+        <div style={{ fontSize:15, fontWeight:700, color:C.error, marginBottom:6 }}>{tr('settings.dangerZone')}</div>
+        <div style={{ fontSize:13, color:C.textSecondary, marginBottom:16 }}>{tr('settings.dangerSub')}</div>
         <button style={{ background:C.errorLight, color:C.error, border:`1.5px solid #FECACA`, borderRadius:9, padding:'10px 20px', fontSize:13, fontWeight:600, cursor:'pointer' }}>
-          Cancel subscription
+          {tr('settings.cancelSub')}
         </button>
       </div>
     </div>
