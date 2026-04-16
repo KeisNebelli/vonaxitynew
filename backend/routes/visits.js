@@ -316,7 +316,7 @@ router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
 router.put('/:id/status', ...requireRole('NURSE'), async (req, res) => {
   try {
     const { status } = req.body;
-    const allowed = ['ON_THE_WAY', 'ARRIVED', 'IN_PROGRESS', 'ACCEPTED'];
+    const allowed = ['ON_THE_WAY', 'ARRIVED', 'IN_PROGRESS', 'ACCEPTED', 'NO_SHOW'];
     if (!allowed.includes(status)) {
       return res.status(400).json({ error: `Status must be one of: ${allowed.join(', ')}` });
     }
@@ -330,6 +330,7 @@ router.put('/:id/status', ...requireRole('NURSE'), async (req, res) => {
       data: {
         status,
         ...(status === 'IN_PROGRESS' ? { startedAt: new Date() } : {}),
+        ...(status === 'NO_SHOW' ? { completedAt: new Date() } : {}),
       },
     });
     res.json({ success: true, visit: updated });

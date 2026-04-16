@@ -105,7 +105,7 @@ export default function VisitLocationCard({ visit, onStatusChange, onComplete, c
       </div>
 
       {/* Status controls */}
-      {['upcoming','accepted','on_the_way','arrived','in_progress'].includes(activeStatus) && (
+      {['upcoming','accepted','pending','on_the_way','arrived','in_progress'].includes(activeStatus) && (
         <div style={{ borderTop:`1px solid ${C.border}`, padding:'14px 18px', background:C.bg }}>
           <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', marginBottom:10 }}>{t(lang,'nurse.updateStatus')}</div>
           <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
