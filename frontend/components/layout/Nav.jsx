@@ -11,7 +11,7 @@ export default function Nav({ lang = 'en' }) {
   const links = [
     { label: t(lang, 'nav.howItWorks'), href: `/${lang}/how-it-works` },
     { label: t(lang, 'nav.services'), href: `/${lang}/services` },
-    { label: lang === 'sq' ? 'Infermierët' : 'Our Nurses', href: `/${lang}/nurses` },
+    { label: t(lang, 'nav.ourNurses'), href: `/${lang}/nurses` },
     { label: t(lang, 'nav.pricing'), href: `/${lang}/pricing` },
     { label: t(lang, 'nav.about'), href: `/${lang}/about` },
   ];

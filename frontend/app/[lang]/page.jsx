@@ -150,14 +150,14 @@ export default function HomePage({ params }) {
                 </div>
                 <div style={{ display: 'inline-flex', alignItems: 'center', gap: 5, fontSize: 12, fontWeight: 600, color: C.secondary, background: C.secondaryLight, padding: '4px 10px', borderRadius: 99 }}>
                   <div style={{ width: 6, height: 6, borderRadius: '50%', background: C.secondary }} />
-                  {lang === 'sq' ? 'Vizitë sot' : 'Visit today'}
+                  {t(lang, 'hero.visitToday')}
                 </div>
               </div>
               <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap' }}>
                 {[
-                  [lang === 'sq' ? 'Infermierja' : 'Nurse', 'Elona Berberi', true],
-                  [lang === 'sq' ? 'Planifikuar' : 'Time', '10:00 AM', false],
-                  [lang === 'sq' ? 'Shërbimi' : 'Service', 'BP + glucose', false],
+                  [t(lang, 'hero.nurseLabel'), 'Elona Berberi', true],
+                  [t(lang, 'hero.timeLabel'), '10:00 AM', false],
+                  [t(lang, 'hero.serviceLabel'), 'BP + glucose', false],
                 ].map(([k, v, blue]) => (
                   <div key={k}>
                     <div style={{ fontSize: 10, color: C.textTertiary, marginBottom: 2 }}>{k}</div>

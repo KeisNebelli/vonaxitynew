@@ -78,13 +78,8 @@ export default function NursesPage({ params }) {
     });
   }, [nurses, search, filterCity]);
 
-  const trustBadges = lang === 'sq'
-    ? [['E licensuar & e verifikuar','Çdo infermiere mban një licencë të vlefshme infermieristike shqiptare'],['E kontrolluar','Kontroll i historikut kriminal para fillimit të punës'],['Trajnim i vazhdueshëm','Përditësime të rregullta të aftësive klinike']]
-    : [['Licensed & verified','Every nurse holds a valid Albanian nursing license'],['Background checked','Criminal record check before joining'],['Ongoing training','Regular clinical skills updates']];
-
-  const stats = lang === 'sq'
-    ? [['6+','Infermierë të verifikuar'],['4.8','Vlerësim mesatar'],['8','Qytete të mbuluara'],['150+','Vizita të kryera']]
-    : [['6+','Verified nurses'],['4.8','Average rating'],['8','Cities covered'],['150+','Visits completed']];
+  const trustBadges = tr('nurses.trustBadges');
+  const stats = tr('nurses.stats');
 
   return (
     <div style={{ fontFamily:"'Inter',system-ui,sans-serif", background:C.bg }}>

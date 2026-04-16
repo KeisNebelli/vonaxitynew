@@ -128,7 +128,7 @@ function SignupContent({ params }) {
             {[{name:'basic',price:'€30',v:1},{name:'standard',price:'€50',v:2},{name:'premium',price:'€120',v:4}].map(p => (
               <div key={p.name} onClick={()=>setForm({...form,plan:p.name})} style={{ borderRadius:12, padding:'14px 18px', marginBottom:10, cursor:'pointer', border:`2px solid ${form.plan===p.name?C.primary:C.border}`, background:form.plan===p.name?C.primaryLight:'#fff', display:'flex', justifyContent:'space-between', alignItems:'center', transition:'all 0.15s' }}>
                 <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, textTransform:'capitalize' }}>{p.name} · {p.v} {p.v===1?t(lang,'pricing.visitMonth'):t(lang,'pricing.visitsMonth')}</div>
-                <div style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px' }}>{p.price}<span style={{ fontSize:12, fontWeight:500, color:C.textTertiary }}>/mo</span></div>
+                <div style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px' }}>{p.price}<span style={{ fontSize:12, fontWeight:500, color:C.textTertiary }}>{t(lang,'dashboard.perMonth')}</span></div>
               </div>
             ))}
             <button onClick={()=>setStep(2)} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', marginTop:8 }}>{t(lang,'signup.continue')}</button>
@@ -201,5 +201,5 @@ function SignupContent({ params }) {
 
 export default function SignupPage({ params }) {
   const lang = params?.lang || 'en';
-  return <Suspense fallback={<div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', color:'#6B7280', fontSize:14 }}>{lang === 'sq' ? 'Duke ngarkuar...' : 'Loading...'}</div>}><SignupContent params={params} /></Suspense>;
+  return <Suspense fallback={<div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', color:'#6B7280', fontSize:14 }}>{t(lang, 'signup.loading')}</div>}><SignupContent params={params} /></Suspense>;
 }

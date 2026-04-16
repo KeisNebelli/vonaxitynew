@@ -88,7 +88,7 @@ export default function NurseProfilePage({ params }) {
         <Nav lang={lang} />
         <div style={{ maxWidth:700, margin:'80px auto', padding:'0 24px', textAlign:'center' }}>
           <div style={{ fontSize:18, fontWeight:600, color:C.textPrimary, marginBottom:12 }}>
-            {lang === 'sq' ? 'Infermierja nuk u gjet.' : 'Nurse not found.'}
+            {tr('nurses.notFound')}
           </div>
           <Link href={`/${lang}/nurses`} style={{ color:C.primary, fontSize:14, fontWeight:600, textDecoration:'none' }}>
             {tr('nurses.backToNurses')}
@@ -100,8 +100,7 @@ export default function NurseProfilePage({ params }) {
 
   const joinedYear = nurse.joinedAt ? new Date(nurse.joinedAt).getFullYear() : null;
   const DAYS_EN = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
-  const DAYS_SQ = ['E Hënë','E Martë','E Mërkurë','E Enjte','E Premte','E Shtunë','E Diel'];
-  const dayLabels = lang === 'sq' ? DAYS_SQ : DAYS_EN;
+  const shortDays = tr('nurses.shortDays');
 
   return (
     <div style={{ fontFamily:"'Inter',system-ui,sans-serif", background:C.bg }}>
@@ -164,11 +163,7 @@ export default function NurseProfilePage({ params }) {
 
               {/* Trust row */}
               <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-                {[
-                  lang === 'sq' ? 'Licencë e vlefshme shqiptare' : 'Valid Albanian nursing license',
-                  lang === 'sq' ? 'E verifikuar nga Vonaxity' : 'Vonaxity verified',
-                  lang === 'sq' ? 'Kontroll i historikut kriminal' : 'Background checked',
-                ].map(badge => (
+                {[tr('nurses.trustBadge1'), tr('nurses.trustBadge2'), tr('nurses.trustBadge3')].map(badge => (
                   <span key={badge} style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11, fontWeight:600, color:C.secondary, background:C.secondaryLight, padding:'4px 10px', borderRadius:99 }}>
                     <CheckIcon />{badge}
                   </span>
@@ -230,7 +225,7 @@ export default function NurseProfilePage({ params }) {
 
             {/* Details card */}
             <div style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, padding:'24px', marginBottom:20 }}>
-              <h3 style={{ fontSize:14, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>{lang === 'sq' ? 'Detajet' : 'Details'}</h3>
+              <h3 style={{ fontSize:14, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>{tr('nurses.details')}</h3>
               <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
                 {nurse.licenseNumber && (
                   <div style={{ display:'flex', gap:10 }}>
@@ -274,14 +269,14 @@ export default function NurseProfilePage({ params }) {
             {nurse.availability?.length > 0 && (
               <div style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, padding:'24px' }}>
                 <h3 style={{ fontSize:14, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>
-                  {lang === 'sq' ? 'Disponueshmëria' : 'Availability'}
+                  {tr('nurses.availability')}
                 </h3>
                 <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
                   {DAYS_EN.map((dayEn, i) => {
                     const active = nurse.availability.includes(dayEn);
                     return (
                       <span key={dayEn} style={{ fontSize:12, fontWeight:600, padding:'4px 10px', borderRadius:8, background:active?C.secondaryLight:C.bgSubtle, color:active?C.secondary:C.textTertiary, border:`1px solid ${active?'rgba(5,150,105,0.15)':C.border}` }}>
-                        {dayLabels[i].slice(0,3)}
+                        {Array.isArray(shortDays) ? shortDays[i] : dayEn.slice(0,3)}
                       </span>
                     );
                   })}

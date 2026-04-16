@@ -63,14 +63,15 @@ const Badge = ({ label, type='default', small=false }) => {
   return <span style={{ fontSize:small?11:12, fontWeight:600, padding:small?'3px 8px':'4px 10px', borderRadius:99, background:bg, color, display:'inline-block', whiteSpace:'nowrap' }}>{label}</span>;
 };
 
-const statusBadge = (status) => {
+const statusBadge = (status, lang='en') => {
   const map = {
     ACTIVE:'success', APPROVED:'success', COMPLETED:'success', paid:'success',
     TRIAL:'warning', PENDING:'warning', pending:'warning',
     SUSPENDED:'error', UNASSIGNED:'error', NO_SHOW:'error', CANCELLED:'error', failed:'error',
     IN_PROGRESS:'primary', ON_THE_WAY:'primary',
   };
-  return <Badge label={status} type={map[status]||'default'} />;
+  const statusText = t(lang, 'admin.status.'+status) || status;
+  return <Badge label={statusText} type={map[status]||'default'} />;
 };
 
 const inp = { padding:'9px 12px', borderRadius:8, border:`1.5px solid ${C.border}`, fontSize:13, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' };
@@ -115,14 +116,14 @@ function SidebarContent({ mobile=false, active, setActive, onLogout, alertCount,
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
             <div>
               <div style={{ fontSize:17, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>Vonaxity</div>
-              <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'2px', marginTop:2 }}>ADMIN CRM</div>
+              <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'2px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
             </div>
             <button onClick={()=>setOpen(false)} style={{ background:'rgba(255,255,255,0.08)', border:'none', color:'rgba(255,255,255,0.6)', borderRadius:8, width:30,height:30, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>✕</button>
           </div>
         ) : (
           <div style={{ marginBottom:14 }}>
             <div style={{ fontSize:17, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>Vonaxity</div>
-            <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'2px', marginTop:2 }}>ADMIN CRM</div>
+            <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'2px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
           </div>
         )}
         <div style={{ display:'flex', alignItems:'center', gap:9 }}>
@@ -145,9 +146,9 @@ function SidebarContent({ mobile=false, active, setActive, onLogout, alertCount,
       </nav>
       <div style={{ padding:'12px 16px', borderTop:'1px solid rgba(255,255,255,0.06)' }}>
         {mobile ? (
-          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{(ADMIN_LABELS[lang]||ADMIN_LABELS.en).signOut||'Sign out'}</button>
+          <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{t(lang, 'admin.signOut')}</button>
         ) : (
-          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>Sign out</button>
+          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>{t(lang, 'admin.signOut')}</button>
         )}
       </div>
     </>
@@ -201,14 +202,14 @@ function Overview({ setActive, nurses, clients, visits, payments, lang='en' }) {
         <div style={{ marginBottom:24 }}>
           {unassigned.length > 0 && (
             <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:12, padding:'14px 18px', marginBottom:10, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <div style={{ fontSize:14, fontWeight:600, color:C.error }}>{unassigned.length} visit{unassigned.length>1?'s':''} need a nurse assigned</div>
-              <button onClick={()=>setActive('alerts')} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', background:C.error, color:'#fff', border:'none', borderRadius:8, cursor:'pointer' }}>Fix now</button>
+              <div style={{ fontSize:14, fontWeight:600, color:C.error }}>{unassigned.length} {tr('admin.visitCountSuffix')} {tr('admin.unassigned')}</div>
+              <button onClick={()=>setActive('alerts')} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', background:C.error, color:'#fff', border:'none', borderRadius:8, cursor:'pointer' }}>{tr('admin.fixNow')}</button>
             </div>
           )}
           {pending.length > 0 && (
             <div style={{ background:C.warningLight, border:'1px solid #FDE68A', borderRadius:12, padding:'14px 18px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <div style={{ fontSize:14, fontWeight:600, color:C.warning }}>{pending.length} nurse application{pending.length>1?'s':''} awaiting review</div>
-              <button onClick={()=>setActive('nurses')} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', background:C.warning, color:'#fff', border:'none', borderRadius:8, cursor:'pointer' }}>Review</button>
+              <div style={{ fontSize:14, fontWeight:600, color:C.warning }}>{pending.length} {tr('admin.nurseCountSuffix')} {tr('admin.pendingNurses')}</div>
+              <button onClick={()=>setActive('nurses')} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', background:C.warning, color:'#fff', border:'none', borderRadius:8, cursor:'pointer' }}>{tr('admin.reviewBtn')}</button>
             </div>
           )}
         </div>
@@ -249,7 +250,8 @@ function Overview({ setActive, nurses, clients, visits, payments, lang='en' }) {
 }
 
 // ── Clients ───────────────────────────────────────────────────────────────────
-function Clients({ clients, visits }) {
+function Clients({ clients, visits, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const [search, setSearch] = useState('');
   const [filterPlan, setFilterPlan] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -266,31 +268,31 @@ function Clients({ clients, visits }) {
     return matchSearch && matchPlan && matchStatus;
   }), [search, filterPlan, filterStatus, clients]);
 
-  if (selected) return <ClientDetail client={selected} onBack={()=>setSelected(null)} visits={visits} />;
+  if (selected) return <ClientDetail client={selected} onBack={()=>setSelected(null)} visits={visits} lang={lang} />;
 
   return (
     <div>
       <div style={{ display:'flex', gap:10, marginBottom:20, flexWrap:'wrap', alignItems:'center' }}>
-        <div style={{ flex:'1 1 220px' }}><SearchInput value={search} onChange={setSearch} placeholder="Search clients..." /></div>
+        <div style={{ flex:'1 1 220px' }}><SearchInput value={search} onChange={setSearch} placeholder={tr('admin.searchClients')} /></div>
         <select style={{...inp}} value={filterPlan} onChange={e=>setFilterPlan(e.target.value)}>
-          <option value="all">All plans</option>
+          <option value="all">{tr('admin.allPlans')}</option>
           <option value="basic">Basic</option>
           <option value="standard">Standard</option>
           <option value="premium">Premium</option>
         </select>
         <select style={{...inp}} value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
-          <option value="all">All statuses</option>
-          <option value="ACTIVE">Active</option>
-          <option value="TRIAL">Trial</option>
-          <option value="CANCELLED">Cancelled</option>
+          <option value="all">{tr('admin.allStatuses')}</option>
+          <option value="ACTIVE">{tr('admin.status.ACTIVE')}</option>
+          <option value="TRIAL">{tr('admin.status.TRIAL')}</option>
+          <option value="CANCELLED">{tr('admin.status.CANCELLED')}</option>
         </select>
-        <span style={{ fontSize:12, color:C.textTertiary }}>{filtered.length} clients</span>
+        <span style={{ fontSize:12, color:C.textTertiary }}>{filtered.length} {tr('admin.clientCountSuffix')}</span>
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden' }}>
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ background:C.bgSubtle }}>
-              {['Client','Country','Plan','Status','Visits used','Joined',''].map(h => (
+              {[tr('admin.clientTable.client'),tr('admin.clientTable.country'),tr('admin.clientTable.plan'),tr('admin.clientTable.status'),tr('admin.clientTable.visitsUsed'),tr('admin.clientTable.joined'),''].map(h => (
                 <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', borderBottom:`1px solid ${C.border}` }}>{h}</th>
               ))}
             </tr>
@@ -304,27 +306,28 @@ function Clients({ clients, visits }) {
                 </td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{c.country}</td>
                 <td style={{ padding:'12px 16px' }}><Badge label={(c.subscription?.plan || c.plan || 'N/A').charAt(0).toUpperCase()+(c.subscription?.plan || c.plan || 'N/A').slice(1)} type='primary' small /></td>
-                <td style={{ padding:'12px 16px' }}>{statusBadge(c.status)}</td>
+                <td style={{ padding:'12px 16px' }}>{statusBadge(c.status, lang)}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{c.visitsUsed}/{c.visitsTotal}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary }}>{c.joinedAt}</td>
-                <td style={{ padding:'12px 16px' }}><span style={{ color:C.primary, fontWeight:600, fontSize:12 }}>View →</span></td>
+                <td style={{ padding:'12px 16px' }}><span style={{ color:C.primary, fontWeight:600, fontSize:12 }}>{tr('admin.viewBtn')}</span></td>
               </tr>
             ))}
           </tbody>
         </table>
-        {filtered.length===0 && <div style={{ padding:28, textAlign:'center', color:C.textTertiary, fontSize:14 }}>No clients found.</div>}
+        {filtered.length===0 && <div style={{ padding:28, textAlign:'center', color:C.textTertiary, fontSize:14 }}>{tr('admin.noClients')}</div>}
       </div>
     </div>
   );
 }
 
-function ClientDetail({ client, onBack, visits=[] }) {
+function ClientDetail({ client, onBack, visits=[], lang='en' }) {
+  const tr = (key) => t(lang, key);
   const clientVisits = visits.filter(v=>v.clientId===client.id||v.relative?.clientId===client.id);
   return (
     <div>
       <button onClick={onBack} style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:C.textSecondary, background:'transparent', border:'none', cursor:'pointer', marginBottom:20, padding:0, fontWeight:500 }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        All clients
+        {tr('admin.allClients')}
       </button>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
@@ -333,9 +336,9 @@ function ClientDetail({ client, onBack, visits=[] }) {
               <div style={{ fontSize:20, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px' }}>{client.name}</div>
               <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{client.email}</div>
             </div>
-            {statusBadge(client.status)}
+            {statusBadge(client.status, lang)}
           </div>
-          {[['Phone',client.phone],['Country',client.country],['Plan',(client.subscription?.plan || client.plan || 'N/A').charAt(0).toUpperCase()+(client.subscription?.plan || client.plan || 'N/A').slice(1)],['Joined',client.joinedAt],['Visits used',`${client.subscription?.visitsUsed || 0}/${client.subscription?.visitsPerMonth || 0}`]].map(([k,v]) => (
+          {[[tr('admin.phone'),client.phone],[tr('admin.country'),client.country],[tr('admin.plan'),(client.subscription?.plan || client.plan || 'N/A').charAt(0).toUpperCase()+(client.subscription?.plan || client.plan || 'N/A').slice(1)],[tr('admin.joined'),client.joinedAt],[tr('admin.visitsUsed'),`${client.subscription?.visitsUsed || 0}/${client.subscription?.visitsPerMonth || 0}`]].map(([k,v]) => (
             <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
               <span style={{ color:C.textTertiary }}>{k}</span>
               <span style={{ color:C.textPrimary, fontWeight:500 }}>{v}</span>
@@ -343,14 +346,14 @@ function ClientDetail({ client, onBack, visits=[] }) {
           ))}
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
-          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Loved one</div>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.lovedOne')}</div>
           {(client.relatives?.length > 0 ? [
-            ['Name', client.relatives[0].name],
-            ['City', client.relatives[0].city],
-            ['Address', client.relatives[0].address],
-            ['Phone', client.relatives[0].phone || 'Not set'],
-            ['Age', client.relatives[0].age || 'Not set'],
-          ] : [['Loved one', 'No relative added yet']]).map(([k,v]) => (
+            [tr('settings.theirName'), client.relatives[0].name],
+            [tr('admin.city'), client.relatives[0].city],
+            [tr('settings.theirAddress'), client.relatives[0].address],
+            [tr('admin.phone'), client.relatives[0].phone || tr('admin.notSet')],
+            [tr('settings.theirAge'), client.relatives[0].age || tr('admin.notSet')],
+          ] : [[tr('admin.lovedOne'), tr('admin.notSet')]]).map(([k,v]) => (
             <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
               <span style={{ color:C.textTertiary }}>{k}</span>
               <span style={{ color:C.textPrimary, fontWeight:500 }}>{v}</span>
@@ -359,14 +362,14 @@ function ClientDetail({ client, onBack, visits=[] }) {
         </div>
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginTop:20 }}>
-        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Visit history ({clientVisits.length})</div>
-        {clientVisits.length===0 ? <div style={{ fontSize:13, color:C.textTertiary }}>No visits yet.</div> : clientVisits.map((v,i) => (
+        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.visitHistory')} ({clientVisits.length})</div>
+        {clientVisits.length===0 ? <div style={{ fontSize:13, color:C.textTertiary }}>{tr('admin.noVisitsYet')}</div> : clientVisits.map((v,i) => (
           <div key={v.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0', borderBottom:i<clientVisits.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
             <div>
               <div style={{ fontSize:14, fontWeight:500, color:C.textPrimary }}>{v.service}</div>
               <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{new Date(v.scheduledAt).toLocaleDateString()} · {v.nurseName||'No nurse'}</div>
             </div>
-            {statusBadge(v.status)}
+            {statusBadge(v.status, lang)}
           </div>
         ))}
       </div>
@@ -375,7 +378,8 @@ function ClientDetail({ client, onBack, visits=[] }) {
 }
 
 // ── Nurses ────────────────────────────────────────────────────────────────────
-function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject }) {
+function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const [search, setSearch] = useState('');
   const [filterCity, setFilterCity] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
@@ -399,31 +403,31 @@ function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject }) {
   const handleApprove = (id) => onApprove(id);
   const handleSuspend = (id) => onSuspend(id);
 
-  if (selected) return <NurseDetail nurse={nurses.find(n=>n.id===selected)} onBack={()=>setSelected(null)} onApprove={handleApprove} onSuspend={handleSuspend} />;
+  if (selected) return <NurseDetail nurse={nurses.find(n=>n.id===selected)} onBack={()=>setSelected(null)} onApprove={handleApprove} onSuspend={handleSuspend} onReject={onReject} lang={lang} />;
 
   return (
     <div>
       <div style={{ display:'flex', gap:10, marginBottom:20, flexWrap:'wrap', alignItems:'center' }}>
-        <div style={{ flex:'1 1 220px' }}><SearchInput value={search} onChange={setSearch} placeholder="Search nurses..." /></div>
+        <div style={{ flex:'1 1 220px' }}><SearchInput value={search} onChange={setSearch} placeholder={tr('admin.searchNurses')} /></div>
         <select style={{...inp}} value={filterCity} onChange={e=>setFilterCity(e.target.value)}>
-          <option value="all">All cities</option>
+          <option value="all">{tr('admin.allCities')}</option>
           {['Tirana','Durrës','Elbasan','Fier','Shkodër','Sarandë'].map(c=><option key={c}>{c}</option>)}
         </select>
         <select style={{...inp}} value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
-          <option value="all">All statuses</option>
-          <option value="INCOMPLETE">Incomplete</option>
-          <option value="PENDING">Pending review</option>
-          <option value="APPROVED">Approved</option>
-          <option value="REJECTED">Rejected</option>
-          <option value="SUSPENDED">Suspended</option>
+          <option value="all">{tr('admin.allStatuses')}</option>
+          <option value="INCOMPLETE">{tr('admin.status.INCOMPLETE')}</option>
+          <option value="PENDING">{tr('admin.status.PENDING')}</option>
+          <option value="APPROVED">{tr('admin.status.APPROVED')}</option>
+          <option value="REJECTED">{tr('admin.status.REJECTED')}</option>
+          <option value="SUSPENDED">{tr('admin.status.SUSPENDED')}</option>
         </select>
-        <span style={{ fontSize:12, color:C.textTertiary }}>{filtered.length} nurses</span>
+        <span style={{ fontSize:12, color:C.textTertiary }}>{filtered.length} {tr('admin.nurseCountSuffix')}</span>
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden' }}>
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ background:C.bgSubtle }}>
-              {['Nurse','City','Status','Rating','Visits','License','Actions'].map(h => (
+              {[tr('admin.nurseTable.nurse'),tr('admin.nurseTable.city'),tr('admin.nurseTable.status'),tr('admin.nurseTable.rating'),tr('admin.nurseTable.visits'),tr('admin.nurseTable.license'),tr('admin.nurseTable.actions')].map(h => (
                 <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', borderBottom:`1px solid ${C.border}` }}>{h}</th>
               ))}
             </tr>
@@ -436,31 +440,32 @@ function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject }) {
                   <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{n.user?.email || n.email || '—'}</div>
                 </td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{n.city || '—'}</td>
-                <td style={{ padding:'12px 16px' }}>{statusBadge(n.status)}</td>
-                <td style={{ padding:'12px 16px', color:n.rating>0?C.warning:C.textTertiary, fontWeight:600 }}>{n.rating>0?`${n.rating}`:'N/A'}</td>
+                <td style={{ padding:'12px 16px' }}>{statusBadge(n.status, lang)}</td>
+                <td style={{ padding:'12px 16px', color:n.rating>0?C.warning:C.textTertiary, fontWeight:600 }}>{n.rating>0?`${n.rating}`:tr('admin.notYetRated')}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{n.totalVisits || 0}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary, fontSize:12 }}>{n.licenseNumber || '—'}</td>
                 <td style={{ padding:'12px 16px' }}>
                   <div style={{ display:'flex', gap:6 }}>
                     {(n.status==='PENDING'||n.status==='INCOMPLETE') && <>
-                      <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{'Approve'}</button>
-                      <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.errorLight, color:C.error, border:'none', borderRadius:6, cursor:'pointer' }}>{'Reject'}</button>
+                      <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.approve')}</button>
+                      <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.errorLight, color:C.error, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.reject')}</button>
                     </>}
-                    {n.status==='APPROVED' && <button onClick={()=>handleSuspend(n.id)} style={{ fontSize:11, padding:'5px 10px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:6, cursor:'pointer' }}>{'Suspend'}</button>}
-                    {(n.status==='SUSPENDED'||n.status==='REJECTED') && <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{'Reinstate'}</button>}
+                    {n.status==='APPROVED' && <button onClick={()=>handleSuspend(n.id)} style={{ fontSize:11, padding:'5px 10px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:6, cursor:'pointer' }}>{tr('admin.suspend')}</button>}
+                    {(n.status==='SUSPENDED'||n.status==='REJECTED') && <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.reinstate')}</button>}
                   </div>
                 </td>
               </tr>
             ))}
           </tbody>
         </table>
-        {filtered.length===0 && <div style={{ padding:28, textAlign:'center', color:C.textTertiary, fontSize:14 }}>No nurses found.</div>}
+        {filtered.length===0 && <div style={{ padding:28, textAlign:'center', color:C.textTertiary, fontSize:14 }}>{tr('admin.noNurses')}</div>}
       </div>
     </div>
   );
 }
 
-function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
+function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, lang='en' }) {
+  const tr = (key) => t(lang, key);
   if (!nurse) return null;
   const name = nurse.name || nurse.user?.name || 'Unknown';
   const email = nurse.email || nurse.user?.email || '';
@@ -472,7 +477,7 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
     <div>
       <button onClick={onBack} style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:C.textSecondary, background:'transparent', border:'none', cursor:'pointer', marginBottom:20, padding:0, fontWeight:500 }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-        All nurses
+        {tr('admin.allNurses')}
       </button>
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:20 }}>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
@@ -481,25 +486,25 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
               <div style={{ fontSize:20, fontWeight:700, color:C.textPrimary }}>{name}</div>
               <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{email}</div>
             </div>
-            {statusBadge(nurse.status)}
+            {statusBadge(nurse.status, lang)}
           </div>
-          {[['Phone',phone],['City',nurse.city||'Not set'],['License',nurse.licenseNumber||'Not set'],['Issuing authority',nurse.issuingAuthority||'Not set'],['Experience',nurse.experience||'Not set'],['Rating',nurse.rating>0?nurse.rating:'Not yet rated'],['Total visits',nurse.totalVisits||0],['Submitted',nurse.submittedAt?new Date(nurse.submittedAt).toLocaleDateString():'Not submitted'],['Joined',nurse.createdAt?new Date(nurse.createdAt).toLocaleDateString():'']].map(([k,v]) => (
+          {[[tr('admin.phone'),phone],[tr('admin.city'),nurse.city||tr('admin.notSet')],[tr('admin.nurseTable.license'),nurse.licenseNumber||tr('admin.notSet')],[tr('onboarding.issuingAuthority'),nurse.issuingAuthority||tr('admin.notSet')],[tr('dashboard.experienceLabel'),nurse.experience||tr('admin.notSet')],[tr('admin.nurseTable.rating'),nurse.rating>0?nurse.rating:tr('admin.notYetRated')],[tr('admin.nurseTable.visits'),nurse.totalVisits||0],[tr('admin.notSubmitted'),nurse.submittedAt?new Date(nurse.submittedAt).toLocaleDateString():tr('admin.notSubmitted')],[tr('admin.joined'),nurse.createdAt?new Date(nurse.createdAt).toLocaleDateString():'']].map(([k,v]) => (
             <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
               <span style={{ color:C.textTertiary }}>{k}</span>
-              <span style={{ color:v==='Not set'||v==='Not submitted'?C.warning:C.textPrimary, fontWeight:500 }}>{v}</span>
+              <span style={{ color:v===tr('admin.notSet')||v===tr('admin.notSubmitted')?C.warning:C.textPrimary, fontWeight:500 }}>{v}</span>
             </div>
           ))}
           <div style={{ marginTop:16, display:'flex', gap:8 }}>
             {(nurse.status==='PENDING'||nurse.status==='INCOMPLETE') && <>
-              <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondary, color:'#fff', border:'none', borderRadius:9, cursor:'pointer' }}>{'Approve'}</button>
-              <button onClick={()=>onReject(nurse.id, 'Rejected by admin')} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>{'Reject'}</button>
+              <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondary, color:'#fff', border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.approve')}</button>
+              <button onClick={()=>onReject(nurse.id, 'Rejected by admin')} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.reject')}</button>
             </>}
-            {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>{'Suspend'}</button>}
-            {(nurse.status==='SUSPENDED'||nurse.status==='REJECTED') && <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:9, cursor:'pointer' }}>{'Reinstate'}</button>}
+            {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>{tr('admin.suspend')}</button>}
+            {(nurse.status==='SUSPENDED'||nurse.status==='REJECTED') && <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.reinstate')}</button>}
           </div>
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
-          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:12 }}>Availability</div>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:12 }}>{tr('admin.availabilityLabel')}</div>
           <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:20 }}>
             {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => {
               const full = {Mon:'Monday',Tue:'Tuesday',Wed:'Wednesday',Thu:'Thursday',Fri:'Friday',Sat:'Saturday',Sun:'Sunday'};
@@ -507,20 +512,20 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
               return <span key={d} style={{ fontSize:12, fontWeight:600, padding:'5px 10px', borderRadius:8, background:active?C.primaryLight:C.bgSubtle, color:active?C.primary:C.textTertiary, border:`1px solid ${active?'rgba(37,99,235,0.2)':C.border}` }}>{d}</span>;
             })}
           </div>
-          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>Bio</div>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>{tr('admin.bioLabel')}</div>
           <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7 }}>{nurse.bio}</div>
         </div>
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
-        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Visit history ({nurseVisits.length})</div>
-        {nurseVisits.length===0 ? <div style={{ fontSize:13, color:C.textTertiary }}>No visits yet.</div> : nurseVisits.map((v,i) => (
+        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.visitHistory')} ({nurseVisits.length})</div>
+        {nurseVisits.length===0 ? <div style={{ fontSize:13, color:C.textTertiary }}>{tr('admin.noVisitsYet')}</div> : nurseVisits.map((v,i) => (
           <div key={v.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0', borderBottom:i<nurseVisits.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
             <div>
               <div style={{ fontSize:14, fontWeight:500, color:C.textPrimary }}>{v.clientName}</div>
               <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{v.service} · {new Date(v.scheduledAt).toLocaleDateString()}</div>
               {v.nurseNotes && <div style={{ fontSize:11, color:C.textTertiary, marginTop:2, fontStyle:'italic' }}>{v.nurseNotes}</div>}
             </div>
-            {statusBadge(v.status)}
+            {statusBadge(v.status, lang)}
           </div>
         ))}
       </div>
@@ -529,7 +534,8 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend }) {
 }
 
 // ── Visits ────────────────────────────────────────────────────────────────────
-function Visits({ visits, setVisits, nurses, onAssign }) {
+function Visits({ visits, setVisits, nurses, onAssign, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCity, setFilterCity] = useState('all');
@@ -551,7 +557,7 @@ function Visits({ visits, setVisits, nurses, onAssign }) {
       <div>
         <button onClick={()=>setSelected(null)} style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:C.textSecondary, background:'transparent', border:'none', cursor:'pointer', marginBottom:20, padding:0, fontWeight:500 }}>
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
-          All visits
+          {tr('admin.allVisits')}
         </button>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
           <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
@@ -560,29 +566,29 @@ function Visits({ visits, setVisits, nurses, onAssign }) {
                 <div style={{ fontSize:18, fontWeight:700, color:C.textPrimary }}>{v.clientName}</div>
                 <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{v.service}</div>
               </div>
-              {statusBadge(v.status)}
+              {statusBadge(v.status, lang)}
             </div>
-            {[['City',v.city],['Scheduled',new Date(v.scheduledAt).toLocaleString()],['Nurse',v.nurseName||'Unassigned'],['Notes',v.notes||'None'],['BP',v.bp||'N/A'],['Glucose',v.glucose?`${v.glucose} mmol/L`:'N/A']].map(([k,val]) => (
+            {[[tr('admin.city'),v.city],[tr('workOrder.scheduledAt'),new Date(v.scheduledAt).toLocaleString()],[tr('admin.nurseTable.nurse'),v.nurseName||tr('admin.unassignedLabel')],[tr('admin.notes'),v.notes||'—'],[tr('admin.bpLabel'),v.bp||'N/A'],[tr('admin.glucoseLabel'),v.glucose?`${v.glucose} mmol/L`:'N/A']].map(([k,val]) => (
               <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
                 <span style={{ color:C.textTertiary }}>{k}</span>
                 <span style={{ color:C.textPrimary, fontWeight:500 }}>{val}</span>
               </div>
             ))}
-            {v.nurseNotes && <div style={{ marginTop:16, background:C.bg, borderRadius:10, padding:'12px 14px', fontSize:13, color:C.textSecondary }}><strong>Nurse notes:</strong> {v.nurseNotes}</div>}
+            {v.nurseNotes && <div style={{ marginTop:16, background:C.bg, borderRadius:10, padding:'12px 14px', fontSize:13, color:C.textSecondary }}><strong>{tr('admin.nurseNotesLabel')}</strong> {v.nurseNotes}</div>}
           </div>
           {v.status!=='COMPLETED' && (
             <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
-              <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>Assign nurse</div>
+              <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.assignNurseLabel')}</div>
               {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).map(n => (
                 <button key={n.id} onClick={()=>handleAssign(v.id,n)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', width:'100%', padding:'12px 16px', background:v.nurseId===n.id?C.primaryLight:C.bg, border:`1px solid ${v.nurseId===n.id?C.primary:C.border}`, borderRadius:10, cursor:'pointer', marginBottom:8, textAlign:'left' }}>
                   <div>
                     <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{n.user?.name || n.name || '—'}</div>
-                    <div style={{ fontSize:12, color:C.textTertiary }}>Rating {n.rating || 'N/A'} · {n.totalVisits || 0} visits</div>
+                    <div style={{ fontSize:12, color:C.textTertiary }}>{tr('admin.nurseTable.rating')} {n.rating || 'N/A'} · {n.totalVisits || 0} {tr('admin.visitCountSuffix')}</div>
                   </div>
-                  {v.nurseId===n.id ? <span style={{ fontSize:12, fontWeight:700, color:C.primary }}>Assigned</span> : <span style={{ fontSize:12, fontWeight:600, color:C.primary }}>Assign →</span>}
+                  {v.nurseId===n.id ? <span style={{ fontSize:12, fontWeight:700, color:C.primary }}>{tr('admin.assigned')}</span> : <span style={{ fontSize:12, fontWeight:600, color:C.primary }}>{tr('admin.assignBtn')}</span>}
                 </button>
               ))}
-              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).length===0 && <div style={{ fontSize:13, color:C.error }}>No approved nurses in {v.city}.</div>}
+              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).length===0 && <div style={{ fontSize:13, color:C.error }}>{tr('admin.noNurseInCity')}</div>}
             </div>
           )}
         </div>
@@ -593,22 +599,22 @@ function Visits({ visits, setVisits, nurses, onAssign }) {
   return (
     <div>
       <div style={{ display:'flex', gap:10, marginBottom:20, flexWrap:'wrap', alignItems:'center' }}>
-        <div style={{ flex:'1 1 220px' }}><SearchInput value={search} onChange={setSearch} placeholder="Search visits..." /></div>
+        <div style={{ flex:'1 1 220px' }}><SearchInput value={search} onChange={setSearch} placeholder={tr('admin.searchVisits')} /></div>
         <select style={{...inp}} value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
-          <option value="all">All statuses</option>
-          {['UNASSIGNED','PENDING','IN_PROGRESS','COMPLETED','NO_SHOW','CANCELLED'].map(s=><option key={s}>{s}</option>)}
+          <option value="all">{tr('admin.allStatuses')}</option>
+          {['UNASSIGNED','PENDING','IN_PROGRESS','COMPLETED','NO_SHOW','CANCELLED'].map(s=><option key={s}>{t(lang, 'admin.status.'+s)||s}</option>)}
         </select>
         <select style={{...inp}} value={filterCity} onChange={e=>setFilterCity(e.target.value)}>
-          <option value="all">All cities</option>
+          <option value="all">{tr('admin.allCities')}</option>
           {['Tirana','Durrës','Elbasan','Fier','Shkodër'].map(c=><option key={c}>{c}</option>)}
         </select>
-        <span style={{ fontSize:12, color:C.textTertiary }}>{filtered.length} visits</span>
+        <span style={{ fontSize:12, color:C.textTertiary }}>{filtered.length} {tr('admin.visitCountSuffix')}</span>
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden' }}>
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ background:C.bgSubtle }}>
-              {['Patient','Service','City','Date','Nurse','Status',''].map(h => (
+              {[tr('admin.visitTable.patient'),tr('admin.visitTable.service'),tr('admin.visitTable.city'),tr('admin.visitTable.date'),tr('admin.visitTable.nurse'),tr('admin.visitTable.status'),''].map(h => (
                 <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', borderBottom:`1px solid ${C.border}` }}>{h}</th>
               ))}
             </tr>
@@ -620,21 +626,22 @@ function Visits({ visits, setVisits, nurses, onAssign }) {
                 <td style={{ padding:'12px 16px', color:C.textSecondary, fontSize:12 }}>{v.service}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{v.city}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary, fontSize:12 }}>{new Date(v.scheduledAt).toLocaleDateString()}</td>
-                <td style={{ padding:'12px 16px', color:v.nurseName?C.textPrimary:C.error, fontWeight:v.nurseName?400:600 }}>{v.nurseName||'Unassigned'}</td>
-                <td style={{ padding:'12px 16px' }}>{statusBadge(v.status)}</td>
-                <td style={{ padding:'12px 16px' }}><button onClick={()=>setSelected(v.id)} style={{ fontSize:12, fontWeight:600, color:C.primary, background:'transparent', border:'none', cursor:'pointer' }}>View →</button></td>
+                <td style={{ padding:'12px 16px', color:v.nurseName?C.textPrimary:C.error, fontWeight:v.nurseName?400:600 }}>{v.nurseName||tr('admin.unassignedLabel')}</td>
+                <td style={{ padding:'12px 16px' }}>{statusBadge(v.status, lang)}</td>
+                <td style={{ padding:'12px 16px' }}><button onClick={()=>setSelected(v.id)} style={{ fontSize:12, fontWeight:600, color:C.primary, background:'transparent', border:'none', cursor:'pointer' }}>{tr('admin.viewBtn')}</button></td>
               </tr>
             ))}
           </tbody>
         </table>
-        {filtered.length===0 && <div style={{ padding:28, textAlign:'center', color:C.textTertiary, fontSize:14 }}>No visits found.</div>}
+        {filtered.length===0 && <div style={{ padding:28, textAlign:'center', color:C.textTertiary, fontSize:14 }}>{tr('admin.noVisits')}</div>}
       </div>
     </div>
   );
 }
 
 // ── Alerts ────────────────────────────────────────────────────────────────────
-function AlertGroup({ title, count, color, children }) {
+function AlertGroup({ title, count, color, children, lang='en' }) {
+  const tr = (key) => t(lang, key);
   return (
     <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, marginBottom:16, overflow:'hidden' }}>
       <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center', background:count>0?`rgba(${color==='red'?'220,38,38':color==='yellow'?'217,119,6':'37,99,235'},0.04)`:'transparent' }}>
@@ -646,7 +653,8 @@ function AlertGroup({ title, count, color, children }) {
   );
 }
 
-function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, onAssign }) {
+function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, onReject, onAssign, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
   const noShow = visits.filter(v=>v.status==='NO_SHOW');
   const pendingNurses = nurses.filter(n=>['PENDING','INCOMPLETE'].includes(n.status));
@@ -658,8 +666,8 @@ function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, on
 
   return (
     <div>
-      <AlertGroup title="Unassigned visits" count={unassigned.length} color="red">
-        {unassigned.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>All visits are assigned.</div> : unassigned.map(v => (
+      <AlertGroup title={tr('admin.unassignedLabel')} count={unassigned.length} color="red" lang={lang}>
+        {unassigned.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>{tr('admin.allAssigned')}</div> : unassigned.map(v => (
           <div key={v.id} style={{ padding:'14px 20px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10 }}>
             <div>
               <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{v.clientName}</div>
@@ -668,32 +676,32 @@ function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, on
             <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
               {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).slice(0,2).map(n => (
                 <button key={n.id} onClick={()=>handleAssignAlert(v.id,n.id)} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.primaryLight, color:C.primary, border:`1px solid rgba(37,99,235,0.2)`, borderRadius:8, cursor:'pointer' }}>
-                  Assign {(n.user?.name || n.name || 'Nurse').split(' ')[0]}
+                  {tr('admin.assignNurse')}
                 </button>
               ))}
-              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).length===0 && <span style={{ fontSize:12, color:C.error }}>No nurses in {v.city}</span>}
+              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).length===0 && <span style={{ fontSize:12, color:C.error }}>{tr('admin.noNurseInCity')}</span>}
             </div>
           </div>
         ))}
       </AlertGroup>
 
-      <AlertGroup title="Pending nurse applications" count={pendingNurses.length} color="yellow">
-        {pendingNurses.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>No pending applications.</div> : pendingNurses.map(n => (
+      <AlertGroup title={tr('admin.pendingNurses')} count={pendingNurses.length} color="yellow" lang={lang}>
+        {pendingNurses.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>{tr('admin.noPendingApps')}</div> : pendingNurses.map(n => (
           <div key={n.id} style={{ padding:'14px 20px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <div>
               <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{n.user?.name || n.name || '—'}</div>
-              <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{n.city || 'City not set'} · Applied {n.createdAt ? new Date(n.createdAt).toLocaleDateString() : '—'} · {n.licenseNumber || 'License pending'}</div>
+              <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{n.city || tr('admin.cityNotSet')} · {n.createdAt ? new Date(n.createdAt).toLocaleDateString() : '—'} · {n.licenseNumber || tr('admin.licensePending')}</div>
             </div>
             <div style={{ display:'flex', gap:8 }}>
-              <button onClick={()=>onApprove(n.id)} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:8, cursor:'pointer' }}>{'Approve'}</button>
-              <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.errorLight, color:C.error, border:'none', borderRadius:8, cursor:'pointer' }}>{'Reject'}</button>
+              <button onClick={()=>onApprove(n.id)} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:8, cursor:'pointer' }}>{tr('admin.approve')}</button>
+              <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.errorLight, color:C.error, border:'none', borderRadius:8, cursor:'pointer' }}>{tr('admin.reject')}</button>
             </div>
           </div>
         ))}
       </AlertGroup>
 
-      <AlertGroup title="No-show visits" count={noShow.length} color="red">
-        {noShow.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>No no-shows.</div> : noShow.map(v => (
+      <AlertGroup title={t(lang,'visits.status.NO_SHOW')} count={noShow.length} color="red" lang={lang}>
+        {noShow.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>{tr('admin.noNoShows')}</div> : noShow.map(v => (
           <div key={v.id} style={{ padding:'14px 20px', borderBottom:`1px solid ${C.borderSubtle}` }}>
             <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{v.clientName}</div>
             <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{v.service} · {v.city} · {new Date(v.scheduledAt).toLocaleDateString()}</div>
@@ -702,8 +710,8 @@ function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, on
         ))}
       </AlertGroup>
 
-      <AlertGroup title="Missing nurse reports" count={incompleteReports.length} color="blue">
-        {incompleteReports.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>All completed visits have reports.</div> : incompleteReports.map(v => (
+      <AlertGroup title={tr('admin.allReportsComplete')} count={incompleteReports.length} color="blue" lang={lang}>
+        {incompleteReports.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>{tr('admin.allReportsComplete')}</div> : incompleteReports.map(v => (
           <div key={v.id} style={{ padding:'14px 20px' }}>
             <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{v.clientName}</div>
             <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{v.service} · {v.nurseName} · {new Date(v.scheduledAt).toLocaleDateString()}</div>
@@ -715,13 +723,14 @@ function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, on
 }
 
 // ── Payments ──────────────────────────────────────────────────────────────────
-function Payments({ payments }) {
+function Payments({ payments, lang='en' }) {
+  const tr = (key) => t(lang, key);
   const total = payments.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
   const failed = payments.filter(p=>p.status==='failed');
   return (
     <div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:24 }}>
-        {[['Total revenue',`€${total}`,C.secondary],['Successful',payments.filter(p=>p.status==='paid').length,C.secondary],['Failed',failed.length,failed.length>0?C.error:C.textTertiary]].map(([label,value,color]) => (
+        {[[tr('admin.totalRevenue'),`€${total}`,C.secondary],[tr('admin.successful'),payments.filter(p=>p.status==='paid').length,C.secondary],[tr('admin.failedPayments'),failed.length,failed.length>0?C.error:C.textTertiary]].map(([label,value,color]) => (
           <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'18px' }}>
             <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:24, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
@@ -730,19 +739,19 @@ function Payments({ payments }) {
       </div>
       {failed.length>0 && (
         <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:12, padding:'14px 18px', marginBottom:20 }}>
-          <div style={{ fontSize:13, fontWeight:600, color:C.error, marginBottom:4 }}>{failed.length} failed payment{failed.length>1?'s':''}</div>
+          <div style={{ fontSize:13, fontWeight:600, color:C.error, marginBottom:4 }}>{failed.length} {tr('admin.failedPayments')}</div>
           {failed.map(p => <div key={p.id} style={{ fontSize:12, color:C.error }}>{p.clientName} · {p.plan} · €{p.amount} · {p.date}</div>)}
         </div>
       )}
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden' }}>
         <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>All transactions</div>
-          <button style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:8, cursor:'pointer' }}>Export CSV</button>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{tr('admin.allTransactions')}</div>
+          <button style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:8, cursor:'pointer' }}>{tr('admin.exportCSV')}</button>
         </div>
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ background:C.bgSubtle }}>
-              {['Client','Plan','Amount','Date','Status',''].map(h => (
+              {[tr('admin.paymentTable.client'),tr('admin.paymentTable.plan'),tr('admin.paymentTable.amount'),tr('admin.paymentTable.date'),tr('admin.paymentTable.status'),''].map(h => (
                 <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', borderBottom:`1px solid ${C.border}` }}>{h}</th>
               ))}
             </tr>
@@ -754,9 +763,9 @@ function Payments({ payments }) {
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{p.plan}</td>
                 <td style={{ padding:'12px 16px', fontWeight:700, color:C.textPrimary }}>€{p.amount}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary }}>{p.date}</td>
-                <td style={{ padding:'12px 16px' }}>{statusBadge(p.status)}</td>
+                <td style={{ padding:'12px 16px' }}>{statusBadge(p.status, lang)}</td>
                 <td style={{ padding:'12px 16px' }}>
-                  {p.status==='failed' && <button style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.warningLight, color:C.warning, border:'none', borderRadius:6, cursor:'pointer' }}>Retry</button>}
+                  {p.status==='failed' && <button style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.warningLight, color:C.warning, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.retry')}</button>}
                 </td>
               </tr>
             ))}
@@ -768,7 +777,8 @@ function Payments({ payments }) {
 }
 
 // ── AI Assistant ──────────────────────────────────────────────────────────────
-function Analytics({ clients, nurses, visits, payments=[] }) {
+function Analytics({ clients, nurses, visits, payments=[], lang='en' }) {
+  const tr = (key) => t(lang, key);
   const completed = visits.filter(v=>v.status==='COMPLETED');
   const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
   const approved = nurses.filter(n=>n.status==='APPROVED');
@@ -804,7 +814,7 @@ function Analytics({ clients, nurses, visits, payments=[] }) {
     <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
       {/* KPI row */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12 }}>
-        {[['Total clients',clients.length,C.primary],['Active nurses',approved.length,C.secondary],['Visits completed',completed.length,C.purple],['Revenue',`€${revenue}`,C.warning]].map(([label,val,color])=>(
+        {[[tr('admin.analyticsLabels.totalClients'),clients.length,C.primary],[tr('admin.analyticsLabels.activeNurses'),approved.length,C.secondary],[tr('admin.analyticsLabels.visitsCompleted'),completed.length,C.purple],[tr('admin.analyticsLabels.revenue'),`€${revenue}`,C.warning]].map(([label,val,color])=>(
           <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'16px 18px' }}>
             <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:24, fontWeight:800, color, letterSpacing:'-0.5px' }}>{val}</div>
@@ -814,7 +824,7 @@ function Analytics({ clients, nurses, visits, payments=[] }) {
 
       {/* Monthly visits chart */}
       <Card>
-        <SectionTitle>Visits per month</SectionTitle>
+        <SectionTitle>{tr('admin.visitsPerMonth')}</SectionTitle>
         <div style={{ display:'flex', alignItems:'flex-end', gap:8, height:120 }}>
           {monthlyData.map(m=>(
             <div key={m.label} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:6 }}>
@@ -829,7 +839,7 @@ function Analytics({ clients, nurses, visits, payments=[] }) {
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
         {/* City breakdown */}
         <Card>
-          <SectionTitle>Visits by city</SectionTitle>
+          <SectionTitle>{tr('admin.visitsByCity')}</SectionTitle>
           {cities.length ? cities.map(([city,count])=>(
             <div key={city} style={{ marginBottom:10 }}>
               <div style={{ display:'flex', justifyContent:'space-between', fontSize:12, marginBottom:4 }}>
@@ -840,26 +850,26 @@ function Analytics({ clients, nurses, visits, payments=[] }) {
                 <div style={{ background:C.secondary, borderRadius:4, height:6, width:`${(count/maxCity)*100}%` }} />
               </div>
             </div>
-          )) : <div style={{ color:C.textTertiary, fontSize:13 }}>No data yet</div>}
+          )) : <div style={{ color:C.textTertiary, fontSize:13 }}>{tr('admin.noData')}</div>}
         </Card>
 
         {/* Service breakdown */}
         <Card>
-          <SectionTitle>Top services</SectionTitle>
+          <SectionTitle>{tr('admin.topServices')}</SectionTitle>
           {services.length ? services.map(([svc,count],i)=>(
             <div key={svc} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'8px 0', borderBottom:i<services.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
               <div style={{ fontSize:12, color:C.textPrimary, fontWeight:500, flex:1, marginRight:8 }}>{svc}</div>
               <span style={{ fontSize:12, fontWeight:700, color:C.primary, background:C.primaryLight, padding:'2px 8px', borderRadius:99 }}>{count}</span>
             </div>
-          )) : <div style={{ color:C.textTertiary, fontSize:13 }}>No data yet</div>}
+          )) : <div style={{ color:C.textTertiary, fontSize:13 }}>{tr('admin.noData')}</div>}
         </Card>
       </div>
 
       {/* Nurse stats */}
       <Card>
-        <SectionTitle>Nurse pipeline</SectionTitle>
+        <SectionTitle>{tr('admin.nursePipeline')}</SectionTitle>
         <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-          {[['Approved',nurses.filter(n=>n.status==='APPROVED').length,'#ECFDF5','#059669'],['Pending',nurses.filter(n=>n.status==='PENDING').length,'#FFFBEB','#D97706'],['Incomplete',nurses.filter(n=>n.status==='INCOMPLETE').length,'#F1F5F9','#475569'],['Rejected',nurses.filter(n=>n.status==='REJECTED').length,'#FEF2F2','#DC2626'],['Suspended',nurses.filter(n=>n.status==='SUSPENDED').length,'#F5F3FF','#7C3AED']].map(([label,count,bg,color])=>(
+          {[[t(lang,'admin.status.APPROVED'),nurses.filter(n=>n.status==='APPROVED').length,'#ECFDF5','#059669'],[t(lang,'admin.status.PENDING'),nurses.filter(n=>n.status==='PENDING').length,'#FFFBEB','#D97706'],[t(lang,'admin.status.INCOMPLETE'),nurses.filter(n=>n.status==='INCOMPLETE').length,'#F1F5F9','#475569'],[t(lang,'admin.status.REJECTED'),nurses.filter(n=>n.status==='REJECTED').length,'#FEF2F2','#DC2626'],[t(lang,'admin.status.SUSPENDED'),nurses.filter(n=>n.status==='SUSPENDED').length,'#F5F3FF','#7C3AED']].map(([label,count,bg,color])=>(
             <div key={label} style={{ background:bg, borderRadius:10, padding:'12px 16px', minWidth:100, textAlign:'center' }}>
               <div style={{ fontSize:20, fontWeight:800, color }}>{count}</div>
               <div style={{ fontSize:11, color, marginTop:2, fontWeight:600 }}>{label}</div>
@@ -871,9 +881,10 @@ function Analytics({ clients, nurses, visits, payments=[] }) {
   );
 }
 
-function AIAssistant({ clients, nurses, visits, payments=[] }) {
+function AIAssistant({ clients, nurses, visits, payments=[], lang='en' }) {
+  const tr = (key) => t(lang, key);
   const [messages, setMessages] = useState([
-    { role:'assistant', content:"Hi! I'm the Vonaxity smart assistant. I can instantly analyze your platform data and answer operational questions. Try asking me something below or click a quick question!" }
+    { role:'assistant', content:t(lang,'admin.aiSubtitle') }
   ]);
   const [input, setInput] = useState('');
 
@@ -967,8 +978,8 @@ function AIAssistant({ clients, nurses, visits, payments=[] }) {
           <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
         </div>
         <div>
-          <div style={{ fontSize:15, fontWeight:700, color:C.primary }}>Vonaxity Smart Assistant</div>
-          <div style={{ fontSize:12, color:'#3B82F6', marginTop:2 }}>Instant data analysis · No API cost · Real-time platform insights</div>
+          <div style={{ fontSize:15, fontWeight:700, color:C.primary }}>{tr('admin.aiTitle')}</div>
+          <div style={{ fontSize:12, color:'#3B82F6', marginTop:2 }}>{tr('admin.aiSubtitle')}</div>
         </div>
       </div>
 
@@ -994,15 +1005,15 @@ function AIAssistant({ clients, nurses, visits, payments=[] }) {
       </div>
 
       <div style={{ display:'flex', gap:10 }}>
-        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&sendMessage()} placeholder="Ask about clients, nurses, visits, revenue..." style={{ flex:1, padding:'12px 16px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' }} />
-        <button onClick={sendMessage} disabled={!input.trim()} style={{ padding:'12px 20px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:14, fontWeight:600, cursor:'pointer', opacity:!input.trim()?0.5:1 }}>Send</button>
+        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&sendMessage()} placeholder={tr('admin.aiPlaceholder')} style={{ flex:1, padding:'12px 16px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' }} />
+        <button onClick={sendMessage} disabled={!input.trim()} style={{ padding:'12px 20px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:14, fontWeight:600, cursor:'pointer', opacity:!input.trim()?0.5:1 }}>{tr('admin.aiSend')}</button>
       </div>
     </div>
   );
 }
 
 // ── Settings ──────────────────────────────────────────────────────────────────
-function AdminSectionCard({ title, subtitle, children }) {
+function AdminSectionCard({ title, subtitle, children, lang='en' }) {
   return (
     <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'24px', marginBottom:20 }}>
       <div style={{ marginBottom:20 }}>
@@ -1014,7 +1025,8 @@ function AdminSectionCard({ title, subtitle, children }) {
   );
 }
 
-function AdminSettings() {
+function AdminSettings({ lang='en' }) {
+  const tr = (key) => t(lang, key);
   const DEFAULT = { payPerVisit:20, trialDays:7, basicPrice:30, standardPrice:50, premiumPrice:120 };
   const [settings, setSettings] = useState(DEFAULT);
   const [loading, setLoading] = useState(true);
@@ -1048,12 +1060,12 @@ function AdminSettings() {
 
   return (
     <div style={{ maxWidth:560 }}>
-      <AdminSectionCard title="Platform settings" subtitle="Core operational parameters">
+      <AdminSectionCard title={tr('admin.platformSettings')} subtitle={tr('admin.coreParams')} lang={lang}>
         {loading ? (
-          <div style={{ padding:'20px 0', textAlign:'center', color:C.textTertiary, fontSize:13 }}>Loading settings...</div>
+          <div style={{ padding:'20px 0', textAlign:'center', color:C.textTertiary, fontSize:13 }}>{tr('admin.loadingSettings')}</div>
         ) : (
           <>
-            {[['Nurse pay per visit (€)','payPerVisit'],['Trial period (days)','trialDays'],['Basic plan price (€)','basicPrice'],['Standard plan price (€)','standardPrice'],['Premium plan price (€)','premiumPrice']].map(([label,key]) => (
+            {[[tr('admin.nursePayLabel'),'payPerVisit'],[tr('admin.trialDaysLabel'),'trialDays'],[tr('admin.basicPriceLabel'),'basicPrice'],[tr('admin.standardPriceLabel'),'standardPrice'],[tr('admin.premiumPriceLabel'),'premiumPrice']].map(([label,key]) => (
               <div key={key} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0', borderBottom:`1px solid ${C.borderSubtle}` }}>
                 <label style={{ fontSize:14, color:C.textPrimary }}>{label}</label>
                 <input type="number" value={settings[key]} onChange={e=>setSettings({...settings,[key]:Number(e.target.value)})} style={{ ...inp, width:90, textAlign:'center' }} />
@@ -1061,17 +1073,17 @@ function AdminSettings() {
             ))}
             <div style={{ marginTop:20, display:'flex', alignItems:'center', gap:14 }}>
               <button onClick={handleSave} disabled={saving} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:saving?'not-allowed':'pointer', opacity:saving?0.7:1 }}>
-                {saving ? 'Saving...' : 'Save settings'}
+                {saving ? tr('dashboard.saving') : tr('admin.saveSettings')}
               </button>
-              {status==='saved' && <span style={{ fontSize:13, color:C.secondary, fontWeight:600 }}>✓ Settings saved</span>}
-              {status==='error' && <span style={{ fontSize:13, color:C.error, fontWeight:600 }}>✗ Failed to save</span>}
+              {status==='saved' && <span style={{ fontSize:13, color:C.secondary, fontWeight:600 }}>{tr('admin.settingsSaved')}</span>}
+              {status==='error' && <span style={{ fontSize:13, color:C.error, fontWeight:600 }}>{tr('admin.settingsFailed')}</span>}
             </div>
           </>
         )}
       </AdminSectionCard>
 
-      <AdminSectionCard title="Admin profile" subtitle="Your account details">
-        {[['Name','Vonaxity Admin'],['Email','admin@vonaxity.com'],['Role','Super Admin']].map(([k,v]) => (
+      <AdminSectionCard title={tr('admin.adminProfile')} subtitle={tr('admin.accountDetails')} lang={lang}>
+        {[[tr('settings.fullName'),'Vonaxity Admin'],[tr('login.email'),'admin@vonaxity.com'],['Role','Super Admin']].map(([k,v]) => (
           <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'10px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:14 }}>
             <span style={{ color:C.textTertiary }}>{k}</span>
             <span style={{ color:C.textPrimary, fontWeight:500 }}>{v}</span>
@@ -1197,9 +1209,9 @@ export default function AdminPage({ params }) {
               {actionError && (
                 <div style={{ fontSize:12, fontWeight:600, padding:'6px 12px', background:'#FEF2F2', color:'#DC2626', borderRadius:8, border:'1px solid #FECACA' }}>{actionError}</div>
               )}
-              {alertCount>0 && <button onClick={()=>setActive('alerts')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#FEF2F2',color:'#DC2626',border:'none',borderRadius:8,cursor:'pointer',fontFamily:F }}>{alertCount} alert{alertCount>1?'s':''}</button>}
-              <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>{'↻ Refresh'}</button>
-              <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#F5F3FF',color:'#7C3AED',border:'1px solid rgba(124,58,237,0.2)',borderRadius:8,cursor:'pointer',fontFamily:F }}>{'AI Assistant'}</button>
+              {alertCount>0 && <button onClick={()=>setActive('alerts')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#FEF2F2',color:'#DC2626',border:'none',borderRadius:8,cursor:'pointer',fontFamily:F }}>{alertCount} {tr('admin.alerts')}</button>}
+              <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>↻ {tr('admin.refresh')}</button>
+              <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#F5F3FF',color:'#7C3AED',border:'1px solid rgba(124,58,237,0.2)',borderRadius:8,cursor:'pointer',fontFamily:F }}>{tr('admin.ai')}</button>
               <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:'1px solid #E2E8F0' }}>
                 {['en','sq'].map(l=>(
                   <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:lang===l?'#2563EB':'transparent', color:lang===l?'#fff':'#475569', fontFamily:F }}>{l.toUpperCase()}</button>
@@ -1215,14 +1227,14 @@ export default function AdminPage({ params }) {
             ) : (
               <>
                 {active==='overview' && <Overview setActive={setActive} nurses={nurses} clients={clients} visits={visits} payments={payments} lang={lang} />}
-                {active==='clients' && <Clients clients={clients} visits={visits} />}
-                {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} />}
-                {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} onAssign={handleAssign} />}
-                {active==='alerts' && <Alerts visits={visits} nurses={nurses} setVisits={setVisits} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onAssign={handleAssign} />}
-                {active==='payments' && <Payments payments={payments} />}
-                {active==='analytics' && <Analytics clients={clients} nurses={nurses} visits={visits} payments={payments} />}
-                {active==='ai' && <AIAssistant clients={clients} nurses={nurses} visits={visits} payments={payments} />}
-                {active==='settings' && <AdminSettings />}
+                {active==='clients' && <Clients clients={clients} visits={visits} lang={lang} />}
+                {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} lang={lang} />}
+                {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} onAssign={handleAssign} lang={lang} />}
+                {active==='alerts' && <Alerts visits={visits} nurses={nurses} setVisits={setVisits} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onAssign={handleAssign} lang={lang} />}
+                {active==='payments' && <Payments payments={payments} lang={lang} />}
+                {active==='analytics' && <Analytics clients={clients} nurses={nurses} visits={visits} payments={payments} lang={lang} />}
+                {active==='ai' && <AIAssistant clients={clients} nurses={nurses} visits={visits} payments={payments} lang={lang} />}
+                {active==='settings' && <AdminSettings lang={lang} />}
               </>
             )}
           </main>
@@ -1230,7 +1242,7 @@ export default function AdminPage({ params }) {
         <div className="admin-tabs" style={{ display:'none', position:'fixed', bottom:0, left:0, right:0, background:'#0F172A', borderTop:'1px solid rgba(255,255,255,0.08)', zIndex:48, padding:'8px 0 env(safe-area-inset-bottom,8px)' }}>
           <button onClick={()=>setSidebarOpen(true)} style={{ flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,border:'none',background:'transparent',color:'rgba(255,255,255,0.45)',cursor:'pointer',fontSize:10,fontWeight:500,fontFamily:F,padding:'4px 2px' }}>
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
-            Menu
+            {tr('admin.menu')}
           </button>
           {ADMIN_NAV_BOTTOM.map(item=>(
             <button key={item.id} onClick={()=>setActive(item.id)} style={{ flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,border:'none',background:'transparent',color:active===item.id?'#93C5FD':'rgba(255,255,255,0.4)',cursor:'pointer',fontSize:10,fontWeight:active===item.id?700:500,fontFamily:F,padding:'4px 2px',position:'relative' }}>

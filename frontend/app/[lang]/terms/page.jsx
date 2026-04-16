@@ -1,6 +1,7 @@
 import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
+import { t } from '@/translations';
 
 const TR = {
   en: {
@@ -61,7 +62,7 @@ export default function TermsPage({ params }) {
             {s.privacyLink ? (
               <p style={S.p}>
                 {s.p.split('Privacy Policy')[0]}
-                <Link href={`/${lang}/privacy`} style={{ color:'#2563EB' }}>{lang === 'sq' ? 'Politikës së Privatësisë' : 'Privacy Policy'}</Link>
+                <Link href={`/${lang}/privacy`} style={{ color:'#2563EB' }}>{t(lang, 'footer.privacy')}</Link>
                 {s.p.split('Privacy Policy')[1]}
               </p>
             ) : s.p.includes('hello@vonaxity.com') ? (
