@@ -169,7 +169,7 @@ export default function NursesPage({ params }) {
                   <div key={nurse.id} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.05)' }}>
                     <div style={{ padding:'24px 24px 0' }}>
                       <div style={{ display:'flex', gap:16, alignItems:'flex-start', marginBottom:16 }}>
-                        <NurseAvatar name={nurse.name} size={64} verified={available} />
+                        <NurseAvatar name={nurse.name} photo={nurse.profilePhotoUrl||null} size={64} verified={available} />
                         <div style={{ flex:1, minWidth:0 }}>
                           <div style={{ fontSize:17, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4 }}>{nurse.name}</div>
                           <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:13, color:C.textTertiary, marginBottom:6 }}>

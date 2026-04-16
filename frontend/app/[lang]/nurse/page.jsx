@@ -72,7 +72,11 @@ function NurseSidebarInner({ mobile=false, initials, nurse, status, sbg, scol, a
         )}
         {!mobile && <div style={{ fontSize:18, fontWeight:800, color:'#fff', letterSpacing:'-0.5px', marginBottom:18 }}>Vonaxity</div>}
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <div style={{ width:34,height:34,borderRadius:10,background:'#059669',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
+          {nurse?.profilePhotoUrl ? (
+            <img src={nurse.profilePhotoUrl} alt={initials} style={{ width:34,height:34,borderRadius:10,objectFit:'cover',flexShrink:0,border:'1.5px solid rgba(255,255,255,0.15)' }} />
+          ) : (
+            <div style={{ width:34,height:34,borderRadius:10,background:'#059669',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
+          )}
           <div style={{ minWidth:0 }}>
             <div style={{ fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{nurse?.name||'Nurse'}</div>
             <div style={{ display:'inline-flex', alignItems:'center', gap:4, fontSize:10, fontWeight:700, color:scol, background:sbg, padding:'2px 8px', borderRadius:99, marginTop:3 }}>
@@ -557,6 +561,24 @@ function NurseProfile({ lang='en', nurse=null }) {
   const [profileStatus, setProfileStatus] = useState(null);
   const [passStatus, setPassStatus] = useState(null);
   const [passError, setPassError] = useState('');
+  const [photoUrl, setPhotoUrl] = useState(nurse?.profilePhotoUrl || null);
+  const [photoUploading, setPhotoUploading] = useState(false);
+  const [photoStatus, setPhotoStatus] = useState(null); // 'success' | 'error'
+
+  const handlePhotoChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setPhotoUploading(true); setPhotoStatus(null);
+    try {
+      const res = await api.uploadNurseDoc(file, 'photo');
+      setPhotoUrl(res.url);
+      setPhotoStatus('success');
+      setTimeout(() => setPhotoStatus(null), 4000);
+    } catch {
+      setPhotoStatus('error');
+      setTimeout(() => setPhotoStatus(null), 4000);
+    } finally { setPhotoUploading(false); }
+  };
 
   const inp = { width:'100%', padding:'11px 14px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box' };
 
@@ -592,6 +614,34 @@ function NurseProfile({ lang='en', nurse=null }) {
 
   return (
     <div style={{ maxWidth:620 }}>
+
+      {/* Profile photo */}
+      <NurseSectionCard title={tr('nurse.changePhoto')} subtitle={tr('nurse.photoHint')}>
+        <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+          <div style={{ position:'relative', flexShrink:0 }}>
+            {photoUrl ? (
+              <img src={photoUrl} alt="Profile" style={{ width:80, height:80, borderRadius:'50%', objectFit:'cover', border:`2px solid ${C.border}` }} />
+            ) : (
+              <div style={{ width:80, height:80, borderRadius:'50%', background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', fontSize:26, fontWeight:800, color:'#fff' }}>
+                {(nurse?.user?.name || nurse?.name || 'N').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+              </div>
+            )}
+            {photoUploading && (
+              <div style={{ position:'absolute', inset:0, borderRadius:'50%', background:'rgba(0,0,0,0.45)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <div style={{ width:20, height:20, border:'2px solid rgba(255,255,255,0.3)', borderTopColor:'#fff', borderRadius:'50%', animation:'spin 0.7s linear infinite' }} />
+              </div>
+            )}
+          </div>
+          <div>
+            <label style={{ display:'inline-block', cursor:'pointer', background:C.primary, color:'#fff', borderRadius:10, padding:'10px 18px', fontSize:13, fontWeight:600, boxShadow:'0 2px 8px rgba(37,99,235,0.2)', opacity:photoUploading?0.6:1, pointerEvents:photoUploading?'none':'auto' }}>
+              {photoUploading ? tr('nurse.photoUploading') : (photoUrl ? tr('nurse.changePhoto') : tr('nurse.uploadPhoto'))}
+              <input type="file" accept="image/jpeg,image/png,image/webp" style={{ display:'none' }} onChange={handlePhotoChange} disabled={photoUploading} />
+            </label>
+            {photoStatus === 'success' && <div style={{ marginTop:8, fontSize:13, fontWeight:600, color:C.secondary }}>✓ {tr('nurse.photoSaved')}</div>}
+            {photoStatus === 'error' && <div style={{ marginTop:8, fontSize:13, color:C.error }}>{tr('nurse.photoError')}</div>}
+          </div>
+        </div>
+      </NurseSectionCard>
 
       {/* Profile info */}
       <NurseSectionCard title={tr('dashboard.personalInfo')} subtitle={tr('dashboard.personalInfoSub')}>

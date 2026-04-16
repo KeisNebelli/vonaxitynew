@@ -123,7 +123,7 @@ export default function NurseProfilePage({ params }) {
             {/* Profile header */}
             <div style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, padding:'28px', marginBottom:20 }}>
               <div style={{ display:'flex', gap:20, alignItems:'flex-start', marginBottom:24 }}>
-                <NurseAvatar name={nurse.name} size={80} verified={true} />
+                <NurseAvatar name={nurse.name} photo={nurse.profilePhotoUrl||null} size={80} verified={true} />
                 <div style={{ flex:1, minWidth:0 }}>
                   <h1 style={{ fontSize:24, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:6 }}>{nurse.name}</h1>
                   <div style={{ display:'flex', gap:16, flexWrap:'wrap', marginBottom:10 }}>

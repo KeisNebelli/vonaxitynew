@@ -17,10 +17,13 @@ export default function NurseAvatar({ name='', photo=null, size=48, verified=fal
   const fontSize = Math.round(size * 0.35);
   return (
     <div style={{ position:'relative', width:size, height:size, flexShrink:0 }}>
-      {photo ? <img src={photo} alt={name} style={{ width:size, height:size, borderRadius:'50%', objectFit:'cover', display:'block', border:'2px solid #fff', boxShadow:'0 1px 4px rgba(0,0,0,0.1)' }} onError={e=>{e.target.style.display='none';}} /> : null}
-      <div style={{ width:size, height:size, borderRadius:'50%', background:bg, display:'flex', alignItems:'center', justifyContent:'center', fontSize, fontWeight:700, color:text, border:'2px solid #fff', boxShadow:'0 1px 4px rgba(0,0,0,0.08)', fontFamily:"'Inter',system-ui,sans-serif" }}>
-        {initials}
-      </div>
+      {photo ? (
+        <img src={photo} alt={name} style={{ width:size, height:size, borderRadius:'50%', objectFit:'cover', display:'block', border:'2px solid #fff', boxShadow:'0 1px 4px rgba(0,0,0,0.1)', position:'absolute', inset:0 }} onError={e=>{e.currentTarget.style.display='none';}} />
+      ) : (
+        <div style={{ width:size, height:size, borderRadius:'50%', background:bg, display:'flex', alignItems:'center', justifyContent:'center', fontSize, fontWeight:700, color:text, border:'2px solid #fff', boxShadow:'0 1px 4px rgba(0,0,0,0.08)', fontFamily:"'Inter',system-ui,sans-serif" }}>
+          {initials}
+        </div>
+      )}
       {verified && (
         <div style={{ position:'absolute', bottom:0, right:0, width:Math.round(size*0.35), height:Math.round(size*0.35), borderRadius:'50%', background:'#059669', border:'2px solid #fff', display:'flex', alignItems:'center', justifyContent:'center' }}>
           <svg width={Math.round(size*0.18)} height={Math.round(size*0.18)} viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
