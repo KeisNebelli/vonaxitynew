@@ -9,6 +9,7 @@ const nurseRoutes = require('./routes/nurses');
 const paymentsRoute = null; // Stripe payments - coming soon
 const uploadsRoute = require('./routes/uploads');
 const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter, publicSettingsRouter, cleanupRouter, contactRouter } = require('./routes/other');
+const payoutsRouter = require('./routes/payouts');
 
 const app = express();
 const PORT = process.env.PORT || 4000;
@@ -63,6 +64,7 @@ app.use('/notifications', notificationsRouter);
 app.use('/settings/public', publicSettingsRouter);
 app.use('/settings', settingsRouter);
 app.use('/admin/cleanup-duplicates', cleanupRouter);
+app.use('/payouts', payoutsRouter);
 app.use('/contact', contactRouter);
 app.use('/profile', profileRouter);
 

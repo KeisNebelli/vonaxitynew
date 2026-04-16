@@ -286,13 +286,28 @@ router.delete('/:id', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
   }
 });
 
-// PUT /visits/:id — admin updates
+// PUT /visits/:id — admin updates (assign nurse, change status)
 router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
   try {
-    const { nurseId, status } = req.body;
-    const visit = await prisma.visit.update({ where: { id: req.params.id }, data: { ...(nurseId !== undefined && { nurseId }), ...(status && { status }) } });
+    const { nurseId, status, notes } = req.body;
+    const allowed = ['UNASSIGNED','PENDING','ACCEPTED','IN_PROGRESS','COMPLETED','NO_SHOW','CANCELLED'];
+    if (status && !allowed.includes(status)) {
+      return res.status(400).json({ error: `Invalid status. Must be one of: ${allowed.join(', ')}` });
+    }
+    const visit = await prisma.visit.update({
+      where: { id: req.params.id },
+      data: {
+        ...(nurseId !== undefined && { nurseId: nurseId || null }),
+        ...(status && { status }),
+        ...(notes !== undefined && { notes }),
+        ...(status === 'CANCELLED' && { completedAt: new Date() }),
+      },
+      include: { relative: { include: { client: true } }, nurse: { include: { user: true } } },
+    });
+    console.log(`[ADMIN] Updated visit ${req.params.id}: status=${status||'—'} nurseId=${nurseId||'—'}`);
     res.json({ success: true, visit });
   } catch (err) {
+    console.error('Admin update visit error:', err);
     res.status(500).json({ error: 'Failed to update visit' });
   }
 });

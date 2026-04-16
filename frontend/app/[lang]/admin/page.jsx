@@ -1,5 +1,5 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
+import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
@@ -14,40 +14,6 @@ const C = {
   textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF',
   border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827',
 };
-
-// ── Mock Data ─────────────────────────────────────────────────────────────────
-const MOCK_CLIENTS = [
-  { id:'c1', name:'Arta Murati', email:'client@test.com', phone:'+44 7700 000000', country:'UK', plan:'standard', status:'TRIAL', visitsUsed:1, visitsTotal:2, joinedAt:'2024-11-15', relative:{ name:'Fatmira Murati', city:'Tirana', address:'Rruga e Elbasanit 14', phone:'+355690001111', age:74 } },
-  { id:'c2', name:'Besnik Kola', email:'besnik@test.com', phone:'+39 340 000 0000', country:'Italy', plan:'premium', status:'ACTIVE', visitsUsed:3, visitsTotal:4, joinedAt:'2024-10-02', relative:{ name:'Shqipe Kola', city:'Durrës', address:'Rruga Tregtare 5', phone:'+355692002222', age:68 } },
-  { id:'c3', name:'Donika Cela', email:'donika@test.com', phone:'+1 212 000 0000', country:'USA', plan:'standard', status:'TRIAL', visitsUsed:0, visitsTotal:2, joinedAt:'2024-12-01', relative:{ name:'Ndrek Cela', city:'Shkodër', address:'Rruga Vasil Shanto 8', phone:'+355693003333', age:79 } },
-  { id:'c4', name:'Gjon Marku', email:'gjon@test.com', phone:'+49 160 000 0000', country:'Germany', plan:'basic', status:'ACTIVE', visitsUsed:1, visitsTotal:1, joinedAt:'2024-09-20', relative:{ name:'Mira Marku', city:'Tirana', address:'Bulevardi Zogu I 12', phone:'+355694004444', age:71 } },
-  { id:'c5', name:'Entela Hoxha', email:'entela@test.com', phone:'+44 7800 000000', country:'UK', plan:'premium', status:'ACTIVE', visitsUsed:2, visitsTotal:4, joinedAt:'2024-08-10', relative:{ name:'Ramazan Hoxha', city:'Elbasan', address:'Rruga 28 Nentori 3', phone:'+355695005555', age:83 } },
-];
-
-const MOCK_NURSES = [
-  { id:'n1', name:'Elona Berberi', email:'nurse@test.com', phone:'+355690001111', city:'Tirana', status:'APPROVED', rating:4.9, totalVisits:47, totalEarnings:940, licenseNumber:'ALB-2024-001', availability:['Monday','Tuesday','Wednesday','Friday'], joinedAt:'2024-03-10', bio:'6 years experience in cardiovascular and diabetic care.' },
-  { id:'n2', name:'Mirjeta Doshi', email:'mirjeta@test.com', phone:'+355690002222', city:'Durrës', status:'APPROVED', rating:4.7, totalVisits:31, totalEarnings:620, licenseNumber:'ALB-2024-002', availability:['Tuesday','Thursday','Friday','Saturday'], joinedAt:'2024-06-15', bio:'Post-surgical care and welfare checks specialist.' },
-  { id:'n3', name:'Arjana Teli', email:'arjana@test.com', phone:'+355690003333', city:'Tirana', status:'PENDING', rating:0, totalVisits:0, totalEarnings:0, licenseNumber:'ALB-2024-003', availability:['Monday','Wednesday','Friday'], joinedAt:'2024-12-18', bio:'Recent graduate, eager to serve families.' },
-  { id:'n4', name:'Fatjona Leka', email:'fatjona@test.com', phone:'+355690004444', city:'Fier', status:'APPROVED', rating:4.9, totalVisits:22, totalEarnings:440, licenseNumber:'ALB-2024-004', availability:['Monday','Tuesday','Thursday'], joinedAt:'2024-08-01', bio:'Preventive care and health education.' },
-  { id:'n5', name:'Besa Marku', email:'besa@test.com', phone:'+355690005555', city:'Tirana', status:'SUSPENDED', rating:3.8, totalVisits:12, totalEarnings:240, licenseNumber:'ALB-2024-005', availability:[], joinedAt:'2024-05-20', bio:'Geriatric nursing specialist.' },
-];
-
-const MOCK_VISITS = [
-  { id:'v1', clientName:'Fatmira Murati', clientId:'c1', nurseName:'Elona Berberi', nurseId:'n1', city:'Tirana', service:'Blood Pressure + Glucose Check', scheduledAt:'2024-12-20T10:00:00Z', status:'PENDING', notes:'Patient has diabetes.', bp:null, glucose:null, nurseNotes:null },
-  { id:'v2', clientName:'Shqipe Kola', clientId:'c2', nurseName:'Mirjeta Doshi', nurseId:'n2', city:'Durrës', service:'Vitals Monitoring', scheduledAt:'2024-12-20T14:00:00Z', status:'PENDING', notes:'Post-surgery check.', bp:null, glucose:null, nurseNotes:null },
-  { id:'v3', clientName:'Ndrek Cela', clientId:'c3', nurseName:null, nurseId:null, city:'Shkodër', service:'Welfare Check', scheduledAt:'2024-12-22T09:00:00Z', status:'UNASSIGNED', notes:'First visit.', bp:null, glucose:null, nurseNotes:null },
-  { id:'v4', clientName:'Fatmira Murati', clientId:'c1', nurseName:'Elona Berberi', nurseId:'n1', city:'Tirana', service:'Blood Pressure Check', scheduledAt:'2024-11-28T10:00:00Z', status:'COMPLETED', notes:'', bp:'128/82', glucose:'5.4', nurseNotes:'Patient in good spirits. BP slightly elevated.' },
-  { id:'v5', clientName:'Ramazan Hoxha', clientId:'c5', nurseName:null, nurseId:null, city:'Elbasan', service:'Blood Work Collection', scheduledAt:'2024-12-21T11:00:00Z', status:'UNASSIGNED', notes:'Fasting required.', bp:null, glucose:null, nurseNotes:null },
-  { id:'v6', clientName:'Mira Marku', clientId:'c4', nurseName:'Elona Berberi', nurseId:'n1', city:'Tirana', service:'Welfare Check', scheduledAt:'2024-12-18T09:00:00Z', status:'NO_SHOW', notes:'', bp:null, glucose:null, nurseNotes:'Patient did not answer door.' },
-];
-
-const MOCK_PAYMENTS = [
-  { id:'p1', clientName:'Besnik Kola', plan:'Premium', amount:120, date:'2024-12-01', status:'paid' },
-  { id:'p2', clientName:'Arta Murati', plan:'Standard', amount:50, date:'2024-12-01', status:'paid' },
-  { id:'p3', clientName:'Entela Hoxha', plan:'Premium', amount:120, date:'2024-12-01', status:'paid' },
-  { id:'p4', clientName:'Gjon Marku', plan:'Basic', amount:30, date:'2024-11-22', status:'failed' },
-  { id:'p5', clientName:'Donika Cela', plan:'Standard', amount:50, date:'2024-12-01', status:'paid' },
-];
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 const Badge = ({ label, type='default', small=false }) => {
@@ -95,13 +61,14 @@ const NAV = [
   { id:'alerts', label:'Alerts', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> },
   { id:'payments', label:'Payments', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
   { id:'analytics', label:'Analytics', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg> },
+  { id:'payouts', label:'Payouts', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 1v22M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
   { id:'ai', label:'AI Assistant', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>, highlight:true },
   { id:'settings', label:'Settings', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
 ];
 
 const ADMIN_LABELS = {
-  en:{ overview:'Admin Overview', clients:'Clients', nurses:'Nurses', visits:'Visits', alerts:'Alerts', payments:'Payments', analytics:'Analytics', ai:'AI Assistant', settings:'Settings' },
-  sq:{ overview:'Pasqyra', clients:'Klientët', nurses:'Infermierët', visits:'Vizitat', alerts:'Alarmet', payments:'Pagesat', analytics:'Analitika', ai:'Asistenti AI', settings:'Cilësimet' },
+  en:{ overview:'Admin Overview', clients:'Clients', nurses:'Nurses', visits:'Visits', alerts:'Alerts', payments:'Payments', analytics:'Analytics', payouts:'Payouts', ai:'AI Assistant', settings:'Settings' },
+  sq:{ overview:'Pasqyra', clients:'Klientët', nurses:'Infermierët', visits:'Vizitat', alerts:'Alarmet', payments:'Pagesat', analytics:'Analitika', payouts:'Pagesat e infermierëve', ai:'Asistenti AI', settings:'Cilësimet' },
 };
 
 const F = "'DM Sans','Inter',system-ui,sans-serif";
@@ -250,7 +217,7 @@ function Overview({ setActive, nurses, clients, visits, payments, lang='en' }) {
 }
 
 // ── Clients ───────────────────────────────────────────────────────────────────
-function Clients({ clients, visits, lang='en' }) {
+function Clients({ clients, visits, onStatusChange, lang='en' }) {
   const tr = (key) => t(lang, key);
   const [search, setSearch] = useState('');
   const [filterPlan, setFilterPlan] = useState('all');
@@ -268,7 +235,7 @@ function Clients({ clients, visits, lang='en' }) {
     return matchSearch && matchPlan && matchStatus;
   }), [search, filterPlan, filterStatus, clients]);
 
-  if (selected) return <ClientDetail client={selected} onBack={()=>setSelected(null)} visits={visits} lang={lang} />;
+  if (selected) return <ClientDetail client={selected} onBack={()=>setSelected(null)} visits={visits} onStatusChange={onStatusChange} lang={lang} />;
 
   return (
     <div>
@@ -320,15 +287,42 @@ function Clients({ clients, visits, lang='en' }) {
   );
 }
 
-function ClientDetail({ client, onBack, visits=[], lang='en' }) {
+function ClientDetail({ client, onBack, visits=[], onStatusChange, lang='en' }) {
   const tr = (key) => t(lang, key);
+  const [editing, setEditing] = useState(false);
+  const [editData, setEditData] = useState({ name:client.name||'', phone:client.phone||'', country:client.country||'' });
+  const [saving, setSaving] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('');
   const clientVisits = visits.filter(v=>v.clientId===client.id||v.relative?.clientId===client.id);
+
+  const handleSaveEdit = async () => {
+    setSaving(true);
+    try {
+      await api.editUser(client.id, editData);
+      setEditing(false);
+      setStatusMsg(tr('admin.settingsSaved'));
+      setTimeout(()=>setStatusMsg(''),3000);
+      onStatusChange && onStatusChange();
+    } catch { setStatusMsg(tr('admin.settingsFailed')); }
+    finally { setSaving(false); }
+  };
+
+  const handleStatusChange = async (newStatus) => {
+    try {
+      await api.updateUserStatus(client.id, newStatus);
+      setStatusMsg(tr('admin.settingsSaved'));
+      setTimeout(()=>setStatusMsg(''),3000);
+      onStatusChange && onStatusChange();
+    } catch { setStatusMsg(tr('admin.settingsFailed')); }
+  };
+
   return (
     <div>
       <button onClick={onBack} style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:C.textSecondary, background:'transparent', border:'none', cursor:'pointer', marginBottom:20, padding:0, fontWeight:500 }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         {tr('admin.allClients')}
       </button>
+      {statusMsg && <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:9, padding:'10px 16px', marginBottom:16, fontSize:13, fontWeight:600, color:C.secondary }}>{statusMsg}</div>}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
@@ -336,14 +330,39 @@ function ClientDetail({ client, onBack, visits=[], lang='en' }) {
               <div style={{ fontSize:20, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px' }}>{client.name}</div>
               <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{client.email}</div>
             </div>
-            {statusBadge(client.status, lang)}
-          </div>
-          {[[tr('admin.phone'),client.phone],[tr('admin.country'),client.country],[tr('admin.plan'),(client.subscription?.plan || client.plan || 'N/A').charAt(0).toUpperCase()+(client.subscription?.plan || client.plan || 'N/A').slice(1)],[tr('admin.joined'),client.joinedAt],[tr('admin.visitsUsed'),`${client.subscription?.visitsUsed || 0}/${client.subscription?.visitsPerMonth || 0}`]].map(([k,v]) => (
-            <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
-              <span style={{ color:C.textTertiary }}>{k}</span>
-              <span style={{ color:C.textPrimary, fontWeight:500 }}>{v}</span>
+            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+              {statusBadge(client.status, lang)}
+              <button onClick={()=>setEditing(!editing)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.primaryLight, color:C.primary, border:'none', borderRadius:6, cursor:'pointer' }}>{editing ? tr('admin.cancelEdit') : tr('admin.editClient')}</button>
             </div>
-          ))}
+          </div>
+          {editing ? (
+            <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+              {[['name',tr('settings.fullName')],['phone',tr('admin.phone')],['country',tr('admin.country')]].map(([field,label])=>(
+                <div key={field}>
+                  <div style={{ fontSize:12, color:C.textTertiary, marginBottom:4 }}>{label}</div>
+                  <input style={{...inp,width:'100%',boxSizing:'border-box'}} value={editData[field]} onChange={e=>setEditData({...editData,[field]:e.target.value})} />
+                </div>
+              ))}
+              <div style={{ display:'flex', gap:8, marginTop:4 }}>
+                <button onClick={handleSaveEdit} disabled={saving} style={{ padding:'9px 18px', background:C.primary, color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>{saving?tr('dashboard.saving'):tr('admin.saveChanges')}</button>
+                <button onClick={()=>setEditing(false)} style={{ padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:8, fontSize:13, cursor:'pointer' }}>{tr('admin.cancelEdit')}</button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {[[tr('admin.phone'),client.phone],[tr('admin.country'),client.country],[tr('admin.plan'),(client.subscription?.plan || client.plan || 'N/A').charAt(0).toUpperCase()+(client.subscription?.plan || client.plan || 'N/A').slice(1)],[tr('admin.joined'),client.joinedAt],[tr('admin.visitsUsed'),`${client.subscription?.visitsUsed || client.visitsUsed || 0}/${client.subscription?.visitsPerMonth || client.visitsTotal || 0}`]].map(([k,v]) => (
+                <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
+                  <span style={{ color:C.textTertiary }}>{k}</span>
+                  <span style={{ color:C.textPrimary, fontWeight:500 }}>{v}</span>
+                </div>
+              ))}
+              <div style={{ marginTop:16, display:'flex', gap:8, flexWrap:'wrap' }}>
+                {client.status!=='ACTIVE' && <button onClick={()=>handleStatusChange('ACTIVE')} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:7, cursor:'pointer' }}>{tr('admin.activate')}</button>}
+                {client.status==='ACTIVE' && <button onClick={()=>handleStatusChange('SUSPENDED')} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.errorLight, color:C.error, border:'none', borderRadius:7, cursor:'pointer' }}>{tr('admin.suspend')}</button>}
+                {client.status==='SUSPENDED' && <button onClick={()=>handleStatusChange('CANCELLED')} style={{ fontSize:12, padding:'7px 14px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:7, cursor:'pointer' }}>{tr('admin.deactivate')}</button>}
+              </div>
+            </>
+          )}
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
           <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.lovedOne')}</div>
@@ -378,7 +397,7 @@ function ClientDetail({ client, onBack, visits=[], lang='en' }) {
 }
 
 // ── Nurses ────────────────────────────────────────────────────────────────────
-function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, lang='en' }) {
+function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, onRefresh, lang='en' }) {
   const tr = (key) => t(lang, key);
   const [search, setSearch] = useState('');
   const [filterCity, setFilterCity] = useState('all');
@@ -403,7 +422,7 @@ function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, lang='en' }
   const handleApprove = (id) => onApprove(id);
   const handleSuspend = (id) => onSuspend(id);
 
-  if (selected) return <NurseDetail nurse={nurses.find(n=>n.id===selected)} onBack={()=>setSelected(null)} onApprove={handleApprove} onSuspend={handleSuspend} onReject={onReject} lang={lang} />;
+  if (selected) return <NurseDetail nurse={nurses.find(n=>n.id===selected)} onBack={()=>setSelected(null)} onApprove={handleApprove} onSuspend={handleSuspend} onReject={onReject} onRefresh={onRefresh} lang={lang} />;
 
   return (
     <div>
@@ -464,8 +483,12 @@ function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, lang='en' }
   );
 }
 
-function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, lang='en' }) {
+function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh, lang='en' }) {
   const tr = (key) => t(lang, key);
+  const [editing, setEditing] = useState(false);
+  const [editData, setEditData] = useState({ city:'', bio:'', licenseNumber:'', paypalEmail:'', payRatePerVisit:20 });
+  const [saving, setSaving] = useState(false);
+  const [statusMsg, setStatusMsg] = useState('');
   if (!nurse) return null;
   const name = nurse.name || nurse.user?.name || 'Unknown';
   const email = nurse.email || nurse.user?.email || '';
@@ -473,12 +496,33 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, lang='en' 
   const nurseVisits = (nurse.visits || []);
   let availability = [];
   try { availability = typeof nurse.availability === 'string' ? JSON.parse(nurse.availability) : (nurse.availability || []); } catch {}
+
+  const startEdit = () => {
+    setEditData({ city:nurse.city||'', bio:nurse.bio||'', licenseNumber:nurse.licenseNumber||'', paypalEmail:nurse.paypalEmail||'', payRatePerVisit:nurse.payRatePerVisit||20 });
+    setEditing(true);
+  };
+
+  const handleSaveEdit = async () => {
+    setSaving(true);
+    try {
+      await api.editNurse(nurse.id, editData);
+      setEditing(false);
+      setStatusMsg(tr('admin.settingsSaved'));
+      setTimeout(()=>setStatusMsg(''),3000);
+      onRefresh && onRefresh();
+    } catch { setStatusMsg(tr('admin.settingsFailed')); }
+    finally { setSaving(false); }
+  };
+
+  const isWarning = (v) => [tr('admin.notSet'), tr('admin.notSubmitted'), tr('admin.paypalEmailNotSet')].includes(v);
+
   return (
     <div>
       <button onClick={onBack} style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, color:C.textSecondary, background:'transparent', border:'none', cursor:'pointer', marginBottom:20, padding:0, fontWeight:500 }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         {tr('admin.allNurses')}
       </button>
+      {statusMsg && <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:9, padding:'10px 16px', marginBottom:16, fontSize:13, fontWeight:600, color:C.secondary }}>{statusMsg}</div>}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:20 }}>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
@@ -486,34 +530,86 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, lang='en' 
               <div style={{ fontSize:20, fontWeight:700, color:C.textPrimary }}>{name}</div>
               <div style={{ fontSize:13, color:C.textTertiary, marginTop:3 }}>{email}</div>
             </div>
-            {statusBadge(nurse.status, lang)}
-          </div>
-          {[[tr('admin.phone'),phone],[tr('admin.city'),nurse.city||tr('admin.notSet')],[tr('admin.nurseTable.license'),nurse.licenseNumber||tr('admin.notSet')],[tr('onboarding.issuingAuthority'),nurse.issuingAuthority||tr('admin.notSet')],[tr('dashboard.experienceLabel'),nurse.experience||tr('admin.notSet')],[tr('admin.nurseTable.rating'),nurse.rating>0?nurse.rating:tr('admin.notYetRated')],[tr('admin.nurseTable.visits'),nurse.totalVisits||0],[tr('admin.notSubmitted'),nurse.submittedAt?new Date(nurse.submittedAt).toLocaleDateString():tr('admin.notSubmitted')],[tr('admin.joined'),nurse.createdAt?new Date(nurse.createdAt).toLocaleDateString():'']].map(([k,v]) => (
-            <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
-              <span style={{ color:C.textTertiary }}>{k}</span>
-              <span style={{ color:v===tr('admin.notSet')||v===tr('admin.notSubmitted')?C.warning:C.textPrimary, fontWeight:500 }}>{v}</span>
+            <div style={{ display:'flex', gap:8, alignItems:'center' }}>
+              {statusBadge(nurse.status, lang)}
+              <button onClick={editing ? ()=>setEditing(false) : startEdit} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.primaryLight, color:C.primary, border:'none', borderRadius:6, cursor:'pointer' }}>{editing ? tr('admin.cancelEdit') : tr('admin.editNurse')}</button>
             </div>
-          ))}
-          <div style={{ marginTop:16, display:'flex', gap:8 }}>
-            {(nurse.status==='PENDING'||nurse.status==='INCOMPLETE') && <>
-              <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondary, color:'#fff', border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.approve')}</button>
-              <button onClick={()=>onReject(nurse.id, 'Rejected by admin')} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.reject')}</button>
-            </>}
-            {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>{tr('admin.suspend')}</button>}
-            {(nurse.status==='SUSPENDED'||nurse.status==='REJECTED') && <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.reinstate')}</button>}
           </div>
+          {editing ? (
+            <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+              {[['city',tr('admin.city')],['licenseNumber',tr('admin.nurseTable.license')],['paypalEmail',tr('admin.paypalEmail')]].map(([field,label])=>(
+                <div key={field}>
+                  <div style={{ fontSize:12, color:C.textTertiary, marginBottom:4 }}>{label}</div>
+                  <input style={{...inp,width:'100%',boxSizing:'border-box'}} value={editData[field]} onChange={e=>setEditData({...editData,[field]:e.target.value})} />
+                </div>
+              ))}
+              <div>
+                <div style={{ fontSize:12, color:C.textTertiary, marginBottom:4 }}>{tr('admin.nursePayLabel')} (€)</div>
+                <input type="number" style={{...inp,width:'100%',boxSizing:'border-box'}} value={editData.payRatePerVisit} onChange={e=>setEditData({...editData,payRatePerVisit:Number(e.target.value)})} />
+              </div>
+              <div>
+                <div style={{ fontSize:12, color:C.textTertiary, marginBottom:4 }}>{tr('admin.bioLabel')}</div>
+                <textarea style={{...inp,width:'100%',boxSizing:'border-box',minHeight:80,resize:'vertical'}} value={editData.bio} onChange={e=>setEditData({...editData,bio:e.target.value})} />
+              </div>
+              <div style={{ display:'flex', gap:8, marginTop:4 }}>
+                <button onClick={handleSaveEdit} disabled={saving} style={{ padding:'9px 18px', background:C.primary, color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>{saving?tr('dashboard.saving'):tr('admin.saveChanges')}</button>
+                <button onClick={()=>setEditing(false)} style={{ padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:8, fontSize:13, cursor:'pointer' }}>{tr('admin.cancelEdit')}</button>
+              </div>
+            </div>
+          ) : (
+            <>
+              {[
+                [tr('admin.phone'), phone],
+                [tr('admin.city'), nurse.city||tr('admin.notSet')],
+                [tr('admin.nurseTable.license'), nurse.licenseNumber||tr('admin.notSet')],
+                [tr('onboarding.issuingAuthority'), nurse.issuingAuthority||tr('admin.notSet')],
+                [tr('dashboard.experienceLabel'), nurse.experience||tr('admin.notSet')],
+                [tr('admin.paypalEmail'), nurse.paypalEmail||tr('admin.paypalEmailNotSet')],
+                [tr('admin.nurseTable.rating'), nurse.rating>0?String(nurse.rating):tr('admin.notYetRated')],
+                [tr('admin.nurseTable.visits'), String(nurse.totalVisits||0)],
+                [tr('admin.nursePayLabel'), `€${nurse.payRatePerVisit||20}/visit`],
+                [tr('admin.notSubmitted'), nurse.submittedAt?new Date(nurse.submittedAt).toLocaleDateString():tr('admin.notSubmitted')],
+                [tr('admin.joined'), nurse.createdAt?new Date(nurse.createdAt).toLocaleDateString():''],
+              ].map(([k,v]) => (
+                <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'9px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:13 }}>
+                  <span style={{ color:C.textTertiary }}>{k}</span>
+                  <span style={{ color:isWarning(v)?C.warning:C.textPrimary, fontWeight:500 }}>{v}</span>
+                </div>
+              ))}
+              <div style={{ marginTop:16, display:'flex', gap:8 }}>
+                {(nurse.status==='PENDING'||nurse.status==='INCOMPLETE') && <>
+                  <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondary, color:'#fff', border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.approve')}</button>
+                  <button onClick={()=>onReject(nurse.id, 'Rejected by admin')} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.reject')}</button>
+                </>}
+                {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>{tr('admin.suspend')}</button>}
+                {(nurse.status==='SUSPENDED'||nurse.status==='REJECTED') && <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.reinstate')}</button>}
+              </div>
+            </>
+          )}
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
           <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:12 }}>{tr('admin.availabilityLabel')}</div>
           <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:20 }}>
             {['Mon','Tue','Wed','Thu','Fri','Sat','Sun'].map(d => {
               const full = {Mon:'Monday',Tue:'Tuesday',Wed:'Wednesday',Thu:'Thursday',Fri:'Friday',Sat:'Saturday',Sun:'Sunday'};
-              const active = availability.includes(full[d]);
-              return <span key={d} style={{ fontSize:12, fontWeight:600, padding:'5px 10px', borderRadius:8, background:active?C.primaryLight:C.bgSubtle, color:active?C.primary:C.textTertiary, border:`1px solid ${active?'rgba(37,99,235,0.2)':C.border}` }}>{d}</span>;
+              const isActive = availability.includes(full[d]);
+              return <span key={d} style={{ fontSize:12, fontWeight:600, padding:'5px 10px', borderRadius:8, background:isActive?C.primaryLight:C.bgSubtle, color:isActive?C.primary:C.textTertiary, border:`1px solid ${isActive?'rgba(37,99,235,0.2)':C.border}` }}>{d}</span>;
             })}
           </div>
           <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>{tr('admin.bioLabel')}</div>
-          <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7 }}>{nurse.bio}</div>
+          <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7, marginBottom:20 }}>{nurse.bio || <span style={{color:C.textTertiary,fontStyle:'italic'}}>{tr('admin.notSet')}</span>}</div>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:12 }}>{tr('admin.documents')}</div>
+          <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+            {[['Diploma', nurse.diplomaUrl||nurse.diplomaDocUrl], ['License', nurse.licenseDocUrl||nurse.licenseUrl]].map(([label,url]) => (
+              <div key={label} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 14px', borderRadius:9, background:C.bgSubtle, border:`1px solid ${C.border}` }}>
+                <span style={{ fontSize:13, color:C.textPrimary, fontWeight:500 }}>{label}</span>
+                {url
+                  ? <a href={url} target="_blank" rel="noopener noreferrer" style={{ fontSize:12, fontWeight:600, color:C.primary, textDecoration:'none' }}>{tr('admin.viewDiploma')} →</a>
+                  : <span style={{ fontSize:12, color:C.textTertiary }}>{tr('admin.noDocument')}</span>
+                }
+              </div>
+            ))}
+          </div>
         </div>
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
@@ -541,6 +637,18 @@ function Visits({ visits, setVisits, nurses, onAssign, lang='en' }) {
   const [filterCity, setFilterCity] = useState('all');
   const [assigning, setAssigning] = useState(null);
   const [selected, setSelected] = useState(null);
+  const [statusUpdating, setStatusUpdating] = useState(false);
+  const [newVisitStatus, setNewVisitStatus] = useState('');
+
+  const handleUpdateStatus = async (visitId, status) => {
+    setStatusUpdating(true);
+    try {
+      await api.updateVisit(visitId, { status });
+      setVisits(prev => prev.map(v => v.id===visitId ? {...v, status} : v));
+      setNewVisitStatus('');
+    } catch(e) { console.error(e); }
+    finally { setStatusUpdating(false); }
+  };
 
   const filtered = useMemo(() => visits.filter(v => {
     const matchSearch = !search || v.clientName.toLowerCase().includes(search.toLowerCase()) || (v.nurseName||'').toLowerCase().includes(search.toLowerCase());
@@ -575,6 +683,24 @@ function Visits({ visits, setVisits, nurses, onAssign, lang='en' }) {
               </div>
             ))}
             {v.nurseNotes && <div style={{ marginTop:16, background:C.bg, borderRadius:10, padding:'12px 14px', fontSize:13, color:C.textSecondary }}><strong>{tr('admin.nurseNotesLabel')}</strong> {v.nurseNotes}</div>}
+            <div style={{ marginTop:20, borderTop:`1px solid ${C.border}`, paddingTop:16 }}>
+              <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:10 }}>{tr('admin.visitStatus')}</div>
+              <div style={{ display:'flex', gap:8, flexWrap:'wrap', alignItems:'center' }}>
+                <select style={{...inp}} value={newVisitStatus||v.status} onChange={e=>setNewVisitStatus(e.target.value)}>
+                  {['UNASSIGNED','PENDING','IN_PROGRESS','ON_THE_WAY','COMPLETED','NO_SHOW','CANCELLED'].map(s=>(
+                    <option key={s} value={s}>{t(lang,'admin.status.'+s)||s}</option>
+                  ))}
+                </select>
+                <button onClick={()=>handleUpdateStatus(v.id, newVisitStatus||v.status)} disabled={statusUpdating||!newVisitStatus||newVisitStatus===v.status} style={{ padding:'9px 16px', background:C.primary, color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer', opacity:(!newVisitStatus||newVisitStatus===v.status||statusUpdating)?0.45:1 }}>
+                  {statusUpdating ? tr('dashboard.saving') : tr('admin.updateStatus')}
+                </button>
+                {v.status!=='CANCELLED' && (
+                  <button onClick={()=>handleUpdateStatus(v.id,'CANCELLED')} disabled={statusUpdating} style={{ padding:'9px 14px', background:C.errorLight, color:C.error, border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>
+                    {tr('admin.cancelVisit')}
+                  </button>
+                )}
+              </div>
+            </div>
           </div>
           {v.status!=='COMPLETED' && (
             <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
@@ -641,12 +767,11 @@ function Visits({ visits, setVisits, nurses, onAssign, lang='en' }) {
 
 // ── Alerts ────────────────────────────────────────────────────────────────────
 function AlertGroup({ title, count, color, children, lang='en' }) {
-  const tr = (key) => t(lang, key);
   return (
     <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, marginBottom:16, overflow:'hidden' }}>
       <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center', background:count>0?`rgba(${color==='red'?'220,38,38':color==='yellow'?'217,119,6':'37,99,235'},0.04)`:'transparent' }}>
         <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{title}</div>
-        <Badge label={`${count} issue${count!==1?'s':''}`} type={count>0?(color==='red'?'error':color==='yellow'?'warning':'primary'):'default'} />
+        <Badge label={`${count} ${t(lang,'admin.issuesSuffix')}`} type={count>0?(color==='red'?'error':color==='yellow'?'warning':'primary'):'default'} />
       </div>
       <div style={{ padding:'4px 0' }}>{children}</div>
     </div>
@@ -1012,6 +1137,129 @@ function AIAssistant({ clients, nurses, visits, payments=[], lang='en' }) {
   );
 }
 
+// ── Payouts ───────────────────────────────────────────────────────────────────
+function Payouts({ payouts=[], onRefresh, lang='en' }) {
+  const tr = (key) => t(lang, key);
+  const now = new Date();
+  const [period, setPeriod] = useState(`${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`);
+  const [generating, setGenerating] = useState(false);
+  const [genMsg, setGenMsg] = useState('');
+  const [actioning, setActioning] = useState(null);
+  const [filterStatus, setFilterStatus] = useState('all');
+
+  const handleGenerate = async () => {
+    setGenerating(true); setGenMsg('');
+    try {
+      const res = await api.generatePayouts(period);
+      setGenMsg(`${tr('admin.payoutGenerated')}: ${res.generated || res.count || 0}`);
+      onRefresh && onRefresh();
+    } catch(e) { setGenMsg(tr('admin.payoutError') || e.message); }
+    finally { setGenerating(false); }
+  };
+
+  const handleAction = async (id, action) => {
+    setActioning(id+action);
+    try {
+      if (action==='approve') await api.approvePayout(id);
+      else if (action==='pay') await api.markPayoutPaid(id);
+      else if (action==='reject') await api.rejectPayout(id);
+      onRefresh && onRefresh();
+    } catch(e) { console.error(e); }
+    finally { setActioning(null); }
+  };
+
+  const filtered = filterStatus==='all' ? payouts : payouts.filter(p=>p.status===filterStatus);
+  const totalPaid = payouts.filter(p=>p.status==='paid').reduce((s,p)=>s+(p.amount||0),0);
+  const totalPending = payouts.filter(p=>p.status==='pending').reduce((s,p)=>s+(p.amount||0),0);
+  const queueCount = payouts.filter(p=>p.status==='pending'||p.status==='approved').length;
+
+  return (
+    <div>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:24 }}>
+        {[
+          [tr('admin.paidPayouts'), `€${totalPaid}`, C.secondary],
+          [tr('admin.pendingPayouts'), `€${totalPending}`, C.warning],
+          [tr('admin.payoutQueue'), queueCount, queueCount>0?C.primary:C.textTertiary],
+        ].map(([label,value,color]) => (
+          <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'18px' }}>
+            <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
+            <div style={{ fontSize:24, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
+          </div>
+        ))}
+      </div>
+
+      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20, marginBottom:20 }}>
+        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:14 }}>{tr('admin.generatePayouts')}</div>
+        <div style={{ display:'flex', gap:12, alignItems:'flex-end', flexWrap:'wrap' }}>
+          <div>
+            <div style={{ fontSize:12, color:C.textTertiary, marginBottom:5 }}>{tr('admin.generatePeriod')} (YYYY-MM)</div>
+            <input style={{...inp}} value={period} onChange={e=>setPeriod(e.target.value)} placeholder="2025-01" />
+          </div>
+          <button onClick={handleGenerate} disabled={generating||!period} style={{ padding:'9px 20px', background:C.primary, color:'#fff', border:'none', borderRadius:9, fontSize:13, fontWeight:600, cursor:'pointer', opacity:generating?0.7:1 }}>
+            {generating ? tr('dashboard.saving') : tr('admin.generateBtn')}
+          </button>
+          {genMsg && <span style={{ fontSize:13, color:genMsg.includes('rror')?C.error:C.secondary, fontWeight:600 }}>{genMsg}</span>}
+        </div>
+      </div>
+
+      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden' }}>
+        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{tr('admin.payoutQueue')}</div>
+          <select style={{...inp}} value={filterStatus} onChange={e=>setFilterStatus(e.target.value)}>
+            <option value="all">{tr('admin.allStatuses')}</option>
+            <option value="pending">{tr('admin.pendingPayouts')}</option>
+            <option value="approved">{tr('admin.approvedPayouts')}</option>
+            <option value="paid">{tr('admin.paidPayouts')}</option>
+            <option value="rejected">{t(lang,'admin.status.REJECTED')||'Rejected'}</option>
+          </select>
+        </div>
+        {filtered.length===0 ? (
+          <div style={{ padding:28, textAlign:'center', color:C.textTertiary, fontSize:14 }}>{tr('admin.noPayouts')}</div>
+        ) : (
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ background:C.bgSubtle }}>
+                {[tr('admin.payoutNurse'), tr('admin.paypalEmail'), tr('admin.payoutPeriod'), tr('admin.payoutVisits'), tr('admin.payoutAmount'), tr('admin.payoutStatus'), 'Actions'].map(h=>(
+                  <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', borderBottom:`1px solid ${C.border}` }}>{h}</th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {filtered.map((p,i)=>{
+                const nurseName = p.nurse?.user?.name || p.nurse?.name || p.nurseName || '—';
+                const nurseEmail = p.nurse?.user?.email || p.nurseEmail || '—';
+                const paypalEmail = p.nurse?.paypalEmail || p.paypalEmail || null;
+                const busy = !!actioning;
+                return (
+                  <tr key={p.id} style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
+                    <td style={{ padding:'12px 16px' }}>
+                      <div style={{ fontWeight:600, color:C.textPrimary }}>{nurseName}</div>
+                      <div style={{ fontSize:11, color:C.textTertiary }}>{nurseEmail}</div>
+                    </td>
+                    <td style={{ padding:'12px 16px', fontSize:12, color:paypalEmail?C.textPrimary:C.warning }}>{paypalEmail||tr('admin.paypalEmailNotSet')}</td>
+                    <td style={{ padding:'12px 16px', color:C.textSecondary }}>{p.period}</td>
+                    <td style={{ padding:'12px 16px', color:C.textSecondary }}>{p.visits}</td>
+                    <td style={{ padding:'12px 16px', fontWeight:700, color:C.textPrimary }}>€{p.amount}</td>
+                    <td style={{ padding:'12px 16px' }}>{statusBadge(p.status, lang)}</td>
+                    <td style={{ padding:'12px 16px' }}>
+                      <div style={{ display:'flex', gap:6 }}>
+                        {p.status==='pending' && <button onClick={()=>handleAction(p.id,'approve')} disabled={busy} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.approvePayout')}</button>}
+                        {p.status==='approved' && <button onClick={()=>handleAction(p.id,'pay')} disabled={busy} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.primary, color:'#fff', border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.markPaid')}</button>}
+                        {(p.status==='pending'||p.status==='approved') && <button onClick={()=>handleAction(p.id,'reject')} disabled={busy} style={{ fontSize:11, padding:'5px 10px', background:C.errorLight, color:C.error, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.rejectPayout')}</button>}
+                        {p.status==='paid' && p.paidAt && <span style={{ fontSize:11, color:C.textTertiary }}>{new Date(p.paidAt).toLocaleDateString()}</span>}
+                      </div>
+                    </td>
+                  </tr>
+                );
+              })}
+            </tbody>
+          </table>
+        )}
+      </div>
+    </div>
+  );
+}
+
 // ── Settings ──────────────────────────────────────────────────────────────────
 function AdminSectionCard({ title, subtitle, children, lang='en' }) {
   return (
@@ -1083,7 +1331,7 @@ function AdminSettings({ lang='en' }) {
       </AdminSectionCard>
 
       <AdminSectionCard title={tr('admin.adminProfile')} subtitle={tr('admin.accountDetails')} lang={lang}>
-        {[[tr('settings.fullName'),'Vonaxity Admin'],[tr('login.email'),'admin@vonaxity.com'],['Role','Super Admin']].map(([k,v]) => (
+        {[[tr('settings.fullName'),'Vonaxity Admin'],[tr('login.email'),'admin@vonaxity.com'],[tr('settings.role')||'Role',tr('admin.superAdmin')]].map(([k,v]) => (
           <div key={k} style={{ display:'flex', justifyContent:'space-between', padding:'10px 0', borderBottom:`1px solid ${C.borderSubtle}`, fontSize:14 }}>
             <span style={{ color:C.textTertiary }}>{k}</span>
             <span style={{ color:C.textPrimary, fontWeight:500 }}>{v}</span>
@@ -1107,16 +1355,18 @@ export default function AdminPage({ params }) {
   const [visits, setVisits] = useState([]);
   const [clients, setClients] = useState([]);
   const [payments, setPayments] = useState([]);
+  const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
 
   const loadData = async () => {
     setLoading(true);
     try {
-      const [nursesData, usersData, visitsData, paymentsData] = await Promise.all([
+      const [nursesData, usersData, visitsData, paymentsData, payoutsData] = await Promise.all([
         api.getNurses().catch(()=>({ nurses:[] })),
         api.getUsers().catch(()=>({ users:[] })),
         api.getVisits().catch(()=>({ visits:[] })),
         api.getPayments().catch(()=>({ payments:[] })),
+        api.getPayouts().catch(()=>({ payouts:[] })),
       ]);
       setNurses((nursesData?.nurses || []).map(n => ({
         ...n,
@@ -1145,6 +1395,7 @@ export default function AdminPage({ params }) {
       const rawVisits = visitsData?.visits || [];
       setVisits(rawVisits.map(v=>({ ...v, clientName:v.clientName||v.relative?.name||'Unknown', service:v.service||v.serviceType||'Unknown', nurseName:v.nurseName||v.nurse?.user?.name||null, nurseId:v.nurseId||v.nurse?.id||null })));
       setPayments(paymentsData?.payments || []);
+      setPayouts(payoutsData?.payouts || []);
     } catch (err) { console.error('Admin load error:', err); }
     finally { setLoading(false); }
   };
@@ -1178,7 +1429,7 @@ export default function AdminPage({ params }) {
   // Auto-clear action errors
   if (actionError) setTimeout(() => setActionError(''), 4000);
   const _AL = ADMIN_LABELS[lang] || ADMIN_LABELS.en;
-  const TITLES = { overview:_AL.overview, clients:_AL.clients, nurses:_AL.nurses, visits:_AL.visits, alerts:_AL.alerts, payments:_AL.payments, ai:_AL.ai, settings:_AL.settings };
+  const TITLES = { overview:_AL.overview, clients:_AL.clients, nurses:_AL.nurses, visits:_AL.visits, alerts:_AL.alerts, payments:_AL.payments, analytics:_AL.analytics, payouts:_AL.payouts, ai:_AL.ai, settings:_AL.settings };
   const ADMIN_NAV_BOTTOM = NAV.slice(0,4);
 
   return (
@@ -1227,12 +1478,13 @@ export default function AdminPage({ params }) {
             ) : (
               <>
                 {active==='overview' && <Overview setActive={setActive} nurses={nurses} clients={clients} visits={visits} payments={payments} lang={lang} />}
-                {active==='clients' && <Clients clients={clients} visits={visits} lang={lang} />}
-                {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} lang={lang} />}
+                {active==='clients' && <Clients clients={clients} visits={visits} onStatusChange={loadData} lang={lang} />}
+                {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onRefresh={loadData} lang={lang} />}
                 {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} onAssign={handleAssign} lang={lang} />}
                 {active==='alerts' && <Alerts visits={visits} nurses={nurses} setVisits={setVisits} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onAssign={handleAssign} lang={lang} />}
                 {active==='payments' && <Payments payments={payments} lang={lang} />}
                 {active==='analytics' && <Analytics clients={clients} nurses={nurses} visits={visits} payments={payments} lang={lang} />}
+                {active==='payouts' && <Payouts payouts={payouts} onRefresh={loadData} lang={lang} />}
                 {active==='ai' && <AIAssistant clients={clients} nurses={nurses} visits={visits} payments={payments} lang={lang} />}
                 {active==='settings' && <AdminSettings lang={lang} />}
               </>

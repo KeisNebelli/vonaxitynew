@@ -220,6 +220,45 @@ router.get('/:id', ...requireRole('ADMIN'), async (req, res) => {
   }
 });
 
+// PUT /nurses/:id — admin edits nurse info
+router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
+  try {
+    const { city, bio, experience, licenseNumber, issuingAuthority, paypalEmail, payRatePerVisit, status } = req.body;
+    const nurse = await prisma.nurse.findUnique({ where: { id: req.params.id } });
+    if (!nurse) return res.status(404).json({ error: 'Nurse not found' });
+
+    const nurseUpdate = {
+      ...(city !== undefined && { city }),
+      ...(bio !== undefined && { bio }),
+      ...(experience !== undefined && { experience }),
+      ...(licenseNumber !== undefined && { licenseNumber }),
+      ...(issuingAuthority !== undefined && { issuingAuthority }),
+      ...(paypalEmail !== undefined && { paypalEmail }),
+      ...(payRatePerVisit !== undefined && { payRatePerVisit: parseFloat(payRatePerVisit) }),
+    };
+
+    // Also update user name/phone if passed
+    const { name, phone } = req.body;
+    if (name || phone) {
+      await prisma.user.update({
+        where: { id: nurse.userId },
+        data: { ...(name && { name }), ...(phone && { phone }) },
+      });
+    }
+
+    const updated = await prisma.nurse.update({
+      where: { id: req.params.id },
+      data: nurseUpdate,
+      include: { user: { select: { id: true, name: true, email: true, phone: true } } },
+    });
+    console.log(`[ADMIN] Edited nurse ${req.params.id}`);
+    res.json({ success: true, nurse: updated });
+  } catch (err) {
+    console.error('Edit nurse error:', err);
+    res.status(500).json({ error: 'Failed to update nurse' });
+  }
+});
+
 // PUT /nurses/:id/approve
 router.put('/:id/approve', ...requireRole('ADMIN'), async (req, res) => {
   try {

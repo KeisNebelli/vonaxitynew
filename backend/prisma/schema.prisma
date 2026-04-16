@@ -58,6 +58,7 @@ model Nurse {
   diplomaUrl        String?
   licenseUrl        String?
   profilePhotoUrl   String?
+  paypalEmail       String?
   rejectionReason   String?
   submittedAt       DateTime?
   approvedAt        DateTime?

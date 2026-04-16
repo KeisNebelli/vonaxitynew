@@ -386,6 +386,28 @@ const translations = {
       notSet:'Not set', notYetRated:'Not yet rated', notSubmitted:'Not submitted',
       phone:'Phone', country:'Country', plan:'Plan', visitsUsed:'Visits used', joined:'Joined',
       city:'City', notes:'Notes', bpLabel:'BP', glucoseLabel:'Glucose',
+      // Edit forms
+      editClient:'Edit client', editNurse:'Edit nurse', saveChanges:'Save changes', cancelEdit:'Cancel',
+      activate:'Activate', deactivate:'Deactivate', suspend:'Suspend',
+      updateStatus:'Update status', cancelVisit:'Cancel visit', reassignNurse:'Reassign nurse',
+      visitStatus:'Visit status', selectStatus:'Select status',
+      // Payouts
+      payouts:'Payouts', payoutQueue:'Payout queue', generatePayouts:'Generate payouts',
+      approvePayout:'Approve', markPaid:'Mark as paid', rejectPayout:'Reject',
+      payoutPeriod:'Period', payoutAmount:'Amount', payoutVisits:'Visits', payoutStatus:'Status',
+      payoutNurse:'Nurse', paypalEmail:'PayPal email',
+      noPayouts:'No payouts found.', pendingPayouts:'Pending payouts',
+      approvedPayouts:'Approved payouts', paidPayouts:'Paid payouts',
+      generatePeriod:'Period (YYYY-MM)', generateBtn:'Generate',
+      payoutGenerated:'Payouts generated', payoutError:'Failed to generate payouts',
+      approveSuccess:'Payout approved', paySuccess:'Payout marked as paid',
+      issuesSuffix:'issues', onePayout:'payout', manyPayouts:'payouts',
+      // Document viewer
+      viewDiploma:'View diploma', viewLicense:'View license doc', noDocument:'No document',
+      documents:'Documents', paypalEmailNotSet:'PayPal email not set',
+      // Status options
+      superAdmin:'Super Admin',
+      incompleteReports:'Incomplete reports',
     },
 
     workOrder: {
@@ -881,6 +903,28 @@ const translations = {
       notSet:'Nuk është vendosur', notYetRated:'Ende pa vlerësim', notSubmitted:'Nuk është dorëzuar',
       phone:'Telefoni', country:'Vendi', plan:'Plani', visitsUsed:'Vizita të përdorura', joined:'U regjistrua',
       city:'Qyteti', notes:'Shënime', bpLabel:'TA', glucoseLabel:'Glukoza',
+      // Edit forms
+      editClient:'Ndrysho klientin', editNurse:'Ndrysho infermieren', saveChanges:'Ruaj ndryshimet', cancelEdit:'Anulo',
+      activate:'Aktivizo', deactivate:'Çaktivizo', suspend:'Pezullo',
+      updateStatus:'Përditëso statusin', cancelVisit:'Anulo vizitën', reassignNurse:'Ricakto infermieren',
+      visitStatus:'Statusi i vizitës', selectStatus:'Zgjidh statusin',
+      // Payouts
+      payouts:'Pagesat e infermierëve', payoutQueue:'Radhë pagesash', generatePayouts:'Gjenero pagesat',
+      approvePayout:'Aprovo', markPaid:'Shëno si paguar', rejectPayout:'Refuzo',
+      payoutPeriod:'Periudha', payoutAmount:'Shuma', payoutVisits:'Vizita', payoutStatus:'Statusi',
+      payoutNurse:'Infermierja', paypalEmail:'Email PayPal',
+      noPayouts:'Nuk u gjetën pagesa.', pendingPayouts:'Pagesa në pritje',
+      approvedPayouts:'Pagesa të aprovuara', paidPayouts:'Pagesa të kryera',
+      generatePeriod:'Periudha (VVVV-MM)', generateBtn:'Gjenero',
+      payoutGenerated:'Pagesat u gjeneruan', payoutError:'Gjenerimi i pagesave dështoi',
+      approveSuccess:'Pagesa u aprovua', paySuccess:'Pagesa u shënua si e kryer',
+      issuesSuffix:'çështje', onePayout:'pagesë', manyPayouts:'pagesa',
+      // Document viewer
+      viewDiploma:'Shiko diplomën', viewLicense:'Shiko licencën', noDocument:'Nuk ka dokument',
+      documents:'Dokumentet', paypalEmailNotSet:'Email PayPal nuk është vendosur',
+      // Status options
+      superAdmin:'Super Admin',
+      incompleteReports:'Raporte të pakompletuara',
     },
 
     workOrder: {

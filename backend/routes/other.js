@@ -45,17 +45,60 @@ router.get('/', ...requireRole('ADMIN'), async (req, res) => {
   }
 });
 
-// GET /users/:id
-router.get('/:id', authMiddleware, async (req, res) => {
+// GET /users/:id — admin only
+router.get('/:id', ...requireRole('ADMIN'), async (req, res) => {
   try {
     const user = await prisma.user.findUnique({
       where: { id: req.params.id },
-      include: { subscription: true, relatives: true },
+      include: {
+        subscription: true,
+        relatives: { include: { visits: { orderBy: { scheduledAt: 'desc' }, take: 10 } } },
+        payments: { orderBy: { createdAt: 'desc' }, take: 10 },
+      },
     });
     if (!user) return res.status(404).json({ error: 'User not found' });
     res.json({ user });
   } catch (err) {
     res.status(500).json({ error: 'Failed to fetch user' });
+  }
+});
+
+// PUT /users/:id — admin edits client
+router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
+  try {
+    const { name, phone, country, city, email } = req.body;
+    const updated = await prisma.user.update({
+      where: { id: req.params.id },
+      data: {
+        ...(name !== undefined && { name }),
+        ...(phone !== undefined && { phone }),
+        ...(country !== undefined && { country }),
+        ...(city !== undefined && { city }),
+        ...(email !== undefined && { email }),
+      },
+      include: { subscription: true },
+    });
+    console.log(`[ADMIN] Edited user ${req.params.id}`);
+    res.json({ success: true, user: updated });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update user' });
+  }
+});
+
+// PUT /users/:id/status — admin activate/deactivate/suspend
+router.put('/:id/status', ...requireRole('ADMIN'), async (req, res) => {
+  try {
+    const { status } = req.body;
+    const allowed = ['ACTIVE', 'TRIAL', 'SUSPENDED', 'CANCELLED'];
+    if (!allowed.includes(status)) return res.status(400).json({ error: `Status must be one of: ${allowed.join(', ')}` });
+    const updated = await prisma.user.update({
+      where: { id: req.params.id },
+      data: { status },
+    });
+    console.log(`[ADMIN] Updated user ${req.params.id} status → ${status}`);
+    res.json({ success: true, user: updated });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to update user status' });
   }
 });
 

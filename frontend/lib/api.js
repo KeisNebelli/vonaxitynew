@@ -88,6 +88,7 @@ export const api = {
   approveNurse: (id) => apiFetch(`/nurses/${id}/approve`, { method: 'PUT' }),
   suspendNurse: (id) => apiFetch(`/nurses/${id}/suspend`, { method: 'PUT' }),
   rejectNurse: (id, body) => apiFetch(`/nurses/${id}/reject`, { method: 'PUT', body: JSON.stringify(body) }),
+  editNurse: (id, body) => apiFetch(`/nurses/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
   updateAvailability: (id, body) => apiFetch(`/nurses/${id}/availability`, { method: 'PUT', body: JSON.stringify(body) }),
   submitNurseOnboarding: (body) => apiFetch('/nurses/me/onboarding', { method: 'PUT', body: JSON.stringify(body) }),
   saveNurseProfile: (body) => apiFetch('/nurses/me/profile', { method: 'PUT', body: JSON.stringify(body) }),
@@ -95,6 +96,15 @@ export const api = {
   // Users
   getUsers: () => apiFetch('/users'),
   getUser: (id) => apiFetch(`/users/${id}`),
+  editUser: (id, body) => apiFetch(`/users/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  updateUserStatus: (id, status) => apiFetch(`/users/${id}/status`, { method: 'PUT', body: JSON.stringify({ status }) }),
+
+  // Payouts
+  getPayouts: () => apiFetch('/payouts'),
+  generatePayouts: (period) => apiFetch('/payouts/generate', { method: 'POST', body: JSON.stringify({ period }) }),
+  approvePayout: (id) => apiFetch(`/payouts/${id}/approve`, { method: 'PUT' }),
+  markPayoutPaid: (id) => apiFetch(`/payouts/${id}/pay`, { method: 'PUT' }),
+  rejectPayout: (id) => apiFetch(`/payouts/${id}/reject`, { method: 'PUT' }),
 
   // Analytics
   getAnalytics: () => apiFetch('/analytics'),
