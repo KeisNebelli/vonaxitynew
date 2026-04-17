@@ -26,11 +26,7 @@ const CITIES = [
   { name: 'Shkodër', note: { en: 'Northern hub', sq: 'Veri-qendër' } },
 ];
 
-const PLANS = [
-  { name: 'Basic', price: '€30', visits: 1, featured: false },
-  { name: 'Standard', price: '€50', visits: 2, featured: true },
-  { name: 'Premium', price: '€120', visits: 4, featured: false },
-];
+const DEFAULT_PRICING = { basicPrice: 30, standardPrice: 50, premiumPrice: 120, basicVisits: 1, standardVisits: 2, premiumVisits: 4 };
 
 const TRUST_ITEMS = [
   { icon: <ShieldIcon />, title: 'Licensed nurses only', sub: 'Background-checked & verified' },
@@ -88,11 +84,24 @@ const TAG = ({ children }) => (
   </div>
 );
 
-export default function HomePage({ params }) {
+export default async function HomePage({ params }) {
   const lang = params.lang || 'en';
   const services = t(lang, 'services.items');
   const faqs = t(lang, 'faq.items');
   const steps = t(lang, 'howItWorks.steps');
+
+  const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://vonaxitynew-production.up.railway.app';
+  let pricing = DEFAULT_PRICING;
+  try {
+    const res = await fetch(`${BASE}/settings/public`, { next: { revalidate: 300 } });
+    if (res.ok) pricing = await res.json();
+  } catch {}
+
+  const PLANS = [
+    { name: 'Basic',    price: `€${pricing.basicPrice}`,    visits: pricing.basicVisits,    featured: false },
+    { name: 'Standard', price: `€${pricing.standardPrice}`, visits: pricing.standardVisits, featured: true  },
+    { name: 'Premium',  price: `€${pricing.premiumPrice}`,  visits: pricing.premiumVisits,  featured: false },
+  ];
 
   return (
     <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: C.bg }}>
