@@ -123,4 +123,5 @@ export const api = {
   updateProfile: (body) => apiFetch('/profile', { method: 'PUT', body: JSON.stringify(body) }),
   updatePassword: (body) => apiFetch('/profile/password', { method: 'PUT', body: JSON.stringify(body) }),
   updateRelative: (id, body) => apiFetch(`/profile/relative/${id}`, { method: 'PUT', body: JSON.stringify(body) }),
+  addRelative: (clientId, body) => apiFetch(`/users/${clientId}/relatives`, { method: 'POST', body: JSON.stringify(body) }),
 };

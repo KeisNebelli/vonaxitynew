@@ -3,6 +3,7 @@ import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
+import { toastSuccess, toastError } from '@/components/ui/Toast';
 
 const C = {
   primary:'#2563EB', primaryLight:'#EFF6FF', primaryDark:'#1D4ED8',
@@ -292,7 +293,6 @@ function ClientDetail({ client, onBack, visits=[], onStatusChange, lang='en' }) 
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState({ name:client.name||'', phone:client.phone||'', country:client.country||'' });
   const [saving, setSaving] = useState(false);
-  const [statusMsg, setStatusMsg] = useState('');
   const clientVisits = visits.filter(v=>v.clientId===client.id||v.relative?.clientId===client.id);
 
   const handleSaveEdit = async () => {
@@ -300,20 +300,18 @@ function ClientDetail({ client, onBack, visits=[], onStatusChange, lang='en' }) 
     try {
       await api.editUser(client.id, editData);
       setEditing(false);
-      setStatusMsg(tr('admin.settingsSaved'));
-      setTimeout(()=>setStatusMsg(''),3000);
+      toastSuccess(tr('admin.settingsSaved'));
       onStatusChange && onStatusChange();
-    } catch { setStatusMsg(tr('admin.settingsFailed')); }
+    } catch { toastError(tr('admin.settingsFailed')); }
     finally { setSaving(false); }
   };
 
   const handleStatusChange = async (newStatus) => {
     try {
       await api.updateUserStatus(client.id, newStatus);
-      setStatusMsg(tr('admin.settingsSaved'));
-      setTimeout(()=>setStatusMsg(''),3000);
+      toastSuccess(tr('admin.settingsSaved'));
       onStatusChange && onStatusChange();
-    } catch { setStatusMsg(tr('admin.settingsFailed')); }
+    } catch { toastError(tr('admin.settingsFailed')); }
   };
 
   return (
@@ -322,7 +320,6 @@ function ClientDetail({ client, onBack, visits=[], onStatusChange, lang='en' }) 
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         {tr('admin.allClients')}
       </button>
-      {statusMsg && <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:9, padding:'10px 16px', marginBottom:16, fontSize:13, fontWeight:600, color:C.secondary }}>{statusMsg}</div>}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
@@ -488,7 +485,6 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh,
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState({ city:'', bio:'', licenseNumber:'', paypalEmail:'', payRatePerVisit:20 });
   const [saving, setSaving] = useState(false);
-  const [statusMsg, setStatusMsg] = useState('');
   if (!nurse) return null;
   const name = nurse.name || nurse.user?.name || 'Unknown';
   const email = nurse.email || nurse.user?.email || '';
@@ -507,10 +503,9 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh,
     try {
       await api.editNurse(nurse.id, editData);
       setEditing(false);
-      setStatusMsg(tr('admin.settingsSaved'));
-      setTimeout(()=>setStatusMsg(''),3000);
+      toastSuccess(tr('admin.settingsSaved'));
       onRefresh && onRefresh();
-    } catch { setStatusMsg(tr('admin.settingsFailed')); }
+    } catch { toastError(tr('admin.settingsFailed')); }
     finally { setSaving(false); }
   };
 
@@ -522,7 +517,6 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh,
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
         {tr('admin.allNurses')}
       </button>
-      {statusMsg && <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:9, padding:'10px 16px', marginBottom:16, fontSize:13, fontWeight:600, color:C.secondary }}>{statusMsg}</div>}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:20 }}>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:20 }}>
@@ -1350,7 +1344,6 @@ export default function AdminPage({ params }) {
   const switchLang = (l) => { document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; const path = window.location.pathname.replace(/^\/(en|sq)/,`/${l}`); window.location.href = path; };
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
-  const [actionError, setActionError] = useState('');
   const [nurses, setNurses] = useState([]);
   const [visits, setVisits] = useState([]);
   const [clients, setClients] = useState([]);
@@ -1403,20 +1396,20 @@ export default function AdminPage({ params }) {
   useEffect(() => { loadData(); }, []);
 
   const handleApprove = async (nurseId) => {
-    try { await api.approveNurse(nurseId); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'APPROVED'}:n)); }
-    catch (err) { setActionError(err.message || 'Action failed. Please try again.'); }
+    try { await api.approveNurse(nurseId); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'APPROVED'}:n)); toastSuccess(tr('admin.approveSuccess')||'Nurse approved'); }
+    catch (err) { toastError(err.message || 'Action failed'); }
   };
   const handleSuspend = async (nurseId) => {
-    try { await api.suspendNurse(nurseId); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'SUSPENDED'}:n)); }
-    catch (err) { setActionError(err.message || 'Action failed. Please try again.'); }
+    try { await api.suspendNurse(nurseId); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'SUSPENDED'}:n)); toastSuccess(tr('admin.settingsSaved')); }
+    catch (err) { toastError(err.message || 'Action failed'); }
   };
   const handleReject = async (nurseId, reason) => {
-    try { await api.rejectNurse(nurseId, { reason }); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'REJECTED',rejectionReason:reason}:n)); }
-    catch (err) { setActionError(err.message || 'Action failed. Please try again.'); }
+    try { await api.rejectNurse(nurseId, { reason }); setNurses(prev=>prev.map(n=>n.id===nurseId?{...n,status:'REJECTED',rejectionReason:reason}:n)); toastSuccess('Nurse rejected'); }
+    catch (err) { toastError(err.message || 'Action failed'); }
   };
   const handleAssign = async (visitId, nurseId) => {
-    try { await api.updateVisit(visitId,{nurseId,status:'PENDING'}); await loadData(); }
-    catch (err) { setActionError(err.message || 'Action failed. Please try again.'); }
+    try { await api.updateVisit(visitId,{nurseId,status:'PENDING'}); await loadData(); toastSuccess(tr('admin.assigned')||'Nurse assigned'); }
+    catch (err) { toastError(err.message || 'Action failed'); }
   };
   const logout = () => {
     localStorage.removeItem('vonaxity-token');
@@ -1426,8 +1419,6 @@ export default function AdminPage({ params }) {
   };
 
   const alertCount = visits.filter(v=>v.status==='UNASSIGNED').length + nurses.filter(n=>n.status==='PENDING').length;
-  // Auto-clear action errors
-  if (actionError) setTimeout(() => setActionError(''), 4000);
   const _AL = ADMIN_LABELS[lang] || ADMIN_LABELS.en;
   const TITLES = { overview:_AL.overview, clients:_AL.clients, nurses:_AL.nurses, visits:_AL.visits, alerts:_AL.alerts, payments:_AL.payments, analytics:_AL.analytics, payouts:_AL.payouts, ai:_AL.ai, settings:_AL.settings };
   const ADMIN_NAV_BOTTOM = NAV.slice(0,4);
@@ -1457,10 +1448,7 @@ export default function AdminPage({ params }) {
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]}</div>
             </div>
             <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-              {actionError && (
-                <div style={{ fontSize:12, fontWeight:600, padding:'6px 12px', background:'#FEF2F2', color:'#DC2626', borderRadius:8, border:'1px solid #FECACA' }}>{actionError}</div>
-              )}
-              {alertCount>0 && <button onClick={()=>setActive('alerts')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#FEF2F2',color:'#DC2626',border:'none',borderRadius:8,cursor:'pointer',fontFamily:F }}>{alertCount} {tr('admin.alerts')}</button>}
+              {alertCount>0 &&<button onClick={()=>setActive('alerts')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#FEF2F2',color:'#DC2626',border:'none',borderRadius:8,cursor:'pointer',fontFamily:F }}>{alertCount} {tr('admin.alerts')}</button>}
               <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>↻ {tr('admin.refresh')}</button>
               <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#F5F3FF',color:'#7C3AED',border:'1px solid rgba(124,58,237,0.2)',borderRadius:8,cursor:'pointer',fontFamily:F }}>{tr('admin.ai')}</button>
               <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:'1px solid #E2E8F0' }}>

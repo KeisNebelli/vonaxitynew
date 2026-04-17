@@ -1,4 +1,5 @@
 import CookieBanner from '@/components/CookieBanner';
+import { ToastContainer } from '@/components/ui/Toast';
 import { Suspense } from 'react';
 
 export const metadata = {
@@ -49,6 +50,7 @@ export default function RootLayout({ children }) {
       </head>
       <body>
         {children}
+        <ToastContainer />
         <Suspense fallback={null}><CookieBanner /></Suspense>
       </body>
     </html>

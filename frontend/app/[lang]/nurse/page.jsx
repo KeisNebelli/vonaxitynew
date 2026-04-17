@@ -4,6 +4,7 @@ import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
+import { toastSuccess, toastError } from '@/components/ui/Toast';
 // Module-level translation helper - uses 'en' as default
 let _currentLang = 'en';
 const tr = (key) => t(_currentLang, key);
@@ -11,13 +12,6 @@ const tr = (key) => t(_currentLang, key);
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#7C3AED', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827' };
 
-const MOCK_NURSE = { name:'Elona Berberi', email:'nurse@test.com', phone:'+355690001111', city:'Tirana', initials:'EB', rating:4.8, totalVisits:47, totalEarnings:940, payRatePerVisit:20, licenseNumber:'ALB-NURSE-2024-001', bio:'Specialised in cardiovascular monitoring and diabetic care. 6 years of home nursing experience across Tirana.', specialties:['Blood Pressure','Glucose Monitoring','Vitals'], languages:['Albanian','English'], availability:['Monday','Tuesday','Wednesday','Friday'] };
-
-const MOCK_VISITS = [
-  { id:'v1', relative:{ name:'Fatmira Murati', address:'Rruga e Elbasanit 14, Tirana', phone:'+355690001111', age:74, city:'Tirana' }, serviceType:'Blood Pressure + Glucose Check', scheduledAt:'2024-12-20T10:00:00Z', status:'PENDING', notes:'Patient has diabetes. Bring glucose kit. Ring doorbell twice.', lat:41.3275, lng:19.8187 },
-  { id:'v2', relative:{ name:'Besnik Kola', address:'Bulevardi Bajram Curri 5, Tirana', phone:'+355690002222', age:68, city:'Tirana' }, serviceType:'Vitals Monitoring', scheduledAt:'2024-12-20T14:30:00Z', status:'PENDING', notes:'Post-surgery check. 3rd floor.', lat:41.3317, lng:19.8319 },
-  { id:'v3', relative:{ name:'Lirije Hoxha', address:'Rruga Myslym Shyri 22, Tirana', phone:'+355690003333', age:81, city:'Tirana' }, serviceType:'Welfare Check', scheduledAt:'2024-12-19T09:00:00Z', status:'COMPLETED', notes:'', bpSystolic:126, bpDiastolic:80, glucose:5.2, nurseNotes:'Patient well. Mild fatigue.', lat:41.3248, lng:19.8227 },
-];
 
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
 const CITIES = ['Tirana','Durrës','Elbasan','Fier','Berat','Sarandë','Kukës','Shkodër'];
@@ -1050,7 +1044,8 @@ export default function NursePage({ params }) {
       const apiStatus = status.toUpperCase().replace(/ /g, '_');
       await api.updateVisitStatus(visitId, apiStatus);
       setVisits(prev => prev.map(v => v.id === visitId ? { ...v, status: apiStatus } : v));
-    } catch (err) { console.error('Status update error:', err); }
+      toastSuccess(t(_currentLang, 'nurse.updateStatus') + ': ' + apiStatus.replace(/_/g,' '));
+    } catch (err) { toastError(err.message || 'Failed to update status'); }
   };
 
   const handleSave = async (formData) => { await api.saveNurseProfile(formData); };

@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
+import { toastSuccess, toastError } from '@/components/ui/Toast';
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6' };
 const CITIES_AL = ['Tirana','Durrës','Elbasan','Fier','Berat','Sarandë','Kukës','Shkodër'];
 const COUNTRIES = ['United Kingdom','Italy','Germany','Greece','USA','Albania','Other'];
@@ -49,24 +50,38 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
   const [contact, setContact] = useState({ preferredContact:'email', emergencyName:'', emergencyPhone:'' });
   const [saving, setSaving] = useState(false);
   const [savingPass, setSavingPass] = useState(false);
-  const [profileStatus, setProfileStatus] = useState(null);
   const [passStatus, setPassStatus] = useState(null);
   const [passError, setPassError] = useState('');
+  const [addingRelative, setAddingRelative] = useState(false);
+  const [savingNewRel, setSavingNewRel] = useState(false);
+  const [newRel, setNewRel] = useState({ name:'', age:'', city:'', phone:'', address:'', healthNotes:'' });
 
   const inp = { width:'100%', padding:'11px 14px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box' };
 
   const handleSaveProfile = async () => {
-    setSaving(true); setProfileStatus(null);
+    setSaving(true);
     try {
       await api.updateProfile({ name:profile.name, phone:profile.phone, country:profile.country, city:profile.city });
       if (initialRelative?.id) {
         await api.updateRelative(initialRelative.id, { name:rel.name, city:rel.city, address:rel.address, phone:rel.phone, age:rel.age||null, healthNotes:rel.healthNotes });
       }
-      setProfileStatus('success');
-      setTimeout(() => setProfileStatus(null), 4000);
+      toastSuccess(tr('settings.savedSuccess'));
     } catch (err) {
-      setProfileStatus('error');
+      toastError(err.message || tr('settings.savedError'));
     } finally { setSaving(false); }
+  };
+
+  const handleAddRelative = async () => {
+    if (!newRel.name || !newRel.city) return toastError('Name and city are required.');
+    setSavingNewRel(true);
+    try {
+      await api.addRelative(initialUser.id, { ...newRel, age: newRel.age ? parseInt(newRel.age) : null });
+      toastSuccess('Loved one added successfully!');
+      setNewRel({ name:'', age:'', city:'', phone:'', address:'', healthNotes:'' });
+      setAddingRelative(false);
+    } catch (err) {
+      toastError(err.message || 'Failed to add loved one.');
+    } finally { setSavingNewRel(false); }
   };
 
   const handleChangePassword = async () => {
@@ -131,6 +146,48 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
         <Field label={tr("settings.healthNotes")}>
           <textarea style={{...inp, minHeight:80, resize:'vertical'}} value={rel.healthNotes} onChange={e => setRel(r => ({...r, healthNotes:e.target.value}))} placeholder="e.g. Diabetes Type 2, takes Metformin daily..." />
         </Field>
+
+        <div style={{ marginTop:8, paddingTop:20, borderTop:`1px solid ${C.borderSubtle}` }}>
+          {!addingRelative ? (
+            <button onClick={() => setAddingRelative(true)} style={{ display:'flex', alignItems:'center', gap:7, background:C.primaryLight, color:C.primary, border:`1.5px solid rgba(37,99,235,0.2)`, borderRadius:9, padding:'9px 16px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+              Add Another Loved One
+            </button>
+          ) : (
+            <div style={{ background:C.bgSubtle, borderRadius:12, padding:'20px', border:`1px solid ${C.border}` }}>
+              <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>New Loved One</div>
+              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+                <Field label={tr("settings.theirName")}>
+                  <input style={inp} value={newRel.name} onChange={e => setNewRel(r => ({...r, name:e.target.value}))} placeholder="Full name" />
+                </Field>
+                <Field label={tr("settings.theirAge")}>
+                  <input style={inp} type="number" value={newRel.age} onChange={e => setNewRel(r => ({...r, age:e.target.value}))} placeholder="e.g. 74" />
+                </Field>
+                <Field label={tr("settings.theirCity")}>
+                  <select style={inp} value={newRel.city} onChange={e => setNewRel(r => ({...r, city:e.target.value}))}>
+                    <option value="">{tr('settings.selectCity')}</option>
+                    {CITIES_AL.map(c => <option key={c}>{c}</option>)}
+                  </select>
+                </Field>
+                <Field label={tr("settings.theirPhone")}>
+                  <input style={inp} value={newRel.phone} onChange={e => setNewRel(r => ({...r, phone:e.target.value}))} placeholder="+355 69 000 0000" />
+                </Field>
+              </div>
+              <Field label={tr("settings.homeAddress")}>
+                <input style={inp} value={newRel.address} onChange={e => setNewRel(r => ({...r, address:e.target.value}))} placeholder="Street address in Albania" />
+              </Field>
+              <Field label={tr("settings.healthNotes")}>
+                <textarea style={{...inp, minHeight:70, resize:'vertical'}} value={newRel.healthNotes} onChange={e => setNewRel(r => ({...r, healthNotes:e.target.value}))} placeholder="e.g. Diabetes Type 2..." />
+              </Field>
+              <div style={{ display:'flex', gap:10, marginTop:4 }}>
+                <button onClick={() => { setAddingRelative(false); setNewRel({ name:'', age:'', city:'', phone:'', address:'', healthNotes:'' }); }} style={{ background:'transparent', color:C.textSecondary, border:`1.5px solid ${C.border}`, borderRadius:9, padding:'9px 18px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>Cancel</button>
+                <button onClick={handleAddRelative} disabled={savingNewRel} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:9, padding:'9px 20px', fontSize:13, fontWeight:600, cursor:'pointer', opacity:savingNewRel?0.7:1, fontFamily:'inherit' }}>
+                  {savingNewRel ? 'Saving…' : 'Save Loved One'}
+                </button>
+              </div>
+            </div>
+          )}
+        </div>
       </SectionCard>
 
       <SectionCard title={tr("settings.contactPref")} subtitle={tr("settings.contactSub")}>
@@ -153,17 +210,6 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
         </div>
       </SectionCard>
 
-      {profileStatus==='success' && (
-        <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:10, padding:'12px 16px', marginBottom:16, display:'flex', alignItems:'center', gap:10 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-          <span style={{ fontSize:14, fontWeight:600, color:C.secondary }}>{tr('settings.savedSuccess')}</span>
-        </div>
-      )}
-      {profileStatus==='error' && (
-        <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:10, padding:'12px 16px', marginBottom:16 }}>
-          <span style={{ fontSize:14, color:C.error }}>{tr('settings.savedError')}</span>
-        </div>
-      )}
       <button onClick={handleSaveProfile} disabled={saving} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:'pointer', marginBottom:28, opacity:saving?0.7:1 }}>
         {saving ? tr("settings.saving") : tr("settings.saveChanges")}
       </button>
