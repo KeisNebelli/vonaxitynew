@@ -16,6 +16,12 @@ const translations = {
       cta1:'Care for a Loved One', cta2:'See How It Works',
       stat1:'Families served', stat2:'Cities covered', stat3:'Verified nurses',
       visitToday:'Visit today', nurseLabel:'Nurse', timeLabel:'Time', serviceLabel:'Service',
+      trustItems:[
+        { title:'Licensed nurses only', sub:'Background-checked & verified' },
+        { title:'Health report after every visit', sub:'Emailed to you within hours' },
+        { title:'Visits in 8 cities', sub:'Tirana, Durrës, Elbasan & more' },
+        { title:'Book from anywhere', sub:'UK, Italy, Germany, USA & more' },
+      ],
     },
     services: {
       tag:'What we do', title:'Professional care, at home',
@@ -541,6 +547,12 @@ const translations = {
       cta1:'Kujdesuni për një të dashur', cta2:'Shiko si funksionon',
       stat1:'Familje të shërbyera', stat2:'Qytete të mbuluara', stat3:'Infermierë të verifikuar',
       visitToday:'Vizitë sot', nurseLabel:'Infermierja', timeLabel:'Planifikuar', serviceLabel:'Shërbimi',
+      trustItems:[
+        { title:'Vetëm infermierë të licensuar', sub:'Kontrolluar & verifikuar' },
+        { title:'Raport shëndetësor pas çdo vizite', sub:'Dërguar me email brenda orëve' },
+        { title:'Vizita në 8 qytete', sub:'Tiranë, Durrës, Elbasan & më shumë' },
+        { title:'Rezervoni kudo', sub:'MB, Itali, Gjermani, SHBA & më shumë' },
+      ],
     },
     services: {
       tag:'Çfarë ofrojmë', title:'Kujdes profesional, në shtëpi',

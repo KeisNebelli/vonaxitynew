@@ -28,12 +28,7 @@ const CITIES = [
 
 const DEFAULT_PRICING = { basicPrice: 30, standardPrice: 50, premiumPrice: 120, basicVisits: 1, standardVisits: 2, premiumVisits: 4 };
 
-const TRUST_ITEMS = [
-  { icon: <ShieldIcon />, title: 'Licensed nurses only', sub: 'Background-checked & verified' },
-  { icon: <CheckIcon />, title: 'Health report after every visit', sub: 'Emailed to you within hours' },
-  { icon: <HomeIcon />, title: 'Visits in 8 cities', sub: 'Tirana, Durrës, Elbasan & more' },
-  { icon: <GlobeIcon />, title: 'Book from anywhere', sub: 'UK, Italy, Germany, USA & more' },
-];
+const TRUST_ICONS = [<ShieldIcon />, <CheckIcon />, <HomeIcon />, <GlobeIcon />];
 
 function ShieldIcon() {
   return <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>;
@@ -89,6 +84,8 @@ export default async function HomePage({ params }) {
   const services = t(lang, 'services.items');
   const faqs = t(lang, 'faq.items');
   const steps = t(lang, 'howItWorks.steps');
+  const trustTexts = t(lang, 'hero.trustItems') || [];
+  const TRUST_ITEMS = trustTexts.map((item, i) => ({ ...item, icon: TRUST_ICONS[i] }));
 
   const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://vonaxitynew-production.up.railway.app';
   let pricing = DEFAULT_PRICING;
@@ -111,7 +108,7 @@ export default async function HomePage({ params }) {
       <section style={{ padding: '80px 24px 96px', background: C.bgWhite }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 60, alignItems: 'center' }}>
           <div>
-            <TAG>Serving Albania since 2024</TAG>
+            <TAG>{t(lang, 'hero.badge')}</TAG>
             <h1 style={{ fontSize: 'clamp(38px,5vw,56px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: '-1.5px', color: C.textPrimary, margin: '0 0 20px' }}>
               {t(lang, 'hero.headline1')}<br />
               <span style={{ color: C.primary }}>{t(lang, 'hero.headline2')}</span>
