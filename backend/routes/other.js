@@ -41,7 +41,7 @@ router.get('/', ...requireRole('ADMIN'), async (req, res) => {
     res.json({ users: normalized });
   } catch (err) {
     console.error('Get users error:', err);
-    res.status(500).json({ error: 'Failed to fetch users', detail: err.message });
+    res.status(500).json({ error: 'Failed to fetch users' });
   }
 });
 
@@ -104,6 +104,9 @@ router.put('/:id/status', ...requireRole('ADMIN'), async (req, res) => {
 
 // GET /users/:id/relatives
 router.get('/:id/relatives', authMiddleware, async (req, res) => {
+  if (req.user.userId !== req.params.id && req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Access denied' });
+  }
   try {
     const relatives = await prisma.relative.findMany({ where: { clientId: req.params.id } });
     res.json({ relatives });
@@ -114,6 +117,9 @@ router.get('/:id/relatives', authMiddleware, async (req, res) => {
 
 // POST /users/:id/relatives
 router.post('/:id/relatives', authMiddleware, async (req, res) => {
+  if (req.user.userId !== req.params.id && req.user.role !== 'ADMIN') {
+    return res.status(403).json({ error: 'Access denied' });
+  }
   try {
     const { name, age, phone, city, address, relationship, healthNotes } = req.body;
     const relative = await prisma.relative.create({

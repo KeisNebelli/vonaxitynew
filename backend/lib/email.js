@@ -1,6 +1,17 @@
 const RESEND_API_KEY = process.env.RESEND_API_KEY;
 const FROM = 'Vonaxity <hello@vonaxity.com>';
 
+// Escape user-supplied strings before inserting into HTML
+function esc(str) {
+  if (str == null) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;');
+}
+
 async function sendEmail({ to, subject, html }) {
   if (!RESEND_API_KEY) {
     console.log(`[EMAIL SKIPPED - no RESEND_API_KEY] To: ${to} | Subject: ${subject}`);
@@ -28,15 +39,15 @@ const emailTemplates = {
 
   // ── To nurse: new job posted in their city ─────────────────────────────────
   newJobPosted: ({ nurseName, serviceType, city, scheduledAt, visitId }) => ({
-    subject: `New job available in ${city} — ${serviceType}`,
+    subject: `New job available in ${esc(city)} — ${esc(serviceType)}`,
     html: `
       <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
         <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">New job available near you</h2>
-        <p style="color:#475569;margin-bottom:24px">Hi ${nurseName}, a new visit request just came in that matches your area.</p>
+        <p style="color:#475569;margin-bottom:24px">Hi ${esc(nurseName)}, a new visit request just came in that matches your area.</p>
         <div style="background:#F8FAFC;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #E2E8F0">
-          <div style="margin-bottom:10px"><strong>Service:</strong> ${serviceType}</div>
-          <div style="margin-bottom:10px"><strong>City:</strong> ${city}</div>
+          <div style="margin-bottom:10px"><strong>Service:</strong> ${esc(serviceType)}</div>
+          <div style="margin-bottom:10px"><strong>City:</strong> ${esc(city)}</div>
           <div><strong>Date:</strong> ${new Date(scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
         </div>
         <a href="${BASE_URL}/en/nurse" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">View &amp; Apply →</a>
@@ -46,12 +57,12 @@ const emailTemplates = {
 
   // ── To client: nurse applied to their visit ────────────────────────────────
   nurseApplied: ({ clientName, nurseName, nurseCity, serviceType, visitId }) => ({
-    subject: `${nurseName} applied for your visit`,
+    subject: `${esc(nurseName)} applied for your visit`,
     html: `
       <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
         <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">A nurse applied to your visit</h2>
-        <p style="color:#475569;margin-bottom:24px">Hi ${clientName}, <strong>${nurseName}</strong> from ${nurseCity} has applied for your <strong>${serviceType}</strong> visit.</p>
+        <p style="color:#475569;margin-bottom:24px">Hi ${esc(clientName)}, <strong>${esc(nurseName)}</strong> from ${esc(nurseCity)} has applied for your <strong>${esc(serviceType)}</strong> visit.</p>
         <p style="color:#475569;margin-bottom:24px">Review their profile and select them if you're happy to proceed.</p>
         <a href="${BASE_URL}/en/dashboard" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">View applicants →</a>
         <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
@@ -60,16 +71,16 @@ const emailTemplates = {
 
   // ── To nurse: client selected them ────────────────────────────────────────
   nurseSelected: ({ nurseName, clientName, serviceType, city, scheduledAt, relativeName }) => ({
-    subject: `You've been selected for a visit in ${city}`,
+    subject: `You've been selected for a visit in ${esc(city)}`,
     html: `
       <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
         <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">You've been selected!</h2>
-        <p style="color:#475569;margin-bottom:24px">Hi ${nurseName}, great news — ${clientName} has selected you for their visit.</p>
+        <p style="color:#475569;margin-bottom:24px">Hi ${esc(nurseName)}, great news — ${esc(clientName)} has selected you for their visit.</p>
         <div style="background:#ECFDF5;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #6EE7B7">
-          <div style="margin-bottom:10px"><strong>Patient:</strong> ${relativeName}</div>
-          <div style="margin-bottom:10px"><strong>Service:</strong> ${serviceType}</div>
-          <div style="margin-bottom:10px"><strong>City:</strong> ${city}</div>
+          <div style="margin-bottom:10px"><strong>Patient:</strong> ${esc(relativeName)}</div>
+          <div style="margin-bottom:10px"><strong>Service:</strong> ${esc(serviceType)}</div>
+          <div style="margin-bottom:10px"><strong>City:</strong> ${esc(city)}</div>
           <div><strong>Date:</strong> ${new Date(scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
         </div>
         <a href="${BASE_URL}/en/nurse" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">View your visits →</a>
@@ -79,17 +90,17 @@ const emailTemplates = {
 
   // ── To client: visit completed + health report ─────────────────────────────
   visitCompleted: ({ clientName, nurseName, relativeName, serviceType, scheduledAt, bp, glucose, notes }) => ({
-    subject: `Health report: visit for ${relativeName} completed`,
+    subject: `Health report: visit for ${esc(relativeName)} completed`,
     html: `
       <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
         <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Visit completed</h2>
-        <p style="color:#475569;margin-bottom:24px">Hi ${clientName}, ${nurseName} has completed the ${serviceType} visit for <strong>${relativeName}</strong>.</p>
+        <p style="color:#475569;margin-bottom:24px">Hi ${esc(clientName)}, ${esc(nurseName)} has completed the ${esc(serviceType)} visit for <strong>${esc(relativeName)}</strong>.</p>
         <div style="background:#F8FAFC;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #E2E8F0">
           <div style="font-size:14px;font-weight:600;margin-bottom:12px;color:#0F172A">Health report</div>
-          ${bp ? `<div style="margin-bottom:8px"><strong>Blood pressure:</strong> ${bp} mmHg</div>` : ''}
-          ${glucose ? `<div style="margin-bottom:8px"><strong>Glucose:</strong> ${glucose} mmol/L</div>` : ''}
-          ${notes ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid #E2E8F0;font-style:italic;color:#475569">"${notes}"</div>` : ''}
+          ${bp ? `<div style="margin-bottom:8px"><strong>Blood pressure:</strong> ${esc(bp)} mmHg</div>` : ''}
+          ${glucose ? `<div style="margin-bottom:8px"><strong>Glucose:</strong> ${esc(glucose)} mmol/L</div>` : ''}
+          ${notes ? `<div style="margin-top:12px;padding-top:12px;border-top:1px solid #E2E8F0;font-style:italic;color:#475569">"${esc(notes)}"</div>` : ''}
         </div>
         <a href="${BASE_URL}/en/dashboard" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">View full report →</a>
         <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
@@ -103,7 +114,7 @@ const emailTemplates = {
       <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
         <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">You're approved!</h2>
-        <p style="color:#475569;margin-bottom:24px">Hi ${nurseName}, your Vonaxity nurse profile has been reviewed and approved. You can now browse and apply to visit requests in your area.</p>
+        <p style="color:#475569;margin-bottom:24px">Hi ${esc(nurseName)}, your Vonaxity nurse profile has been reviewed and approved. You can now browse and apply to visit requests in your area.</p>
         <a href="${BASE_URL}/en/nurse" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">Browse jobs →</a>
         <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
       </div>`,
@@ -116,8 +127,8 @@ const emailTemplates = {
       <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
         <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Application update</h2>
-        <p style="color:#475569;margin-bottom:16px">Hi ${nurseName}, unfortunately we were unable to approve your profile at this time.</p>
-        ${reason ? `<div style="background:#FEF2F2;border-radius:10px;padding:16px;margin-bottom:24px;border:1px solid #FECACA;color:#DC2626">${reason}</div>` : ''}
+        <p style="color:#475569;margin-bottom:16px">Hi ${esc(nurseName)}, unfortunately we were unable to approve your profile at this time.</p>
+        ${reason ? `<div style="background:#FEF2F2;border-radius:10px;padding:16px;margin-bottom:24px;border:1px solid #FECACA;color:#DC2626">${esc(reason)}</div>` : ''}
         <p style="color:#475569;margin-bottom:24px">You can update your profile and resubmit for review.</p>
         <a href="${BASE_URL}/en/nurse" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">Update profile →</a>
         <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
@@ -126,16 +137,16 @@ const emailTemplates = {
 
   // ── To client: booking confirmation ────────────────────────────────────────
   bookingConfirmed: ({ clientName, serviceType, city, scheduledAt, relativeName }) => ({
-    subject: `Visit booked — ${serviceType} on ${new Date(scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`,
+    subject: `Visit booked — ${esc(serviceType)} on ${new Date(scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`,
     html: `
       <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
         <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Visit booked successfully</h2>
-        <p style="color:#475569;margin-bottom:24px">Hi ${clientName}, your visit has been booked. Nurses in ${city} are being notified and will apply soon.</p>
+        <p style="color:#475569;margin-bottom:24px">Hi ${esc(clientName)}, your visit has been booked. Nurses in ${esc(city)} are being notified and will apply soon.</p>
         <div style="background:#F8FAFC;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #E2E8F0">
-          <div style="margin-bottom:10px"><strong>Service:</strong> ${serviceType}</div>
-          <div style="margin-bottom:10px"><strong>For:</strong> ${relativeName}</div>
-          <div style="margin-bottom:10px"><strong>City:</strong> ${city}</div>
+          <div style="margin-bottom:10px"><strong>Service:</strong> ${esc(serviceType)}</div>
+          <div style="margin-bottom:10px"><strong>For:</strong> ${esc(relativeName)}</div>
+          <div style="margin-bottom:10px"><strong>City:</strong> ${esc(city)}</div>
           <div><strong>Date:</strong> ${new Date(scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
         </div>
         <p style="color:#475569;margin-bottom:24px">You will receive another email when a nurse applies. You can then review and select your preferred nurse from your dashboard.</p>
@@ -149,7 +160,7 @@ const emailTemplates = {
     html: `
       <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
-        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Welcome, ${name}!</h2>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Welcome, ${esc(name)}!</h2>
         <p style="color:#475569;margin-bottom:24px">Your account is ready. You can now book professional nurse visits for your loved ones in Albania.</p>
         <a href="${BASE_URL}/en/dashboard" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">Go to dashboard →</a>
         <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
@@ -164,14 +175,14 @@ module.exports.sendNurseNudge = async ({ nurseEmail, nurseName, serviceType, sch
   const { sendEmail } = module.exports;
   return sendEmail({
     to: nurseEmail,
-    subject: `Reminder: Visit tomorrow — ${serviceType} in ${city}`,
+    subject: `Reminder: Visit tomorrow — ${esc(serviceType)} in ${esc(city)}`,
     html: `<div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
       <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
       <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Visit reminder</h2>
-      <p style="color:#475569;margin-bottom:24px">Hi ${nurseName}, you have a visit scheduled tomorrow.</p>
+      <p style="color:#475569;margin-bottom:24px">Hi ${esc(nurseName)}, you have a visit scheduled tomorrow.</p>
       <div style="background:#F8FAFC;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #E2E8F0">
-        <div style="margin-bottom:10px"><strong>Service:</strong> ${serviceType}</div>
-        <div style="margin-bottom:10px"><strong>City:</strong> ${city}</div>
+        <div style="margin-bottom:10px"><strong>Service:</strong> ${esc(serviceType)}</div>
+        <div style="margin-bottom:10px"><strong>City:</strong> ${esc(city)}</div>
         <div><strong>Date:</strong> ${new Date(scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})}</div>
       </div>
       <a href="${process.env.FRONTEND_URL||'https://vonaxity.com'}/en/nurse" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">View visit details →</a>

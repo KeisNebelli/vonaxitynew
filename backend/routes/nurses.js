@@ -135,10 +135,10 @@ router.get('/public', async (req, res) => {
       totalVisits: n.totalVisits || 0,
       reviewCount: n.reviews?.length || 0,
       bio: n.bio || '',
-      specialties: n.specialties ? JSON.parse(n.specialties) : [],
-      services: n.services ? JSON.parse(n.services) : [],
-      languages: n.languages ? JSON.parse(n.languages) : [],
-      availability: n.availability ? JSON.parse(n.availability) : [],
+      specialties: (() => { try { return n.specialties ? JSON.parse(n.specialties) : []; } catch { return []; } })(),
+      services: (() => { try { return n.services ? JSON.parse(n.services) : []; } catch { return []; } })(),
+      languages: (() => { try { return n.languages ? JSON.parse(n.languages) : []; } catch { return []; } })(),
+      availability: (() => { try { return n.availability ? JSON.parse(n.availability) : []; } catch { return []; } })(),
       experience: n.experience || '',
       profilePhotoUrl: n.profilePhotoUrl || null,
       approvedAt: n.approvedAt,
@@ -251,7 +251,7 @@ router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
       data: nurseUpdate,
       include: { user: { select: { id: true, name: true, email: true, phone: true } } },
     });
-    console.log(`[ADMIN] Edited nurse ${req.params.id}`);
+    // nurse updated
     res.json({ success: true, nurse: updated });
   } catch (err) {
     console.error('Edit nurse error:', err);

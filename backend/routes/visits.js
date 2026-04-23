@@ -304,7 +304,7 @@ router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
       },
       include: { relative: { include: { client: true } }, nurse: { include: { user: true } } },
     });
-    console.log(`[ADMIN] Updated visit ${req.params.id}: status=${status||'—'} nurseId=${nurseId||'—'}`);
+    // visit updated
     res.json({ success: true, visit });
   } catch (err) {
     console.error('Admin update visit error:', err);

@@ -2,7 +2,6 @@ import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { t } from '@/translations';
-import { StepIcon, TrustIcon } from '@/components/visuals/StepIcons';
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', bg:'#FAFAF9', bgWhite:'#FFFFFF', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
 

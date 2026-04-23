@@ -67,10 +67,8 @@ router.post('/create-portal', ...requireRole('CLIENT'), async (req, res) => {
   }
 });
 
-// POST /payments/webhook — Stripe webhook handler
-router.post('/webhook', express => {
-  // This route needs raw body - handled in server.js
-}, async (req, res) => {
+// POST /payments/webhook — Stripe webhook handler (raw body handled in server.js)
+router.post('/webhook', async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
   try {

@@ -72,15 +72,15 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
   };
 
   const handleAddRelative = async () => {
-    if (!newRel.name || !newRel.city) return toastError('Name and city are required.');
+    if (!newRel.name || !newRel.city) return toastError(tr('settings.lovedOneRequired'));
     setSavingNewRel(true);
     try {
       await api.addRelative(initialUser.id, { ...newRel, age: newRel.age ? parseInt(newRel.age) : null });
-      toastSuccess('Loved one added successfully!');
+      toastSuccess(tr('settings.lovedOneAdded'));
       setNewRel({ name:'', age:'', city:'', phone:'', address:'', healthNotes:'' });
       setAddingRelative(false);
     } catch (err) {
-      toastError(err.message || 'Failed to add loved one.');
+      toastError(err.message || tr('settings.lovedOneError'));
     } finally { setSavingNewRel(false); }
   };
 
