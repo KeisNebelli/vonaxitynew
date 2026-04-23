@@ -162,7 +162,10 @@ router.post('/login', authLimiter, async (req, res) => {
       await prisma.subscription.update({ where: { userId: user.id }, data: { status: 'EXPIRED' } });
     }
 
-    if (user.status === 'SUSPENDED') {
+    // If suspended only because trial expired — let them in, dashboard shows paywall
+    if (user.status === 'SUSPENDED' && user.subscription?.status === 'EXPIRED') {
+      // allow login through — fall through to token generation
+    } else if (user.status === 'SUSPENDED') {
       return res.status(403).json({ error: 'Account suspended. Contact support.' });
     }
 
