@@ -180,7 +180,7 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
                 <textarea style={{...inp, minHeight:70, resize:'vertical'}} value={newRel.healthNotes} onChange={e => setNewRel(r => ({...r, healthNotes:e.target.value}))} placeholder="e.g. Diabetes Type 2..." />
               </Field>
               <div style={{ display:'flex', gap:10, marginTop:4 }}>
-                <button onClick={() => { setAddingRelative(false); setNewRel({ name:'', age:'', city:'', phone:'', address:'', healthNotes:'' }); }} style={{ background:'transparent', color:C.textSecondary, border:`1.5px solid ${C.border}`, borderRadius:9, padding:'9px 18px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>Cancel</button>
+                <button onClick={() => { setAddingRelative(false); setNewRel({ name:'', age:'', city:'', phone:'', address:'', healthNotes:'' }); }} style={{ background:'transparent', color:C.textSecondary, border:`1.5px solid ${C.border}`, borderRadius:9, padding:'9px 18px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>{tr('settings.cancel')}</button>
                 <button onClick={handleAddRelative} disabled={savingNewRel} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:9, padding:'9px 20px', fontSize:13, fontWeight:600, cursor:'pointer', opacity:savingNewRel?0.7:1, fontFamily:'inherit' }}>
                   {savingNewRel ? tr('settings.savingLovedOne') : tr('settings.saveLovedOne')}
                 </button>

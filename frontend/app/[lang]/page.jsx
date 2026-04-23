@@ -2,6 +2,7 @@ import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { t } from '@/translations';
+import AlbaniaMap from '@/components/visuals/AlbaniaMap';
 
 const C = {
   primary: '#2563EB', primaryLight: '#EFF6FF', primaryDark: '#1D4ED8',
