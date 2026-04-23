@@ -2,9 +2,6 @@ import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { t } from '@/translations';
-import HeroIllustration from '@/components/visuals/HeroIllustration';
-import AlbaniaMap from '@/components/visuals/AlbaniaMap';
-import { StepIcon, TrustIcon } from '@/components/visuals/StepIcons';
 
 const C = {
   primary: '#2563EB', primaryLight: '#EFF6FF', primaryDark: '#1D4ED8',
@@ -203,8 +200,7 @@ export default async function HomePage({ params }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16 }}>
             {Array.isArray(steps) && steps.slice(0, 4).map((s, i) => (
               <div key={i} style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, padding: '28px 22px' }}>
-                <div style={{ marginBottom: 16 }}><StepIcon step={s.num} size={52} /></div>
-                <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, letterSpacing: '1.5px', marginBottom: 10 }}>STEP {s.num}</div>
+                <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, letterSpacing: '1.5px', marginBottom: 10 }}>0{i + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, marginBottom: 8, lineHeight: 1.4 }}>{s.title}</div>
                 <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>{s.desc}</div>
               </div>
@@ -239,7 +235,7 @@ export default async function HomePage({ params }) {
           <div style={{ marginTop: 24, background: C.warningLight, border: `1px solid #FDE68A`, borderRadius: 12, padding: '14px 18px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
             <div style={{ flexShrink: 0, marginTop: 1 }}><WarningIcon /></div>
             <p style={{ fontSize: 13, color: '#92400E', margin: 0, lineHeight: 1.6 }}>
-              <strong>Non-emergency care only.</strong> {t(lang, 'services.emergency')} <strong>127</strong> {t(lang, 'services.immediately')}
+              <strong>{t(lang, 'services.nonEmergencyStrong')}</strong> {t(lang, 'services.emergency')} <strong>127</strong> {t(lang, 'services.immediately')}
             </p>
           </div>
         </div>

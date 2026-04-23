@@ -151,11 +151,11 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
           {!addingRelative ? (
             <button onClick={() => setAddingRelative(true)} style={{ display:'flex', alignItems:'center', gap:7, background:C.primaryLight, color:C.primary, border:`1.5px solid rgba(37,99,235,0.2)`, borderRadius:9, padding:'9px 16px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
-              Add Another Loved One
+              {tr('settings.addAnotherLoved')}
             </button>
           ) : (
             <div style={{ background:C.bgSubtle, borderRadius:12, padding:'20px', border:`1px solid ${C.border}` }}>
-              <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>New Loved One</div>
+              <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>{tr('settings.newLovedOne')}</div>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
                 <Field label={tr("settings.theirName")}>
                   <input style={inp} value={newRel.name} onChange={e => setNewRel(r => ({...r, name:e.target.value}))} placeholder="Full name" />
@@ -182,7 +182,7 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
               <div style={{ display:'flex', gap:10, marginTop:4 }}>
                 <button onClick={() => { setAddingRelative(false); setNewRel({ name:'', age:'', city:'', phone:'', address:'', healthNotes:'' }); }} style={{ background:'transparent', color:C.textSecondary, border:`1.5px solid ${C.border}`, borderRadius:9, padding:'9px 18px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>Cancel</button>
                 <button onClick={handleAddRelative} disabled={savingNewRel} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:9, padding:'9px 20px', fontSize:13, fontWeight:600, cursor:'pointer', opacity:savingNewRel?0.7:1, fontFamily:'inherit' }}>
-                  {savingNewRel ? 'Saving…' : 'Save Loved One'}
+                  {savingNewRel ? tr('settings.savingLovedOne') : tr('settings.saveLovedOne')}
                 </button>
               </div>
             </div>

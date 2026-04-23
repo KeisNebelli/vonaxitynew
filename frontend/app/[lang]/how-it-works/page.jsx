@@ -144,8 +144,7 @@ export default function HowItWorksPage({ params }) {
           <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(260px,1fr))', gap:16, marginBottom:60 }}>
             {Array.isArray(steps) && steps.map((s,i) => (
               <div key={i} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, padding:'28px 24px' }}>
-                <div style={{ marginBottom:18 }}><StepIcon step={s.num} size={52} /></div>
-                <div style={{ display:'inline-block', fontSize:11, fontWeight:700, color:C.primary, letterSpacing:'1.5px', background:C.primaryLight, padding:'3px 10px', borderRadius:99, marginBottom:12 }}>STEP {s.num}</div>
+                <div style={{ display:'inline-block', fontSize:11, fontWeight:700, color:C.primary, letterSpacing:'1.5px', background:C.primaryLight, padding:'3px 10px', borderRadius:99, marginBottom:12 }}>0{i + 1}</div>
                 <div style={{ fontSize:16, fontWeight:600, color:C.textPrimary, marginBottom:10, lineHeight:1.4 }}>{s.title}</div>
                 <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7 }}>{s.desc}</div>
               </div>
