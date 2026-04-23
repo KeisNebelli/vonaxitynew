@@ -84,28 +84,28 @@ function SidebarContent({ mobile=false, active, setActive, onLogout, alertCount,
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
             <div>
               <div style={{ fontSize:17, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>Vonaxity</div>
-              <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'2px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
+              <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.5)', letterSpacing:'2px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
             </div>
             <button onClick={()=>setOpen(false)} style={{ background:'rgba(255,255,255,0.08)', border:'none', color:'rgba(255,255,255,0.6)', borderRadius:8, width:30,height:30, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>✕</button>
           </div>
         ) : (
           <div style={{ marginBottom:14 }}>
             <div style={{ fontSize:17, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>Vonaxity</div>
-            <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'2px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
+            <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.5)', letterSpacing:'2px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
           </div>
         )}
         <div style={{ display:'flex', alignItems:'center', gap:9 }}>
-          <div style={{ width:32,height:32,borderRadius:9,background:'linear-gradient(135deg,#7C3AED,#5B21B6)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>A</div>
+          <div style={{ width:32,height:32,borderRadius:9,background:'linear-gradient(135deg,#2563EB,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>A</div>
           <div>
             <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>Admin</div>
-            <div style={{ fontSize:10, color:'rgba(255,255,255,0.35)' }}>admin@vonaxity.com</div>
+            <div style={{ fontSize:10, color:'rgba(255,255,255,0.55)' }}>admin@vonaxity.com</div>
           </div>
         </div>
       </div>
       <nav style={{ flex:1, padding:'10px', overflowY:'auto' }}>
         {NAV.map(item=>(
           <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }}
-            style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:mobile?'12px 12px':'10px 12px', borderRadius:10, border:'none', background:active===item.id?(item.highlight?'rgba(124,58,237,0.25)':'rgba(37,99,235,0.22)'):'transparent', color:active===item.id?(item.highlight?'#C4B5FD':'#93C5FD'):'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
+            style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:mobile?'12px 12px':'10px 12px', borderRadius:10, border:'none', borderLeft:active===item.id?'2px solid #60A5FA':'2px solid transparent', background:active===item.id?(item.highlight?'rgba(124,58,237,0.25)':'rgba(37,99,235,0.2)'):'transparent', color:active===item.id?(item.highlight?'#C4B5FD':'#93C5FD'):'rgba(255,255,255,0.72)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
             {item.icon}
             <span style={{ flex:1 }}>{(ADMIN_LABELS[lang]||ADMIN_LABELS.en)[item.id]||item.label}</span>
             {item.id==='alerts' && alertCount>0 && <span style={{ fontSize:10,fontWeight:800,background:'#DC2626',color:'#fff',borderRadius:99,padding:'2px 6px',minWidth:18,textAlign:'center' }}>{alertCount}</span>}
@@ -116,7 +116,7 @@ function SidebarContent({ mobile=false, active, setActive, onLogout, alertCount,
         {mobile ? (
           <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>{t(lang, 'admin.signOut')}</button>
         ) : (
-          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>{t(lang, 'admin.signOut')}</button>
+          <button onClick={onLogout} style={{ width:'100%', padding:'11px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>{t(lang, 'admin.signOut')}</button>
         )}
       </div>
     </>
@@ -126,11 +126,11 @@ function SidebarContent({ mobile=false, active, setActive, onLogout, alertCount,
 function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen, lang="en" }) {
   return (
     <>
-      <div style={{ width:224, background:'#0F172A', display:'flex', flexDirection:'column', position:'sticky', top:0, height:'100vh', flexShrink:0 }} className="admin-desk-sb">
+      <div style={{ width:224, background:'#111827', display:'flex', flexDirection:'column', position:'sticky', top:0, height:'100vh', flexShrink:0 }} className="admin-desk-sb">
         <SidebarContent active={active} setActive={setActive} onLogout={onLogout} alertCount={alertCount} setOpen={setOpen} lang={lang} />
       </div>
       {open && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:39 }} onClick={()=>setOpen(false)} />}
-      <div style={{ display:'none', position:'fixed', top:0, left:0, height:'100vh', width:270, background:'#0F172A', flexDirection:'column', zIndex:50, transform:open?'translateX(0)':'translateX(-100%)', transition:'transform 0.25s ease', boxShadow:'4px 0 24px rgba(0,0,0,0.3)' }} className="admin-mob-sb">
+      <div style={{ display:'none', position:'fixed', top:0, left:0, height:'100vh', width:270, background:'#111827', flexDirection:'column', zIndex:50, transform:open?'translateX(0)':'translateX(-100%)', transition:'transform 0.25s ease', boxShadow:'4px 0 24px rgba(0,0,0,0.3)' }} className="admin-mob-sb">
         <SidebarContent mobile active={active} setActive={setActive} onLogout={onLogout} alertCount={alertCount} setOpen={setOpen} lang={lang} />
       </div>
       <style>{`@media(max-width:768px){.admin-desk-sb{display:none!important;}.admin-mob-sb{display:flex!important;}}`}</style>
@@ -1441,9 +1441,9 @@ export default function AdminPage({ params }) {
           <div style={{ padding:'0 24px', height:58, borderBottom:'1px solid #E2E8F0', display:'flex', alignItems:'center', justifyContent:'space-between', background:'#FFFFFF', flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', gap:12 }}>
               <button onClick={()=>setSidebarOpen(true)} className="admin-ham" style={{ display:'none', flexDirection:'column', gap:4, background:'transparent', border:'none', cursor:'pointer', padding:'6px' }}>
-                <span style={{ display:'block',width:20,height:2,background:'#0F172A',borderRadius:2 }}/>
-                <span style={{ display:'block',width:20,height:2,background:'#0F172A',borderRadius:2 }}/>
-                <span style={{ display:'block',width:20,height:2,background:'#0F172A',borderRadius:2 }}/>
+                <span style={{ display:'block',width:20,height:2,background:'#111827',borderRadius:2 }}/>
+                <span style={{ display:'block',width:20,height:2,background:'#111827',borderRadius:2 }}/>
+                <span style={{ display:'block',width:20,height:2,background:'#111827',borderRadius:2 }}/>
               </button>
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]}</div>
             </div>
@@ -1479,7 +1479,7 @@ export default function AdminPage({ params }) {
             )}
           </main>
         </div>
-        <div className="admin-tabs" style={{ display:'none', position:'fixed', bottom:0, left:0, right:0, background:'#0F172A', borderTop:'1px solid rgba(255,255,255,0.08)', zIndex:48, padding:'8px 0 env(safe-area-inset-bottom,8px)' }}>
+        <div className="admin-tabs" style={{ display:'none', position:'fixed', bottom:0, left:0, right:0, background:'#111827', borderTop:'1px solid rgba(255,255,255,0.08)', zIndex:48, padding:'8px 0 env(safe-area-inset-bottom,8px)' }}>
           <button onClick={()=>setSidebarOpen(true)} style={{ flex:1,display:'flex',flexDirection:'column',alignItems:'center',gap:3,border:'none',background:'transparent',color:'rgba(255,255,255,0.45)',cursor:'pointer',fontSize:10,fontWeight:500,fontFamily:F,padding:'4px 2px' }}>
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             {tr('admin.menu')}

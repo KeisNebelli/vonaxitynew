@@ -69,7 +69,7 @@ function NurseSidebarInner({ mobile=false, initials, nurse, status, sbg, scol, a
           {nurse?.profilePhotoUrl ? (
             <img src={nurse.profilePhotoUrl} alt={initials} style={{ width:34,height:34,borderRadius:10,objectFit:'cover',flexShrink:0,border:'1.5px solid rgba(255,255,255,0.15)' }} />
           ) : (
-            <div style={{ width:34,height:34,borderRadius:10,background:'#059669',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
+            <div style={{ width:34,height:34,borderRadius:10,background:'linear-gradient(135deg,#2563EB,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
           )}
           <div style={{ minWidth:0 }}>
             <div style={{ fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{nurse?.name||'Nurse'}</div>
@@ -81,7 +81,7 @@ function NurseSidebarInner({ mobile=false, initials, nurse, status, sbg, scol, a
       </div>
       <nav style={{ flex:1, padding:'10px', overflow:'auto' }}>
         {NAV_ITEMS.map(item=>(
-          <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }} style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:mobile?'13px 12px':'10px 12px', borderRadius:10, border:'none', background:active===item.id?'rgba(5,150,105,0.2)':'transparent', color:active===item.id?'#6EE7B7':'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
+          <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }} style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:mobile?'13px 12px':'10px 12px', borderRadius:10, border:'none', borderLeft:active===item.id?'2px solid #60A5FA':'2px solid transparent', background:active===item.id?'rgba(37,99,235,0.2)':'transparent', color:active===item.id?'#93C5FD':'rgba(255,255,255,0.72)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
             {item.icon}<span>{(NURSE_LABELS[lang]||NURSE_LABELS.en)[item.label]||item.label}</span>
           </button>
         ))}
@@ -90,7 +90,7 @@ function NurseSidebarInner({ mobile=false, initials, nurse, status, sbg, scol, a
         {mobile ? (
           <button onClick={onLogout} style={{ width:'100%', padding:'13px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>Sign out</button>
         ) : (
-          <button onClick={onLogout} style={{ fontSize:12, color:'rgba(255,255,255,0.3)', background:'transparent', border:'none', cursor:'pointer', fontFamily:F, padding:0 }}>Sign out</button>
+          <button onClick={onLogout} style={{ width:'100%', padding:'11px', background:'rgba(239,68,68,0.1)', border:'1px solid rgba(239,68,68,0.2)', borderRadius:10, color:'#F87171', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>Sign out</button>
         )}
       </div>
     </>
@@ -106,13 +106,13 @@ function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen, lang=
   return (
     <>
       {/* Desktop sidebar */}
-      <div style={{ width:220, background:'#0F172A', display:'flex', flexDirection:'column', position:'sticky', top:0, height:'100vh', flexShrink:0 }} className="nurse-desk-sidebar">
+      <div style={{ width:220, background:'#111827', display:'flex', flexDirection:'column', position:'sticky', top:0, height:'100vh', flexShrink:0 }} className="nurse-desk-sidebar">
         <NurseSidebarInner initials={initials} nurse={nurse} status={status} sbg={sbg} scol={scol} active={active} setActive={setActive} onLogout={onLogout} setOpen={setOpen} lang={lang} />
       </div>
       {/* Mobile overlay */}
       {open && <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.5)', zIndex:39 }} onClick={()=>setOpen(false)} />}
       {/* Mobile sidebar */}
-      <div style={{ display:'none', position:'fixed', top:0, left:0, height:'100vh', width:270, background:'#0F172A', flexDirection:'column', zIndex:50, transform:open?'translateX(0)':'translateX(-100%)', transition:'transform 0.25s ease', boxShadow:'4px 0 24px rgba(0,0,0,0.3)' }} className="nurse-mob-sidebar">
+      <div style={{ display:'none', position:'fixed', top:0, left:0, height:'100vh', width:270, background:'#111827', flexDirection:'column', zIndex:50, transform:open?'translateX(0)':'translateX(-100%)', transition:'transform 0.25s ease', boxShadow:'4px 0 24px rgba(0,0,0,0.3)' }} className="nurse-mob-sidebar">
         <NurseSidebarInner mobile initials={initials} nurse={nurse} status={status} sbg={sbg} scol={scol} active={active} setActive={setActive} onLogout={onLogout} setOpen={setOpen} lang={lang} />
       </div>
       <style>{`
@@ -1099,9 +1099,9 @@ export default function NursePage({ params }) {
           <div style={{ padding:'0 24px', height:58, borderBottom:'1px solid #E2E8F0', display:'flex', alignItems:'center', justifyContent:'space-between', background:'#FFFFFF', flexShrink:0 }}>
             <div style={{ display:'flex', alignItems:'center', gap:12 }}>
               <button onClick={()=>setSidebarOpen(true)} className="nurse-ham" style={{ display:'none', flexDirection:'column', gap:4, background:'transparent', border:'none', cursor:'pointer', padding:'6px' }}>
-                <span style={{ display:'block',width:20,height:2,background:'#0F172A',borderRadius:2 }}/>
-                <span style={{ display:'block',width:20,height:2,background:'#0F172A',borderRadius:2 }}/>
-                <span style={{ display:'block',width:20,height:2,background:'#0F172A',borderRadius:2 }}/>
+                <span style={{ display:'block',width:20,height:2,background:'#111827',borderRadius:2 }}/>
+                <span style={{ display:'block',width:20,height:2,background:'#111827',borderRadius:2 }}/>
+                <span style={{ display:'block',width:20,height:2,background:'#111827',borderRadius:2 }}/>
               </button>
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]||'Nurse Dashboard'}</div>
             </div>
@@ -1130,7 +1130,7 @@ export default function NursePage({ params }) {
         </div>
 
         {/* Mobile bottom tabs */}
-        <div style={{ display:'none', position:'fixed', bottom:0, left:0, right:0, background:'#0F172A', borderTop:'1px solid rgba(255,255,255,0.08)', zIndex:48, padding:'8px 0 env(safe-area-inset-bottom,8px)' }} className="nurse-tabs">
+        <div style={{ display:'none', position:'fixed', bottom:0, left:0, right:0, background:'#111827', borderTop:'1px solid rgba(255,255,255,0.08)', zIndex:48, padding:'8px 0 env(safe-area-inset-bottom,8px)' }} className="nurse-tabs">
           <button onClick={()=>setSidebarOpen(true)} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:3, border:'none', background:'transparent', color:'rgba(255,255,255,0.45)', cursor:'pointer', fontSize:10, fontWeight:500, fontFamily:F, padding:'4px 2px' }}>
             <svg width="18" height="18" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
             Menu
