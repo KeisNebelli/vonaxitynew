@@ -6,7 +6,7 @@ const cookieParser = require('cookie-parser');
 const authRoutes = require('./routes/auth');
 const visitRoutes = require('./routes/visits');
 const nurseRoutes = require('./routes/nurses');
-const paymentsRoute = null; // Stripe payments - coming soon
+const paymentsRoute = require('./routes/payments');
 const uploadsRoute = require('./routes/uploads');
 const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter, publicSettingsRouter, cleanupRouter, contactRouter } = require('./routes/other');
 const payoutsRouter = require('./routes/payouts');
@@ -55,8 +55,7 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/visits', visitRoutes);
 app.use('/nurses', nurseRoutes);
-// app.use('/payments', paymentsRoute); // Stripe checkout - coming soon
-app.use('/payments', paymentsRouter); // Admin payments list
+app.use('/payments', paymentsRoute); // Stripe checkout + admin payments
 app.use('/uploads', uploadsRoute);
 app.use('/users', usersRouter);
 app.use('/analytics', analyticsRouter);
