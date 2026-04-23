@@ -592,6 +592,7 @@ export default function Dashboard({ params }) {
   const relativeDisplay = r || null;
   const plan = (userData.subscription?.plan||'standard').charAt(0).toUpperCase()+(userData.subscription?.plan||'standard').slice(1);
   const isTrial = userData.subscription?.status === 'TRIAL';
+  const isExpired = userData.subscription?.status === 'EXPIRED';
   const initials = (userData.name||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 
   const handleBookSuccess = async () => {
@@ -703,8 +704,28 @@ export default function Dashboard({ params }) {
               />
             ) : (
               <>
-                {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>setActive('book')}/>}
-                {active==='book' && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
+                {/* Trial expired paywall banner */}
+                {isExpired && (
+                  <div style={{ background:'linear-gradient(135deg,#7C3AED,#2563EB)', padding:'18px 28px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+                    <div>
+                      <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:3 }}>
+                        {lang==='sq' ? 'Periudha e provës ka përfunduar' : 'Your free trial has ended'}
+                      </div>
+                      <div style={{ fontSize:13, color:'rgba(255,255,255,0.75)' }}>
+                        {lang==='sq' ? 'Zgjidhni një plan për të vazhduar rezervimet e vizitave.' : 'Choose a plan to continue booking nurse visits for your loved ones.'}
+                      </div>
+                    </div>
+                    <button
+                      onClick={() => setActive('subscription')}
+                      style={{ background:'#fff', color:'#7C3AED', border:'none', borderRadius:10, padding:'10px 22px', fontSize:14, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}
+                    >
+                      {lang==='sq' ? 'Shiko planet →' : 'View plans →'}
+                    </button>
+                  </div>
+                )}
+                {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')}/>}
+                {active==='book' && !isExpired && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
+                {active==='book' && isExpired && <SubscriptionSection userData={userData} lang={lang} />}
                 {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} onRefresh={loadData} />}
                 {active==='subscription' && (
                   <SubscriptionSection userData={userData} lang={lang} />

@@ -118,15 +118,13 @@ async function expireTrials() {
     });
     if (expired.length === 0) return;
     const userIds = expired.map(s => s.userId);
+    // Only expire the subscription — do NOT suspend the user account.
+    // The dashboard will show a paywall when subscription.status === 'EXPIRED'.
     await prismaExpiry.subscription.updateMany({
       where: { userId: { in: userIds }, status: 'TRIAL' },
       data: { status: 'EXPIRED' },
     });
-    await prismaExpiry.user.updateMany({
-      where: { id: { in: userIds }, status: 'TRIAL' },
-      data: { status: 'SUSPENDED' },
-    });
-    console.log(`[Trial sweep] Expired ${userIds.length} trial account(s)`);
+    console.log(`[Trial sweep] Marked ${userIds.length} trial subscription(s) as EXPIRED`);
   } catch (err) {
     console.error('[Trial sweep] Error:', err.message);
   }
