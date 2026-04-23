@@ -106,6 +106,36 @@ app.use((err, req, res, next) => {
   res.status(500).json({ error: 'Internal server error' });
 });
 
+// ── Trial expiry sweep ────────────────────────────────────────────────────────
+const prismaExpiry = require('./lib/db');
+
+async function expireTrials() {
+  try {
+    const now = new Date();
+    const expired = await prismaExpiry.subscription.findMany({
+      where: { status: 'TRIAL', trialEndsAt: { lt: now } },
+      select: { userId: true },
+    });
+    if (expired.length === 0) return;
+    const userIds = expired.map(s => s.userId);
+    await prismaExpiry.subscription.updateMany({
+      where: { userId: { in: userIds }, status: 'TRIAL' },
+      data: { status: 'EXPIRED' },
+    });
+    await prismaExpiry.user.updateMany({
+      where: { id: { in: userIds }, status: 'TRIAL' },
+      data: { status: 'SUSPENDED' },
+    });
+    console.log(`[Trial sweep] Expired ${userIds.length} trial account(s)`);
+  } catch (err) {
+    console.error('[Trial sweep] Error:', err.message);
+  }
+}
+
+// Run once on startup to catch any missed expirations, then every hour
+expireTrials();
+setInterval(expireTrials, 60 * 60 * 1000);
+
 // ── Start ─────────────────────────────────────────────────────────────────────
 app.listen(PORT, () => {
   console.log('');

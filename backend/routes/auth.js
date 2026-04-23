@@ -143,11 +143,26 @@ router.post('/login', authLimiter, async (req, res) => {
     const { email, password } = req.body;
     if (!email || !password) return res.status(400).json({ error: 'Email and password required' });
 
-    const user = await prisma.user.findUnique({ where: { email }, include: { nurseProfile: true } });
+    const user = await prisma.user.findUnique({
+      where: { email },
+      include: { nurseProfile: true, subscription: true },
+    });
     if (!user) return res.status(401).json({ error: 'Invalid credentials' });
 
     const valid = await bcrypt.compare(password, user.passwordHash);
     if (!valid) return res.status(401).json({ error: 'Invalid credentials' });
+
+    // Expire trial at login if trialEndsAt has passed
+    if (
+      user.status === 'TRIAL' &&
+      user.subscription?.status === 'TRIAL' &&
+      user.subscription?.trialEndsAt &&
+      user.subscription.trialEndsAt < new Date()
+    ) {
+      await prisma.subscription.update({ where: { userId: user.id }, data: { status: 'EXPIRED' } });
+      await prisma.user.update({ where: { id: user.id }, data: { status: 'SUSPENDED' } });
+      return res.status(403).json({ error: 'Your free trial has ended. Please choose a plan to continue.' });
+    }
 
     if (user.status === 'SUSPENDED') {
       return res.status(403).json({ error: 'Account suspended. Contact support.' });
