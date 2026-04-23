@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { t } from '@/translations';
 import Settings from './settings';
 
-const C = { primary:'#2563EB',primaryLight:'#EFF6FF',primaryDark:'#1D4ED8',secondary:'#059669',secondaryLight:'#ECFDF5',warning:'#D97706',warningLight:'#FFFBEB',error:'#DC2626',errorLight:'#FEF2F2',purple:'#7C3AED',purpleLight:'#F5F3FF',bg:'#F8FAFC',bgWhite:'#FFFFFF',bgSubtle:'#F1F5F9',textPrimary:'#0F172A',textSecondary:'#475569',textTertiary:'#94A3B8',border:'#E2E8F0',borderSubtle:'#F1F5F9',sidebarBg:'linear-gradient(160deg, #1E1B4B 0%, #312E81 40%, #1E3A5F 100%)' };
+const C = { primary:'#2563EB',primaryLight:'#EFF6FF',primaryDark:'#1D4ED8',secondary:'#059669',secondaryLight:'#ECFDF5',warning:'#D97706',warningLight:'#FFFBEB',error:'#DC2626',errorLight:'#FEF2F2',purple:'#7C3AED',purpleLight:'#F5F3FF',bg:'#F8FAFC',bgWhite:'#FFFFFF',bgSubtle:'#F1F5F9',textPrimary:'#0F172A',textSecondary:'#475569',textTertiary:'#94A3B8',border:'#E2E8F0',borderSubtle:'#F1F5F9',sidebarBg:'#111827' };
 const F = "'DM Sans','Inter',system-ui,sans-serif";
 const SSM = '0 1px 3px rgba(15,23,42,0.06)';
 const SMD = '0 4px 12px rgba(15,23,42,0.08)';
@@ -627,26 +627,26 @@ export default function Dashboard({ params }) {
       <div className="dash-wrap">
         {/* Desktop sidebar */}
         <div className="desk-sb" style={{ width:224,background:C.sidebarBg,display:'flex',flexDirection:'column',position:'sticky',top:0,height:'100vh',flexShrink:0 }}>
-          <div style={{ padding:'22px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)' }}>
+          <div style={{ padding:'22px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ fontSize:17,fontWeight:800,color:'#fff',letterSpacing:'-0.5px',marginBottom:14 }}>Vonaxity</div>
             <div style={{ display:'flex',alignItems:'center',gap:9 }}>
-              <div style={{ width:32,height:32,borderRadius:9,background:C.primary,display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
+              <div style={{ width:34,height:34,borderRadius:10,background:'linear-gradient(135deg,#2563EB,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
               <div>
                 <div style={{ fontSize:12,fontWeight:700,color:'#fff' }}>{userData.name}</div>
-                <div style={{ fontSize:10,color:'rgba(255,255,255,0.35)' }}>{tr('dashboard.clientRole')} · {plan}</div>
+                <div style={{ fontSize:10,color:'rgba(255,255,255,0.55)' }}>{tr('dashboard.clientRole')} · {plan}</div>
               </div>
             </div>
           </div>
           <nav style={{ flex:1,padding:'10px',overflowY:'auto' }}>
             {NAV.map(item=>(
               <button key={item.id} onClick={()=>{ setActive(item.id); setViewingApplicants(null); }}
-                style={{ width:'100%',display:'flex',alignItems:'center',gap:10,padding:'10px 12px',borderRadius:10,border:'none',background:active===item.id?'rgba(37,99,235,0.22)':'transparent',color:active===item.id?'#93C5FD':'rgba(255,255,255,0.45)',cursor:'pointer',fontSize:13,fontWeight:active===item.id?700:500,marginBottom:2,textAlign:'left',fontFamily:F }}>
+                style={{ width:'100%',display:'flex',alignItems:'center',gap:10,padding:'10px 12px',borderRadius:10,border:'none',background:active===item.id?'rgba(37,99,235,0.2)':'transparent',color:active===item.id?'#93C5FD':'rgba(255,255,255,0.72)',cursor:'pointer',fontSize:13,fontWeight:active===item.id?700:500,marginBottom:2,textAlign:'left',fontFamily:F,borderLeft:active===item.id?'2px solid #60A5FA':'2px solid transparent' }}>
                 {item.icon}<span>{item.label}</span>
               </button>
             ))}
           </nav>
-          <div style={{ padding:'12px 16px',borderTop:'1px solid rgba(255,255,255,0.06)' }}>
-            <button onClick={logout} style={{ fontSize:12,color:'rgba(255,255,255,0.3)',background:'transparent',border:'none',cursor:'pointer',fontFamily:F,padding:0 }}>{tr('dashboard.signOut')}</button>
+          <div style={{ padding:'14px 16px',borderTop:'1px solid rgba(255,255,255,0.08)' }}>
+            <button onClick={logout} style={{ width:'100%',padding:'10px 12px',background:'rgba(239,68,68,0.08)',border:'1px solid rgba(239,68,68,0.2)',borderRadius:9,color:'#F87171',fontSize:13,fontWeight:600,cursor:'pointer',fontFamily:F,textAlign:'left' }}>{tr('dashboard.signOut')}</button>
           </div>
         </div>
 
@@ -661,7 +661,7 @@ export default function Dashboard({ params }) {
           </div>
           <nav style={{ flex:1,padding:'10px' }}>
             {NAV.map(item=>(
-              <button key={item.id} onClick={()=>{ setActive(item.id); setSidebarOpen(false); setViewingApplicants(null); }} style={{ width:'100%',display:'flex',alignItems:'center',gap:12,padding:'13px 14px',borderRadius:10,border:'none',background:active===item.id?'rgba(37,99,235,0.22)':'transparent',color:active===item.id?'#93C5FD':'rgba(255,255,255,0.55)',cursor:'pointer',fontSize:14,fontWeight:active===item.id?700:500,marginBottom:2,textAlign:'left',fontFamily:F }}>
+              <button key={item.id} onClick={()=>{ setActive(item.id); setSidebarOpen(false); setViewingApplicants(null); }} style={{ width:'100%',display:'flex',alignItems:'center',gap:12,padding:'13px 14px',borderRadius:10,border:'none',background:active===item.id?'rgba(37,99,235,0.2)':'transparent',color:active===item.id?'#93C5FD':'rgba(255,255,255,0.72)',cursor:'pointer',fontSize:14,fontWeight:active===item.id?700:500,marginBottom:2,textAlign:'left',fontFamily:F,borderLeft:active===item.id?'2px solid #60A5FA':'2px solid transparent' }}>
                 {item.icon}<span>{item.label}</span>
               </button>
             ))}
