@@ -103,25 +103,25 @@ export default async function HomePage({ params }) {
       <Nav lang={lang} />
 
       {/* ── Hero ── */}
-      <section style={{ padding: '80px 24px 96px', background: C.bgWhite }}>
+      <section style={{ padding: '80px 24px 96px', background: 'linear-gradient(150deg, #FFFFFF 0%, #EFF6FF 100%)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 60, alignItems: 'center' }}>
           <div>
             <TAG>{t(lang, 'hero.badge')}</TAG>
             <h1 style={{ fontSize: 'clamp(38px,5vw,56px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: '-1.5px', color: C.textPrimary, margin: '0 0 20px' }}>
               {t(lang, 'hero.headline1')}<br />
-              <span style={{ color: C.primary }}>{t(lang, 'hero.headline2')}</span>
+              <span style={{ background: 'linear-gradient(135deg, #2563EB 0%, #7C3AED 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>{t(lang, 'hero.headline2')}</span>
             </h1>
             <p style={{ fontSize: 17, lineHeight: 1.75, color: C.textSecondary, maxWidth: 480, margin: '0 0 36px' }}>
               {t(lang, 'hero.subtitle')}
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 52 }}>
               <Link href={`/${lang}/signup`}>
-                <button style={{ fontSize: 15, fontWeight: 600, padding: '14px 28px', borderRadius: 10, border: 'none', background: C.primary, color: '#fff', cursor: 'pointer', boxShadow: '0 2px 8px rgba(37,99,235,0.25)' }}>
+                <button style={{ fontSize: 15, fontWeight: 600, padding: '14px 28px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)', color: '#fff', cursor: 'pointer', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}>
                   {t(lang, 'hero.cta1')}
                 </button>
               </Link>
               <Link href={`/${lang}/how-it-works`}>
-                <button style={{ fontSize: 15, fontWeight: 600, padding: '13px 28px', borderRadius: 10, border: `2px solid ${C.border}`, background: 'transparent', color: C.textPrimary, cursor: 'pointer' }}>
+                <button style={{ fontSize: 15, fontWeight: 600, padding: '13px 28px', borderRadius: 10, border: `2px solid ${C.border}`, background: 'rgba(255,255,255,0.8)', color: C.textPrimary, cursor: 'pointer' }}>
                   {t(lang, 'hero.cta2')}
                 </button>
               </Link>
@@ -129,7 +129,7 @@ export default async function HomePage({ params }) {
             <div style={{ display: 'flex', gap: 40 }}>
               {[['500+', t(lang, 'hero.stat1')], ['8', t(lang, 'hero.stat2')], ['100%', t(lang, 'hero.stat3')]].map(([n, l]) => (
                 <div key={l}>
-                  <div style={{ fontSize: 30, fontWeight: 700, color: C.primary, letterSpacing: '-1px' }}>{n}</div>
+                  <div style={{ fontSize: 32, fontWeight: 800, color: C.primary, letterSpacing: '-1.5px' }}>{n}</div>
                   <div style={{ fontSize: 12, color: C.textTertiary, marginTop: 2 }}>{l}</div>
                 </div>
               ))}
@@ -175,16 +175,16 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Trust bar ── */}
-      <section style={{ background: C.bg, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '24px 24px' }}>
+      <section style={{ background: C.bgWhite, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '28px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20 }}>
           {TRUST_ITEMS.map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
-              <div style={{ width: 38, height: 38, borderRadius: 10, background: C.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
+            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
+              <div style={{ width: 42, height: 42, borderRadius: 12, background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 1px 4px rgba(37,99,235,0.12)' }}>
                 {item.icon}
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.textPrimary }}>{item.title}</div>
-                <div style={{ fontSize: 11, color: C.textTertiary, marginTop: 1 }}>{item.sub}</div>
+                <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary }}>{item.title}</div>
+                <div style={{ fontSize: 11, color: C.textTertiary, marginTop: 2 }}>{item.sub}</div>
               </div>
             </div>
           ))}
@@ -200,9 +200,9 @@ export default async function HomePage({ params }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16 }}>
             {Array.isArray(steps) && steps.slice(0, 4).map((s, i) => (
-              <div key={i} style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, padding: '28px 22px' }}>
-                <div style={{ fontSize: 11, fontWeight: 700, color: C.primary, letterSpacing: '1.5px', marginBottom: 10 }}>0{i + 1}</div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, marginBottom: 8, lineHeight: 1.4 }}>{s.title}</div>
+              <div key={i} style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, borderTop: `3px solid ${C.primary}`, padding: '28px 22px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+                <div style={{ fontSize: 13, fontWeight: 800, color: C.primary, letterSpacing: '0.5px', marginBottom: 12, fontVariantNumeric: 'tabular-nums' }}>0{i + 1}</div>
+                <div style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, marginBottom: 8, lineHeight: 1.4 }}>{s.title}</div>
                 <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>{s.desc}</div>
               </div>
             ))}
@@ -220,11 +220,11 @@ export default async function HomePage({ params }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(290px,1fr))', gap: 16 }}>
             {SERVICE_ITEMS.map(({ Icon, titleKey }, i) => (
-              <div key={i} style={{ background: C.bgWhite, borderRadius: 14, border: `1px solid ${C.border}`, padding: 22 }}>
-                <div style={{ width: 44, height: 44, borderRadius: 11, background: C.primaryLight, display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16 }}>
+              <div key={i} style={{ background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+                <div style={{ width: 48, height: 48, borderRadius: 13, background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, boxShadow: '0 1px 4px rgba(37,99,235,0.12)' }}>
                   <Icon />
                 </div>
-                <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, marginBottom: 6 }}>
+                <div style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, marginBottom: 6 }}>
                   {Array.isArray(services) && services[i]?.title}
                 </div>
                 <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>
@@ -250,7 +250,7 @@ export default async function HomePage({ params }) {
           <p style={{ fontSize: 16, color: C.textSecondary, marginBottom: 48 }}>{t(lang, 'pricing.subtitle')}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(250px,1fr))', gap: 16 }}>
             {PLANS.map(p => (
-              <div key={p.name} style={{ background: C.bgWhite, borderRadius: 18, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: '28px 24px', position: 'relative' }}>
+              <div key={p.name} style={{ background: C.bgWhite, borderRadius: 18, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: '28px 24px', position: 'relative', boxShadow: p.featured ? '0 8px 32px rgba(37,99,235,0.18)' : '0 2px 8px rgba(0,0,0,0.04)' }}>
                 {p.featured && (
                   <div style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', background: C.primary, color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 99, whiteSpace: 'nowrap', letterSpacing: '0.3px' }}>
                     {t(lang, 'pricing.mostPopular')}
@@ -322,11 +322,11 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── CTA ── */}
-      <section style={{ padding: '80px 24px', background: '#1E3A5F', textAlign: 'center' }}>
-        <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 700, color: '#fff', marginBottom: 16, letterSpacing: '-1px' }}>{t(lang, 'cta.title')}</h2>
-        <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.6)', maxWidth: 420, margin: '0 auto 36px', lineHeight: 1.7 }}>{t(lang, 'cta.subtitle')}</p>
+      <section style={{ padding: '96px 24px', background: 'linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%)', textAlign: 'center' }}>
+        <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 800, color: '#fff', marginBottom: 16, letterSpacing: '-1.5px' }}>{t(lang, 'cta.title')}</h2>
+        <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.7)', maxWidth: 420, margin: '0 auto 36px', lineHeight: 1.7 }}>{t(lang, 'cta.subtitle')}</p>
         <Link href={`/${lang}/signup`}>
-          <button style={{ background: '#fff', color: '#1E3A5F', border: 'none', borderRadius: 10, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer' }}>
+          <button style={{ background: '#fff', color: '#1E3A5F', border: 'none', borderRadius: 10, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 24px rgba(0,0,0,0.2)' }}>
             {t(lang, 'cta.btn1')}
           </button>
         </Link>
