@@ -1086,9 +1086,12 @@ export default function NursePage({ params }) {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box;}body{margin:0;}
         @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .nurse-section{animation:fadeSlideIn 0.2s ease both;}
         @media(max-width:768px){
           .nurse-cont{padding:16px 16px 140px!important;}
           .nurse-ham{display:flex!important;}
+          .nurse-tabs{display:flex!important;}
         }
       `}</style>
       <div style={{ display:'flex', minHeight:'100vh', fontFamily:F, background:'#F8FAFC' }}>
@@ -1118,14 +1121,16 @@ export default function NursePage({ params }) {
           {/* Content */}
           <main className="nurse-cont" style={{ flex:1, padding:24, overflowY:'auto', maxWidth:720, width:'100%' }}>
             <OnboardingBanner nurse={nurse} onStartOnboarding={()=>setActive('onboarding')} lang={lang} />
-            {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
-            {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} />}
-            {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
-            {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} />}
-            {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} onStatusChange={handleStatusChange} lang={lang} />}
-            {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
-            {active==='earnings' && <Earnings lang={lang} nurse={nurse} />}
-            {active==='profile' && <NurseProfile lang={lang} nurse={nurse} />}
+            <div key={active} className="nurse-section">
+              {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
+              {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} />}
+              {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
+              {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} />}
+              {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} onStatusChange={handleStatusChange} lang={lang} />}
+              {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
+              {active==='earnings' && <Earnings lang={lang} nurse={nurse} />}
+              {active==='profile' && <NurseProfile lang={lang} nurse={nurse} />}
+            </div>
           </main>
         </div>
 

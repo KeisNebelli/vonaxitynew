@@ -616,6 +616,8 @@ export default function Dashboard({ params }) {
         .dash-wrap{display:flex;height:100vh;overflow:hidden;background:${C.bg};}
         .desk-sb{display:flex!important;}
         .mob-sb,.mob-ham,.mob-tabs{display:none!important;}
+        @keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        .dash-section{animation:fadeSlideIn 0.2s ease both;}
         @media(max-width:768px){
           .desk-sb{display:none!important;}
           .mob-sb{display:flex!important;}
@@ -723,14 +725,14 @@ export default function Dashboard({ params }) {
                     </button>
                   </div>
                 )}
-                {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')}/>}
-                {active==='book' && !isExpired && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
-                {active==='book' && isExpired && <SubscriptionSection userData={userData} lang={lang} />}
-                {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} onRefresh={loadData} />}
-                {active==='subscription' && (
-                  <SubscriptionSection userData={userData} lang={lang} />
-                )}
-                {active==='settings' && <Settings key="settings-page" initialUser={userData} initialRelative={relative} lang={lang}/>}
+                <div key={active} className="dash-section">
+                  {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')}/>}
+                  {active==='book' && !isExpired && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
+                  {active==='book' && isExpired && <SubscriptionSection userData={userData} lang={lang} />}
+                  {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} onRefresh={loadData} />}
+                  {active==='subscription' && <SubscriptionSection userData={userData} lang={lang} />}
+                  {active==='settings' && <Settings key="settings-page" initialUser={userData} initialRelative={relative} lang={lang}/>}
+                </div>
               </>
             )}
           </main>
