@@ -467,7 +467,7 @@ function SubscriptionSection({ userData, lang }) {
   const handleCheckout = async (planId) => {
     setLoading(planId); setError('');
     try {
-      const data = await api.createCheckout(planId);
+      const data = await api.createCheckout(planId, lang);
       if (data.url) window.location.href = data.url;
     } catch (err) {
       setError(err.message || tr('dashboard.checkoutFailed'));

@@ -54,7 +54,7 @@ export const api = {
   deleteVisit: (id) => apiFetch(`/visits/${id}`, { method: 'DELETE' }),
   forgotPassword: (email) => apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
   resetPassword: (token, password) => apiFetch('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) }),
-  createCheckout: (plan) => apiFetch('/payments/create-checkout', { method: 'POST', body: JSON.stringify({ plan }) }),
+  createCheckout: (plan, lang='en') => apiFetch('/payments/create-checkout', { method: 'POST', body: JSON.stringify({ plan, lang }) }),
   createPortal: () => apiFetch('/payments/create-portal', { method: 'POST' }),
   uploadNurseDoc: async (file, type) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('vonaxity-token') : null;

@@ -78,7 +78,7 @@ router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
       },
       include: { subscription: true },
     });
-    console.log(`[ADMIN] Edited user ${req.params.id}`);
+
     res.json({ success: true, user: updated });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update user' });
@@ -95,7 +95,7 @@ router.put('/:id/status', ...requireRole('ADMIN'), async (req, res) => {
       where: { id: req.params.id },
       data: { status },
     });
-    console.log(`[ADMIN] Updated user ${req.params.id} status → ${status}`);
+
     res.json({ success: true, user: updated });
   } catch (err) {
     res.status(500).json({ error: 'Failed to update user status' });
@@ -203,7 +203,7 @@ notificationsRouter.post('/send', ...requireRole('ADMIN'), async (req, res) => {
       data: users.map(u => ({ userId: u.id, type: 'announcement', title, message })),
     });
 
-    console.log(`📢 Notification sent to ${users.length} users: ${title}`);
+
     res.json({ success: true, sentTo: users.length });
   } catch (err) {
     res.status(500).json({ error: 'Failed to send notification' });

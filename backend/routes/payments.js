@@ -37,8 +37,8 @@ router.post('/create-checkout', ...requireRole('CLIENT'), async (req, res) => {
       payment_method_types: ['card'],
       mode: 'subscription',
       line_items: [{ price: planData.priceId, quantity: 1 }],
-      success_url: `${FRONTEND_URL}/en/dashboard?payment=success&plan=${plan}`,
-      cancel_url: `${FRONTEND_URL}/en/dashboard?payment=cancelled`,
+      success_url: `${FRONTEND_URL}/{LANG}/dashboard?payment=success&plan=${plan}`.replace('{LANG}', req.body.lang || 'en'),
+      cancel_url: `${FRONTEND_URL}/{LANG}/dashboard?payment=cancelled`.replace('{LANG}', req.body.lang || 'en'),
       metadata: { userId: user.id, plan },
       subscription_data: { metadata: { userId: user.id, plan } },
     });
@@ -58,7 +58,7 @@ router.post('/create-portal', ...requireRole('CLIENT'), async (req, res) => {
     if (!user?.stripeCustomerId) return res.status(400).json({ error: 'No billing account found' });
     const session = await stripe.billingPortal.sessions.create({
       customer: user.stripeCustomerId,
-      return_url: `${FRONTEND_URL}/en/dashboard`,
+      return_url: `${FRONTEND_URL}/en/dashboard`,  // portal always returns to en (Stripe limitation)
     });
     res.json({ url: session.url });
   } catch (err) {
@@ -94,7 +94,7 @@ router.post('/webhook', async (req, res) => {
           await prisma.subscription.create({ data: { userId, plan, status: 'ACTIVE', visitsPerMonth: planData.visits, visitsUsed: 0, stripeSubId: session.subscription, stripeCustomerId: session.customer } });
         }
         await prisma.user.update({ where: { id: userId }, data: { status: 'ACTIVE', stripeCustomerId: session.customer } });
-        console.log(`✅ Subscription activated: ${plan} for user ${userId}`);
+
         break;
       }
       case 'invoice.payment_succeeded': {
@@ -104,7 +104,7 @@ router.post('/webhook', async (req, res) => {
         if (!userId) break;
         // Reset visits at start of new billing period
         await prisma.subscription.updateMany({ where: { stripeSubId: invoice.subscription }, data: { visitsUsed: 0, status: 'ACTIVE' } });
-        console.log(`✅ Invoice paid - visits reset for user ${userId}`);
+
         break;
       }
       case 'customer.subscription.deleted': {
@@ -113,7 +113,7 @@ router.post('/webhook', async (req, res) => {
         if (!userId) break;
         await prisma.subscription.updateMany({ where: { stripeSubId: sub.id }, data: { status: 'CANCELLED', cancelledAt: new Date() } });
         await prisma.user.update({ where: { id: userId }, data: { status: 'SUSPENDED' } });
-        console.log(`❌ Subscription cancelled for user ${userId}`);
+
         break;
       }
       case 'customer.subscription.updated': {

@@ -206,7 +206,7 @@ router.get('/:id/applicants', ...requireRole('CLIENT', 'ADMIN'), async (req, res
   try {
     if (req.user.role === 'CLIENT') {
       const visit = await prisma.visit.findUnique({ where: { id: req.params.id }, include: { relative: true } });
-      if (!visit || visit.relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Not your visit' });
+      if (!visit || !visit.relative || visit.relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Not your visit' });
     }
     const applications = await prisma.visitApplication.findMany({
       where: { visitId: req.params.id },
@@ -265,7 +265,7 @@ router.put('/:id/client', ...requireRole('CLIENT'), async (req, res) => {
       include: { relative: true },
     });
     if (!visit) return res.status(404).json({ error: 'Visit not found' });
-    if (visit.relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Not your visit' });
+    if (!visit.relative || visit.relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Not your visit' });
     if (!['UNASSIGNED'].includes(visit.status)) return res.status(400).json({ error: 'Only unassigned visits can be edited. Contact support for changes to active visits.' });
 
     const updated = await prisma.visit.update({
@@ -381,7 +381,9 @@ router.post('/:id/complete', ...requireRole('NURSE'), async (req, res) => {
     });
     await prisma.nurse.update({ where: { id: nurse.id }, data: { totalVisits: { increment: 1 }, totalEarnings: { increment: nurse.payRatePerVisit } } });
     const relative = await prisma.relative.findUnique({ where: { id: visit.relativeId } });
-    await prisma.subscription.updateMany({ where: { userId: relative.clientId }, data: { visitsUsed: { increment: 1 } } });
+    if (relative?.clientId) {
+      await prisma.subscription.updateMany({ where: { userId: relative.clientId }, data: { visitsUsed: { increment: 1 } } });
+    }
 
     // Send health report to client
     try {
@@ -422,7 +424,7 @@ router.post('/:id/review', ...requireRole('CLIENT'), async (req, res) => {
     });
     // Update nurse average rating
     const allReviews = await prisma.review.findMany({ where: { nurseId: visit.nurseId } });
-    const avg = allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length;
+    const avg = allReviews.length ? allReviews.reduce((sum, r) => sum + r.rating, 0) / allReviews.length : 0;
     await prisma.nurse.update({ where: { id: visit.nurseId }, data: { rating: Math.round(avg * 10) / 10 } });
     res.status(201).json({ success: true, review });
   } catch (err) {
