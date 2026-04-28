@@ -210,6 +210,60 @@ notificationsRouter.post('/send', ...requireRole('ADMIN'), async (req, res) => {
   }
 });
 
+// GET /notifications — fetch current user's notifications (newest first)
+notificationsRouter.get('/', async (req, res) => {
+  try {
+    const token = req.cookies?.['vonaxity-token'] || req.headers.authorization?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const userId = decoded.userId;
+    const notifications = await prisma.notification.findMany({
+      where: { userId },
+      orderBy: { createdAt: 'desc' },
+      take: 50,
+    });
+    const unreadCount = notifications.filter(n => !n.read).length;
+    res.json({ notifications, unreadCount });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to fetch notifications' });
+  }
+});
+
+// PATCH /notifications/read-all — mark all as read
+notificationsRouter.patch('/read-all', async (req, res) => {
+  try {
+    const token = req.cookies?.['vonaxity-token'] || req.headers.authorization?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    await prisma.notification.updateMany({
+      where: { userId: decoded.userId, read: false },
+      data: { read: true },
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark read' });
+  }
+});
+
+// PATCH /notifications/:id/read — mark one as read
+notificationsRouter.patch('/:id/read', async (req, res) => {
+  try {
+    const token = req.cookies?.['vonaxity-token'] || req.headers.authorization?.replace('Bearer ', '');
+    if (!token) return res.status(401).json({ error: 'Unauthorized' });
+    const jwt = require('jsonwebtoken');
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    await prisma.notification.update({
+      where: { id: req.params.id },
+      data: { read: true },
+    });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: 'Failed to mark read' });
+  }
+});
+
 module.exports.notificationsRouter = notificationsRouter;
 
 // ── SETTINGS ──────────────────────────────────────────────────────────────────

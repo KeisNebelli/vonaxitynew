@@ -190,6 +190,7 @@ model Notification {
   type      String
   title     String
   message   String
+  relatedId String?
   read      Boolean  @default(false)
   createdAt DateTime @default(now())
 }

@@ -2,6 +2,7 @@ const router = require('express').Router();
 const prisma = require('../lib/db');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { sendEmail, emailTemplates } = require('../lib/email');
+const { createNotification } = require('../lib/notifications');
 
 // ── Work order number generator ───────────────────────────────────────────────
 async function generateWorkOrderNumber() {
@@ -135,6 +136,24 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
       include: { relative: true },
     });
 
+    // After visit is created — notify approved nurses in city
+    const city = visit.relative?.city;
+    if (city) {
+      const nursesInCity = await prisma.nurse.findMany({
+        where: { status: 'APPROVED', city },
+        select: { userId: true },
+      });
+      for (const n of nursesInCity) {
+        await createNotification({
+          userId: n.userId,
+          type: 'NEW_JOB',
+          title: 'New job available',
+          message: `A new ${visit.serviceType} visit is available in ${city}.`,
+          relatedId: visit.id,
+        });
+      }
+    }
+
     // Notify approved nurses in the same city
     try {
       const city = visit.relative?.city;
@@ -186,6 +205,21 @@ router.post('/:id/apply', ...requireRole('NURSE'), async (req, res) => {
     const application = await prisma.visitApplication.create({
       data: { visitId: req.params.id, nurseId: nurse.id, message: req.body.message || '', status: 'PENDING' },
     });
+
+    // After application saved — notify client
+    const visitForNotif = await prisma.visit.findUnique({
+      where: { id: req.params.id },
+      include: { relative: { include: { client: true } }, nurse: { include: { user: true } } },
+    });
+    if (visitForNotif) {
+      await createNotification({
+        userId: visitForNotif.relative.clientId,
+        type: 'NURSE_APPLIED',
+        title: 'New applicant',
+        message: `A nurse has applied for your ${visitForNotif.serviceType} visit.`,
+        relatedId: req.params.id,
+      });
+    }
 
     // Notify client that a nurse applied
     try {
@@ -242,6 +276,19 @@ router.post('/:id/select/:nurseId', ...requireRole('CLIENT', 'ADMIN'), async (re
     await prisma.visitApplication.update({ where: { id: application.id }, data: { status: 'ACCEPTED' } });
     await prisma.visitApplication.updateMany({ where: { visitId, id: { not: application.id } }, data: { status: 'REJECTED' } });
 
+    // After nurse is selected — notify the nurse
+    const selectedNurse = await prisma.nurse.findUnique({ where: { id: nurseId }, select: { userId: true } });
+    const visitForNotif = await prisma.visit.findUnique({ where: { id: visitId }, include: { relative: true } });
+    if (selectedNurse && visitForNotif) {
+      await createNotification({
+        userId: selectedNurse.userId,
+        type: 'JOB_ASSIGNED',
+        title: 'Job assigned to you',
+        message: `You have been assigned a ${visitForNotif.serviceType} visit in ${visitForNotif.relative.city}.`,
+        relatedId: visitId,
+      });
+    }
+
     // Notify nurse they were selected
     try {
       if (nurse?.user?.email) {
@@ -278,6 +325,19 @@ router.put('/:id/client', ...requireRole('CLIENT'), async (req, res) => {
       },
       include: { relative: true, nurse: { include: { user: { select: { name: true } } } } },
     });
+
+    // Notify assigned nurse if any
+    const visitForNotif = await prisma.visit.findUnique({ where: { id: req.params.id }, include: { nurse: true } });
+    if (visitForNotif?.nurse?.userId) {
+      await createNotification({
+        userId: visitForNotif.nurse.userId,
+        type: 'JOB_UPDATED',
+        title: 'Job updated',
+        message: `A client has updated the details of your scheduled ${visitForNotif.serviceType} visit.`,
+        relatedId: req.params.id,
+      });
+    }
+
     res.json({ success: true, visit: updated });
   } catch (err) {
     console.error('Edit visit error:', err);
@@ -331,6 +391,15 @@ router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
       },
       include: { relative: { include: { client: true } }, nurse: { include: { user: true } } },
     });
+
+    // Notify based on new status
+    if (status === 'CANCELLED') {
+      const clientId = visit.relative.clientId;
+      const nurseUserId = visit.nurse?.userId;
+      if (clientId) await createNotification({ userId: clientId, type: 'VISIT_CANCELLED', title: 'Visit cancelled', message: `Your ${visit.serviceType} visit has been cancelled.`, relatedId: req.params.id });
+      if (nurseUserId) await createNotification({ userId: nurseUserId, type: 'VISIT_CANCELLED', title: 'Job cancelled', message: `A ${visit.serviceType} job you were assigned has been cancelled.`, relatedId: req.params.id });
+    }
+
     // visit updated
     res.json({ success: true, visit });
   } catch (err) {
@@ -360,6 +429,22 @@ router.put('/:id/status', ...requireRole('NURSE'), async (req, res) => {
         ...(status === 'NO_SHOW' ? { completedAt: new Date() } : {}),
       },
     });
+
+    // Notify based on new status
+    const visitForNotif = await prisma.visit.findUnique({
+      where: { id: req.params.id },
+      include: { relative: true, nurse: { include: { user: true } } }
+    });
+    if (visitForNotif) {
+      const clientId = visitForNotif.relative.clientId;
+      const nurseUserId = visitForNotif.nurse?.userId;
+      if (status === 'ON_THE_WAY' && clientId) {
+        await createNotification({ userId: clientId, type: 'NURSE_ON_WAY', title: 'Nurse on the way', message: `Your nurse is on the way for your ${visitForNotif.serviceType} visit.`, relatedId: req.params.id });
+      } else if (status === 'ARRIVED' && clientId) {
+        await createNotification({ userId: clientId, type: 'NURSE_ARRIVED', title: 'Nurse has arrived', message: `Your nurse has arrived for your ${visitForNotif.serviceType} visit.`, relatedId: req.params.id });
+      }
+    }
+
     res.json({ success: true, visit: updated });
   } catch (err) {
     console.error('Nurse status update error:', err);
@@ -388,6 +473,18 @@ router.post('/:id/complete', ...requireRole('NURSE'), async (req, res) => {
       if (sub && sub.visitsPerMonth < 999) {
         await prisma.subscription.updateMany({ where: { userId: relative.clientId }, data: { visitsUsed: { increment: 1 } } });
       }
+    }
+
+    // Notify client
+    const visitForNotif = await prisma.visit.findUnique({ where: { id: req.params.id }, include: { relative: true } });
+    if (visitForNotif) {
+      await createNotification({
+        userId: visitForNotif.relative.clientId,
+        type: 'VISIT_COMPLETED',
+        title: 'Visit completed',
+        message: `Your ${visitForNotif.serviceType} visit has been completed successfully.`,
+        relatedId: req.params.id,
+      });
     }
 
     // Send health report to client
