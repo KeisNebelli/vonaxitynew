@@ -100,6 +100,28 @@ export default async function HomePage({ params }) {
 
   return (
     <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: C.bg }}>
+      <style>{`
+        .hp-hero-btn-primary{transition:all 0.18s ease;background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)!important;}
+        .hp-hero-btn-primary:hover{background:linear-gradient(135deg,#1D4ED8 0%,#1E40AF 100%)!important;box-shadow:0 6px 22px rgba(37,99,235,0.5)!important;transform:translateY(-1px)}
+        .hp-hero-btn-secondary{transition:all 0.18s ease;}
+        .hp-hero-btn-secondary:hover{background:#F8FAFF!important;border-color:#2563EB!important;color:#1D4ED8!important;transform:translateY(-1px)}
+        .hp-step-card{transition:all 0.2s ease;}
+        .hp-step-card:hover{transform:translateY(-3px);box-shadow:0 8px 28px rgba(37,99,235,0.1)!important;border-top-color:#1D4ED8!important;}
+        .hp-service-card{transition:all 0.2s ease;}
+        .hp-service-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.09)!important;}
+        .hp-pricing-card{transition:all 0.2s ease;}
+        .hp-pricing-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(37,99,235,0.15)!important;}
+        .hp-pricing-btn-outline{transition:all 0.18s ease;}
+        .hp-pricing-btn-outline:hover{background:#2563EB!important;color:#fff!important;}
+        .hp-pricing-btn-featured{transition:all 0.18s ease;}
+        .hp-pricing-btn-featured:hover{background:#1D4ED8!important;}
+        .hp-city-card{transition:all 0.18s ease;}
+        .hp-city-card:hover{background:#EFF6FF!important;border-color:#BFDBFE!important;}
+        .hp-faq-card{transition:all 0.2s ease;}
+        .hp-faq-card:hover{border-color:#BFDBFE!important;box-shadow:0 4px 16px rgba(37,99,235,0.06)!important;}
+        .hp-cta-btn{transition:all 0.18s ease;}
+        .hp-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.35)!important;}
+      `}</style>
       <Nav lang={lang} />
 
       {/* ── Hero ── */}
@@ -116,12 +138,12 @@ export default async function HomePage({ params }) {
             </p>
             <div style={{ display: 'flex', gap: 12, flexWrap: 'wrap', marginBottom: 52 }}>
               <Link href={`/${lang}/signup`}>
-                <button style={{ fontSize: 15, fontWeight: 600, padding: '14px 28px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)', color: '#fff', cursor: 'pointer', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}>
+                <button className="hp-hero-btn-primary" style={{ fontSize: 15, fontWeight: 600, padding: '14px 28px', borderRadius: 10, border: 'none', background: 'linear-gradient(135deg, #2563EB 0%, #1D4ED8 100%)', color: '#fff', cursor: 'pointer', boxShadow: '0 4px 16px rgba(37,99,235,0.35)' }}>
                   {t(lang, 'hero.cta1')}
                 </button>
               </Link>
               <Link href={`/${lang}/how-it-works`}>
-                <button style={{ fontSize: 15, fontWeight: 600, padding: '13px 28px', borderRadius: 10, border: `2px solid ${C.border}`, background: 'rgba(255,255,255,0.8)', color: C.textPrimary, cursor: 'pointer' }}>
+                <button className="hp-hero-btn-secondary" style={{ fontSize: 15, fontWeight: 600, padding: '13px 28px', borderRadius: 10, border: `2px solid ${C.border}`, background: 'rgba(255,255,255,0.8)', color: C.textPrimary, cursor: 'pointer' }}>
                   {t(lang, 'hero.cta2')}
                 </button>
               </Link>
@@ -142,7 +164,7 @@ export default async function HomePage({ params }) {
               <img
                 src="/hero.jpg"
                 alt="Nurse visiting patient at home"
-                style={{ width: '100%', height: 420, objectFit: 'cover', display: 'block' }}
+                style={{ width: '100%', height: 'clamp(260px, 40vw, 460px)', objectFit: 'cover', display: 'block' }}
               />
             </div>
             {/* Floating info card over the photo */}
@@ -200,7 +222,7 @@ export default async function HomePage({ params }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16 }}>
             {Array.isArray(steps) && steps.slice(0, 4).map((s, i) => (
-              <div key={i} style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, borderTop: `3px solid ${C.primary}`, padding: '28px 22px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+              <div key={i} className="hp-step-card" style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, borderTop: `3px solid ${C.primary}`, padding: '28px 22px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
                 <div style={{ fontSize: 13, fontWeight: 800, color: C.primary, letterSpacing: '0.5px', marginBottom: 12, fontVariantNumeric: 'tabular-nums' }}>0{i + 1}</div>
                 <div style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, marginBottom: 8, lineHeight: 1.4 }}>{s.title}</div>
                 <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>{s.desc}</div>
@@ -220,7 +242,7 @@ export default async function HomePage({ params }) {
           </div>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(290px,1fr))', gap: 16 }}>
             {SERVICE_ITEMS.map(({ Icon, titleKey }, i) => (
-              <div key={i} style={{ background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+              <div key={i} className="hp-service-card" style={{ background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
                 <div style={{ width: 48, height: 48, borderRadius: 13, background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, boxShadow: '0 1px 4px rgba(37,99,235,0.12)' }}>
                   <Icon />
                 </div>
@@ -250,7 +272,7 @@ export default async function HomePage({ params }) {
           <p style={{ fontSize: 16, color: C.textSecondary, marginBottom: 48 }}>{t(lang, 'pricing.subtitle')}</p>
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(250px,1fr))', gap: 16 }}>
             {PLANS.map(p => (
-              <div key={p.name} style={{ background: C.bgWhite, borderRadius: 18, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: '28px 24px', position: 'relative', boxShadow: p.featured ? '0 8px 32px rgba(37,99,235,0.18)' : '0 2px 8px rgba(0,0,0,0.04)' }}>
+              <div key={p.name} className="hp-pricing-card" style={{ background: C.bgWhite, borderRadius: 18, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: '28px 24px', position: 'relative', boxShadow: p.featured ? '0 8px 32px rgba(37,99,235,0.18)' : '0 2px 8px rgba(0,0,0,0.04)' }}>
                 {p.featured && (
                   <div style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', background: C.primary, color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 99, whiteSpace: 'nowrap', letterSpacing: '0.3px' }}>
                     {t(lang, 'pricing.mostPopular')}
@@ -264,7 +286,7 @@ export default async function HomePage({ params }) {
                 </div>
                 <br />
                 <Link href={`/${lang}/signup?plan=${p.name.toLowerCase()}`}>
-                  <button style={{ width: '100%', padding: '12px', borderRadius: 10, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? C.primary : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
+                  <button className={p.featured ? 'hp-pricing-btn-featured' : 'hp-pricing-btn-outline'} style={{ width: '100%', padding: '12px', borderRadius: 10, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? C.primary : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
                     {t(lang, 'pricing.getStarted')}
                   </button>
                 </Link>
@@ -285,7 +307,7 @@ export default async function HomePage({ params }) {
               <p style={{ fontSize:16, color:C.textSecondary, lineHeight:1.7, marginBottom:32, maxWidth:440 }}>{t(lang,'cities.subtitle')}</p>
               <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
                 {CITIES.map(city => (
-                  <div key={city.name} style={{ background:C.bg, borderRadius:12, border:`1px solid ${C.border}`, padding:'12px 16px', display:'flex', alignItems:'center', gap:10 }}>
+                  <div key={city.name} className="hp-city-card" style={{ background:C.bg, borderRadius:12, border:`1px solid ${C.border}`, padding:'12px 16px', display:'flex', alignItems:'center', gap:10 }}>
                     <div style={{ width:8, height:8, borderRadius:'50%', background:C.secondary, flexShrink:0 }} />
                     <div>
                       <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{city.name}</div>
@@ -310,7 +332,7 @@ export default async function HomePage({ params }) {
             <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: 0, letterSpacing: '-1px' }}>{t(lang, 'faq.title')}</h2>
           </div>
           {Array.isArray(faqs) && faqs.slice(0, 4).map((f, i) => (
-            <div key={i} style={{ background: C.bgWhite, borderRadius: 12, border: `1px solid ${C.border}`, padding: '18px 22px', marginBottom: 8 }}>
+            <div key={i} className="hp-faq-card" style={{ background: C.bgWhite, borderRadius: 12, border: `1px solid ${C.border}`, padding: '18px 22px', marginBottom: 8 }}>
               <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, marginBottom: 8 }}>{f.q}</div>
               <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.7 }}>{f.a}</div>
             </div>
@@ -326,7 +348,7 @@ export default async function HomePage({ params }) {
         <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 800, color: '#fff', marginBottom: 16, letterSpacing: '-1.5px' }}>{t(lang, 'cta.title')}</h2>
         <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.7)', maxWidth: 420, margin: '0 auto 36px', lineHeight: 1.7 }}>{t(lang, 'cta.subtitle')}</p>
         <Link href={`/${lang}/signup`}>
-          <button style={{ background: '#fff', color: '#1E3A5F', border: 'none', borderRadius: 10, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 24px rgba(0,0,0,0.2)' }}>
+          <button className="hp-cta-btn" style={{ background: '#fff', color: '#1E3A5F', border: 'none', borderRadius: 10, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 24px rgba(0,0,0,0.2)' }}>
             {t(lang, 'cta.btn1')}
           </button>
         </Link>

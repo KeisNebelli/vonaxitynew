@@ -160,24 +160,42 @@ export default function NursesPage({ params }) {
       <section style={{ padding:'28px 24px 80px' }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           {loading ? (
-            <div style={{ textAlign:'center', padding:'60px 0', color:C.textTertiary, fontSize:14 }}>
-              {tr('nurses.loading')}
+            <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:20 }}>
+              {[...Array(6)].map((_,i) => (
+                <div key={i} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden', padding:24 }}>
+                  <div style={{ display:'flex', gap:16, marginBottom:16 }}>
+                    <div style={{ width:64, height:64, borderRadius:16, background:'#F1F5F9', flexShrink:0, animation:'shimmer 1.5s infinite' }} />
+                    <div style={{ flex:1 }}>
+                      <div style={{ height:16, borderRadius:8, background:'#F1F5F9', marginBottom:8, width:'70%' }} />
+                      <div style={{ height:12, borderRadius:8, background:'#F1F5F9', marginBottom:8, width:'50%' }} />
+                      <div style={{ height:12, borderRadius:8, background:'#F1F5F9', width:'40%' }} />
+                    </div>
+                  </div>
+                  <div style={{ height:12, borderRadius:8, background:'#F1F5F9', marginBottom:8, width:'100%' }} />
+                  <div style={{ height:12, borderRadius:8, background:'#F1F5F9', marginBottom:8, width:'85%' }} />
+                  <div style={{ height:12, borderRadius:8, background:'#F1F5F9', width:'60%' }} />
+                </div>
+              ))}
+              <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:0.5}}`}</style>
             </div>
           ) : filtered.length === 0 ? (
-            <div style={{ textAlign:'center', padding:'60px 0', color:C.textTertiary, fontSize:14 }}>
-              {tr('nurses.noNurses')}
+            <div style={{ textAlign:'center', padding:'80px 24px', color:C.textTertiary }}>
+              <div style={{ fontSize:48, marginBottom:16 }}>🔍</div>
+              <div style={{ fontSize:16, fontWeight:600, color:C.textSecondary, marginBottom:8 }}>{tr('nurses.noNurses')}</div>
+              <div style={{ fontSize:14 }}>Try adjusting your search or city filter</div>
             </div>
           ) : (
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:20 }}>
               {filtered.map(nurse => {
                 const available = nurse.available !== false && (nurse.availability?.length > 0 || nurse.available === true);
                 return (
-                  <div key={nurse.id} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.05)' }}>
+                  <div key={nurse.id} className="nurse-card" style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.05)', transition:'box-shadow 0.2s, transform 0.2s' }}>
+                    <style>{`.nurse-card:hover{box-shadow:0 8px 28px rgba(0,0,0,0.1)!important;transform:translateY(-2px)}`}</style>
                     <div style={{ padding:'24px 24px 0' }}>
                       <div style={{ display:'flex', gap:16, alignItems:'flex-start', marginBottom:16 }}>
                         <NurseAvatar name={nurse.name} photo={nurse.profilePhotoUrl||null} size={64} verified={available} />
                         <div style={{ flex:1, minWidth:0 }}>
-                          <div style={{ fontSize:17, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4 }}>{nurse.name}</div>
+                          <div style={{ fontSize:17, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{nurse.name}</div>
                           <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:13, color:C.textTertiary, marginBottom:6 }}>
                             <MapPinIcon /> {nurse.city}
                             {nurse.experience && <>
@@ -237,9 +255,10 @@ export default function NursesPage({ params }) {
 
                     {/* Card footer */}
                     <div style={{ borderTop:`1px solid ${C.border}`, padding:'14px 24px' }}>
-                      <Link href={`/${lang}/nurses/${nurse.id}`} style={{ display:'block', textAlign:'center', padding:'9px', borderRadius:9, background:C.primary, color:'#fff', fontSize:13, fontWeight:700, textDecoration:'none' }}>
+                      <Link href={`/${lang}/nurses/${nurse.id}`} className="nurse-cta" style={{ display:'block', textAlign:'center', padding:'10px', borderRadius:9, background:C.primary, color:'#fff', fontSize:13, fontWeight:700, textDecoration:'none', transition:'background 0.15s, transform 0.15s' }}>
                         {tr('nurses.viewProfile')}
                       </Link>
+                      <style>{`.nurse-cta:hover{background:#1D4ED8!important;transform:translateY(-1px)}.nurse-cta:active{transform:translateY(0)}`}</style>
                     </div>
                   </div>
                 );

@@ -53,8 +53,9 @@ export default function ForgotPasswordPage({ params }) {
   };
 
   return (
-    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:C.bg, padding:24 }}>
-      <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'40px 36px', maxWidth:420, width:'100%', boxShadow:'0 4px 24px rgba(0,0,0,0.06)' }}>
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(150deg,#EFF6FF 0%,#F8FAFC 50%,#F0FDF4 100%)', padding:24 }}>
+      <style>{`.fp-btn:not(:disabled):hover{background:#1D4ED8!important;transform:translateY(-1px)}.fp-btn{transition:all 0.15s}`}</style>
+      <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'40px 36px', maxWidth:420, width:'100%', boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
         <Link href={`/${lang}/login`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px', display:'block', marginBottom:32 }}>Vonaxity</Link>
 
         {sent ? (
@@ -75,7 +76,7 @@ export default function ForgotPasswordPage({ params }) {
               <input style={inp} type="email" placeholder="you@email.com" value={email} onChange={e=>setEmail(e.target.value)} onKeyDown={e=>e.key==='Enter'&&handleSubmit()} autoFocus />
             </div>
             {error && <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:9, padding:'11px 14px', fontSize:13, color:'#DC2626', marginBottom:16 }}>{error}</div>}
-            <button onClick={handleSubmit} disabled={loading} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:loading?0.7:1, marginBottom:16 }}>
+            <button className="fp-btn" onClick={handleSubmit} disabled={loading} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:loading?0.7:1, marginBottom:16 }}>
               {loading ? tr('sending') : tr('sendBtn')}
             </button>
             <Link href={`/${lang}/login`} style={{ fontSize:13, color:C.textTertiary, display:'block', textAlign:'center' }}>{tr('backToLogin')}</Link>

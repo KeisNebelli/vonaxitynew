@@ -41,8 +41,9 @@ export default function LoginPage({ params }) {
   const inp = { width:'100%', padding:'11px 14px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box' };
 
   return (
-    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:C.bg, padding:24 }}>
-      <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'40px 36px', maxWidth:420, width:'100%', boxShadow:'0 4px 24px rgba(0,0,0,0.06)' }}>
+    <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'linear-gradient(150deg,#EFF6FF 0%,#F8FAFC 50%,#F0FDF4 100%)', padding:24 }}>
+      <style>{`.login-btn:hover{background:#1D4ED8!important;}.login-btn:active{transform:scale(0.99)}.login-input:focus{border-color:#2563EB!important;box-shadow:0 0 0 3px rgba(37,99,235,0.1)}`}</style>
+      <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'40px 36px', maxWidth:420, width:'100%', boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:32 }}>
           <Link href={`/${uiLang}`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px' }}>Vonaxity</Link>
           <div style={{ display:'flex', background:'#F5F5F4', borderRadius:8, padding:3, border:`1px solid ${C.border}` }}>
@@ -72,7 +73,7 @@ export default function LoginPage({ params }) {
             </div>
           </div>
           {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'11px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
-          <button type="submit" disabled={loading} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:loading?0.7:1 }}>
+          <button type="submit" disabled={loading} className="login-btn" style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:loading?0.7:1, transition:'background 0.15s' }}>
             {loading ? tr('loading') : tr('submit')}
           </button>
         </form>

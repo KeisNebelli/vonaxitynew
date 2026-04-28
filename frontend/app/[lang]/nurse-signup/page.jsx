@@ -72,8 +72,9 @@ export default function NurseSignup({ params }) {
   };
 
   return (
-    <div style={{ minHeight:'100vh', background:C.bg, display:'flex', alignItems:'center', justifyContent:'center', padding:24, fontFamily:"'Inter',system-ui,sans-serif" }}>
-      <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'36px 32px', maxWidth:460, width:'100%', boxShadow:'0 4px 24px rgba(0,0,0,0.06)' }}>
+    <div style={{ minHeight:'100vh', background:'linear-gradient(150deg,#EFF6FF 0%,#F8FAFC 50%,#F0FDF4 100%)', display:'flex', alignItems:'center', justifyContent:'center', padding:24, fontFamily:"'Inter',system-ui,sans-serif" }}>
+      <style>{`.ns-btn:not(:disabled):hover{background:#1D4ED8!important;transform:translateY(-1px)}.ns-btn{transition:all 0.15s}`}</style>
+      <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'36px 32px', maxWidth:460, width:'100%', boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
         <Link href={`/${lang}`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px', display:'block', marginBottom:8 }}>Vonaxity</Link>
         <div style={{ fontSize:11, fontWeight:700, color:C.secondary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:24 }}>{tr.nurseAccount}</div>
 
@@ -82,11 +83,11 @@ export default function NurseSignup({ params }) {
 
         <div style={{ marginBottom:14 }}>
           <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr.fullName}</label>
-          <input style={inp} value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder={tr.fullNamePh} />
+          <input style={inp} name="name" autoComplete="name" value={form.name} onChange={e=>setForm(f=>({...f,name:e.target.value}))} placeholder={tr.fullNamePh} />
         </div>
         <div style={{ marginBottom:14 }}>
           <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr.email}</label>
-          <input style={inp} type="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} placeholder="your@email.com" />
+          <input style={inp} type="email" name="email" autoComplete="email" value={form.email} onChange={e=>setForm(f=>({...f,email:e.target.value}))} placeholder="your@email.com" />
         </div>
         <div style={{ marginBottom:14 }}>
           <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr.phone}</label>
@@ -95,11 +96,11 @@ export default function NurseSignup({ params }) {
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:14 }}>
           <div>
             <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr.password}</label>
-            <input style={inp} type="password" value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))} placeholder={tr.passwordPh} />
+            <input style={inp} type="password" name="password" autoComplete="new-password" value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))} placeholder={tr.passwordPh} />
           </div>
           <div>
             <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr.confirmPassword}</label>
-            <input style={{...inp, borderColor:form.confirm&&form.password!==form.confirm?C.error:C.border}} type="password" value={form.confirm} onChange={e=>setForm(f=>({...f,confirm:e.target.value}))} placeholder={tr.confirmPh} />
+            <input style={{...inp, borderColor:form.confirm&&form.password!==form.confirm?C.error:C.border}} type="password" name="confirm-password" autoComplete="new-password" value={form.confirm} onChange={e=>setForm(f=>({...f,confirm:e.target.value}))} placeholder={tr.confirmPh} />
           </div>
         </div>
         {form.confirm && form.password !== form.confirm && <div style={{ fontSize:12, color:C.error, marginBottom:12 }}>{tr.passwordMismatch}</div>}
@@ -110,7 +111,7 @@ export default function NurseSignup({ params }) {
 
         {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', marginBottom:14, fontSize:13, color:C.error }}>{error}</div>}
 
-        <button onClick={submit} disabled={!valid||loading} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:!valid||loading?0.5:1, marginBottom:16 }}>
+        <button className="ns-btn" onClick={submit} disabled={!valid||loading} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:!valid||loading?0.5:1, marginBottom:16 }}>
           {loading ? tr.loading : tr.submit}
         </button>
 

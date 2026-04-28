@@ -100,8 +100,9 @@ function SignupContent({ params }) {
   };
 
   return (
-    <div style={{ minHeight:'100vh', background:C.bg, display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}>
-      <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'36px 32px', maxWidth:500, width:'100%', boxShadow:'0 4px 24px rgba(0,0,0,0.06)' }}>
+    <div style={{ minHeight:'100vh', background:'linear-gradient(150deg,#EFF6FF 0%,#F8FAFC 50%,#F0FDF4 100%)', display:'flex', alignItems:'center', justifyContent:'center', padding:24 }}>
+      <style>{`.su-btn-primary{transition:background 0.15s,transform 0.1s}.su-btn-primary:hover:not(:disabled){background:#1D4ED8!important;transform:translateY(-1px)}.su-btn-back{transition:all 0.15s}.su-btn-back:hover{border-color:#2563EB!important;color:#2563EB!important}`}</style>
+      <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'36px 32px', maxWidth:500, width:'100%', boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
 
         {/* Show role selection if no role chosen yet */}
         {!role && <RoleSelect lang={lang} onSelect={handleRoleSelect} />}
@@ -131,7 +132,7 @@ function SignupContent({ params }) {
                 <div style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px' }}>{p.price}<span style={{ fontSize:12, fontWeight:500, color:C.textTertiary }}>{t(lang,'dashboard.perMonth')}</span></div>
               </div>
             ))}
-            <button onClick={()=>setStep(2)} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', marginTop:8 }}>{t(lang,'signup.continue')}</button>
+            <button className="su-btn-primary" onClick={()=>setStep(2)} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'13px', fontSize:15, fontWeight:600, cursor:'pointer', marginTop:8 }}>{t(lang,'signup.continue')}</button>
           </div>
         )}
 
@@ -152,8 +153,8 @@ function SignupContent({ params }) {
               </select>
             </div>
             <div style={{ display:'flex', gap:10 }}>
-              <button onClick={()=>setStep(1)} style={{ flex:'0 0 auto', padding:'12px 20px', borderRadius:10, border:`2px solid ${C.border}`, background:'#fff', cursor:'pointer', fontWeight:600, fontSize:14 }}>{t(lang,'signup.back')}</button>
-              <button onClick={()=>setStep(3)} disabled={!form.name||!form.email||!form.password} style={{ flex:1, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:(!form.name||!form.email||!form.password)?0.4:1 }}>{t(lang,'signup.continue')}</button>
+              <button className="su-btn-back" onClick={()=>setStep(1)} style={{ flex:'0 0 auto', padding:'12px 20px', borderRadius:10, border:`2px solid ${C.border}`, background:'#fff', cursor:'pointer', fontWeight:600, fontSize:14 }}>{t(lang,'signup.back')}</button>
+              <button className="su-btn-primary" onClick={()=>setStep(3)} disabled={!form.name||!form.email||!form.password} style={{ flex:1, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:(!form.name||!form.email||!form.password)?0.4:1 }}>{t(lang,'signup.continue')}</button>
             </div>
           </div>
         )}
@@ -179,8 +180,8 @@ function SignupContent({ params }) {
               {t(lang,'signup.nonEmergency')} <strong>127</strong>
             </div>
             <div style={{ display:'flex', gap:10 }}>
-              <button onClick={()=>setStep(2)} style={{ flex:'0 0 auto', padding:'12px 20px', borderRadius:10, border:`2px solid ${C.border}`, background:'#fff', cursor:'pointer', fontWeight:600, fontSize:14 }}>{t(lang,'signup.back')}</button>
-              <button onClick={submit} disabled={loading||!form.relativeName||!form.relativeCity} style={{ flex:1, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:loading?0.7:1 }}>
+              <button className="su-btn-back" onClick={()=>setStep(2)} style={{ flex:'0 0 auto', padding:'12px 20px', borderRadius:10, border:`2px solid ${C.border}`, background:'#fff', cursor:'pointer', fontWeight:600, fontSize:14 }}>{t(lang,'signup.back')}</button>
+              <button className="su-btn-primary" onClick={submit} disabled={loading||!form.relativeName||!form.relativeCity} style={{ flex:1, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:15, fontWeight:600, cursor:'pointer', opacity:loading?0.7:1 }}>
                 {loading?t(lang,'signup.loading'):t(lang,'signup.submit')}
               </button>
             </div>
