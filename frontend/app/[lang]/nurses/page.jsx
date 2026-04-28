@@ -88,7 +88,7 @@ export default function NursesPage({ params }) {
       {/* Hero */}
       <section style={{ position:'relative', minHeight:480, display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', overflow:'hidden' }}>
         {/* Background image */}
-        <img src="/hero.jpg" alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
+        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1400&auto=format&fit=crop&q=80" alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
         {/* Dark gradient overlay */}
         <div style={{ position:'absolute', inset:0, background:'linear-gradient(160deg, rgba(10,15,40,0.72) 0%, rgba(10,30,80,0.65) 100%)' }} />
         {/* Content */}
