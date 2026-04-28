@@ -62,11 +62,11 @@ export default function LoginPage({ params }) {
         <form onSubmit={handleLogin}>
           <div style={{ marginBottom:16 }}>
             <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('email')}</label>
-            <input style={inp} type="email" placeholder="you@email.com" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
+            <input style={inp} type="email" name="email" autoComplete="email" placeholder="you@email.com" required value={form.email} onChange={e=>setForm({...form,email:e.target.value})} />
           </div>
           <div style={{ marginBottom:24 }}>
             <label style={{ fontSize:13, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('password')}</label>
-            <input style={inp} type="password" placeholder="••••••••" required value={form.password} onChange={e=>setForm({...form,password:e.target.value})} />
+            <input style={inp} type="password" name="password" autoComplete="current-password" placeholder="••••••••" required value={form.password} onChange={e=>setForm({...form,password:e.target.value})} />
             <div style={{ textAlign:'right', marginTop:6 }}>
               <Link href={`/${lang}/forgot-password`} style={{ fontSize:12, color:C.primary, fontWeight:500 }}>{tr('forgotPassword')}</Link>
             </div>
