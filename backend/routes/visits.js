@@ -3,6 +3,30 @@ const prisma = require('../lib/db');
 const { authMiddleware, requireRole } = require('../middleware/auth');
 const { sendEmail, emailTemplates } = require('../lib/email');
 
+// ── Work order number generator ───────────────────────────────────────────────
+async function generateWorkOrderNumber() {
+  const year = new Date().getFullYear();
+  const prefix = `VON-${year}-`;
+  // Find the highest existing number for this year
+  const last = await prisma.visit.findFirst({
+    where: { workOrderNumber: { startsWith: prefix } },
+    orderBy: { workOrderNumber: 'desc' },
+  });
+  let next = 1;
+  if (last?.workOrderNumber) {
+    const seq = parseInt(last.workOrderNumber.replace(prefix, ''), 10);
+    if (!isNaN(seq)) next = seq + 1;
+  }
+  // Loop to guarantee uniqueness (handles race conditions)
+  let candidate, exists;
+  do {
+    candidate = `${prefix}${String(next).padStart(5, '0')}`;
+    exists = await prisma.visit.findUnique({ where: { workOrderNumber: candidate } });
+    if (exists) next++;
+  } while (exists);
+  return candidate;
+}
+
 // GET /visits — role-based
 router.get('/', authMiddleware, async (req, res) => {
   try {
@@ -104,8 +128,9 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
     });
     if (recent) return res.status(409).json({ error: 'This visit was already booked. Please refresh your dashboard.' });
 
+    const workOrderNumber = await generateWorkOrderNumber();
     const visit = await prisma.visit.create({
-      data: { relativeId, serviceType, scheduledAt: new Date(scheduledAt), notes, status: 'UNASSIGNED' },
+      data: { relativeId, serviceType, scheduledAt: new Date(scheduledAt), notes, status: 'UNASSIGNED', workOrderNumber },
       include: { relative: true },
     });
 
@@ -134,6 +159,7 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
           city: visit.relative?.city || '',
           scheduledAt,
           relativeName: visit.relative?.name || 'your loved one',
+          workOrderNumber: visit.workOrderNumber,
         });
         sendEmail({ to: clientUser.email, ...tmpl });
       }

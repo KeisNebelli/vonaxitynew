@@ -107,17 +107,18 @@ model Subscription {
 }
 
 model Visit {
-  id          String    @id @default(cuid())
-  relativeId  String
-  relative    Relative  @relation(fields: [relativeId], references: [id])
-  nurseId     String?
-  nurse       Nurse?    @relation(fields: [nurseId], references: [id])
-  serviceType String
-  status      String    @default("UNASSIGNED")
-  scheduledAt DateTime
-  startedAt   DateTime?
-  completedAt DateTime?
-  notes       String?
+  id              String    @id @default(cuid())
+  workOrderNumber String?   @unique
+  relativeId      String
+  relative        Relative  @relation(fields: [relativeId], references: [id])
+  nurseId         String?
+  nurse           Nurse?    @relation(fields: [nurseId], references: [id])
+  serviceType     String
+  status          String    @default("UNASSIGNED")
+  scheduledAt     DateTime
+  startedAt       DateTime?
+  completedAt     DateTime?
+  notes           String?
   bpSystolic  Int?
   bpDiastolic Int?
   heartRate   Int?

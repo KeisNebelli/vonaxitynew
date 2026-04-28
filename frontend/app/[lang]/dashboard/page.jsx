@@ -373,7 +373,10 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
         <div key={v.id} style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'18px 20px', marginBottom:12, boxShadow:SSM }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:v.bpSystolic||v.status==='UNASSIGNED'?14:0 }}>
             <div>
-              <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>{v.serviceType}</div>
+              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:3 }}>
+                <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.serviceType}</div>
+                {v.workOrderNumber && <span style={{ fontSize:10, fontWeight:700, color:C.primary, background:C.primaryLight, padding:'2px 8px', borderRadius:99, letterSpacing:'0.5px' }}>{v.workOrderNumber}</span>}
+              </div>
               <div style={{ fontSize:12, color:C.textTertiary }}>{new Date(v.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · {v.nurse?.user?.name||tr('visits.nurseTBC')}</div>
             </div>
             <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 }}>

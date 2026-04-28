@@ -32,6 +32,7 @@ const NAV_ITEMS = [
 function formatVisit(v) {
   return {
     id: v.id,
+    workOrderNumber: v.workOrderNumber || null,
     clientName: v.relative?.name || 'Patient',
     address: v.relative?.address || '',
     lat: v.lat || null,
@@ -263,7 +264,10 @@ function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
   return (
     <div style={{ maxWidth:560 }}>
       <div style={{ background:C.primaryLight, borderRadius:12, padding:'14px 18px', marginBottom:24, border:`1px solid rgba(37,99,235,0.15)` }}>
-        <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>{visit.relative?.name || visit.clientName || 'Patient'}</div>
+        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+          <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>{visit.relative?.name || visit.clientName || 'Patient'}</div>
+          {visit.workOrderNumber && <span style={{ fontSize:10, fontWeight:700, color:'#fff', background:'rgba(37,99,235,0.5)', padding:'2px 8px', borderRadius:99, letterSpacing:'0.5px' }}>{visit.workOrderNumber}</span>}
+        </div>
         <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{visit.serviceType} · {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
         {visit.relative?.address && <div style={{ fontSize:12, color:'#3B82F6', marginTop:2, opacity:0.8 }}>📍 {visit.relative.address}</div>}
       </div>

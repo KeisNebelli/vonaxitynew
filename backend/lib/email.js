@@ -136,13 +136,14 @@ const emailTemplates = {
   }),
 
   // ── To client: booking confirmation ────────────────────────────────────────
-  bookingConfirmed: ({ clientName, serviceType, city, scheduledAt, relativeName }) => ({
-    subject: `Visit booked — ${esc(serviceType)} on ${new Date(scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`,
+  bookingConfirmed: ({ clientName, serviceType, city, scheduledAt, relativeName, workOrderNumber }) => ({
+    subject: `Visit booked${workOrderNumber ? ` · ${workOrderNumber}` : ''} — ${esc(serviceType)} on ${new Date(scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'long',year:'numeric'})}`,
     html: `
       <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
         <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Visit booked successfully</h2>
         <p style="color:#475569;margin-bottom:24px">Hi ${esc(clientName)}, your visit has been booked. Nurses in ${esc(city)} are being notified and will apply soon.</p>
+        ${workOrderNumber ? `<div style="background:#EFF6FF;border-radius:10px;padding:14px 18px;margin-bottom:20px;border:1px solid #BFDBFE"><div style="font-size:11px;font-weight:700;color:#2563EB;text-transform:uppercase;letter-spacing:0.5px;margin-bottom:4px">Work Order Number</div><div style="font-size:20px;font-weight:800;color:#1D4ED8;letter-spacing:2px">${workOrderNumber}</div><div style="font-size:11px;color:#6B7280;margin-top:4px">Keep this number — you can use it to reference your case with our team.</div></div>` : ''}
         <div style="background:#F8FAFC;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #E2E8F0">
           <div style="margin-bottom:10px"><strong>Service:</strong> ${esc(serviceType)}</div>
           <div style="margin-bottom:10px"><strong>For:</strong> ${esc(relativeName)}</div>

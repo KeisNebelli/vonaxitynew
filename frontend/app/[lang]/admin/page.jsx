@@ -645,7 +645,8 @@ function Visits({ visits, setVisits, nurses, onAssign, lang='en' }) {
   };
 
   const filtered = useMemo(() => visits.filter(v => {
-    const matchSearch = !search || v.clientName.toLowerCase().includes(search.toLowerCase()) || (v.nurseName||'').toLowerCase().includes(search.toLowerCase());
+    const q = search.toLowerCase();
+    const matchSearch = !q || v.clientName.toLowerCase().includes(q) || (v.nurseName||'').toLowerCase().includes(q) || (v.workOrderNumber||'').toLowerCase().includes(q);
     const matchStatus = filterStatus==='all' || v.status===filterStatus;
     const matchCity = filterCity==='all' || v.city===filterCity;
     return matchSearch && matchStatus && matchCity;
@@ -742,7 +743,10 @@ function Visits({ visits, setVisits, nurses, onAssign, lang='en' }) {
           <tbody>
             {filtered.map((v,i) => (
               <tr key={v.id} style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
-                <td style={{ padding:'12px 16px', fontWeight:600, color:C.textPrimary }}>{v.clientName}</td>
+                <td style={{ padding:'12px 16px' }}>
+                  <div style={{ fontWeight:600, color:C.textPrimary }}>{v.clientName}</div>
+                  {v.workOrderNumber && <div style={{ fontSize:10, fontWeight:700, color:C.primary, marginTop:2, letterSpacing:'0.5px' }}>{v.workOrderNumber}</div>}
+                </td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary, fontSize:12 }}>{v.service}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{v.city}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary, fontSize:12 }}>{new Date(v.scheduledAt).toLocaleDateString()}</td>
@@ -1386,7 +1390,7 @@ export default function AdminPage({ params }) {
         visitsTotal: c.subscription?.visitsPerMonth || 0,
       })));
       const rawVisits = visitsData?.visits || [];
-      setVisits(rawVisits.map(v=>({ ...v, clientName:v.clientName||v.relative?.name||'Unknown', service:v.service||v.serviceType||'Unknown', nurseName:v.nurseName||v.nurse?.user?.name||null, nurseId:v.nurseId||v.nurse?.id||null })));
+      setVisits(rawVisits.map(v=>({ ...v, clientName:v.clientName||v.relative?.name||'Unknown', service:v.service||v.serviceType||'Unknown', nurseName:v.nurseName||v.nurse?.user?.name||null, nurseId:v.nurseId||v.nurse?.id||null, workOrderNumber:v.workOrderNumber||null })));
       setPayments(paymentsData?.payments || []);
       setPayouts(payoutsData?.payouts || []);
     } catch (err) { console.error('Admin load error:', err); }
