@@ -164,12 +164,18 @@ function NotificationBell({ lang, onNavigate }) {
   };
 
   const iconFor = (type) => {
-    if (type === 'NEW_JOB') return '💼';
-    if (type === 'JOB_ASSIGNED') return '✅';
-    if (type === 'JOB_UPDATED') return '✏️';
-    if (type === 'VISIT_COMPLETED') return '🏁';
-    if (type === 'VISIT_CANCELLED') return '❌';
-    return '🔔';
+    const icons = {
+      NEW_JOB:         { bg:'#EDE9FE', color:'#7C3AED', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> },
+      JOB_ASSIGNED:    { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
+      JOB_UPDATED:     { bg:'#FEF3C7', color:'#D97706', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> },
+      VISIT_COMPLETED: { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
+      VISIT_CANCELLED: { bg:'#FEF2F2', color:'#DC2626', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> },
+      NURSE_ON_WAY:    { bg:'#EFF6FF', color:'#2563EB', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
+      NURSE_ARRIVED:   { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+      announcement:    { bg:'#F1F5F9', color:'#475569', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> },
+    };
+    const cfg = icons[type] || icons.announcement;
+    return <div style={{ width:32, height:32, borderRadius:9, background:cfg.bg, color:cfg.color, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>{cfg.svg}</div>;
   };
 
   const timeAgo = (d) => {
@@ -220,13 +226,13 @@ function NotificationBell({ lang, onNavigate }) {
                   onMouseEnter={e => e.currentTarget.style.background = C2.bgSubtle}
                   onMouseLeave={e => e.currentTarget.style.background = n.read ? 'transparent' : C2.primaryLight}
                 >
-                  <div style={{ fontSize:18, flexShrink:0, marginTop:1 }}>{iconFor(n.type)}</div>
+                  {iconFor(n.type)}
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:13, fontWeight:n.read ? 500 : 700, color:C2.textPrimary, marginBottom:2, lineHeight:1.3 }}>{title}</div>
                     <div style={{ fontSize:12, color:C2.textSecondary, lineHeight:1.4, marginBottom:4 }}>{message}</div>
                     <div style={{ fontSize:11, color:C2.textTertiary }}>{timeAgo(n.createdAt)}</div>
                   </div>
-                  {!n.read && <div style={{ width:7, height:7, borderRadius:'50%', background:C2.primary, flexShrink:0, marginTop:5 }} />}
+                  {!n.read && <div style={{ width:6, height:6, borderRadius:'50%', background:C2.primary, flexShrink:0, marginTop:6 }} />}
                 </div>
               );
             })}
