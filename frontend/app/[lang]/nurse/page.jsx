@@ -130,19 +130,72 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
   const tr = (key) => t(lang, key);
   const today = visits.filter(v => !['COMPLETED','CANCELLED'].includes(v.status));
   const nurseName = nurse?.user?.name || nurse?.name || 'Nurse';
+  const nurseInitials = nurseName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const ratingValue = nurse?.rating > 0 ? nurse.rating : null;
+  const totalVisits = nurse?.totalVisits || 0;
+  const specialtiesArray = nurse?.specialties ? (typeof nurse.specialties === 'string' ? JSON.parse(nurse.specialties) : nurse.specialties) : [];
+  const statusMap = { APPROVED:['#ECFDF5','#059669'], PENDING:['#FEF3C7','#D97706'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
+  const [statusBg, statusColor] = statusMap[nurse?.status] || statusMap.INCOMPLETE;
+
   return (
     <div>
-      <div style={{ background:C.primaryLight, borderRadius:14, border:`1px solid rgba(37,99,235,0.15)`, padding:'18px 22px', marginBottom:28, display:'flex', gap:14, alignItems:'center' }}>
-        <div style={{ width:44, height:44, borderRadius:'50%', background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
-        </div>
-        <div>
-          <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>{t(lang,'dashboard.goodMorning')}, {nurseName.split(' ')[0]}</div>
-          <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{today.length} {t(lang,'nurse.todayVisits')} · {nurse?.city||''}</div>
+      {/* Nurse Identity Card */}
+      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'24px', marginBottom:28, borderLeft:`4px solid ${C.primary}` }}>
+        <div style={{ display:'flex', gap:20, alignItems:'flex-start' }}>
+          {/* Avatar */}
+          <div style={{ flexShrink:0 }}>
+            {nurse?.profilePhotoUrl ? (
+              <img src={nurse.profilePhotoUrl} alt={nurseName} style={{ width:80, height:80, borderRadius:'50%', objectFit:'cover', border:`2px solid ${C.border}` }} />
+            ) : (
+              <div style={{ width:80, height:80, borderRadius:'50%', background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', fontSize:28, fontWeight:800, color:'#fff' }}>
+                {nurseInitials}
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div style={{ flex:1, minWidth:0 }}>
+            <h1 style={{ fontSize:20, fontWeight:700, color:C.textPrimary, margin:'0 0 8px 0' }}>{nurseName}</h1>
+
+            {/* Rating */}
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
+              <div style={{ display:'flex', gap:4, alignItems:'center' }}>
+                {[1,2,3,4,5].map((idx) => (
+                  <svg key={idx} width="16" height="16" viewBox="0 0 24 24" style={{ fill: ratingValue && idx <= Math.round(ratingValue) ? C.warning : '#E5E7EB', stroke: 'none' }}>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                ))}
+              </div>
+              {ratingValue ? (
+                <span style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{ratingValue.toFixed(1)} / 5 · {totalVisits} {totalVisits === 1 ? 'visit' : 'visits'}</span>
+              ) : (
+                <span style={{ fontSize:14, fontWeight:600, color:C.textSecondary }}>New Nurse</span>
+              )}
+            </div>
+
+            {/* Status Badge */}
+            <div style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:12, fontWeight:600, background:statusBg, color:statusColor, padding:'5px 12px', borderRadius:6, marginBottom:12 }}>
+              <div style={{ width:6, height:6, borderRadius:'50%', background:statusColor }} />
+              {nurse?.status || 'INCOMPLETE'}
+            </div>
+
+            {/* Specialties */}
+            {specialtiesArray.length > 0 && (
+              <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginTop:8 }}>
+                {specialtiesArray.map((spec) => (
+                  <span key={spec} style={{ fontSize:12, fontWeight:500, background:C.primaryLight, color:C.primary, padding:'4px 10px', borderRadius:4 }}>
+                    {spec}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
+
+      {/* Stat Cards */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:24 }}>
-        {[[t(lang,'nurse.todayLabel'),today.length,C.primary],[t(lang,'nurse.totalVisits'),nurse?.totalVisits||0,C.secondary],[t(lang,'nurse.rating'),nurse?.rating>0?nurse.rating:'N/A',C.warning],[t(lang,'nurse.earningsLabel'),`€${nurse?.totalEarnings||0}`,C.purple]].map(([label,value,color]) => (
+        {[[t(lang,'nurse.todayLabel'),today.length,C.primary],[t(lang,'nurse.totalVisits'),nurse?.totalVisits||0,C.secondary],[t(lang,'nurse.earningsLabel'),`€${nurse?.totalEarnings||0}`,C.purple]].map(([label,value,color]) => (
           <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'16px 18px' }}>
             <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:22, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
@@ -610,8 +663,82 @@ function NurseProfile({ lang='en', nurse=null }) {
     } finally { setSavingPass(false); }
   };
 
+  const specialtiesArray = nurse?.specialties ? (typeof nurse.specialties === 'string' ? JSON.parse(nurse.specialties) : nurse.specialties) : [];
+  const ratingValue = nurse?.rating > 0 ? nurse.rating : null;
+  const totalVisits = nurse?.totalVisits || 0;
+  const nurseName = nurse?.user?.name || nurse?.name || 'Nurse';
+  const nurseInitials = nurseName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const statusMap = { APPROVED:['#ECFDF5','#059669'], PENDING:['#FEF3C7','#D97706'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
+  const [statusBg, statusColor] = statusMap[nurse?.status] || statusMap.INCOMPLETE;
+
   return (
     <div style={{ maxWidth:620 }}>
+
+      {/* Your Public Profile - Read-only display */}
+      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'24px', marginBottom:28 }}>
+        <div style={{ marginBottom:16 }}>
+          <h2 style={{ fontSize:16, fontWeight:700, color:C.textPrimary, margin:'0 0 4px 0' }}>Your Public Profile</h2>
+          <p style={{ fontSize:13, color:C.textSecondary, margin:0 }}>This is what clients see when they find you</p>
+        </div>
+
+        <div style={{ display:'flex', gap:16, alignItems:'flex-start' }}>
+          {/* Avatar */}
+          <div style={{ flexShrink:0 }}>
+            {photoUrl ? (
+              <img src={photoUrl} alt={nurseName} style={{ width:80, height:80, borderRadius:'50%', objectFit:'cover', border:`2px solid ${C.border}` }} />
+            ) : (
+              <div style={{ width:80, height:80, borderRadius:'50%', background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', fontSize:28, fontWeight:800, color:'#fff' }}>
+                {nurseInitials}
+              </div>
+            )}
+          </div>
+
+          {/* Info */}
+          <div style={{ flex:1, minWidth:0 }}>
+            <h3 style={{ fontSize:18, fontWeight:700, color:C.textPrimary, margin:'0 0 8px 0' }}>{nurseName}</h3>
+
+            {/* Rating */}
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:10 }}>
+              <div style={{ display:'flex', gap:3, alignItems:'center' }}>
+                {[1,2,3,4,5].map((idx) => (
+                  <svg key={idx} width="14" height="14" viewBox="0 0 24 24" style={{ fill: ratingValue && idx <= Math.round(ratingValue) ? C.warning : '#E5E7EB', stroke: 'none' }}>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                ))}
+              </div>
+              {ratingValue ? (
+                <span style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{ratingValue.toFixed(1)} / 5</span>
+              ) : (
+                <span style={{ fontSize:13, fontWeight:600, color:C.textSecondary }}>No rating yet</span>
+              )}
+            </div>
+
+            {/* Visits count */}
+            <div style={{ fontSize:13, color:C.textSecondary, marginBottom:10 }}>
+              {totalVisits} completed {totalVisits === 1 ? 'visit' : 'visits'}
+            </div>
+
+            {/* Specialties */}
+            {specialtiesArray.length > 0 && (
+              <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
+                {specialtiesArray.map((spec) => (
+                  <span key={spec} style={{ fontSize:11, fontWeight:500, background:C.secondaryLight, color:C.secondary, padding:'3px 9px', borderRadius:3 }}>
+                    {spec}
+                  </span>
+                ))}
+              </div>
+            )}
+          </div>
+
+          {/* Status Badge */}
+          <div style={{ flexShrink:0 }}>
+            <div style={{ display:'inline-flex', alignItems:'center', gap:5, fontSize:11, fontWeight:600, background:statusBg, color:statusColor, padding:'4px 10px', borderRadius:5 }}>
+              <div style={{ width:5, height:5, borderRadius:'50%', background:statusColor }} />
+              {nurse?.status || 'INCOMPLETE'}
+            </div>
+          </div>
+        </div>
+      </div>
 
       {/* Profile photo */}
       <NurseSectionCard title={tr('nurse.changePhoto')} subtitle={tr('nurse.photoHint')}>
@@ -1092,6 +1219,9 @@ export default function NursePage({ params }) {
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
         .nurse-section{animation:fadeSlideIn 0.2s ease both;}
+        .nurse-btn-primary:hover:not(:disabled){background:#1D4ED8!important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.3)!important;}
+        .nurse-btn-secondary:hover:not(:disabled){background:#F8FAFC!important;border-color:#2563EB!important;}
+        .nurse-btn-danger:hover:not(:disabled){background:rgba(239,68,68,0.12)!important;}
         @media(max-width:768px){
           .nurse-cont{padding:16px 16px 140px!important;}
           .nurse-ham{display:flex!important;}

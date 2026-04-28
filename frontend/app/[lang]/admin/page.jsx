@@ -146,38 +146,51 @@ function Overview({ setActive, nurses, clients, visits, payments, lang='en' }) {
   const todayVisits = visits.filter(v=>['PENDING','IN_PROGRESS','ON_THE_WAY'].includes(v.status));
   const revenue = payments.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
 
+  const statCards = [
+    { label:tr('admin.totalClients'), value:clients.length, tab:'clients', accent:C.primary, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> },
+    { label:tr('admin.activeNurses'), value:nurses.filter(n=>n.status==='APPROVED').length, tab:'nurses', accent:C.secondary, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
+    { label:tr('admin.visitsToday'), value:todayVisits.length, tab:'visits', accent:'#7C3AED', icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+    { label:tr('admin.revenue'), value:`€${revenue}`, tab:'payments', accent:C.secondary, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
+    { label:tr('admin.unassigned'), value:unassigned.length, tab:'alerts', accent:unassigned.length>0?C.error:C.textTertiary, alert:unassigned.length>0, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> },
+    { label:tr('admin.pendingNurses'), value:pending.length, tab:'nurses', accent:pending.length>0?C.warning:C.textTertiary, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
+  ];
+
   return (
     <div>
       {/* Metric cards */}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(160px,1fr))', gap:14, marginBottom:28 }}>
-        {[
-          [tr('admin.totalClients'), clients.length, C.primary, 'clients'],
-          [tr('admin.activeNurses'), nurses.filter(n=>n.status==='APPROVED').length, C.secondary, 'nurses'],
-          [tr('admin.visitsToday'), todayVisits.length, C.purple, 'visits'],
-          [tr('admin.unassigned'), unassigned.length, unassigned.length>0?C.error:C.textTertiary, 'alerts'],
-          [tr('admin.revenue'), `€${revenue}`, C.secondary, 'payments'],
-          [tr('admin.pendingNurses'), pending.length, pending.length>0?C.warning:C.textTertiary, 'nurses'],
-        ].map(([label,value,color,tab]) => (
-          <div key={label} onClick={()=>setActive(tab)} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'18px', cursor:'pointer' }}>
-            <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
-            <div style={{ fontSize:24, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
+        {statCards.map(({ label, value, tab, accent, alert, icon }) => (
+          <div key={label} onClick={()=>setActive(tab)}
+            style={{ background:C.bgWhite, borderRadius:13, border:`1px solid ${alert?'rgba(220,38,38,0.25)':C.border}`, padding:'18px 20px', cursor:'pointer', position:'relative', overflow:'hidden', transition:'box-shadow 0.15s', boxShadow:SSM }}
+            onMouseEnter={e=>e.currentTarget.style.boxShadow=SMD}
+            onMouseLeave={e=>e.currentTarget.style.boxShadow=SSM}>
+            <div style={{ position:'absolute', top:0, left:0, width:3, height:'100%', background:accent, borderRadius:'13px 0 0 13px' }} />
+            <div style={{ color:accent, marginBottom:10 }}>{icon}</div>
+            <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:6 }}>{label}</div>
+            <div style={{ fontSize:26, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.8px', lineHeight:1 }}>{value}</div>
           </div>
         ))}
       </div>
 
-      {/* Alerts */}
+      {/* Alerts — subtle, not alarming */}
       {(unassigned.length > 0 || pending.length > 0) && (
         <div style={{ marginBottom:24 }}>
           {unassigned.length > 0 && (
-            <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:12, padding:'14px 18px', marginBottom:10, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <div style={{ fontSize:14, fontWeight:600, color:C.error }}>{unassigned.length} {tr('admin.visitCountSuffix')} {tr('admin.unassigned')}</div>
-              <button onClick={()=>setActive('alerts')} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', background:C.error, color:'#fff', border:'none', borderRadius:8, cursor:'pointer' }}>{tr('admin.fixNow')}</button>
+            <div style={{ background:C.bgWhite, border:`1px solid #FECACA`, borderLeft:`3px solid ${C.error}`, borderRadius:11, padding:'14px 18px', marginBottom:10, display:'flex', justifyContent:'space-between', alignItems:'center', boxShadow:SSM }}>
+              <div>
+                <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:2 }}>{unassigned.length} {tr('admin.visitCountSuffix')} {tr('admin.unassigned')}</div>
+                <div style={{ fontSize:12, color:C.textSecondary }}>{tr('admin.unassignedSub')||'Waiting for nurse assignment'}</div>
+              </div>
+              <button onClick={()=>setActive('alerts')} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', background:'transparent', color:C.error, border:`1.5px solid ${C.error}`, borderRadius:8, cursor:'pointer', whiteSpace:'nowrap', fontFamily:F }}>{tr('admin.fixNow')}</button>
             </div>
           )}
           {pending.length > 0 && (
-            <div style={{ background:C.warningLight, border:'1px solid #FDE68A', borderRadius:12, padding:'14px 18px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-              <div style={{ fontSize:14, fontWeight:600, color:C.warning }}>{pending.length} {tr('admin.nurseCountSuffix')} {tr('admin.pendingNurses')}</div>
-              <button onClick={()=>setActive('nurses')} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', background:C.warning, color:'#fff', border:'none', borderRadius:8, cursor:'pointer' }}>{tr('admin.reviewBtn')}</button>
+            <div style={{ background:C.bgWhite, border:`1px solid #FDE68A`, borderLeft:'3px solid #D97706', borderRadius:11, padding:'14px 18px', display:'flex', justifyContent:'space-between', alignItems:'center', boxShadow:SSM }}>
+              <div>
+                <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:2 }}>{pending.length} {tr('admin.nurseCountSuffix')} {tr('admin.pendingNurses')}</div>
+                <div style={{ fontSize:12, color:C.textSecondary }}>{tr('admin.pendingNursesSub')||'Awaiting profile review & approval'}</div>
+              </div>
+              <button onClick={()=>setActive('nurses')} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', background:'transparent', color:'#D97706', border:'1.5px solid #D97706', borderRadius:8, cursor:'pointer', whiteSpace:'nowrap', fontFamily:F }}>{tr('admin.reviewBtn')}</button>
             </div>
           )}
         </div>
@@ -1482,6 +1495,18 @@ export default function AdminPage({ params }) {
         @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
         *{box-sizing:border-box;}body{margin:0;}
         @keyframes spin{to{transform:rotate(360deg)}}
+        @keyframes fadeSlideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+        .admin-section{animation:fadeSlideIn 0.18s ease both;}
+        .adm-btn-primary{transition:background 0.15s,transform 0.1s,box-shadow 0.15s;}
+        .adm-btn-primary:hover:not(:disabled){background:#1D4ED8!important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.28)!important;}
+        .adm-btn-primary:active:not(:disabled){transform:translateY(0);}
+        .adm-btn-secondary{transition:background 0.15s,border-color 0.15s;}
+        .adm-btn-secondary:hover:not(:disabled){background:#F8FAFC!important;border-color:#2563EB!important;color:#2563EB!important;}
+        .adm-btn-danger{transition:background 0.15s,border-color 0.15s;}
+        .adm-btn-danger:hover:not(:disabled){background:#FEF2F2!important;border-color:#DC2626!important;}
+        .adm-btn-success{transition:background 0.15s;}
+        .adm-btn-success:hover:not(:disabled){background:#047857!important;}
+        .adm-row:hover{background:#F8FAFC!important;}
         @media(max-width:768px){
           .admin-cont{padding:16px 16px 140px!important;}
           .admin-ham{display:flex!important;}

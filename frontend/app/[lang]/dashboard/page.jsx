@@ -364,6 +364,7 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
   const [reviewError, setReviewError] = useState('');
   const [editing, setEditing] = useState(null); // visit object
   const [deleting, setDeleting] = useState(null); // visit object
+  const [viewingDetail, setViewingDetail] = useState(null); // visit object for detail modal
 
   const canEdit = (v) => v.status === 'UNASSIGNED';
   const canDelete = (v) => !['COMPLETED'].includes(v.status) && !['PENDING','ACCEPTED'].includes(v.status);
@@ -424,6 +425,12 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
               {tr('dashboard.viewApplicants')}
             </button>
           )}
+          {v.status === 'COMPLETED' && (
+            <button onClick={()=>setViewingDetail(v)} style={{ width:'100%', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, padding:'9px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:F, marginTop:8, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+              {lang==='sq' ? 'Shiko Raportin e Vizitës' : 'View Full Report'}
+            </button>
+          )}
           {v.status === 'COMPLETED' && !v.review && !reviewed[v.id] && (
             reviewing === v.id ? (
               <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:12, marginTop:8 }}>
@@ -454,7 +461,103 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
     </div>
     {editing && <EditVisit visit={editing} onSave={()=>{ setEditing(null); onRefresh?.(); }} onCancel={()=>setEditing(null)} lang={lang} />}
     {deleting && <DeleteConfirm visit={deleting} onConfirm={()=>{ setDeleting(null); onRefresh?.(); }} onCancel={()=>setDeleting(null)} lang={lang} />}
+    {viewingDetail && <VisitDetailModal visit={viewingDetail} lang={lang} onClose={()=>setViewingDetail(null)} />}
     </>
+  );
+}
+
+// ── Visit Detail Modal ────────────────────────────────────────────────────────
+function VisitDetailModal({ visit, lang, onClose }) {
+  const tr = (key) => t(lang, key);
+  const serviceLabel = (en) => { const s = SERVICES_MAP.find(x => x.en === en); return lang === 'sq' && s ? s.sq : en; };
+  const hasVitals = visit.bpSystolic || visit.glucose || visit.heartRate || visit.oxygenSat || visit.temperature;
+
+  const VitalCard = ({ label, value, unit, bg, col }) => (
+    <div style={{ background:bg, borderRadius:11, padding:'14px 16px' }}>
+      <div style={{ fontSize:10, fontWeight:700, color:col, textTransform:'uppercase', letterSpacing:'0.8px', marginBottom:6, opacity:0.8 }}>{label}</div>
+      <div style={{ fontSize:22, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px', lineHeight:1 }}>{value}</div>
+      <div style={{ fontSize:11, color:C.textTertiary, marginTop:4 }}>{unit}</div>
+    </div>
+  );
+
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', zIndex:9000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{ background:C.bgWhite, borderRadius:20, padding:'28px', maxWidth:540, width:'100%', boxShadow:'0 24px 64px rgba(0,0,0,0.18)', maxHeight:'90vh', overflowY:'auto' }}>
+
+        {/* Header */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:22 }}>
+          <div>
+            <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:6 }}>{lang==='sq'?'Raport Vizite':'Visit Report'}</div>
+            <div style={{ fontSize:20, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4 }}>{serviceLabel(visit.serviceType)}</div>
+            <div style={{ fontSize:13, color:C.textSecondary }}>
+              {new Date(visit.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+              {' · '}
+              {new Date(visit.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+            </div>
+          </div>
+          <button onClick={onClose} style={{ background:C.bgSubtle, border:'none', borderRadius:9, width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary, fontSize:16, flexShrink:0 }}>✕</button>
+        </div>
+
+        {/* Nurse */}
+        {visit.nurse?.user && (
+          <div style={{ background:C.bgSubtle, borderRadius:12, padding:'14px 16px', marginBottom:20, display:'flex', gap:12, alignItems:'center' }}>
+            <div style={{ width:42, height:42, borderRadius:11, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, fontWeight:800, color:'#fff', flexShrink:0, overflow:'hidden' }}>
+              {visit.nurse.profilePhotoUrl
+                ? <img src={visit.nurse.profilePhotoUrl} alt="" style={{ width:'100%',height:'100%',objectFit:'cover' }} />
+                : (visit.nurse.user.name||'N').charAt(0).toUpperCase()}
+            </div>
+            <div>
+              <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>{visit.nurse.user.name}</div>
+              <div style={{ fontSize:12, color:C.textTertiary }}>{lang==='sq'?'Infermiere Kujdestare':'Attending Nurse'}{visit.nurse.city ? ` · ${visit.nurse.city}` : ''}</div>
+            </div>
+            <div style={{ marginLeft:'auto' }}>
+              <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>✓ {lang==='sq'?'Verifikuar':'Verified'}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Vitals */}
+        {hasVitals && (
+          <div style={{ marginBottom:20 }}>
+            <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:12 }}>{lang==='sq'?'Shenjat Vitale':'Vitals Recorded'}</div>
+            <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
+              {visit.bpSystolic && <VitalCard label={lang==='sq'?'Presioni Gjakut':'Blood Pressure'} value={`${visit.bpSystolic}/${visit.bpDiastolic}`} unit="mmHg" bg="#EFF6FF" col="#2563EB" />}
+              {visit.glucose && <VitalCard label={lang==='sq'?'Glukoza':'Glucose'} value={visit.glucose} unit="mmol/L" bg="#ECFDF5" col="#059669" />}
+              {visit.heartRate && <VitalCard label={lang==='sq'?'Rrahjet e Zemrës':'Heart Rate'} value={visit.heartRate} unit="bpm" bg="#FEF2F2" col="#DC2626" />}
+              {visit.oxygenSat && <VitalCard label="SpO₂" value={`${visit.oxygenSat}%`} unit={lang==='sq'?'Saturimi i O₂':'Oxygen Saturation'} bg="#F5F3FF" col="#7C3AED" />}
+              {visit.temperature && <VitalCard label={lang==='sq'?'Temperatura':'Temperature'} value={`${visit.temperature}°C`} unit="Celsius" bg="#FFFBEB" col="#D97706" />}
+            </div>
+          </div>
+        )}
+
+        {/* Nurse Notes */}
+        {visit.nurseNotes && (
+          <div style={{ marginBottom:20 }}>
+            <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:10 }}>{lang==='sq'?'Shënimet e Infermières':'Nurse Notes'}</div>
+            <div style={{ background:C.bgSubtle, borderRadius:11, padding:'16px 18px', fontSize:13, color:C.textSecondary, lineHeight:1.75, fontStyle:'italic', borderLeft:`3px solid ${C.primary}` }}>
+              "{visit.nurseNotes}"
+            </div>
+          </div>
+        )}
+
+        {/* No data fallback */}
+        {!hasVitals && !visit.nurseNotes && (
+          <div style={{ textAlign:'center', padding:'28px 20px', color:C.textTertiary, fontSize:13, background:C.bgSubtle, borderRadius:12, marginBottom:20 }}>
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke={C.textTertiary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ marginBottom:10, display:'block', margin:'0 auto 10px' }}><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+            {lang==='sq' ? 'Nuk janë regjistruar shenja vitale për këtë vizitë.' : 'No vitals were recorded for this visit.'}
+          </div>
+        )}
+
+        {/* Footer */}
+        <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:16, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <Badge s="COMPLETED" lang={lang} />
+          {visit.workOrderNumber && <span style={{ fontSize:12, color:C.textTertiary, fontWeight:500 }}>#{visit.workOrderNumber}</span>}
+          <button onClick={onClose} style={{ fontSize:13, fontWeight:600, padding:'9px 20px', borderRadius:9, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.textSecondary }}>
+            {lang==='sq'?'Mbyll':'Close'}
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }
 
