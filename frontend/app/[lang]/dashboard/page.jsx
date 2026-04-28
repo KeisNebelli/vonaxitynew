@@ -39,7 +39,7 @@ function Badge({ s, lang='en' }) {
   return <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:bg, color:col, textTransform:'uppercase', whiteSpace:'nowrap' }}>{label}</span>;
 }
 
-function NotificationBell({ lang }) {
+function NotificationBell({ lang, onNavigate }) {
   const [notifs, setNotifs] = useState([]);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -62,11 +62,13 @@ function NotificationBell({ lang }) {
 
   const unread = notifs.filter(n => !n.read).length;
 
-  const markRead = async (n) => {
+  const handleClick = async (n) => {
     if (!n.read) {
       try { await api.markNotificationRead(n.id); } catch {}
       setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, read: true } : x));
     }
+    setOpen(false);
+    if (onNavigate) onNavigate(n.type, n.relatedId);
   };
 
   const markAll = async () => {
@@ -78,9 +80,9 @@ function NotificationBell({ lang }) {
     if (type === 'NURSE_APPLIED') return '👤';
     if (type === 'JOB_ASSIGNED') return '✅';
     if (type === 'VISIT_COMPLETED') return '🏁';
-    if (type === 'ON_THE_WAY') return '🚗';
-    if (type === 'ARRIVED') return '📍';
-    if (type === 'CANCELLED') return '❌';
+    if (type === 'NURSE_ON_WAY') return '🚗';
+    if (type === 'NURSE_ARRIVED') return '📍';
+    if (type === 'VISIT_CANCELLED') return '❌';
     return '🔔';
   };
 
@@ -124,7 +126,7 @@ function NotificationBell({ lang }) {
             ) : notifs.map(n => (
               <div
                 key={n.id}
-                onClick={() => markRead(n)}
+                onClick={() => handleClick(n)}
                 style={{ padding:'12px 16px', borderBottom:`1px solid ${C.borderSubtle}`, cursor:'pointer', background:n.read ? 'transparent' : C.primaryLight, display:'flex', gap:10, alignItems:'flex-start', transition:'background 0.1s' }}
                 onMouseEnter={e => e.currentTarget.style.background = C.bgSubtle}
                 onMouseLeave={e => e.currentTarget.style.background = n.read ? 'transparent' : C.primaryLight}
@@ -1079,7 +1081,7 @@ export default function Dashboard({ params }) {
               <div style={{ fontSize:16,fontWeight:700,color:C.textPrimary }}>{viewingApplicants ? tr('dashboard.applicantsTitle') : TITLES[active]}</div>
             </div>
             <div style={{ display:'flex',alignItems:'center',gap:8 }}>
-              <NotificationBell lang={lang} />
+              <NotificationBell lang={lang} onNavigate={(type) => { setActive('visits'); setViewingApplicants(null); }} />
               <div style={{ display:'flex',background:'#F1F5F9',borderRadius:8,padding:3,border:`1px solid ${C.border}` }}>
                 {['en','sq'].map(l=>(
                   <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px',borderRadius:6,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',background:uiLang===l?C.primary:'transparent',color:uiLang===l?'#fff':C.textSecondary,fontFamily:F }}>{l.toUpperCase()}</button>

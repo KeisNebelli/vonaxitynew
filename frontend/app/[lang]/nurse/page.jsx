@@ -126,7 +126,7 @@ function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen, lang=
   );
 }
 
-function NotificationBell({ lang }) {
+function NotificationBell({ lang, onNavigate }) {
   const [notifs, setNotifs] = useState([]);
   const [open, setOpen] = useState(false);
   const ref = useRef(null);
@@ -149,11 +149,13 @@ function NotificationBell({ lang }) {
 
   const unread = notifs.filter(n => !n.read).length;
 
-  const markRead = async (n) => {
+  const handleClick = async (n) => {
     if (!n.read) {
       try { await api.markNotificationRead(n.id); } catch {}
       setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, read: true } : x));
     }
+    setOpen(false);
+    if (onNavigate) onNavigate(n.type, n.relatedId);
   };
 
   const markAll = async () => {
@@ -166,7 +168,7 @@ function NotificationBell({ lang }) {
     if (type === 'JOB_ASSIGNED') return '✅';
     if (type === 'JOB_UPDATED') return '✏️';
     if (type === 'VISIT_COMPLETED') return '🏁';
-    if (type === 'CANCELLED') return '❌';
+    if (type === 'VISIT_CANCELLED') return '❌';
     return '🔔';
   };
 
@@ -209,7 +211,7 @@ function NotificationBell({ lang }) {
             ) : notifs.map(n => (
               <div
                 key={n.id}
-                onClick={() => markRead(n)}
+                onClick={() => handleClick(n)}
                 style={{ padding:'12px 16px', borderBottom:`1px solid ${C2.borderSubtle}`, cursor:'pointer', background:n.read ? 'transparent' : C2.primaryLight, display:'flex', gap:10, alignItems:'flex-start', transition:'background 0.1s' }}
                 onMouseEnter={e => e.currentTarget.style.background = C2.bgSubtle}
                 onMouseLeave={e => e.currentTarget.style.background = n.read ? 'transparent' : C2.primaryLight}
@@ -1347,7 +1349,7 @@ export default function NursePage({ params }) {
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]||'Nurse Dashboard'}</div>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <NotificationBell lang={lang} />
+              <NotificationBell lang={lang} onNavigate={(type) => setActive(type === 'NEW_JOB' ? 'jobs' : 'visits')} />
               <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:'1px solid #E2E8F0' }}>
                 {['en','sq'].map(l=>(
                   <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:lang===l?'#2563EB':'transparent', color:lang===l?'#fff':'#475569', fontFamily:F }}>{l.toUpperCase()}</button>
