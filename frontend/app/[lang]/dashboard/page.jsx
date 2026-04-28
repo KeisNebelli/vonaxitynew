@@ -361,6 +361,7 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
   const [comment, setComment] = useState('');
   const [reviewed, setReviewed] = useState({});
   const [submitting, setSubmitting] = useState(false);
+  const [reviewError, setReviewError] = useState('');
   const [editing, setEditing] = useState(null); // visit object
   const [deleting, setDeleting] = useState(null); // visit object
 
@@ -369,12 +370,15 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
 
   const submitReview = async (visitId) => {
     if (!rating) return;
-    setSubmitting(true);
+    setSubmitting(true); setReviewError('');
     try {
       await api.reviewVisit(visitId, { rating, comment });
       setReviewed(r => ({ ...r, [visitId]: rating }));
-      setReviewing(null); setRating(0); setComment('');
-    } catch (err) { console.error(err); }
+      setReviewing(null); setRating(0); setComment(''); setReviewError('');
+    } catch (err) {
+      console.error('Review error:', err);
+      setReviewError(err.message || 'Failed to submit review. Please try again.');
+    }
     finally { setSubmitting(false); }
   };
 
@@ -430,8 +434,9 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
                   ))}
                 </div>
                 <input value={comment} onChange={e=>setComment(e.target.value)} placeholder={tr('dashboard.leaveComment')} style={{ width:'100%', padding:'9px 12px', borderRadius:8, border:`1px solid ${C.border}`, fontSize:13, fontFamily:F, marginBottom:10, boxSizing:'border-box' }} />
+                {reviewError && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:8, padding:'8px 12px', fontSize:12, color:C.error, marginBottom:10 }}>{reviewError}</div>}
                 <div style={{ display:'flex', gap:8 }}>
-                  <button onClick={()=>setReviewing(null)} style={{ flex:1, padding:'9px', borderRadius:8, border:`1px solid ${C.border}`, background:'transparent', fontSize:13, cursor:'pointer', color:C.textSecondary }}>{tr('dashboard.cancel')}</button>
+                  <button onClick={()=>{ setReviewing(null); setReviewError(''); }} style={{ flex:1, padding:'9px', borderRadius:8, border:`1px solid ${C.border}`, background:'transparent', fontSize:13, cursor:'pointer', color:C.textSecondary }}>{tr('dashboard.cancel')}</button>
                   <button onClick={()=>submitReview(v.id)} disabled={!rating||submitting} style={{ flex:2, padding:'9px', borderRadius:8, border:'none', background:C.primary, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity:!rating||submitting?0.6:1 }}>{submitting?tr('dashboard.submitting'):tr('dashboard.submitReview')}</button>
                 </div>
               </div>

@@ -50,7 +50,7 @@ router.get('/', authMiddleware, async (req, res) => {
       const relativeIds = relatives.map(r => r.id);
       visits = await prisma.visit.findMany({
         where: { relativeId: { in: relativeIds } },
-        include: { nurse: { include: { user: true } }, relative: true },
+        include: { nurse: { include: { user: true } }, relative: true, review: true },
         orderBy: { scheduledAt: 'desc' },
       });
     }
