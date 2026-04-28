@@ -844,12 +844,15 @@ function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, on
               <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{v.service} · {v.city} · {new Date(v.scheduledAt).toLocaleDateString()}</div>
             </div>
             <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).slice(0,2).map(n => (
-                <button key={n.id} onClick={()=>handleAssignAlert(v.id,n.id)} style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.primaryLight, color:C.primary, border:`1px solid rgba(37,99,235,0.2)`, borderRadius:8, cursor:'pointer' }}>
-                  {tr('admin.assignNurse')}
+              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).slice(0,3).map(n => (
+                <button key={n.id} onClick={()=>handleAssignAlert(v.id,n.id)} style={{ fontSize:12, fontWeight:500, padding:'6px 12px', background:'#fff', color:'#374151', border:'1px solid #E2E8F0', borderRadius:8, cursor:'pointer', display:'flex', alignItems:'center', gap:6 }}>
+                  <span style={{ width:20, height:20, borderRadius:'50%', background:'#EFF6FF', color:'#2563EB', fontSize:10, fontWeight:700, display:'inline-flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    {(n.user?.name||n.name||'N').charAt(0).toUpperCase()}
+                  </span>
+                  {n.user?.name||n.name}
                 </button>
               ))}
-              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).length===0 && <span style={{ fontSize:12, color:C.error }}>{tr('admin.noNurseInCity')}</span>}
+              {nurses.filter(n=>n.status==='APPROVED'&&(n.city===v.city||n.city===v.relative?.city)).length===0 && <span style={{ fontSize:12, color:C.textTertiary }}>{tr('admin.noNurseInCity')}</span>}
             </div>
           </div>
         ))}
