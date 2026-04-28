@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
@@ -37,6 +37,112 @@ function Badge({ s, lang='en' }) {
   const [bg,col] = m[s]||[C.bgSubtle,C.textTertiary];
   const label = t(lang,'visits.status.'+s) || s;
   return <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:bg, color:col, textTransform:'uppercase', whiteSpace:'nowrap' }}>{label}</span>;
+}
+
+function NotificationBell({ lang }) {
+  const [notifs, setNotifs] = useState([]);
+  const [open, setOpen] = useState(false);
+  const ref = useRef(null);
+
+  const load = async () => {
+    try { const d = await api.getNotifications(); setNotifs(d.notifications || []); } catch {}
+  };
+
+  useEffect(() => {
+    load();
+    const iv = setInterval(load, 10000);
+    return () => clearInterval(iv);
+  }, []);
+
+  useEffect(() => {
+    const handler = (e) => { if (ref.current && !ref.current.contains(e.target)) setOpen(false); };
+    document.addEventListener('mousedown', handler);
+    return () => document.removeEventListener('mousedown', handler);
+  }, []);
+
+  const unread = notifs.filter(n => !n.read).length;
+
+  const markRead = async (n) => {
+    if (!n.read) {
+      try { await api.markNotificationRead(n.id); } catch {}
+      setNotifs(prev => prev.map(x => x.id === n.id ? { ...x, read: true } : x));
+    }
+  };
+
+  const markAll = async () => {
+    try { await api.markAllNotificationsRead(); } catch {}
+    setNotifs(prev => prev.map(x => ({ ...x, read: true })));
+  };
+
+  const iconFor = (type) => {
+    if (type === 'NURSE_APPLIED') return '👤';
+    if (type === 'JOB_ASSIGNED') return '✅';
+    if (type === 'VISIT_COMPLETED') return '🏁';
+    if (type === 'ON_THE_WAY') return '🚗';
+    if (type === 'ARRIVED') return '📍';
+    if (type === 'CANCELLED') return '❌';
+    return '🔔';
+  };
+
+  const timeAgo = (d) => {
+    const s = Math.floor((Date.now() - new Date(d)) / 1000);
+    if (s < 60) return `${s}s`;
+    if (s < 3600) return `${Math.floor(s/60)}m`;
+    if (s < 86400) return `${Math.floor(s/3600)}h`;
+    return `${Math.floor(s/86400)}d`;
+  };
+
+  return (
+    <div ref={ref} style={{ position:'relative' }}>
+      <button
+        onClick={() => { setOpen(o => !o); }}
+        style={{ position:'relative', width:36, height:36, borderRadius:9, border:`1px solid ${C.border}`, background:open ? C.bgSubtle : C.bgWhite, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary, flexShrink:0 }}
+        aria-label="Notifications"
+      >
+        <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+          <path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/>
+        </svg>
+        {unread > 0 && (
+          <span style={{ position:'absolute', top:4, right:4, width:8, height:8, borderRadius:'50%', background:'#EF4444', border:`1.5px solid ${C.bgWhite}` }} />
+        )}
+      </button>
+
+      {open && (
+        <div style={{ position:'absolute', top:42, right:0, width:320, background:C.bgWhite, borderRadius:14, boxShadow:'0 8px 30px rgba(15,23,42,0.12)', border:`1px solid ${C.border}`, zIndex:9999, overflow:'hidden' }}>
+          {/* Header */}
+          <div style={{ padding:'14px 16px 10px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+            <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>{lang==='sq' ? 'Njoftimet' : 'Notifications'} {unread > 0 && <span style={{ fontSize:11, fontWeight:600, padding:'2px 7px', borderRadius:99, background:C.primaryLight, color:C.primary, marginLeft:6 }}>{unread}</span>}</div>
+            {unread > 0 && <button onClick={markAll} style={{ fontSize:11, fontWeight:600, color:C.primary, background:'none', border:'none', cursor:'pointer', padding:0 }}>{lang==='sq' ? 'Shëno të gjitha' : 'Mark all read'}</button>}
+          </div>
+
+          {/* List */}
+          <div style={{ maxHeight:320, overflowY:'auto' }}>
+            {notifs.length === 0 ? (
+              <div style={{ padding:'28px 16px', textAlign:'center', color:C.textTertiary, fontSize:13 }}>
+                {lang==='sq' ? 'Asnjë njoftim' : 'No notifications yet'}
+              </div>
+            ) : notifs.map(n => (
+              <div
+                key={n.id}
+                onClick={() => markRead(n)}
+                style={{ padding:'12px 16px', borderBottom:`1px solid ${C.borderSubtle}`, cursor:'pointer', background:n.read ? 'transparent' : C.primaryLight, display:'flex', gap:10, alignItems:'flex-start', transition:'background 0.1s' }}
+                onMouseEnter={e => e.currentTarget.style.background = C.bgSubtle}
+                onMouseLeave={e => e.currentTarget.style.background = n.read ? 'transparent' : C.primaryLight}
+              >
+                <div style={{ fontSize:18, flexShrink:0, marginTop:1 }}>{iconFor(n.type)}</div>
+                <div style={{ flex:1, minWidth:0 }}>
+                  <div style={{ fontSize:13, fontWeight:n.read ? 500 : 700, color:C.textPrimary, marginBottom:2, lineHeight:1.3 }}>{n.title}</div>
+                  <div style={{ fontSize:12, color:C.textSecondary, lineHeight:1.4, marginBottom:4 }}>{n.message}</div>
+                  <div style={{ fontSize:11, color:C.textTertiary }}>{timeAgo(n.createdAt)}</div>
+                </div>
+                {!n.read && <div style={{ width:7, height:7, borderRadius:'50%', background:C.primary, flexShrink:0, marginTop:5 }} />}
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
 }
 
 function Overview({ user, visits, relative, lang, onBook }) {
@@ -973,6 +1079,7 @@ export default function Dashboard({ params }) {
               <div style={{ fontSize:16,fontWeight:700,color:C.textPrimary }}>{viewingApplicants ? tr('dashboard.applicantsTitle') : TITLES[active]}</div>
             </div>
             <div style={{ display:'flex',alignItems:'center',gap:8 }}>
+              <NotificationBell lang={lang} />
               <div style={{ display:'flex',background:'#F1F5F9',borderRadius:8,padding:3,border:`1px solid ${C.border}` }}>
                 {['en','sq'].map(l=>(
                   <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px',borderRadius:6,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',background:uiLang===l?C.primary:'transparent',color:uiLang===l?'#fff':C.textSecondary,fontFamily:F }}>{l.toUpperCase()}</button>

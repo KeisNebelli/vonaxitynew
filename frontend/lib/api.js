@@ -114,6 +114,9 @@ export const api = {
 
   // Notifications
   sendNotification: (body) => apiFetch('/notifications/send', { method: 'POST', body: JSON.stringify(body) }),
+  getNotifications: () => apiFetch('/notifications'),
+  markNotificationRead: (id) => apiFetch(`/notifications/${id}/read`, { method: 'PATCH' }),
+  markAllNotificationsRead: () => apiFetch('/notifications/read-all', { method: 'PATCH' }),
 
   // Settings
   getSettings: () => apiFetch('/settings'),
