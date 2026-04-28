@@ -404,3 +404,37 @@ contactRouter.post('/', async (req, res) => {
   }
 });
 module.exports.contactRouter = contactRouter;
+
+// ── TEST RESET ──────────────────────────────────────────────────────────────
+// POST /admin/test-reset — admin only; resets all test accounts for clean testing
+const testResetRouter = require('express').Router();
+testResetRouter.post('/', ...requireRole('ADMIN'), async (req, res) => {
+  const TEST_EMAILS = ['client@test.com', 'client2@test.com'];
+  try {
+    const users = await prisma.user.findMany({ where: { email: { in: TEST_EMAILS } } });
+    const userIds = users.map(u => u.id);
+    if (!userIds.length) return res.status(404).json({ error: 'No test accounts found' });
+
+    // 1. Reset visitsUsed to 0 and ensure unlimited subscription
+    await prisma.subscription.updateMany({
+      where: { userId: { in: userIds } },
+      data: { visitsUsed: 0, status: 'ACTIVE', visitsPerMonth: 999, currentPeriodEnd: new Date('2099-12-31') },
+    });
+
+    // 2. Delete all visits for their relatives
+    const relatives = await prisma.relative.findMany({ where: { clientId: { in: userIds } } });
+    const relativeIds = relatives.map(r => r.id);
+    const deletedVisits = await prisma.visit.deleteMany({ where: { relativeId: { in: relativeIds } } });
+
+    res.json({
+      success: true,
+      message: `Reset ${TEST_EMAILS.length} test accounts`,
+      deletedVisits: deletedVisits.count,
+      accounts: TEST_EMAILS,
+    });
+  } catch (err) {
+    console.error('Test reset error:', err);
+    res.status(500).json({ error: 'Failed to reset test accounts' });
+  }
+});
+module.exports.testResetRouter = testResetRouter;

@@ -60,7 +60,10 @@ function Overview({ user, visits, relative, lang, onBook }) {
         </div>
       )}
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))', gap:12, marginBottom:20 }}>
-        {[[tr('dashboard.plan'),planLabel,C.primary,''],[tr('dashboard.visitsUsed'),`${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`,C.textPrimary,tr('dashboard.thisMonth')],[tr('dashboard.completed'),completed.length,C.secondary,tr('dashboard.total')],[tr('dashboard.lastBP'),last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—',last?.bpSystolic?C.warning:C.textTertiary,last?.bpSystolic?'mmHg':'']].map(([label,val,color,sub2])=>(
+        {[[tr('dashboard.plan'),planLabel,C.primary,''],
+          [tr('dashboard.visitsUsed'), sub?.visitsPerMonth>=999 ? '∞' : `${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`, C.textPrimary, sub?.visitsPerMonth>=999 ? 'Unlimited' : tr('dashboard.thisMonth')],
+          [tr('dashboard.completed'),completed.length,C.secondary,tr('dashboard.total')],
+          [tr('dashboard.lastBP'),last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—',last?.bpSystolic?C.warning:C.textTertiary,last?.bpSystolic?'mmHg':'']].map(([label,val,color,sub2])=>(
           <div key={label} style={{ background:C.bgWhite, borderRadius:13, border:`1px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM }}>
             <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
             <div style={{ fontSize:24, fontWeight:800, color, letterSpacing:'-0.5px', lineHeight:1 }}>{val}</div>
@@ -117,9 +120,11 @@ function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
             {relative ? `${tr('dashboard.bookForPrefix')} ${relative.name} ${tr('dashboard.bookIn')} ${relative.city}` : tr('dashboard.bookAddLoved')}
           </div>
           {subscription && (
-            <div style={{ fontSize:12, fontWeight:600, marginTop:4, color: subscription.visitsUsed >= subscription.visitsPerMonth ? '#DC2626' : '#059669' }}>
-              {subscription.visitsPerMonth - subscription.visitsUsed} {subscription.visitsPerMonth - subscription.visitsUsed !== 1 ? tr('dashboard.bookVisitsLeftPlural') : tr('dashboard.bookVisitsLeft')}
-            </div>
+            subscription.visitsPerMonth >= 999
+              ? <div style={{ fontSize:12, fontWeight:600, marginTop:4, color:'#059669' }}>⚡ Unlimited visits (test account)</div>
+              : <div style={{ fontSize:12, fontWeight:600, marginTop:4, color: subscription.visitsUsed >= subscription.visitsPerMonth ? '#DC2626' : '#059669' }}>
+                  {subscription.visitsPerMonth - subscription.visitsUsed} {subscription.visitsPerMonth - subscription.visitsUsed !== 1 ? tr('dashboard.bookVisitsLeftPlural') : tr('dashboard.bookVisitsLeft')}
+                </div>
           )}
         </div>
         <button onClick={onCancel} style={{ background:C.bgSubtle, border:'none', borderRadius:8, width:32, height:32, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary, fontSize:16 }}>✕</button>
@@ -150,7 +155,7 @@ function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
 
       <div style={{ display:'flex', gap:10 }}>
         <button onClick={onCancel} style={{ flex:1, background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:10, padding:'12px', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:F }}>{tr('dashboard.cancel')}</button>
-        <button onClick={handleSubmit} disabled={loading||!relative||(subscription&&subscription.visitsUsed>=subscription.visitsPerMonth)} style={{ flex:2, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:700, cursor:(loading||!relative||(subscription&&subscription.visitsUsed>=subscription.visitsPerMonth))?'not-allowed':'pointer', opacity:(loading||!relative||(subscription&&subscription.visitsUsed>=subscription.visitsPerMonth))?0.7:1, fontFamily:F }}>
+        <button onClick={handleSubmit} disabled={loading||!relative||(subscription&&subscription.visitsPerMonth<999&&subscription.visitsUsed>=subscription.visitsPerMonth)} style={{ flex:2, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:700, cursor:(loading||!relative||(subscription&&subscription.visitsPerMonth<999&&subscription.visitsUsed>=subscription.visitsPerMonth))?'not-allowed':'pointer', opacity:(loading||!relative||(subscription&&subscription.visitsPerMonth<999&&subscription.visitsUsed>=subscription.visitsPerMonth))?0.7:1, fontFamily:F }}>
           {loading ? tr('dashboard.booking') : tr('dashboard.bookVisitBtn')}
         </button>
       </div>
@@ -643,7 +648,7 @@ function SubscriptionSection({ userData, lang }) {
             <div style={{ fontSize:13, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:6 }}>{tr('dashboard.currentPlan')}</div>
             <div style={{ fontSize:22, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px' }}>{currentPlan ? currentPlan.charAt(0).toUpperCase()+currentPlan.slice(1) : tr('dashboard.trialLabel')}</div>
             <div style={{ fontSize:13, color:C.textSecondary, marginTop:4 }}>
-              {visitsTotal > 0 ? `${visitsUsed}/${visitsTotal} ${tr('dashboard.visitsUsedMonth')}` : tr('dashboard.freeTrial')}
+              {visitsTotal >= 999 ? '⚡ Unlimited visits (test account)' : visitsTotal > 0 ? `${visitsUsed}/${visitsTotal} ${tr('dashboard.visitsUsedMonth')}` : tr('dashboard.freeTrial')}
             </div>
           </div>
           <div style={{ display:'flex', gap:8, alignItems:'center' }}>
@@ -655,7 +660,7 @@ function SubscriptionSection({ userData, lang }) {
             )}
           </div>
         </div>
-        {visitsTotal > 0 && (
+        {visitsTotal > 0 && visitsTotal < 999 && (
           <div style={{ marginTop:16, background:C.bgSubtle, borderRadius:8, height:8, overflow:'hidden' }}>
             <div style={{ height:'100%', background:visitsUsed>=visitsTotal?C.error:C.primary, width:`${Math.min(100,(visitsUsed/visitsTotal)*100)}%`, borderRadius:8, transition:'width 0.3s' }} />
           </div>

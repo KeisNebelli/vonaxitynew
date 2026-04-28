@@ -109,11 +109,12 @@ router.post('/', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
       const relative = await prisma.relative.findUnique({ where: { id: relativeId } });
       if (!relative || relative.clientId !== req.user.userId) return res.status(403).json({ error: 'Relative not found or not yours' });
 
-      // Check subscription limits
+      // Check subscription limits (visitsPerMonth >= 999 = unlimited test account)
       const subscription = await prisma.subscription.findUnique({ where: { userId: req.user.userId } });
       if (!subscription) return res.status(403).json({ error: 'No active subscription. Please choose a plan first.' });
       if (subscription.status === 'CANCELLED') return res.status(403).json({ error: 'Your subscription has been cancelled. Please reactivate to book visits.' });
-      if (subscription.visitsUsed >= subscription.visitsPerMonth) {
+      const isUnlimited = subscription.visitsPerMonth >= 999;
+      if (!isUnlimited && subscription.visitsUsed >= subscription.visitsPerMonth) {
         return res.status(403).json({ error: `You have used all ${subscription.visitsPerMonth} visits for this month. Upgrade your plan for more visits.` });
       }
     }
@@ -382,7 +383,11 @@ router.post('/:id/complete', ...requireRole('NURSE'), async (req, res) => {
     await prisma.nurse.update({ where: { id: nurse.id }, data: { totalVisits: { increment: 1 }, totalEarnings: { increment: nurse.payRatePerVisit } } });
     const relative = await prisma.relative.findUnique({ where: { id: visit.relativeId } });
     if (relative?.clientId) {
-      await prisma.subscription.updateMany({ where: { userId: relative.clientId }, data: { visitsUsed: { increment: 1 } } });
+      // Only increment for non-unlimited (test) accounts
+      const sub = await prisma.subscription.findUnique({ where: { userId: relative.clientId } });
+      if (sub && sub.visitsPerMonth < 999) {
+        await prisma.subscription.updateMany({ where: { userId: relative.clientId }, data: { visitsUsed: { increment: 1 } } });
+      }
     }
 
     // Send health report to client

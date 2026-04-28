@@ -1336,6 +1336,55 @@ function AdminSettings({ lang='en' }) {
           </div>
         ))}
       </AdminSectionCard>
+
+      <TestDataCard lang={lang} />
+    </div>
+  );
+}
+
+function TestDataCard({ lang='en' }) {
+  const [resetting, setResetting] = useState(false);
+  const [result, setResult] = useState(null);
+
+  const handleReset = async () => {
+    if (!confirm('This will delete ALL visits for test accounts (client@test.com, client2@test.com) and reset their booking counts to zero. Continue?')) return;
+    setResetting(true); setResult(null);
+    try {
+      const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://vonaxitynew-production.up.railway.app';
+      const token = localStorage.getItem('vonaxity-token');
+      const res = await fetch(`${BASE}/admin/test-reset`, { method: 'POST', headers: { Authorization: `Bearer ${token}` } });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error);
+      setResult({ ok: true, msg: `✓ Reset complete — ${data.deletedVisits} visits deleted` });
+    } catch (err) {
+      setResult({ ok: false, msg: err.message || 'Reset failed' });
+    } finally { setResetting(false); }
+  };
+
+  return (
+    <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:14, padding:'20px 22px', marginBottom:16 }}>
+      <div style={{ fontSize:13, fontWeight:700, color:'#92400E', marginBottom:4 }}>⚡ Test accounts</div>
+      <div style={{ fontSize:12, color:'#78350F', lineHeight:1.65, marginBottom:14 }}>
+        These accounts have <strong>unlimited bookings</strong> (no monthly limit). Use them for testing without worrying about visit counts.
+        <div style={{ marginTop:10, fontFamily:'monospace', fontSize:11, background:'rgba(0,0,0,0.06)', borderRadius:7, padding:'8px 12px', lineHeight:1.9 }}>
+          client@test.com / test123 — unlimited visits<br/>
+          client2@test.com / test123 — unlimited visits<br/>
+          nurse@test.com / test123<br/>
+          admin@test.com / test123
+        </div>
+      </div>
+      <button
+        onClick={handleReset}
+        disabled={resetting}
+        style={{ background:'#D97706', color:'#fff', border:'none', borderRadius:9, padding:'10px 20px', fontSize:13, fontWeight:700, cursor:resetting?'not-allowed':'pointer', opacity:resetting?0.7:1 }}
+      >
+        {resetting ? 'Resetting…' : '🗑 Reset test visits'}
+      </button>
+      {result && (
+        <div style={{ marginTop:10, fontSize:12, fontWeight:600, color: result.ok ? '#059669' : '#DC2626' }}>
+          {result.msg}
+        </div>
+      )}
     </div>
   );
 }

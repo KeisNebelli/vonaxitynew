@@ -8,7 +8,7 @@ const visitRoutes = require('./routes/visits');
 const nurseRoutes = require('./routes/nurses');
 const paymentsRoute = require('./routes/payments');
 const uploadsRoute = require('./routes/uploads');
-const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter, publicSettingsRouter, cleanupRouter, contactRouter } = require('./routes/other');
+const { usersRouter, paymentsRouter, analyticsRouter, notificationsRouter, settingsRouter, profileRouter, publicSettingsRouter, cleanupRouter, contactRouter, testResetRouter } = require('./routes/other');
 const payoutsRouter = require('./routes/payouts');
 
 const app = express();
@@ -63,6 +63,7 @@ app.use('/notifications', notificationsRouter);
 app.use('/settings/public', publicSettingsRouter);
 app.use('/settings', settingsRouter);
 app.use('/admin/cleanup-duplicates', cleanupRouter);
+app.use('/admin/test-reset', testResetRouter);
 app.use('/payouts', payoutsRouter);
 app.use('/contact', contactRouter);
 app.use('/profile', profileRouter);
