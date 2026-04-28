@@ -17,24 +17,49 @@ const C = {
 };
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
-const Badge = ({ label, type='default', small=false }) => {
-  const types = {
-    default:[C.bgSubtle,C.textSecondary],
-    success:[C.secondaryLight,C.secondary],
-    warning:[C.warningLight,C.warning],
-    error:[C.errorLight,C.error],
-    primary:[C.primaryLight,C.primary],
-    purple:[C.purpleLight,C.purple],
-  };
-  const [bg,color] = types[type]||types.default;
-  return <span style={{ fontSize:small?11:12, fontWeight:600, padding:small?'3px 8px':'4px 10px', borderRadius:99, background:bg, color, display:'inline-block', whiteSpace:'nowrap' }}>{label}</span>;
+
+// dot colours only — badge background is always neutral
+const DOT = {
+  success: '#16A34A',
+  warning: '#D97706',
+  error:   '#94A3B8', // muted slate — not alarming red for routine status
+  primary: '#2563EB',
+  purple:  '#7C3AED',
+  default: '#CBD5E1',
 };
+
+const Badge = ({ label, type='default', small=false }) => {
+  const dot = DOT[type] || DOT.default;
+  return (
+    <span style={{
+      display:'inline-flex', alignItems:'center', gap:5,
+      fontSize: small ? 11 : 12,
+      fontWeight: 500,
+      padding: small ? '3px 8px' : '4px 10px',
+      borderRadius: 99,
+      background: '#F1F5F9',
+      color: '#374151',
+      whiteSpace: 'nowrap',
+      border: '1px solid #E2E8F0',
+    }}>
+      <span style={{ width:6, height:6, borderRadius:'50%', background:dot, flexShrink:0 }} />
+      {label}
+    </span>
+  );
+};
+
+// Plan badge — plain text, no color
+const PlanBadge = ({ label }) => (
+  <span style={{ fontSize:12, fontWeight:500, color:'#374151', background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:6, padding:'3px 9px', whiteSpace:'nowrap' }}>
+    {label}
+  </span>
+);
 
 const statusBadge = (status, lang='en') => {
   const map = {
     ACTIVE:'success', APPROVED:'success', COMPLETED:'success', paid:'success',
     TRIAL:'warning', PENDING:'warning', pending:'warning',
-    SUSPENDED:'error', UNASSIGNED:'error', NO_SHOW:'error', CANCELLED:'error', failed:'error',
+    SUSPENDED:'error', EXPIRED:'error', UNASSIGNED:'error', NO_SHOW:'error', CANCELLED:'error', failed:'error',
     IN_PROGRESS:'primary', ON_THE_WAY:'primary',
   };
   const statusText = t(lang, 'admin.status.'+status) || status;
@@ -286,7 +311,7 @@ function Clients({ clients, visits, onStatusChange, lang='en' }) {
                   <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{c.email}</div>
                 </td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{c.country}</td>
-                <td style={{ padding:'12px 16px' }}><Badge label={(c.subscription?.plan || c.plan || 'N/A').charAt(0).toUpperCase()+(c.subscription?.plan || c.plan || 'N/A').slice(1)} type='primary' small /></td>
+                <td style={{ padding:'12px 16px' }}><PlanBadge label={(c.subscription?.plan || c.plan || 'N/A').charAt(0).toUpperCase()+(c.subscription?.plan || c.plan || 'N/A').slice(1)} /></td>
                 <td style={{ padding:'12px 16px' }}>{statusBadge(c.status, lang)}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{c.visitsUsed}/{c.visitsTotal}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary }}>{c.joinedAt}</td>
@@ -1526,9 +1551,9 @@ export default function AdminPage({ params }) {
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]}</div>
             </div>
             <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-              {alertCount>0 &&<button onClick={()=>setActive('alerts')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#FEF2F2',color:'#DC2626',border:'none',borderRadius:8,cursor:'pointer',fontFamily:F }}>{alertCount} {tr('admin.alerts')}</button>}
+              {alertCount>0 && <button onClick={()=>setActive('alerts')} style={{ display:'inline-flex',alignItems:'center',gap:5,fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#374151',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}><span style={{ width:6,height:6,borderRadius:'50%',background:'#DC2626',display:'inline-block' }}/>{alertCount} {tr('admin.alerts')}</button>}
               <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>↻ {tr('admin.refresh')}</button>
-              <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:700,padding:'5px 12px',background:'#F5F3FF',color:'#7C3AED',border:'1px solid rgba(124,58,237,0.2)',borderRadius:8,cursor:'pointer',fontFamily:F }}>{tr('admin.ai')}</button>
+              <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#374151',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>{tr('admin.ai')}</button>
               <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:'1px solid #E2E8F0' }}>
                 {['en','sq'].map(l=>(
                   <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:lang===l?'#2563EB':'transparent', color:lang===l?'#fff':'#475569', fontFamily:F }}>{l.toUpperCase()}</button>
