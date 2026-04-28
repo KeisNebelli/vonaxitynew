@@ -200,31 +200,36 @@ function NotificationBell({ lang, onNavigate }) {
       {open && (
         <div style={{ position:'absolute', top:42, right:0, width:320, background:C2.bgWhite, borderRadius:14, boxShadow:'0 8px 30px rgba(15,23,42,0.12)', border:`1px solid ${C2.border}`, zIndex:9999, overflow:'hidden' }}>
           <div style={{ padding:'14px 16px 10px', borderBottom:`1px solid ${C2.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-            <div style={{ fontSize:13, fontWeight:700, color:C2.textPrimary }}>{lang==='sq' ? 'Njoftimet' : 'Notifications'} {unread > 0 && <span style={{ fontSize:11, fontWeight:600, padding:'2px 7px', borderRadius:99, background:C2.primaryLight, color:C2.primary, marginLeft:6 }}>{unread}</span>}</div>
-            {unread > 0 && <button onClick={markAll} style={{ fontSize:11, fontWeight:600, color:C2.primary, background:'none', border:'none', cursor:'pointer', padding:0 }}>{lang==='sq' ? 'Shëno të gjitha' : 'Mark all read'}</button>}
+            <div style={{ fontSize:13, fontWeight:700, color:C2.textPrimary }}>{t(lang,'notifications.header')} {unread > 0 && <span style={{ fontSize:11, fontWeight:600, padding:'2px 7px', borderRadius:99, background:C2.primaryLight, color:C2.primary, marginLeft:6 }}>{unread}</span>}</div>
+            {unread > 0 && <button onClick={markAll} style={{ fontSize:11, fontWeight:600, color:C2.primary, background:'none', border:'none', cursor:'pointer', padding:0 }}>{t(lang,'notifications.markAllRead')}</button>}
           </div>
           <div style={{ maxHeight:320, overflowY:'auto' }}>
             {notifs.length === 0 ? (
               <div style={{ padding:'28px 16px', textAlign:'center', color:C2.textTertiary, fontSize:13 }}>
-                {lang==='sq' ? 'Asnjë njoftim' : 'No notifications yet'}
+                {t(lang,'notifications.empty')}
               </div>
-            ) : notifs.map(n => (
-              <div
-                key={n.id}
-                onClick={() => handleClick(n)}
-                style={{ padding:'12px 16px', borderBottom:`1px solid ${C2.borderSubtle}`, cursor:'pointer', background:n.read ? 'transparent' : C2.primaryLight, display:'flex', gap:10, alignItems:'flex-start', transition:'background 0.1s' }}
-                onMouseEnter={e => e.currentTarget.style.background = C2.bgSubtle}
-                onMouseLeave={e => e.currentTarget.style.background = n.read ? 'transparent' : C2.primaryLight}
-              >
-                <div style={{ fontSize:18, flexShrink:0, marginTop:1 }}>{iconFor(n.type)}</div>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ fontSize:13, fontWeight:n.read ? 500 : 700, color:C2.textPrimary, marginBottom:2, lineHeight:1.3 }}>{n.title}</div>
-                  <div style={{ fontSize:12, color:C2.textSecondary, lineHeight:1.4, marginBottom:4 }}>{n.message}</div>
-                  <div style={{ fontSize:11, color:C2.textTertiary }}>{timeAgo(n.createdAt)}</div>
+            ) : notifs.map(n => {
+              const typeMap = t(lang, `notifications.types.${n.type}`);
+              const title = (typeMap && typeof typeMap === 'object' ? typeMap.title : null) || n.title;
+              const message = n.type === 'announcement' ? n.message : ((typeMap && typeof typeMap === 'object' ? typeMap.message : null) || n.message);
+              return (
+                <div
+                  key={n.id}
+                  onClick={() => handleClick(n)}
+                  style={{ padding:'12px 16px', borderBottom:`1px solid ${C2.borderSubtle}`, cursor:'pointer', background:n.read ? 'transparent' : C2.primaryLight, display:'flex', gap:10, alignItems:'flex-start', transition:'background 0.1s' }}
+                  onMouseEnter={e => e.currentTarget.style.background = C2.bgSubtle}
+                  onMouseLeave={e => e.currentTarget.style.background = n.read ? 'transparent' : C2.primaryLight}
+                >
+                  <div style={{ fontSize:18, flexShrink:0, marginTop:1 }}>{iconFor(n.type)}</div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:n.read ? 500 : 700, color:C2.textPrimary, marginBottom:2, lineHeight:1.3 }}>{title}</div>
+                    <div style={{ fontSize:12, color:C2.textSecondary, lineHeight:1.4, marginBottom:4 }}>{message}</div>
+                    <div style={{ fontSize:11, color:C2.textTertiary }}>{timeAgo(n.createdAt)}</div>
+                  </div>
+                  {!n.read && <div style={{ width:7, height:7, borderRadius:'50%', background:C2.primary, flexShrink:0, marginTop:5 }} />}
                 </div>
-                {!n.read && <div style={{ width:7, height:7, borderRadius:'50%', background:C2.primary, flexShrink:0, marginTop:5 }} />}
-              </div>
-            ))}
+              );
+            })}
           </div>
         </div>
       )}

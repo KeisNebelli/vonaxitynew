@@ -431,6 +431,22 @@ const translations = {
       incompleteReports:'Incomplete reports',
     },
 
+    notifications: {
+      header: 'Notifications',
+      markAllRead: 'Mark all read',
+      empty: 'No notifications yet',
+      types: {
+        NEW_JOB:          { title: 'New job available',     message: 'A new visit is available in your city.' },
+        JOB_ASSIGNED:     { title: 'Job assigned to you',   message: 'You have been assigned a new visit.' },
+        JOB_UPDATED:      { title: 'Visit details updated', message: 'The details of a visit you are assigned have changed.' },
+        NURSE_APPLIED:    { title: 'New nurse applicant',   message: 'A nurse has applied for your visit. Review and choose.' },
+        NURSE_ON_WAY:     { title: 'Nurse on the way',      message: 'Your nurse is on the way to the visit.' },
+        NURSE_ARRIVED:    { title: 'Nurse has arrived',     message: 'Your nurse has arrived at the address.' },
+        VISIT_COMPLETED:  { title: 'Visit completed',       message: 'Your nurse has completed the visit. Check the report.' },
+        VISIT_CANCELLED:  { title: 'Visit cancelled',       message: 'A visit has been cancelled.' },
+        announcement:     { title: 'Announcement',          message: '' },
+      },
+    },
     workOrder: {
       title: 'Post a Visit', create: 'Create Work Order',
       serviceType: 'Service type', location: 'Location', 
@@ -969,6 +985,22 @@ const translations = {
       incompleteReports:'Raporte të pakompletuara',
     },
 
+    notifications: {
+      header: 'Njoftimet',
+      markAllRead: 'Shëno të gjitha',
+      empty: 'Asnjë njoftim ende',
+      types: {
+        NEW_JOB:          { title: 'Punë e re e disponueshme',  message: 'Një vizitë e re është e disponueshme në qytetin tuaj.' },
+        JOB_ASSIGNED:     { title: 'Puna u caktua për ju',      message: 'Jeni caktuar për një vizitë të re.' },
+        JOB_UPDATED:      { title: 'Detajet e vizitës ndryshuan', message: 'Detajet e një vizite ku jeni caktuar u ndryshuan.' },
+        NURSE_APPLIED:    { title: 'Infermiere e re aplikoi',   message: 'Një infermiere aplikoi për vizitën tuaj. Shikoni dhe zgjidhni.' },
+        NURSE_ON_WAY:     { title: 'Infermierja është në rrugë', message: 'Infermierja juaj është në rrugë drejt vizitës.' },
+        NURSE_ARRIVED:    { title: 'Infermierja ka mbërrritur', message: 'Infermierja juaj ka mbërrritur në adresë.' },
+        VISIT_COMPLETED:  { title: 'Vizita u përfundua',        message: 'Infermierja e përfundoi vizitën. Shikoni raportin.' },
+        VISIT_CANCELLED:  { title: 'Vizita u anulua',           message: 'Një vizitë u anulua.' },
+        announcement:     { title: 'Njoftim',                   message: '' },
+      },
+    },
     workOrder: {
       title: 'Posto një vizitë', create: 'Krijo Urdhër Pune',
       serviceType: 'Lloji i shërbimit', location: 'Vendndodhja',
