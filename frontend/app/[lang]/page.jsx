@@ -140,7 +140,7 @@ export default async function HomePage({ params }) {
           <div style={{ position: 'relative' }}>
             <div style={{ borderRadius: 20, overflow: 'hidden', boxShadow: '0 8px 40px rgba(0,0,0,0.12)' }}>
               <img
-                src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=800&auto=format&fit=crop&q=80"
+                src="/hero.jpg"
                 alt="Nurse visiting patient at home"
                 style={{ width: '100%', height: 420, objectFit: 'cover', display: 'block' }}
               />
