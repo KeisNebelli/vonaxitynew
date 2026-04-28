@@ -14,6 +14,9 @@ const payoutsRouter = require('./routes/payouts');
 const app = express();
 const PORT = process.env.PORT || 4000;
 
+// Trust Railway's proxy so rate-limit can read the real client IP
+app.set('trust proxy', 1);
+
 // ── Middleware ────────────────────────────────────────────────────────────────
 const allowedOrigins = [
   process.env.FRONTEND_URL || 'http://localhost:3000',
