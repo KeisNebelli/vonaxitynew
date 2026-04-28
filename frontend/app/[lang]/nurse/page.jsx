@@ -1360,7 +1360,14 @@ export default function NursePage({ params }) {
               <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]||'Nurse Dashboard'}</div>
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-              <NotificationBell lang={lang} onNavigate={(type) => setActive(type === 'NEW_JOB' ? 'jobs' : 'visits')} />
+              <NotificationBell lang={lang} onNavigate={(type, relatedId) => {
+                if (type === 'NEW_JOB') { setActive('jobs'); return; }
+                if (relatedId) {
+                  const v = visits.find(x => x.id === relatedId);
+                  if (v && type === 'JOB_ASSIGNED') { setSelectedVisit(v); setActive('map'); return; }
+                }
+                setActive('visits');
+              }} />
               <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:'1px solid #E2E8F0' }}>
                 {['en','sq'].map(l=>(
                   <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:lang===l?'#2563EB':'transparent', color:lang===l?'#fff':'#475569', fontFamily:F }}>{l.toUpperCase()}</button>

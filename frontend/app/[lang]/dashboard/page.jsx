@@ -477,9 +477,12 @@ function DeleteConfirm({ visit, onConfirm, onCancel, lang='en' }) {
   );
 }
 
-function Visits({ visits, lang, onViewApplicants, onRefresh }) {
+function Visits({ visits, lang, onViewApplicants, onRefresh, viewingDetail: _viewingDetail, setViewingDetail: _setViewingDetail }) {
   const tr = (key) => t(lang, key);
   const serviceLabel = (en) => { const s = SERVICES_MAP.find(x => x.en === en); return lang === 'sq' && s ? s.sq : en; };
+  const [_localViewingDetail, _setLocalViewingDetail] = useState(null);
+  const viewingDetail = _viewingDetail !== undefined ? _viewingDetail : _localViewingDetail;
+  const setViewingDetail = _setViewingDetail || _setLocalViewingDetail;
   const [reviewing, setReviewing] = useState(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -488,7 +491,6 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
   const [reviewError, setReviewError] = useState('');
   const [editing, setEditing] = useState(null); // visit object
   const [deleting, setDeleting] = useState(null); // visit object
-  const [viewingDetail, setViewingDetail] = useState(null); // visit object for detail modal
 
   const canEdit = (v) => v.status === 'UNASSIGNED';
   const canDelete = (v) => !['COMPLETED'].includes(v.status) && !['PENDING','ACCEPTED'].includes(v.status);
@@ -955,6 +957,7 @@ export default function Dashboard({ params }) {
   const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewingApplicants, setViewingApplicants] = useState(null); // visit object
+  const [viewingDetail, setViewingDetail] = useState(null); // visit object for report modal
 
   const TITLES = { overview:tr('dashboard.title'), book:tr('dashboard.bookVisitTitle'), nurses:tr('dashboard.findNurses'), visits:tr('dashboard.myVisits'), subscription:tr('dashboard.subscription'), settings:tr('dashboard.settings') };
 
@@ -1097,7 +1100,18 @@ export default function Dashboard({ params }) {
               <div style={{ fontSize:16,fontWeight:700,color:C.textPrimary }}>{viewingApplicants ? tr('dashboard.applicantsTitle') : TITLES[active]}</div>
             </div>
             <div style={{ display:'flex',alignItems:'center',gap:8 }}>
-              <NotificationBell lang={lang} onNavigate={(type) => { setActive('visits'); setViewingApplicants(null); }} />
+              <NotificationBell lang={lang} onNavigate={(type, relatedId) => {
+                setViewingApplicants(null);
+                setViewingDetail(null);
+                setActive('visits');
+                if (relatedId) {
+                  const v = visits.find(x => x.id === relatedId);
+                  if (v) {
+                    if (type === 'NURSE_APPLIED') setViewingApplicants(v);
+                    else if (type === 'VISIT_COMPLETED') setViewingDetail(v);
+                  }
+                }
+              }} />
               <div style={{ display:'flex',background:'#F1F5F9',borderRadius:8,padding:3,border:`1px solid ${C.border}` }}>
                 {['en','sq'].map(l=>(
                   <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px',borderRadius:6,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',background:uiLang===l?C.primary:'transparent',color:uiLang===l?'#fff':C.textSecondary,fontFamily:F }}>{l.toUpperCase()}</button>
@@ -1143,7 +1157,7 @@ export default function Dashboard({ params }) {
                   {active==='book' && !isExpired && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
                   {active==='book' && isExpired && <SubscriptionSection userData={userData} lang={lang} />}
                   {active==='nurses' && <FindNurses lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')} />}
-                  {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} onRefresh={loadData} />}
+                  {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} onRefresh={loadData} viewingDetail={viewingDetail} setViewingDetail={setViewingDetail} />}
                   {active==='subscription' && <SubscriptionSection userData={userData} lang={lang} />}
                   {active==='settings' && <Settings key="settings-page" initialUser={userData} initialRelative={relative} lang={lang}/>}
                 </div>
