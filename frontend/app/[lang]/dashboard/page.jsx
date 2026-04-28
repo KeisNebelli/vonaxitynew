@@ -11,7 +11,17 @@ const SSM = '0 1px 3px rgba(15,23,42,0.06)';
 const SMD = '0 4px 12px rgba(15,23,42,0.08)';
 
 
-const SERVICES = ['Blood Pressure Check','Glucose Monitoring','Vitals Check','Blood Work Collection','Welfare Check','Post-surgical Care'];
+const SERVICES_MAP = [
+  { en:'Blood Pressure Check',   sq:'Matja e Presionit të Gjakut' },
+  { en:'Glucose Monitoring',     sq:'Monitorimi i Glukozës' },
+  { en:'Vitals Check',           sq:'Kontrolli i Shenjave Vitale' },
+  { en:'Blood Work Collection',  sq:'Marrja e Gjakut' },
+  { en:'Welfare Check',          sq:'Vizitë Mirëqenieje' },
+  { en:'Post-surgical Care',     sq:'Kujdes Pas-Operativ' },
+  { en:'Medication Administration', sq:'Administrim Medikamentesh' },
+  { en:'General Nursing',        sq:'Kujdes i Përgjithshëm' },
+];
+const SERVICES = SERVICES_MAP.map(s => s.en);
 
 const makeNAV = (tr) => [
   { id:'overview', label:tr('dashboard.overview'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
@@ -46,7 +56,7 @@ function Overview({ user, visits, relative, lang, onBook }) {
           <div style={{ flex:1, minWidth:160 }}>
             <div style={{ fontSize:10, fontWeight:700, opacity:.65, letterSpacing:'1px', textTransform:'uppercase', marginBottom:4 }}>{tr('dashboard.nextVisit')}</div>
             <div style={{ fontSize:16, fontWeight:700, marginBottom:3 }}>{new Date(next.scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} at {new Date(next.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>
-            <div style={{ fontSize:12, opacity:.8 }}>{next.nurse?.user?.name||tr('dashboard.nurseTBCLabel')} · {next.serviceType}</div>
+            <div style={{ fontSize:12, opacity:.8 }}>{next.nurse?.user?.name||tr('dashboard.nurseTBCLabel')} · {(() => { const s = SERVICES_MAP.find(x=>x.en===next.serviceType); return lang==='sq'&&s?s.sq:next.serviceType; })()}</div>
           </div>
           <Badge s={next.status} lang={lang} />
         </div>
@@ -91,6 +101,7 @@ function Overview({ user, visits, relative, lang, onBook }) {
 
 function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
   const tr = (key) => t(lang, key);
+  const serviceLabel = (en) => { const s = SERVICES_MAP.find(x => x.en === en); return lang === 'sq' && s ? s.sq : en; };
   const [form, setForm] = useState({ serviceType: SERVICES[0], scheduledAt: '', notes: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -133,7 +144,7 @@ function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
       <div style={{ marginBottom:16 }}>
         <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>{tr('dashboard.bookServiceType')}</label>
         <select style={inp} value={form.serviceType} onChange={e=>setForm({...form, serviceType:e.target.value})}>
-          {SERVICES.map(s=><option key={s} value={s}>{s}</option>)}
+          {SERVICES_MAP.map(s=><option key={s.en} value={s.en}>{lang==='sq' ? s.sq : s.en}</option>)}
         </select>
       </div>
 
@@ -196,7 +207,7 @@ function Applicants({ visitId, visitInfo, onBack, onSelect, lang='en' }) {
       </button>
 
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'16px 20px', marginBottom:20, boxShadow:SSM }}>
-        <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{visitInfo?.serviceType}</div>
+        <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{(() => { const s = SERVICES_MAP.find(x=>x.en===visitInfo?.serviceType); return lang==='sq'&&s?s.sq:visitInfo?.serviceType; })()}</div>
         <div style={{ fontSize:12, color:C.textTertiary, marginTop:3 }}>{visitInfo?.scheduledAt ? new Date(visitInfo.scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : ''}</div>
       </div>
 
@@ -254,7 +265,6 @@ function Applicants({ visitId, visitInfo, onBack, onSelect, lang='en' }) {
 // ── Edit Visit Modal ────────────────────────────────────────────────────────
 function EditVisit({ visit, onSave, onCancel, lang='en' }) {
   const tr = (key) => t(lang, key);
-  const SERVICES = ['Blood Pressure Check','Glucose Monitoring','Vitals Monitoring','Blood Work Collection','Welfare Check','Post-surgical Care','Medication Administration','General Nursing'];
   const [form, setForm] = useState({
     serviceType: visit.serviceType || '',
     scheduledAt: visit.scheduledAt ? new Date(visit.scheduledAt).toISOString().slice(0,16) : '',
@@ -283,7 +293,7 @@ function EditVisit({ visit, onSave, onCancel, lang='en' }) {
           <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr('dashboard.bookServiceType')}</label>
           <select value={form.serviceType} onChange={e=>setForm(f=>({...f,serviceType:e.target.value}))} style={{...inp}}>
             <option value="">{tr('dashboard.selectService')}</option>
-            {SERVICES.map(s=><option key={s} value={s}>{s}</option>)}
+            {SERVICES_MAP.map(s=><option key={s.en} value={s.en}>{lang==='sq' ? s.sq : s.en}</option>)}
           </select>
         </div>
         <div style={{ marginBottom:16 }}>
@@ -328,7 +338,7 @@ function DeleteConfirm({ visit, onConfirm, onCancel, lang='en' }) {
         </div>
         <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:8 }}>{tr('dashboard.deleteVisitTitle')}</div>
         <div style={{ fontSize:14, color:C.textSecondary, marginBottom:6 }}>
-          <strong>{visit.serviceType}</strong> — {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
+          <strong>{(() => { const s = SERVICES_MAP.find(x=>x.en===visit.serviceType); return lang==='sq'&&s?s.sq:visit.serviceType; })()}</strong> — {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
         </div>
         <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>{tr('dashboard.deleteCannotUndo')}</div>
         {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
@@ -345,6 +355,7 @@ function DeleteConfirm({ visit, onConfirm, onCancel, lang='en' }) {
 
 function Visits({ visits, lang, onViewApplicants, onRefresh }) {
   const tr = (key) => t(lang, key);
+  const serviceLabel = (en) => { const s = SERVICES_MAP.find(x => x.en === en); return lang === 'sq' && s ? s.sq : en; };
   const [reviewing, setReviewing] = useState(null);
   const [rating, setRating] = useState(0);
   const [comment, setComment] = useState('');
@@ -380,7 +391,7 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:v.bpSystolic||v.status==='UNASSIGNED'?14:0 }}>
             <div>
               <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:3 }}>
-                <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.serviceType}</div>
+                <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{serviceLabel(v.serviceType)}</div>
                 {v.workOrderNumber && <span style={{ fontSize:10, fontWeight:700, color:C.primary, background:C.primaryLight, padding:'2px 8px', borderRadius:99, letterSpacing:'0.5px' }}>{v.workOrderNumber}</span>}
               </div>
               <div style={{ fontSize:12, color:C.textTertiary }}>{new Date(v.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · {v.nurse?.user?.name||tr('visits.nurseTBC')}</div>
