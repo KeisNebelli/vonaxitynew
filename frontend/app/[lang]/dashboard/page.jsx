@@ -433,17 +433,28 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
   );
 }
 
-const PLANS_INFO = [
-  { id:'basic',    name:'Basic',    price:'€30', visits:1, desc:'1 nurse visit per month' },
-  { id:'standard', name:'Standard', price:'€50', visits:2, desc:'2 nurse visits per month', popular:true },
-  { id:'premium',  name:'Premium',  price:'€120', visits:4, desc:'4 nurse visits per month' },
-];
-
 function SubscriptionSection({ userData, lang }) {
   const tr = (key) => t(lang, key);
   const [loading, setLoading] = useState(null);
   const [portalLoading, setPortalLoading] = useState(false);
   const [error, setError] = useState('');
+  const [plans, setPlans] = useState([
+    { id:'basic',    name:'Basic',    price:'€30',  visits:1, desc:'1 nurse visit per month' },
+    { id:'standard', name:'Standard', price:'€50',  visits:2, desc:'2 nurse visits per month', popular:true },
+    { id:'premium',  name:'Premium',  price:'€120', visits:4, desc:'4 nurse visits per month' },
+  ]);
+
+  useEffect(() => {
+    const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://vonaxitynew-production.up.railway.app';
+    fetch(`${BASE}/settings/public`)
+      .then(r => r.json())
+      .then(p => setPlans([
+        { id:'basic',    name:'Basic',    price:`€${p.basicPrice||30}`,    visits:p.basicVisits||1,    desc:`${p.basicVisits||1} nurse visit${(p.basicVisits||1)>1?'s':''} per month` },
+        { id:'standard', name:'Standard', price:`€${p.standardPrice||50}`, visits:p.standardVisits||2, desc:`${p.standardVisits||2} nurse visits per month`, popular:true },
+        { id:'premium',  name:'Premium',  price:`€${p.premiumPrice||120}`, visits:p.premiumVisits||4,  desc:`${p.premiumVisits||4} nurse visits per month` },
+      ]))
+      .catch(() => {});
+  }, []);
   const sub = userData?.subscription;
   const currentPlan = sub?.plan || null;
   const status = sub?.status || 'TRIAL';
@@ -505,7 +516,7 @@ function SubscriptionSection({ userData, lang }) {
         {currentPlan ? tr('dashboard.changePlan') : tr('dashboard.choosePlan')}
       </div>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:12 }}>
-        {PLANS_INFO.map(p => (
+        {plans.map(p => (
           <div key={p.id} style={{ background:C.bgWhite, borderRadius:14, border:`2px solid ${p.id===currentPlan?C.primary:p.popular?'rgba(37,99,235,0.2)':C.border}`, padding:20, position:'relative' }}>
             {p.popular && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.primary, color:'#fff', whiteSpace:'nowrap' }}>{tr('dashboard.mostPopular')}</div>}
             {p.id===currentPlan && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondary, color:'#fff', whiteSpace:'nowrap' }}>{tr('dashboard.currentBadge')}</div>}
