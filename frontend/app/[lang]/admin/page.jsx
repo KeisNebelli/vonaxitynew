@@ -18,49 +18,58 @@ const C = {
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
-// dot colours only — badge background is always neutral
-const DOT = {
-  success: '#16A34A',
-  warning: '#D97706',
-  error:   '#94A3B8', // muted slate — not alarming red for routine status
-  primary: '#2563EB',
-  purple:  '#7C3AED',
-  default: '#CBD5E1',
+// Tinted pill badges — no dots, no borders, Stripe/Linear style
+const BADGE_STYLES = {
+  green:  { background:'#DCFCE7', color:'#15803D' },
+  amber:  { background:'#FEF3C7', color:'#92400E' },
+  slate:  { background:'#F1F5F9', color:'#475569' },
+  red:    { background:'#FEE2E2', color:'#991B1B' },
+  blue:   { background:'#DBEAFE', color:'#1E40AF' },
+  purple: { background:'#EDE9FE', color:'#5B21B6' },
+  default:{ background:'#F1F5F9', color:'#475569' },
 };
 
 const Badge = ({ label, type='default', small=false }) => {
-  const dot = DOT[type] || DOT.default;
+  const style = BADGE_STYLES[type] || BADGE_STYLES.default;
   return (
     <span style={{
-      display:'inline-flex', alignItems:'center', gap:5,
-      fontSize: small ? 11 : 12,
+      display:'inline-flex', alignItems:'center',
+      fontSize: 11,
       fontWeight: 500,
-      padding: small ? '3px 8px' : '4px 10px',
+      padding: '3px 10px',
       borderRadius: 99,
-      background: '#F1F5F9',
-      color: '#374151',
       whiteSpace: 'nowrap',
-      border: '1px solid #E2E8F0',
+      letterSpacing: '0.1px',
+      ...style,
     }}>
-      <span style={{ width:6, height:6, borderRadius:'50%', background:dot, flexShrink:0 }} />
       {label}
     </span>
   );
 };
 
-// Plan badge — plain text, no color
-const PlanBadge = ({ label }) => (
-  <span style={{ fontSize:12, fontWeight:500, color:'#374151', background:'#F8FAFC', border:'1px solid #E2E8F0', borderRadius:6, padding:'3px 9px', whiteSpace:'nowrap' }}>
-    {label}
-  </span>
-);
+// Plan badge — slightly different shape (rounded rect, not pill) to distinguish from status
+const PlanBadge = ({ label }) => {
+  const lower = (label||'').toLowerCase();
+  const style = lower==='premium'
+    ? { background:'#EDE9FE', color:'#5B21B6' }
+    : lower==='standard'
+    ? { background:'#EFF6FF', color:'#1D4ED8' }
+    : { background:'#F8FAFC', color:'#475569', border:'0.5px solid #E2E8F0' };
+  return (
+    <span style={{ fontSize:11, fontWeight:500, padding:'3px 10px', borderRadius:6, whiteSpace:'nowrap', ...style }}>
+      {label}
+    </span>
+  );
+};
 
 const statusBadge = (status, lang='en') => {
+  // green = good, amber = waiting, slate = neutral/inactive, red = needs action, blue = in-flight
   const map = {
-    ACTIVE:'success', APPROVED:'success', COMPLETED:'success', paid:'success',
-    TRIAL:'warning', PENDING:'warning', pending:'warning',
-    SUSPENDED:'error', EXPIRED:'error', UNASSIGNED:'error', NO_SHOW:'error', CANCELLED:'error', failed:'error',
-    IN_PROGRESS:'primary', ON_THE_WAY:'primary',
+    ACTIVE:'green', APPROVED:'green', COMPLETED:'green', paid:'green',
+    TRIAL:'amber',  PENDING:'amber',  pending:'amber',
+    SUSPENDED:'slate', EXPIRED:'slate', CANCELLED:'slate', failed:'slate',
+    UNASSIGNED:'red', NO_SHOW:'red',
+    IN_PROGRESS:'blue', ON_THE_WAY:'blue',
   };
   const statusText = t(lang, 'admin.status.'+status) || status;
   return <Badge label={statusText} type={map[status]||'default'} />;
@@ -315,7 +324,7 @@ function Clients({ clients, visits, onStatusChange, lang='en' }) {
                 <td style={{ padding:'12px 16px' }}>{statusBadge(c.status, lang)}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{c.visitsUsed}/{c.visitsTotal}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary }}>{c.joinedAt}</td>
-                <td style={{ padding:'12px 16px' }}><span style={{ color:C.primary, fontWeight:600, fontSize:12 }}>{tr('admin.viewBtn')}</span></td>
+                <td style={{ padding:'12px 16px' }}><span className="adm-btn-ghost">{tr('admin.viewBtn')}</button></td>
               </tr>
             ))}
           </tbody>
@@ -379,7 +388,7 @@ function ClientDetail({ client, onBack, visits=[], onStatusChange, lang='en' }) 
                 </div>
               ))}
               <div style={{ display:'flex', gap:8, marginTop:4 }}>
-                <button onClick={handleSaveEdit} disabled={saving} style={{ padding:'9px 18px', background:C.primary, color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>{saving?tr('dashboard.saving'):tr('admin.saveChanges')}</button>
+                <button onClick={handleSaveEdit} disabled={saving} className="adm-btn-primary">{saving?tr('dashboard.saving'):tr('admin.saveChanges')}</button>
                 <button onClick={()=>setEditing(false)} style={{ padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:8, fontSize:13, cursor:'pointer' }}>{tr('admin.cancelEdit')}</button>
               </div>
             </div>
@@ -584,7 +593,7 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh,
                 <textarea style={{...inp,width:'100%',boxSizing:'border-box',minHeight:80,resize:'vertical'}} value={editData.bio} onChange={e=>setEditData({...editData,bio:e.target.value})} />
               </div>
               <div style={{ display:'flex', gap:8, marginTop:4 }}>
-                <button onClick={handleSaveEdit} disabled={saving} style={{ padding:'9px 18px', background:C.primary, color:'#fff', border:'none', borderRadius:8, fontSize:13, fontWeight:600, cursor:'pointer' }}>{saving?tr('dashboard.saving'):tr('admin.saveChanges')}</button>
+                <button onClick={handleSaveEdit} disabled={saving} className="adm-btn-primary">{saving?tr('dashboard.saving'):tr('admin.saveChanges')}</button>
                 <button onClick={()=>setEditing(false)} style={{ padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:8, fontSize:13, cursor:'pointer' }}>{tr('admin.cancelEdit')}</button>
               </div>
             </div>
@@ -610,7 +619,7 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh,
               ))}
               <div style={{ marginTop:16, display:'flex', gap:8 }}>
                 {(nurse.status==='PENDING'||nurse.status==='INCOMPLETE') && <>
-                  <button onClick={()=>onApprove(nurse.id)} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.secondary, color:'#fff', border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.approve')}</button>
+                  <button onClick={()=>onApprove(nurse.id)} className="adm-btn-primary adm-btn-sm" style={{ background:'#059669' }}>{tr('admin.approve')}</button>
                   <button onClick={()=>onReject(nurse.id, 'Rejected by admin')} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.reject')}</button>
                 </>}
                 {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>{tr('admin.suspend')}</button>}
@@ -1167,7 +1176,7 @@ function AIAssistant({ clients, nurses, visits, payments=[], lang='en' }) {
 
       <div style={{ display:'flex', gap:10 }}>
         <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&sendMessage()} placeholder={tr('admin.aiPlaceholder')} style={{ flex:1, padding:'12px 16px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' }} />
-        <button onClick={sendMessage} disabled={!input.trim()} style={{ padding:'12px 20px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:14, fontWeight:600, cursor:'pointer', opacity:!input.trim()?0.5:1 }}>{tr('admin.aiSend')}</button>
+        <button onClick={sendMessage} disabled={!input.trim()} className="adm-btn-primary" style={{ padding:'12px 20px', opacity:!input.trim()?0.5:1 }}>{tr('admin.aiSend')}</button>
       </div>
     </div>
   );
@@ -1356,7 +1365,7 @@ function AdminSettings({ lang='en' }) {
               </div>
             ))}
             <div style={{ marginTop:20, display:'flex', alignItems:'center', gap:14 }}>
-              <button onClick={handleSave} disabled={saving} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:saving?'not-allowed':'pointer', opacity:saving?0.7:1 }}>
+              <button onClick={handleSave} disabled={saving} className="adm-btn-primary" style={{ padding:'12px 24px', fontSize:14, opacity:saving?0.7:1 }}>
                 {saving ? tr('dashboard.saving') : tr('admin.saveSettings')}
               </button>
               {status==='saved' && <span style={{ fontSize:13, color:C.secondary, fontWeight:600 }}>{tr('admin.settingsSaved')}</span>}
@@ -1522,16 +1531,19 @@ export default function AdminPage({ params }) {
         @keyframes spin{to{transform:rotate(360deg)}}
         @keyframes fadeSlideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
         .admin-section{animation:fadeSlideIn 0.18s ease both;}
-        .adm-btn-primary{transition:background 0.15s,transform 0.1s,box-shadow 0.15s;}
-        .adm-btn-primary:hover:not(:disabled){background:#1D4ED8!important;transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.28)!important;}
-        .adm-btn-primary:active:not(:disabled){transform:translateY(0);}
-        .adm-btn-secondary{transition:background 0.15s,border-color 0.15s;}
-        .adm-btn-secondary:hover:not(:disabled){background:#F8FAFC!important;border-color:#2563EB!important;color:#2563EB!important;}
-        .adm-btn-danger{transition:background 0.15s,border-color 0.15s;}
-        .adm-btn-danger:hover:not(:disabled){background:#FEF2F2!important;border-color:#DC2626!important;}
-        .adm-btn-success{transition:background 0.15s;}
-        .adm-btn-success:hover:not(:disabled){background:#047857!important;}
-        .adm-row:hover{background:#F8FAFC!important;}
+        .adm-btn-primary{background:#2563EB;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.15s;}
+        .adm-btn-primary:hover:not(:disabled){background:#1D4ED8;}
+        .adm-btn-primary:disabled{opacity:0.55;cursor:not-allowed;}
+        .adm-btn-secondary{background:#fff;color:#374151;border:1px solid #E2E8F0;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.15s,border-color 0.15s;}
+        .adm-btn-secondary:hover:not(:disabled){background:#F9FAFB;border-color:#D1D5DB;}
+        .adm-btn-secondary:disabled{opacity:0.55;cursor:not-allowed;}
+        .adm-btn-danger{background:#fff;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.15s;}
+        .adm-btn-danger:hover:not(:disabled){background:#FEF2F2;}
+        .adm-btn-danger:disabled{opacity:0.55;cursor:not-allowed;}
+        .adm-btn-sm{padding:5px 12px!important;font-size:12px!important;}
+        .adm-btn-ghost{background:transparent;color:#2563EB;border:none;padding:0;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;}
+        .adm-btn-ghost:hover{text-decoration:underline;}
+        .adm-row:hover td{background:#F9FAFB!important;}
         @media(max-width:768px){
           .admin-cont{padding:16px 16px 140px!important;}
           .admin-ham{display:flex!important;}
