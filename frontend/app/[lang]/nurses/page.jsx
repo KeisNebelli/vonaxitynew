@@ -86,30 +86,36 @@ export default function NursesPage({ params }) {
       <Nav lang={lang} />
 
       {/* Hero */}
-      <section style={{ padding:'72px 24px 56px', background:C.bgWhite, textAlign:'center' }}>
-        <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.primary, background:C.primaryLight, padding:'5px 12px', borderRadius:99, marginBottom:16 }}>
-          {tr('nurses.tag')}
-        </div>
-        <h1 style={{ fontSize:'clamp(28px,5vw,48px)', fontWeight:700, color:C.textPrimary, letterSpacing:'-1px', marginBottom:12 }}>
-          {tr('nurses.title')}
-        </h1>
-        <p style={{ fontSize:17, color:C.textSecondary, maxWidth:540, margin:'0 auto 40px', lineHeight:1.7 }}>
-          {tr('nurses.subtitle')}
-        </p>
-
-        {/* Trust badges */}
-        <div style={{ display:'flex', justifyContent:'center', gap:16, flexWrap:'wrap' }}>
-          {trustBadges.map(([title, sub]) => (
-            <div key={title} style={{ display:'flex', alignItems:'center', gap:10, background:C.bg, border:`1px solid ${C.border}`, borderRadius:12, padding:'10px 16px' }}>
-              <div style={{ width:32, height:32, borderRadius:8, background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', color:C.primary, flexShrink:0 }}>
-                <ShieldIcon />
+      <section style={{ position:'relative', minHeight:480, display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', overflow:'hidden' }}>
+        {/* Background image */}
+        <img src="/hero.jpg" alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
+        {/* Dark gradient overlay */}
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(160deg, rgba(10,15,40,0.72) 0%, rgba(10,30,80,0.65) 100%)' }} />
+        {/* Content */}
+        <div style={{ position:'relative', zIndex:1, padding:'80px 24px 64px', maxWidth:720, width:'100%' }}>
+          <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(147,197,253,1)', background:'rgba(37,99,235,0.25)', border:'1px solid rgba(96,165,250,0.3)', padding:'5px 14px', borderRadius:99, marginBottom:20 }}>
+            {tr('nurses.tag')}
+          </div>
+          <h1 style={{ fontSize:'clamp(30px,5vw,52px)', fontWeight:800, color:'#fff', letterSpacing:'-1.5px', marginBottom:16, lineHeight:1.1 }}>
+            {tr('nurses.title')}
+          </h1>
+          <p style={{ fontSize:17, color:'rgba(255,255,255,0.78)', maxWidth:520, margin:'0 auto 44px', lineHeight:1.75 }}>
+            {tr('nurses.subtitle')}
+          </p>
+          {/* Trust badges */}
+          <div style={{ display:'flex', justifyContent:'center', gap:12, flexWrap:'wrap' }}>
+            {trustBadges.map(([title, sub]) => (
+              <div key={title} style={{ display:'flex', alignItems:'center', gap:10, background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.18)', borderRadius:12, padding:'10px 16px', backdropFilter:'blur(8px)' }}>
+                <div style={{ width:30, height:30, borderRadius:8, background:'rgba(37,99,235,0.5)', display:'flex', alignItems:'center', justifyContent:'center', color:'#93C5FD', flexShrink:0 }}>
+                  <ShieldIcon />
+                </div>
+                <div style={{ textAlign:'left' }}>
+                  <div style={{ fontSize:13, fontWeight:600, color:'#fff' }}>{title}</div>
+                  <div style={{ fontSize:11, color:'rgba(255,255,255,0.6)', marginTop:1 }}>{sub}</div>
+                </div>
               </div>
-              <div style={{ textAlign:'left' }}>
-                <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{title}</div>
-                <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{sub}</div>
-              </div>
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       </section>
 
