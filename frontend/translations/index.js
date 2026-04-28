@@ -199,6 +199,16 @@ const translations = {
       checkoutFailed:'Failed to start checkout. Please try again.',
       portalFailed:'Failed to open billing portal.',
       nurseTBCLabel:'Nurse TBC', viewApplicantsBtn:'View applicants →',
+      findNurses:'Find Nurses',
+      searchNursesPlaceholder:'Search by name, city or specialty…',
+      allCities:'All cities',
+      nurseFound:'nurse found', nursesFound:'nurses found',
+      clearFilters:'Clear filters',
+      noNursesFound:'No nurses found',
+      noNursesFoundSub:'Try a different name or city filter.',
+      failedLoadNurses:'Failed to load nurses. Please try again.',
+      nurseVerified:'Verified',
+      bookWithNurse:'Book a visit →',
     },
     visits: {
       status: {
@@ -725,6 +735,16 @@ const translations = {
       checkoutFailed:'Fillimi i pagesës dështoi. Ju lutemi provoni përsëri.',
       portalFailed:'Hapja e portalit të faturimit dështoi.',
       nurseTBCLabel:'Infermierja TBC', viewApplicantsBtn:'Shiko aplikantët →',
+      findNurses:'Gjej Infermiere',
+      searchNursesPlaceholder:'Kërko sipas emrit, qytetit ose specialitetit…',
+      allCities:'Të gjitha qytetet',
+      nurseFound:'infermiere gjetur', nursesFound:'infermiere gjetur',
+      clearFilters:'Pastro filtrat',
+      noNursesFound:'Nuk u gjet asnjë infermiere',
+      noNursesFoundSub:'Provoni emër ose qytet tjetër.',
+      failedLoadNurses:'Ngarkimi i infermiereve dështoi. Ju lutemi provoni përsëri.',
+      nurseVerified:'E verifikuar',
+      bookWithNurse:'Rezervo vizitë →',
     },
     visits: {
       status: {

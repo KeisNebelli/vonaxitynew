@@ -131,66 +131,75 @@ export default function NursesPage({ params }) {
         </div>
       </section>
 
-      {/* Filters */}
+      {/* Search gate — prompts login instead of live search */}
       <section style={{ padding:'32px 24px 0' }}>
-        <div style={{ maxWidth:1100, margin:'0 auto', display:'flex', gap:12, flexWrap:'wrap', alignItems:'center' }}>
-          <div style={{ position:'relative', flex:'1 1 220px', minWidth:200 }}>
-            <span style={{ position:'absolute', left:10, top:'50%', transform:'translateY(-50%)', color:C.textTertiary }}>
+        <div style={{ maxWidth:1100, margin:'0 auto' }}>
+          <div style={{ position:'relative' }} onClick={() => { window.location.href = `/${lang}/login`; }} title="Sign in to search">
+            <span style={{ position:'absolute', left:14, top:'50%', transform:'translateY(-50%)', color:C.textTertiary, pointerEvents:'none', zIndex:1 }}>
               <SearchIcon />
             </span>
             <input
-              value={search}
-              onChange={e => setSearch(e.target.value)}
-              placeholder={tr('nurses.searchPlaceholder')}
-              style={{ width:'100%', padding:'9px 12px 9px 34px', borderRadius:8, border:`1.5px solid ${C.border}`, fontSize:13, color:C.textPrimary, background:C.bgWhite, outline:'none', boxSizing:'border-box' }}
+              readOnly
+              placeholder={lang==='sq' ? 'Kërko sipas emrit, qytetit ose specialitetit…' : 'Search by name, city or specialty…'}
+              style={{ width:'100%', padding:'13px 14px 13px 40px', borderRadius:12, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textTertiary, background:C.bgWhite, outline:'none', boxSizing:'border-box', cursor:'pointer', caretColor:'transparent' }}
             />
+            <div style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', fontSize:12, fontWeight:700, color:C.primary, background:C.primaryLight, padding:'5px 12px', borderRadius:99, whiteSpace:'nowrap', pointerEvents:'none' }}>
+              {lang==='sq' ? '🔒 Hyr për të kërkuar' : '🔒 Sign in to search'}
+            </div>
           </div>
-          <select
-            value={filterCity}
-            onChange={e => setFilterCity(e.target.value)}
-            style={{ padding:'9px 12px', borderRadius:8, border:`1.5px solid ${C.border}`, fontSize:13, color:C.textPrimary, background:C.bgWhite, cursor:'pointer' }}
-          >
-            <option value="all">{tr('nurses.filterAll')}</option>
-            {cities.map(city => <option key={city} value={city}>{city}</option>)}
-          </select>
         </div>
       </section>
 
-      {/* Nurse grid */}
-      <section style={{ padding:'28px 24px 80px' }}>
+      {/* Featured nurses section */}
+      <section style={{ padding:'28px 24px 20px' }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:20, flexWrap:'wrap', gap:12 }}>
+            <div>
+              <div style={{ fontSize:11, fontWeight:700, color:C.primary, textTransform:'uppercase', letterSpacing:'1px', marginBottom:4 }}>
+                {lang==='sq' ? 'Infermiere të rekomanduara' : 'Featured Nurses'}
+              </div>
+              <div style={{ fontSize:14, color:C.textSecondary }}>
+                {loading ? '…' : `${nurses.length} ${lang==='sq' ? 'infermiere të verifikuara' : 'verified nurses'}`}
+                {!loading && <span style={{ marginLeft:6, color:C.textTertiary }}>— {lang==='sq' ? 'Hyrni për të parë të gjitha' : 'Sign in to see all & filter'}</span>}
+              </div>
+            </div>
+            <Link href={`/${lang}/login`} className="nurse-cta" style={{ display:'inline-block', textAlign:'center', padding:'10px 20px', borderRadius:10, background:C.primary, color:'#fff', fontSize:13, fontWeight:700, textDecoration:'none', transition:'background 0.15s, transform 0.15s', whiteSpace:'nowrap' }}>
+              {lang==='sq' ? 'Hyr & Kërko' : 'Sign in & Search →'}
+            </Link>
+            <style>{`.nurse-cta:hover{background:#1D4ED8!important;transform:translateY(-1px)}.nurse-cta:active{transform:translateY(0)}.nurse-card:hover{box-shadow:0 8px 28px rgba(0,0,0,0.1)!important;transform:translateY(-2px)}`}</style>
+          </div>
+
           {loading ? (
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:20 }}>
               {[...Array(6)].map((_,i) => (
                 <div key={i} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden', padding:24 }}>
                   <div style={{ display:'flex', gap:16, marginBottom:16 }}>
-                    <div style={{ width:64, height:64, borderRadius:16, background:'#F1F5F9', flexShrink:0, animation:'shimmer 1.5s infinite' }} />
+                    <div style={{ width:64, height:64, borderRadius:16, flexShrink:0 }} className="nurse-shimmer" />
                     <div style={{ flex:1 }}>
-                      <div style={{ height:16, borderRadius:8, background:'#F1F5F9', marginBottom:8, width:'70%' }} />
-                      <div style={{ height:12, borderRadius:8, background:'#F1F5F9', marginBottom:8, width:'50%' }} />
-                      <div style={{ height:12, borderRadius:8, background:'#F1F5F9', width:'40%' }} />
+                      <div style={{ height:16, borderRadius:8, marginBottom:8, width:'70%' }} className="nurse-shimmer" />
+                      <div style={{ height:12, borderRadius:8, marginBottom:8, width:'50%' }} className="nurse-shimmer" />
+                      <div style={{ height:12, borderRadius:8, width:'40%' }} className="nurse-shimmer" />
                     </div>
                   </div>
-                  <div style={{ height:12, borderRadius:8, background:'#F1F5F9', marginBottom:8, width:'100%' }} />
-                  <div style={{ height:12, borderRadius:8, background:'#F1F5F9', marginBottom:8, width:'85%' }} />
-                  <div style={{ height:12, borderRadius:8, background:'#F1F5F9', width:'60%' }} />
+                  <div style={{ height:12, borderRadius:8, marginBottom:8, width:'100%' }} className="nurse-shimmer" />
+                  <div style={{ height:12, borderRadius:8, marginBottom:8, width:'85%' }} className="nurse-shimmer" />
+                  <div style={{ height:12, borderRadius:8, width:'60%' }} className="nurse-shimmer" />
                 </div>
               ))}
-              <style>{`@keyframes shimmer{0%,100%{opacity:1}50%{opacity:0.5}}`}</style>
+              <style>{`@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}.nurse-shimmer{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:600px 100%;animation:shimmer 1.4s infinite}`}</style>
             </div>
-          ) : filtered.length === 0 ? (
+          ) : nurses.length === 0 ? (
             <div style={{ textAlign:'center', padding:'80px 24px', color:C.textTertiary }}>
-              <div style={{ fontSize:48, marginBottom:16 }}>🔍</div>
+              <div style={{ fontSize:48, marginBottom:16 }}>👩‍⚕️</div>
               <div style={{ fontSize:16, fontWeight:600, color:C.textSecondary, marginBottom:8 }}>{tr('nurses.noNurses')}</div>
-              <div style={{ fontSize:14 }}>Try adjusting your search or city filter</div>
+              <div style={{ fontSize:14 }}>{lang==='sq' ? 'Infermiere do të shfaqen së shpejti.' : 'Nurses will appear here soon.'}</div>
             </div>
           ) : (
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:20 }}>
-              {filtered.map(nurse => {
+              {nurses.slice(0, 6).map(nurse => {
                 const available = nurse.available !== false && (nurse.availability?.length > 0 || nurse.available === true);
                 return (
                   <div key={nurse.id} className="nurse-card" style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.05)', transition:'box-shadow 0.2s, transform 0.2s' }}>
-                    <style>{`.nurse-card:hover{box-shadow:0 8px 28px rgba(0,0,0,0.1)!important;transform:translateY(-2px)}`}</style>
                     <div style={{ padding:'24px 24px 0' }}>
                       <div style={{ display:'flex', gap:16, alignItems:'flex-start', marginBottom:16 }}>
                         <NurseAvatar name={nurse.name} photo={nurse.profilePhotoUrl||null} size={64} verified={available} />
@@ -226,25 +235,20 @@ export default function NursesPage({ params }) {
                         </div>
                       </div>
 
-                      {/* Bio */}
                       {nurse.bio && (
                         <p style={{ fontSize:13, color:C.textSecondary, lineHeight:1.65, marginBottom:16, display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
                           {nurse.bio}
                         </p>
                       )}
 
-                      {/* Specialties */}
                       {nurse.specialties?.length > 0 && (
                         <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:16 }}>
                           {nurse.specialties.slice(0,4).map(s => (
-                            <span key={s} style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:99, background:C.primaryLight, color:C.primary }}>
-                              {s}
-                            </span>
+                            <span key={s} style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{s}</span>
                           ))}
                         </div>
                       )}
 
-                      {/* Languages */}
                       {nurse.languages?.length > 0 && (
                         <div style={{ fontSize:12, color:C.textTertiary, marginBottom:20 }}>
                           <strong style={{ color:C.textSecondary }}>{tr('nurses.languages')}:</strong>{' '}
@@ -253,12 +257,10 @@ export default function NursesPage({ params }) {
                       )}
                     </div>
 
-                    {/* Card footer */}
                     <div style={{ borderTop:`1px solid ${C.border}`, padding:'14px 24px' }}>
-                      <Link href={`/${lang}/nurses/${nurse.id}`} className="nurse-cta" style={{ display:'block', textAlign:'center', padding:'10px', borderRadius:9, background:C.primary, color:'#fff', fontSize:13, fontWeight:700, textDecoration:'none', transition:'background 0.15s, transform 0.15s' }}>
-                        {tr('nurses.viewProfile')}
+                      <Link href={`/${lang}/login`} className="nurse-cta" style={{ display:'block', textAlign:'center', padding:'10px', borderRadius:9, background:C.primary, color:'#fff', fontSize:13, fontWeight:700, textDecoration:'none', transition:'background 0.15s, transform 0.15s' }}>
+                        {lang==='sq' ? 'Hyr për të rezervuar' : 'Sign in to book →'}
                       </Link>
-                      <style>{`.nurse-cta:hover{background:#1D4ED8!important;transform:translateY(-1px)}.nurse-cta:active{transform:translateY(0)}`}</style>
                     </div>
                   </div>
                 );
@@ -267,6 +269,27 @@ export default function NursesPage({ params }) {
           )}
         </div>
       </section>
+
+      {/* Login CTA banner */}
+      {!loading && nurses.length > 6 && (
+        <section style={{ padding:'0 24px 20px' }}>
+          <div style={{ maxWidth:1100, margin:'0 auto' }}>
+            <div style={{ background:'linear-gradient(135deg,#1E3A5F 0%,#2563EB 100%)', borderRadius:16, padding:'28px 32px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:20, flexWrap:'wrap' }}>
+              <div>
+                <div style={{ fontSize:18, fontWeight:800, color:'#fff', marginBottom:6, letterSpacing:'-0.3px' }}>
+                  {lang==='sq' ? `+${nurses.length - 6} infermiere të tjera në zonën tuaj` : `+${nurses.length - 6} more nurses in your area`}
+                </div>
+                <div style={{ fontSize:14, color:'rgba(255,255,255,0.75)' }}>
+                  {lang==='sq' ? 'Hyni për të kërkuar, filtruar sipas qytetit dhe rezervuar vizita.' : 'Sign in to search, filter by city and book nurse visits.'}
+                </div>
+              </div>
+              <Link href={`/${lang}/login`} style={{ background:'#fff', color:'#1E3A5F', border:'none', borderRadius:10, padding:'13px 28px', fontSize:15, fontWeight:700, cursor:'pointer', textDecoration:'none', whiteSpace:'nowrap', display:'inline-block' }}>
+                {lang==='sq' ? 'Hyni tani →' : 'Sign in →'}
+              </Link>
+            </div>
+          </div>
+        </section>
+      )}
 
       <Footer lang={lang} />
     </div>

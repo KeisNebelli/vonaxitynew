@@ -16,6 +16,7 @@ const SERVICES = ['Blood Pressure Check','Glucose Monitoring','Vitals Check','Bl
 const makeNAV = (tr) => [
   { id:'overview', label:tr('dashboard.overview'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
   { id:'book', label:tr('dashboard.bookVisit'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg> },
+  { id:'nurses', label:tr('dashboard.findNurses'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
   { id:'visits', label:tr('dashboard.myVisits'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
   { id:'subscription', label:tr('dashboard.subscription'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
   { id:'settings', label:tr('dashboard.settings'), icon:<svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg> },
@@ -436,6 +437,155 @@ function Visits({ visits, lang, onViewApplicants, onRefresh }) {
   );
 }
 
+// ── Find Nurses ────────────────────────────────────────────────────────────────
+function FindNurses({ lang, onBook }) {
+  const tr = (key) => t(lang, key);
+  const [nurses, setNurses] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [query, setQuery] = useState('');
+  const [cityFilter, setCityFilter] = useState('');
+  const [error, setError] = useState('');
+
+  useEffect(() => {
+    api.getPublicNurses()
+      .then(d => setNurses(d.nurses || []))
+      .catch(() => setError(tr('dashboard.failedLoadNurses')))
+      .finally(() => setLoading(false));
+  }, []);
+
+  const CITIES = [...new Set(nurses.map(n => n.city).filter(Boolean))].sort();
+
+  const filtered = nurses.filter(n => {
+    const q = query.toLowerCase();
+    const matchQ = !q || n.name.toLowerCase().includes(q) || (n.city||'').toLowerCase().includes(q) || (n.bio||'').toLowerCase().includes(q) || (n.specialties||[]).some(s=>s.toLowerCase().includes(q));
+    const matchC = !cityFilter || n.city === cityFilter;
+    return matchQ && matchC;
+  });
+
+  const stars = (rating) => {
+    const r = Math.round(rating * 2) / 2;
+    return [1,2,3,4,5].map(i => (
+      <svg key={i} width="13" height="13" viewBox="0 0 24 24" fill={i<=r?'#F59E0B':'#E5E7EB'} stroke={i<=r?'#F59E0B':'#D1D5DB'} strokeWidth="1" viewBox="0 0 24 24">
+        <polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/>
+      </svg>
+    ));
+  };
+
+  if (loading) return (
+    <div>
+      <style>{`@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}.fn-shimmer{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:600px 100%;animation:shimmer 1.4s infinite}`}</style>
+      <div style={{ marginBottom:20, height:42, borderRadius:10 }} className="fn-shimmer"/>
+      {[1,2,3].map(i=>(
+        <div key={i} style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20, marginBottom:12 }}>
+          <div style={{ display:'flex', gap:14, alignItems:'center', marginBottom:14 }}>
+            <div style={{ width:52, height:52, borderRadius:13, flexShrink:0 }} className="fn-shimmer"/>
+            <div style={{ flex:1 }}>
+              <div style={{ height:14, borderRadius:6, marginBottom:8, width:'55%' }} className="fn-shimmer"/>
+              <div style={{ height:11, borderRadius:6, width:'35%' }} className="fn-shimmer"/>
+            </div>
+          </div>
+          <div style={{ height:11, borderRadius:6, width:'80%', marginBottom:6 }} className="fn-shimmer"/>
+          <div style={{ height:11, borderRadius:6, width:'60%' }} className="fn-shimmer"/>
+        </div>
+      ))}
+    </div>
+  );
+
+  if (error) return <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:12, padding:'16px 20px', fontSize:14, color:C.error }}>{error}</div>;
+
+  return (
+    <div>
+      {/* Search + filter */}
+      <div style={{ display:'flex', gap:10, marginBottom:20, flexWrap:'wrap' }}>
+        <div style={{ flex:1, minWidth:200, position:'relative' }}>
+          <svg style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }} width="15" height="15" fill="none" stroke={C.textTertiary} strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input
+            value={query}
+            onChange={e=>setQuery(e.target.value)}
+            placeholder={tr('dashboard.searchNursesPlaceholder')}
+            style={{ width:'100%', paddingLeft:38, paddingRight:14, paddingTop:10, paddingBottom:10, borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:F, boxSizing:'border-box' }}
+          />
+        </div>
+        <select
+          value={cityFilter}
+          onChange={e=>setCityFilter(e.target.value)}
+          style={{ padding:'10px 14px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:cityFilter?C.textPrimary:C.textTertiary, background:C.bgWhite, outline:'none', fontFamily:F, cursor:'pointer' }}
+        >
+          <option value="">{tr('dashboard.allCities')}</option>
+          {CITIES.map(c=><option key={c} value={c}>{c}</option>)}
+        </select>
+      </div>
+
+      {/* Count */}
+      <div style={{ fontSize:12, color:C.textTertiary, marginBottom:16 }}>
+        {filtered.length} {filtered.length === 1 ? tr('dashboard.nurseFound') : tr('dashboard.nursesFound')}
+        {(query||cityFilter) && <button onClick={()=>{setQuery('');setCityFilter('');}} style={{ marginLeft:10, fontSize:12, color:C.primary, background:'transparent', border:'none', cursor:'pointer', fontWeight:600 }}>{tr('dashboard.clearFilters')}</button>}
+      </div>
+
+      {/* Empty state */}
+      {filtered.length === 0 && (
+        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center' }}>
+          <div style={{ fontSize:40, marginBottom:12 }}>🔍</div>
+          <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:6 }}>{tr('dashboard.noNursesFound')}</div>
+          <div style={{ fontSize:13, color:C.textSecondary }}>{tr('dashboard.noNursesFoundSub')}</div>
+        </div>
+      )}
+
+      {/* Nurse cards */}
+      {filtered.map(nurse => (
+        <div key={nurse.id} style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'20px', marginBottom:14, boxShadow:SSM }}>
+          <div style={{ display:'flex', gap:14, alignItems:'flex-start', marginBottom:14 }}>
+            <div style={{ width:52, height:52, borderRadius:13, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, fontWeight:800, color:'#fff', flexShrink:0, overflow:'hidden' }}>
+              {nurse.profilePhotoUrl
+                ? <img src={nurse.profilePhotoUrl} alt={nurse.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                : (nurse.name||'N').charAt(0).toUpperCase()
+              }
+            </div>
+            <div style={{ flex:1, minWidth:0 }}>
+              <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{nurse.name}</div>
+              <div style={{ fontSize:12, color:C.textTertiary, marginBottom:6 }}>
+                {nurse.city && <span>📍 {nurse.city}</span>}
+                {nurse.experience && <span style={{ marginLeft:10 }}>🩺 {nurse.experience}</span>}
+              </div>
+              <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                <div style={{ display:'flex', gap:1 }}>{stars(nurse.rating||0)}</div>
+                <span style={{ fontSize:12, color:C.textSecondary, fontWeight:600 }}>{nurse.rating>0 ? nurse.rating.toFixed(1) : tr('dashboard.newNurse')}</span>
+                {nurse.reviewCount > 0 && <span style={{ fontSize:11, color:C.textTertiary }}>({nurse.reviewCount})</span>}
+                <span style={{ marginLeft:4, fontSize:11, color:C.textTertiary }}>· {nurse.totalVisits} {tr('dashboard.visitsApplicantLabel')}</span>
+              </div>
+            </div>
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, flexShrink:0 }}>
+              <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary, whiteSpace:'nowrap' }}>✓ {tr('dashboard.nurseVerified')}</span>
+            </div>
+          </div>
+
+          {nurse.bio && (
+            <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.65, marginBottom:12, padding:'10px 13px', background:C.bgSubtle, borderRadius:9, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
+              {nurse.bio}
+            </div>
+          )}
+
+          {nurse.specialties?.length > 0 && (
+            <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:14 }}>
+              {nurse.specialties.slice(0,4).map(s=>(
+                <span key={s} style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{s}</span>
+              ))}
+              {nurse.specialties.length > 4 && <span style={{ fontSize:11, color:C.textTertiary }}>+{nurse.specialties.length-4}</span>}
+            </div>
+          )}
+
+          <button
+            onClick={() => onBook()}
+            style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'11px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}
+          >
+            {tr('dashboard.bookWithNurse')}
+          </button>
+        </div>
+      ))}
+    </div>
+  );
+}
+
 function SubscriptionSection({ userData, lang }) {
   const tr = (key) => t(lang, key);
   const [loading, setLoading] = useState(null);
@@ -558,7 +708,7 @@ export default function Dashboard({ params }) {
   const [loading, setLoading] = useState(true);
   const [viewingApplicants, setViewingApplicants] = useState(null); // visit object
 
-  const TITLES = { overview:tr('dashboard.title'), book:tr('dashboard.bookVisitTitle'), visits:tr('dashboard.myVisits'), subscription:tr('dashboard.subscription'), settings:tr('dashboard.settings') };
+  const TITLES = { overview:tr('dashboard.title'), book:tr('dashboard.bookVisitTitle'), nurses:tr('dashboard.findNurses'), visits:tr('dashboard.myVisits'), subscription:tr('dashboard.subscription'), settings:tr('dashboard.settings') };
 
   useEffect(() => {
     const load = async () => {
@@ -743,6 +893,7 @@ export default function Dashboard({ params }) {
                   {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')}/>}
                   {active==='book' && !isExpired && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
                   {active==='book' && isExpired && <SubscriptionSection userData={userData} lang={lang} />}
+                  {active==='nurses' && <FindNurses lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')} />}
                   {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} onRefresh={loadData} />}
                   {active==='subscription' && <SubscriptionSection userData={userData} lang={lang} />}
                   {active==='settings' && <Settings key="settings-page" initialUser={userData} initialRelative={relative} lang={lang}/>}
