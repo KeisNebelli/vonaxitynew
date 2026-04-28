@@ -624,6 +624,31 @@ function VisitDetailModal({ visit, lang, onClose }) {
           <button onClick={onClose} style={{ background:C.bgSubtle, border:'none', borderRadius:9, width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary, fontSize:16, flexShrink:0 }}>✕</button>
         </div>
 
+        {/* Patient */}
+        {visit.relative && (
+          <div style={{ marginBottom:20 }}>
+            <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:10 }}>{lang==='sq'?'Pacienti':'Patient'}</div>
+            <div style={{ background:C.bgSubtle, borderRadius:12, padding:'14px 16px', display:'flex', flexWrap:'wrap', gap:'10px 24px' }}>
+              <div>
+                <div style={{ fontSize:11, color:C.textTertiary, marginBottom:2 }}>{lang==='sq'?'Emri':'Name'}</div>
+                <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>{visit.relative.name}</div>
+              </div>
+              {visit.relative.age && <div>
+                <div style={{ fontSize:11, color:C.textTertiary, marginBottom:2 }}>{lang==='sq'?'Mosha':'Age'}</div>
+                <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{visit.relative.age}</div>
+              </div>}
+              {visit.relative.city && <div>
+                <div style={{ fontSize:11, color:C.textTertiary, marginBottom:2 }}>{lang==='sq'?'Qyteti':'City'}</div>
+                <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{visit.relative.city}</div>
+              </div>}
+              {visit.relative.address && <div style={{ flexBasis:'100%' }}>
+                <div style={{ fontSize:11, color:C.textTertiary, marginBottom:2 }}>{lang==='sq'?'Adresa':'Address'}</div>
+                <div style={{ fontSize:13, fontWeight:500, color:C.textSecondary }}>{visit.relative.address}</div>
+              </div>}
+            </div>
+          </div>
+        )}
+
         {/* Nurse */}
         {visit.nurse?.user && (
           <div style={{ background:C.bgSubtle, borderRadius:12, padding:'14px 16px', marginBottom:20, display:'flex', gap:12, alignItems:'center' }}>
@@ -638,6 +663,16 @@ function VisitDetailModal({ visit, lang, onClose }) {
             </div>
             <div style={{ marginLeft:'auto' }}>
               <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>✓ {lang==='sq'?'Verifikuar':'Verified'}</span>
+            </div>
+          </div>
+        )}
+
+        {/* Booking Notes */}
+        {visit.notes && (
+          <div style={{ marginBottom:20 }}>
+            <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:10 }}>{lang==='sq'?'Shënimet e Rezervimit':'Booking Notes'}</div>
+            <div style={{ background:'#FFFBEB', borderRadius:11, padding:'14px 16px', fontSize:13, color:'#92400E', lineHeight:1.65, borderLeft:`3px solid #D97706` }}>
+              {visit.notes}
             </div>
           </div>
         )}
