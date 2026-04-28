@@ -324,7 +324,7 @@ function Clients({ clients, visits, onStatusChange, lang='en' }) {
                 <td style={{ padding:'12px 16px' }}>{statusBadge(c.status, lang)}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{c.visitsUsed}/{c.visitsTotal}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary }}>{c.joinedAt}</td>
-                <td style={{ padding:'12px 16px' }}><span className="adm-btn-ghost">{tr('admin.viewBtn')}</button></td>
+                <td style={{ padding:'12px 16px' }}><button className="adm-btn-ghost">{tr('admin.viewBtn')}</button></td>
               </tr>
             ))}
           </tbody>
