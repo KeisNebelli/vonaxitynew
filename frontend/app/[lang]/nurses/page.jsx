@@ -15,12 +15,90 @@ const C = {
 
 // Fallback static nurses (shown if API unavailable)
 const FALLBACK_NURSES = [
-  { id:'1', name:'Elona Berberi', city:'Tirana', rating:4.9, reviewCount:23, totalVisits:47, bio:'Specialised in cardiovascular monitoring and diabetic care. 6 years of home nursing experience across Tirana.', specialties:['Blood Pressure','Glucose Monitoring','Vitals'], languages:['Albanian','English'], experience:'6 years', available:true },
-  { id:'2', name:'Mirjeta Doshi', city:'Durrës', rating:4.7, reviewCount:18, totalVisits:31, bio:'Experienced in post-surgical care and elderly welfare checks. Compassionate approach with elderly patients.', specialties:['Welfare Check','Blood Work','Vitals'], languages:['Albanian','Italian'], experience:'4 years', available:true },
-  { id:'3', name:'Fatjona Leka', city:'Fier', rating:4.9, reviewCount:14, totalVisits:22, bio:'Dedicated to preventive care and health education. Works closely with families to ensure the best outcomes.', specialties:['Blood Pressure','Welfare Check','General'], languages:['Albanian','Greek'], experience:'5 years', available:true },
-  { id:'4', name:'Arba Hoxha', city:'Elbasan', rating:4.6, reviewCount:11, totalVisits:19, bio:'Skilled in blood work collection and laboratory coordination. Calm and professional in all interactions.', specialties:['Blood Work','Glucose Monitoring','Vitals'], languages:['Albanian'], experience:'3 years', available:true },
-  { id:'5', name:'Diona Krasniqi', city:'Shkodër', rating:4.8, reviewCount:9, totalVisits:15, bio:'Passionate about bringing quality healthcare to underserved areas. Specialises in chronic condition monitoring.', specialties:['Blood Pressure','Glucose Monitoring','Blood Work'], languages:['Albanian','English'], experience:'4 years', available:false },
-  { id:'6', name:'Besa Marku', city:'Tirana', rating:4.7, reviewCount:16, totalVisits:28, bio:'Experienced paediatric and geriatric nurse. Known for her warm and reassuring manner with patients.', specialties:['Welfare Check','Vitals','General'], languages:['Albanian','English'], experience:'7 years', available:true },
+  {
+    id:'1', name:'Elona Berberi', city:'Tirana',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/44.jpg',
+    rating:4.9, reviewCount:34, totalVisits:71,
+    bio:'Specialist in cardiovascular monitoring and diabetic care. Over 8 years of home nursing experience in Tirana, known for her calm and thorough approach with elderly patients.',
+    specialties:['Blood Pressure','Glucose Monitoring','Vitals'], languages:['Albanian','English'], experience:'8 years', available:true,
+  },
+  {
+    id:'2', name:'Mirjeta Doshi', city:'Durrës',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/68.jpg',
+    rating:4.8, reviewCount:27, totalVisits:52,
+    bio:'Experienced in post-surgical wound care and elderly welfare checks. Compassionate and detail-oriented, she works closely with families to ensure continuous recovery monitoring.',
+    specialties:['Post-surgical Care','Welfare Check','Blood Work'], languages:['Albanian','Italian'], experience:'6 years', available:true,
+  },
+  {
+    id:'3', name:'Besa Marku', city:'Tirana',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/26.jpg',
+    rating:4.9, reviewCount:41, totalVisits:88,
+    bio:'Geriatric nursing specialist with 9 years of home care experience. Renowned for her warm manner and thorough health assessments. Families trust her for consistent, compassionate care.',
+    specialties:['Vitals','Welfare Check','Blood Pressure'], languages:['Albanian','English'], experience:'9 years', available:true,
+  },
+  {
+    id:'4', name:'Ardita Cela', city:'Tirana',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/53.jpg',
+    rating:4.7, reviewCount:19, totalVisits:38,
+    bio:'Focused on preventive care and patient education. Ardita empowers families with knowledge about managing chronic conditions at home, from diabetes to hypertension.',
+    specialties:['Glucose Monitoring','Blood Pressure','Blood Work'], languages:['Albanian','English'], experience:'5 years', available:true,
+  },
+  {
+    id:'5', name:'Jonida Shehu', city:'Tirana',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/33.jpg',
+    rating:4.8, reviewCount:22, totalVisits:44,
+    bio:'Specialised in vitals monitoring and blood work collection. Works with certified Albanian laboratories and delivers results to families promptly and with clear explanations.',
+    specialties:['Blood Work','Vitals','Glucose Monitoring'], languages:['Albanian'], experience:'6 years', available:true,
+  },
+  {
+    id:'6', name:'Dorina Haxhi', city:'Durrës',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/17.jpg',
+    rating:4.6, reviewCount:15, totalVisits:29,
+    bio:'Home care nurse with a background in internal medicine. Dorina handles complex post-discharge cases with professionalism, coordinating with hospital teams when needed.',
+    specialties:['Post-surgical Care','Blood Pressure','Welfare Check'], languages:['Albanian','Italian'], experience:'4 years', available:true,
+  },
+  {
+    id:'7', name:'Fatjona Leka', city:'Durrës',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/62.jpg',
+    rating:4.9, reviewCount:18, totalVisits:35,
+    bio:'Dedicated to preventive care and health education. Works closely with families to ensure the best outcomes for elderly relatives, with special expertise in fall prevention and mobility care.',
+    specialties:['Blood Pressure','Welfare Check','Vitals'], languages:['Albanian','Greek'], experience:'5 years', available:false,
+  },
+  {
+    id:'8', name:'Arba Hoxha', city:'Tirana',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/79.jpg',
+    rating:4.7, reviewCount:13, totalVisits:24,
+    bio:'Skilled in blood sample collection and laboratory coordination. Professional and reliable, Arba ensures all samples are handled correctly and results are communicated clearly.',
+    specialties:['Blood Work','Glucose Monitoring','Vitals'], languages:['Albanian'], experience:'3 years', available:true,
+  },
+  {
+    id:'9', name:'Ornela Gjika', city:'Tirana',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/88.jpg',
+    rating:4.8, reviewCount:29, totalVisits:56,
+    bio:'Senior nurse with extensive experience in chronic condition management. Ornela builds strong ongoing relationships with her patients and is known for her meticulous reporting.',
+    specialties:['Vitals','Blood Pressure','Blood Work'], languages:['Albanian','English','French'], experience:'10 years', available:true,
+  },
+  {
+    id:'10', name:'Teuta Rama', city:'Durrës',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/5.jpg',
+    rating:4.6, reviewCount:11, totalVisits:20,
+    bio:'Caring and thorough, Teuta specialises in welfare visits for elderly patients living alone. She provides families with detailed written reports after every visit for full peace of mind.',
+    specialties:['Welfare Check','Blood Pressure','Vitals'], languages:['Albanian'], experience:'4 years', available:true,
+  },
+  {
+    id:'11', name:'Lindita Berisha', city:'Tirana',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/21.jpg',
+    rating:4.9, reviewCount:38, totalVisits:79,
+    bio:'Post-surgical recovery specialist with a strong background in hospital care. Lindita transitioned to home nursing to give patients a more comfortable and personal recovery experience.',
+    specialties:['Post-surgical Care','Wound Care','Vitals'], languages:['Albanian','English'], experience:'7 years', available:true,
+  },
+  {
+    id:'12', name:'Silvana Mustafa', city:'Tirana',
+    profilePhotoUrl:'https://randomuser.me/api/portraits/women/37.jpg',
+    rating:4.7, reviewCount:16, totalVisits:31,
+    bio:'Paediatric and geriatric nurse experienced in mixed-family care. Silvana is especially sought after by families caring for both young children and elderly grandparents simultaneously.',
+    specialties:['Welfare Check','Glucose Monitoring','Blood Pressure'], languages:['Albanian','English'], experience:'6 years', available:false,
+  },
 ];
 
 function ShieldIcon() {
