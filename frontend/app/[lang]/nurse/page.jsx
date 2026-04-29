@@ -246,89 +246,160 @@ function NotificationBell({ lang, onNavigate }) {
 function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=null }) {
   const tr = (key) => t(lang, key);
   const today = visits.filter(v => !['COMPLETED','CANCELLED'].includes(v.status));
+  const completed = visits.filter(v => v.status === 'COMPLETED');
   const nurseName = nurse?.user?.name || nurse?.name || 'Nurse';
   const nurseInitials = nurseName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
+  const firstName = nurseName.split(' ')[0];
   const ratingValue = nurse?.rating > 0 ? nurse.rating : null;
   const totalVisits = nurse?.totalVisits || 0;
   const specialtiesArray = nurse?.specialties ? (typeof nurse.specialties === 'string' ? JSON.parse(nurse.specialties) : nurse.specialties) : [];
-  const statusMap = { APPROVED:['#ECFDF5','#059669'], PENDING:['#FEF3C7','#D97706'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
-  const [statusBg, statusColor] = statusMap[nurse?.status] || statusMap.INCOMPLETE;
+  const statusMap = { APPROVED:['#ECFDF5','#059669','Approved'], PENDING:['#FEF3C7','#D97706','Pending'], INCOMPLETE:['#FFFBEB','#D97706','Incomplete'], REJECTED:['#FEF2F2','#DC2626','Rejected'], SUSPENDED:['#F1F5F9','#475569','Suspended'] };
+  const [statusBg, statusColor, statusLabel] = statusMap[nurse?.status] || statusMap.INCOMPLETE;
+  const hourNow = new Date().getHours();
+  const greeting = lang==='sq' ? (hourNow < 12 ? 'Mirëmëngjes' : hourNow < 18 ? 'Mirëdita' : 'Mirëmbrëma') : (hourNow < 12 ? 'Good morning' : hourNow < 18 ? 'Good afternoon' : 'Good evening');
 
   return (
-    <div>
-      {/* Nurse Identity Card */}
-      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'24px', marginBottom:28, borderLeft:`4px solid ${C.primary}` }}>
-        <div style={{ display:'flex', gap:20, alignItems:'flex-start' }}>
-          {/* Avatar */}
-          <div style={{ flexShrink:0 }}>
-            {nurse?.profilePhotoUrl ? (
-              <img src={nurse.profilePhotoUrl} alt={nurseName} style={{ width:80, height:80, borderRadius:'50%', objectFit:'cover', border:`2px solid ${C.border}` }} />
-            ) : (
-              <div style={{ width:80, height:80, borderRadius:'50%', background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', fontSize:28, fontWeight:800, color:'#fff' }}>
-                {nurseInitials}
-              </div>
-            )}
+    <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+      <style>{`
+        .nd-stat:hover { border-color:#2563EB!important; transform:translateY(-2px); }
+        .nd-stat { transition:border-color 0.15s,transform 0.15s; }
+        .nd-route-btn:hover { background:#1D4ED8!important; }
+        .nd-route-btn { transition:background 0.15s; }
+      `}</style>
+
+      {/* ── Profile hero card ── */}
+      <div style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 4px 20px rgba(15,23,42,0.1)', border:`1px solid rgba(0,0,0,0.06)` }}>
+        {/* Dark gradient banner */}
+        <div style={{ background:'linear-gradient(135deg,#0F172A 0%,#1E3A5F 55%,#1D4ED8 100%)', padding:'28px 24px 70px', position:'relative', overflow:'hidden' }}>
+          <div style={{ position:'absolute', inset:0, opacity:0.05, pointerEvents:'none' }}>
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="nd" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#nd)"/></svg>
           </div>
+          <div style={{ position:'absolute', top:-40, right:-40, width:180, height:180, borderRadius:'50%', background:'rgba(37,99,235,0.2)', filter:'blur(50px)', pointerEvents:'none' }}/>
+          <div style={{ position:'relative', zIndex:1 }}>
+            <div style={{ fontSize:13, color:'rgba(255,255,255,0.55)', marginBottom:4 }}>{greeting},</div>
+            <div style={{ fontSize:22, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>{firstName} 👋</div>
+          </div>
+        </div>
 
-          {/* Info */}
-          <div style={{ flex:1, minWidth:0 }}>
-            <h1 style={{ fontSize:20, fontWeight:700, color:C.textPrimary, margin:'0 0 8px 0' }}>{nurseName}</h1>
-
-            {/* Rating */}
-            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:12 }}>
-              <div style={{ display:'flex', gap:4, alignItems:'center' }}>
-                {[1,2,3,4,5].map((idx) => (
-                  <svg key={idx} width="16" height="16" viewBox="0 0 24 24" style={{ fill: ratingValue && idx <= Math.round(ratingValue) ? C.warning : '#E5E7EB', stroke: 'none' }}>
-                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                  </svg>
-                ))}
-              </div>
-              {ratingValue ? (
-                <span style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{ratingValue.toFixed(1)} / 5 · {totalVisits} {totalVisits === 1 ? 'visit' : 'visits'}</span>
+        {/* Avatar + info pulled up over banner */}
+        <div style={{ background:C.bgWhite, padding:'0 24px 22px', marginTop:-44, position:'relative' }}>
+          <div style={{ display:'flex', alignItems:'flex-end', gap:16, marginBottom:16 }}>
+            {/* Avatar */}
+            <div style={{ flexShrink:0, position:'relative' }}>
+              {nurse?.profilePhotoUrl ? (
+                <img src={nurse.profilePhotoUrl} alt={nurseName} style={{ width:80, height:80, borderRadius:20, objectFit:'cover', border:`3px solid ${C.bgWhite}`, boxShadow:'0 4px 14px rgba(0,0,0,0.12)' }} />
               ) : (
-                <span style={{ fontSize:14, fontWeight:600, color:C.textSecondary }}>New Nurse</span>
+                <div style={{ width:80, height:80, borderRadius:20, background:'linear-gradient(135deg,#2563EB,#1D4ED8)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:28, fontWeight:800, color:'#fff', border:`3px solid ${C.bgWhite}`, boxShadow:'0 4px 14px rgba(0,0,0,0.12)' }}>
+                  {nurseInitials}
+                </div>
               )}
+              <div style={{ position:'absolute', bottom:-4, right:-4, width:18, height:18, borderRadius:'50%', background:statusColor, border:`2.5px solid ${C.bgWhite}` }} />
             </div>
-
-            {/* Status Badge */}
-            <div style={{ display:'inline-flex', alignItems:'center', gap:6, fontSize:12, fontWeight:600, background:statusBg, color:statusColor, padding:'5px 12px', borderRadius:6, marginBottom:12 }}>
-              <div style={{ width:6, height:6, borderRadius:'50%', background:statusColor }} />
-              {nurse?.status || 'INCOMPLETE'}
-            </div>
-
-            {/* Specialties */}
-            {specialtiesArray.length > 0 && (
-              <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginTop:8 }}>
-                {specialtiesArray.map((spec) => (
-                  <span key={spec} style={{ fontSize:12, fontWeight:500, background:C.primaryLight, color:C.primary, padding:'4px 10px', borderRadius:4 }}>
-                    {spec}
-                  </span>
-                ))}
+            {/* Name + status */}
+            <div style={{ flex:1, paddingBottom:4 }}>
+              <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.4px', marginBottom:5 }}>{nurseName}</div>
+              <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
+                <span style={{ fontSize:11, fontWeight:700, padding:'3px 11px', borderRadius:99, background:statusBg, color:statusColor, border:`1px solid ${statusColor}22` }}>● {statusLabel}</span>
+                {nurse?.city && <span style={{ fontSize:11, fontWeight:600, padding:'3px 10px', borderRadius:99, background:'#F1F5F9', color:C.textSecondary }}>📍 {nurse.city}</span>}
               </div>
-            )}
+            </div>
           </div>
+
+          {/* Rating row */}
+          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14, padding:'10px 14px', background:'#F8FAFC', borderRadius:12, border:`1px solid ${C.border}` }}>
+            <div style={{ display:'flex', gap:3 }}>
+              {[1,2,3,4,5].map(idx => (
+                <svg key={idx} width="15" height="15" viewBox="0 0 24 24" style={{ fill: ratingValue && idx <= Math.round(ratingValue) ? '#F59E0B' : '#E2E8F0', stroke:'none' }}>
+                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                </svg>
+              ))}
+            </div>
+            {ratingValue ? (
+              <span style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>{ratingValue.toFixed(1)}<span style={{ fontWeight:500, color:C.textTertiary }}> / 5</span></span>
+            ) : (
+              <span style={{ fontSize:13, fontWeight:600, color:C.textTertiary }}>{lang==='sq'?'Infermiere e re':'New Nurse'}</span>
+            )}
+            <span style={{ fontSize:12, color:C.textTertiary, marginLeft:'auto' }}>{totalVisits} {lang==='sq'?'vizita gjithsej':'total visits'}</span>
+          </div>
+
+          {/* Specialties */}
+          {specialtiesArray.length > 0 && (
+            <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
+              {specialtiesArray.map(spec => (
+                <span key={spec} style={{ fontSize:11, fontWeight:600, padding:'4px 11px', borderRadius:99, background:'#EFF6FF', color:'#2563EB', border:'1px solid rgba(37,99,235,0.15)' }}>{spec}</span>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Stat Cards */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:24 }}>
-        {[[t(lang,'nurse.todayLabel'),today.length,C.primary],[t(lang,'nurse.totalVisits'),nurse?.totalVisits||0,C.secondary],[t(lang,'nurse.earningsLabel'),`€${nurse?.totalEarnings||0}`,C.purple]].map(([label,value,color]) => (
-          <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'16px 18px' }}>
-            <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
-            <div style={{ fontSize:22, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
+      {/* ── Stat cards ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
+        {/* Today's visits */}
+        <div className="nd-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer' }} onClick={()=>setActive('visits')}>
+          <div style={{ width:34, height:34, borderRadius:10, background:'#EFF6FF', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
+            <svg width="16" height="16" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
-        ))}
+          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('nurse.todayLabel')}</div>
+          <div style={{ fontSize:24, fontWeight:800, color:'#2563EB', letterSpacing:'-0.5px', lineHeight:1 }}>{today.length}</div>
+          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5 }}>{lang==='sq'?'vizita sot':'visits today'}</div>
+        </div>
+        {/* Total visits */}
+        <div className="nd-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer' }} onClick={()=>setActive('visits')}>
+          <div style={{ width:34, height:34, borderRadius:10, background:'#ECFDF5', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
+            <svg width="16" height="16" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('nurse.totalVisits')}</div>
+          <div style={{ fontSize:24, fontWeight:800, color:'#059669', letterSpacing:'-0.5px', lineHeight:1 }}>{totalVisits}</div>
+          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5 }}>{lang==='sq'?'gjithsej':'all time'}</div>
+        </div>
+        {/* Earnings */}
+        <div className="nd-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer' }} onClick={()=>setActive('earnings')}>
+          <div style={{ width:34, height:34, borderRadius:10, background:'#F5F3FF', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
+            <svg width="16" height="16" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          </div>
+          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('nurse.earningsLabel')}</div>
+          <div style={{ fontSize:24, fontWeight:800, color:'#7C3AED', letterSpacing:'-0.5px', lineHeight:1 }}>€{nurse?.totalEarnings||0}</div>
+          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5 }}>{lang==='sq'?'fituar':'earned'}</div>
+        </div>
       </div>
+
+      {/* ── Quick actions ── */}
+      <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+        <button className="nd-route-btn" onClick={()=>setActive('jobs')} style={{ flex:1, minWidth:120, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:'#2563EB', color:'#fff', border:'none', borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.2)' }}>
+          <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          {lang==='sq'?'Shfleto Punët':'Browse Jobs'}
+        </button>
+        <button onClick={()=>setActive('visits')} style={{ flex:1, minWidth:120, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:C.bgWhite, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>
+          <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          {lang==='sq'?'Vizitat e Mia':'My Visits'}
+        </button>
+        <button onClick={()=>setActive('profile')} style={{ flex:1, minWidth:120, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:C.bgWhite, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>
+          <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+          {lang==='sq'?'Profili Im':'My Profile'}
+        </button>
+      </div>
+
+      {/* ── Today's route ── */}
       {today.length > 0 ? (
         <DailyRouteCard lang={lang} visits={today.map(formatVisit)} onVisitSelect={(v)=>{ setSelectedVisit(today.find(vv=>vv.id===v.id)); setActive('map'); }} />
       ) : (
-        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'32px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
-          {t(lang,'dashboard.noVisits')}
+        <div style={{ background:C.bgWhite, borderRadius:16, border:`1.5px dashed ${C.border}`, padding:'36px 24px', textAlign:'center' }}>
+          <div style={{ width:48, height:48, borderRadius:14, background:'#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 14px' }}>
+            <svg width="22" height="22" fill="none" stroke={C.textTertiary} strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          </div>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textSecondary, marginBottom:4 }}>{lang==='sq'?'Asnjë vizitë sot':'No visits scheduled today'}</div>
+          <div style={{ fontSize:12, color:C.textTertiary }}>{lang==='sq'?'Shfleto punët e disponueshme.':'Browse available jobs to pick up new visits.'}</div>
+          <button className="nd-route-btn" onClick={()=>setActive('jobs')} style={{ marginTop:16, background:'#2563EB', color:'#fff', border:'none', borderRadius:10, padding:'10px 22px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>
+            {lang==='sq'?'Shfleto Punët':'Browse Jobs'}
+          </button>
         </div>
       )}
-      <div style={{ marginTop:16, background:C.warningLight, border:`1px solid #FDE68A`, borderRadius:10, padding:'12px 16px', display:'flex', gap:10, alignItems:'center' }}>
+
+      {/* ── Emergency warning ── */}
+      <div style={{ background:'#FFFBEB', border:`1px solid #FDE68A`, borderRadius:12, padding:'12px 16px', display:'flex', gap:10, alignItems:'center' }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
-        <span style={{ fontSize:13, color:'#92400E' }}>{t(lang,'nurse.emergencyWarning')} <strong>127</strong></span>
+        <span style={{ fontSize:13, color:'#92400E' }}>{tr('nurse.emergencyWarning')} <strong>127</strong></span>
       </div>
     </div>
   );
