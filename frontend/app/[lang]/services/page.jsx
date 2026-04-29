@@ -22,47 +22,39 @@ export default function ServicesPage({ params }) {
     <div style={{ fontFamily:"'Inter',system-ui,sans-serif" }}>
       <Nav lang={lang} />
 
-      {/* Hero */}
-      <section style={{ position:'relative', height:'400px', overflow:'hidden' }}>
-        <img
-          src="https://images.unsplash.com/photo-1631217868264-e5b90bb7e133?w=1400&q=80&auto=format&fit=crop"
-          alt="Professional nurse home care services"
-          style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center 30%' }}
-        />
-        <div style={{ position:'absolute', inset:0, background:'linear-gradient(135deg, rgba(37,99,235,0.75) 0%, rgba(15,23,42,0.6) 100%)' }}/>
-        <div style={{ position:'absolute', inset:0, display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', padding:'0 24px' }}>
-          <div>
-            <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(255,255,255,0.85)', background:'rgba(255,255,255,0.15)', padding:'6px 14px', borderRadius:99, marginBottom:16, border:'1px solid rgba(255,255,255,0.2)' }}>{t(lang,'services.tag')}</div>
-            <h1 style={{ fontSize:'clamp(28px,5vw,52px)', fontWeight:800, color:'#fff', letterSpacing:'-1.5px', lineHeight:1.1, maxWidth:640, margin:'0 auto 16px' }}>{t(lang,'services.title')}</h1>
-            <p style={{ fontSize:17, color:'rgba(255,255,255,0.8)', maxWidth:480, margin:'0 auto', lineHeight:1.7 }}>{t(lang,'services.subtitle')}</p>
-          </div>
+      {/* ── Hero ── */}
+      <section style={{ padding:'88px 24px 100px', background:'linear-gradient(135deg, #0F172A 0%, #1E3A5F 55%, #1D4ED8 100%)', textAlign:'center', position:'relative', overflow:'hidden' }}>
+        {/* Grid pattern */}
+        <div style={{ position:'absolute', inset:0, opacity:0.06 }}>
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs><pattern id="sg" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs>
+            <rect width="100%" height="100%" fill="url(#sg)"/>
+          </svg>
+        </div>
+        <div style={{ position:'relative', zIndex:1 }}>
+          <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(147,197,253,0.95)', background:'rgba(37,99,235,0.3)', padding:'6px 16px', borderRadius:99, marginBottom:20, border:'1px solid rgba(147,197,253,0.2)' }}>{t(lang,'services.tag')}</div>
+          <h1 style={{ fontSize:'clamp(30px,5vw,54px)', fontWeight:800, color:'#fff', letterSpacing:'-2px', lineHeight:1.1, maxWidth:640, margin:'0 auto 16px' }}>{t(lang,'services.title')}</h1>
+          <p style={{ fontSize:17, color:'rgba(255,255,255,0.68)', maxWidth:480, margin:'0 auto', lineHeight:1.75 }}>{t(lang,'services.subtitle')}</p>
         </div>
       </section>
 
-      {/* Split section - image + trust message */}
-      <section style={{ background:C.bgWhite, padding:'0' }}>
-        <div style={{ maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'1fr 1fr', minHeight:320 }}>
-          <div style={{ overflow:'hidden' }}>
-            <img
-              src="https://images.unsplash.com/photo-1518152006812-edab29b069ac?w=700&q=80&auto=format&fit=crop"
-              alt="Nurse with patient"
-              style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }}
-            />
+      {/* ── Certified block ── */}
+      <section style={{ padding:'64px 24px 0', background:C.bgWhite }}>
+        <div style={{ maxWidth:860, margin:'0 auto', background:C.bg, borderRadius:20, border:`1px solid ${C.border}`, padding:'40px 48px', display:'grid', gridTemplateColumns:'1fr 1fr', gap:48, alignItems:'center' }}>
+          <div>
+            <div style={{ fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:C.primary, marginBottom:14 }}>{t(lang,'services.certifiedTag')}</div>
+            <h2 style={{ fontSize:'clamp(20px,3vw,30px)', fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:14, lineHeight:1.2 }}>{t(lang,'services.certifiedTitle')}</h2>
+            <p style={{ fontSize:14, color:C.textSecondary, lineHeight:1.8, margin:0 }}>{t(lang,'services.certifiedDesc')}</p>
           </div>
-          <div style={{ padding:'48px 48px', display:'flex', flexDirection:'column', justifyContent:'center' }}>
-            <div style={{ fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:C.primary, marginBottom:16 }}>{t(lang,'services.certifiedTag')}</div>
-            <h2 style={{ fontSize:'clamp(22px,3vw,34px)', fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:16, lineHeight:1.2 }}>{t(lang,'services.certifiedTitle')}</h2>
-            <p style={{ fontSize:15, color:C.textSecondary, lineHeight:1.8, marginBottom:24 }}>{t(lang,'services.certifiedDesc')}</p>
-            <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
-              {(()=>{const features=t(lang,'services.certifiedFeatures');return Array.isArray(features)?features:[];})().map((item,i) => (
-                <div key={i} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:C.textPrimary, fontWeight:500 }}>
-                  <div style={{ width:22, height:22, borderRadius:'50%', background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                  </div>
-                  {item}
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            {(()=>{const features=t(lang,'services.certifiedFeatures');return Array.isArray(features)?features:[];})().map((item,i) => (
+              <div key={i} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:C.textPrimary, fontWeight:500, padding:'10px 14px', background:C.bgWhite, borderRadius:10, border:`1px solid ${C.border}` }}>
+                <div style={{ width:22, height:22, borderRadius:'50%', background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
-              ))}
-            </div>
+                {item}
+              </div>
+            ))}
           </div>
         </div>
       </section>
