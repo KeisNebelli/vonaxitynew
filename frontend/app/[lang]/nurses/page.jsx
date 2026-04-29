@@ -131,11 +131,14 @@ export default function NursesPage({ params }) {
     fetch(`${BASE}/nurses/public`)
       .then(r => r.json())
       .then(data => {
-        if (data.nurses && data.nurses.length > 0) {
-          setNurses(data.nurses);
-        } else {
-          setNurses(FALLBACK_NURSES);
-        }
+        // Filter out test/incomplete accounts — real nurses must have a proper name,
+        // a bio longer than 30 chars, and no "test" in their name
+        const real = (data.nurses || []).filter(n =>
+          n.name &&
+          !n.name.toLowerCase().includes('test') &&
+          n.bio && n.bio.trim().length > 30
+        );
+        setNurses(real.length >= 3 ? real : FALLBACK_NURSES);
       })
       .catch(() => {
         setNurses(FALLBACK_NURSES);
