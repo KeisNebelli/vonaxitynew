@@ -270,7 +270,7 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
       {/* ── Profile hero card ── */}
       <div style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 4px 20px rgba(15,23,42,0.1)', border:`1px solid rgba(0,0,0,0.06)` }}>
         {/* Dark gradient banner */}
-        <div style={{ background:'linear-gradient(135deg,#0F172A 0%,#1E3A5F 55%,#1D4ED8 100%)', padding:'28px 24px 70px', position:'relative', overflow:'hidden' }}>
+        <div style={{ background:'linear-gradient(135deg,#2563EB 0%,#4F46E5 50%,#7C3AED 100%)', padding:'28px 24px 70px', position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', inset:0, opacity:0.05, pointerEvents:'none' }}>
             <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="nd" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#nd)"/></svg>
           </div>
@@ -685,89 +685,90 @@ function BrowseJobs({ nurse, lang='en' }) {
       </div>
 
       {/* Job cards */}
-      <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+      <style>{`.jc-apply:hover{background:#1D4ED8!important}.jc-apply{transition:background 0.15s}.jc-card:hover{border-color:#2563EB!important;box-shadow:0 6px 20px rgba(37,99,235,0.08)!important}.jc-card{transition:border-color 0.15s,box-shadow 0.15s}`}</style>
+      <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
         {jobs.map(job => {
           const isExpanded = expandedJob === job.id;
           const applied = job.hasApplied || statuses[job.id] === 'applied';
           const failed = statuses[job.id] && statuses[job.id] !== 'applied';
-          const dateStr = new Date(job.scheduledAt).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+          const dateStr = new Date(job.scheduledAt).toLocaleDateString('en-GB',{weekday:'short',day:'numeric',month:'short'});
           const timeStr = new Date(job.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+          const payRate = job.payRate || 20;
+          const postedAgo = job.createdAt ? (() => { const m=Math.floor((Date.now()-new Date(job.createdAt))/60000); return m<60?`${m}m ago`:m<1440?`${Math.floor(m/60)}h ago`:`${Math.floor(m/1440)}d ago`; })() : '';
 
           return (
-            <div key={job.id} style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${applied?'#6EE7B7':isExpanded?C.primary:C.border}`, overflow:'hidden', transition:'border-color 0.15s' }}>
+            <div key={job.id} className="jc-card" style={{ background:C.bgWhite, borderRadius:16, border:`1.5px solid ${applied?'#6EE7B7':isExpanded?C.primary:C.border}`, overflow:'hidden', boxShadow:'0 1px 4px rgba(0,0,0,0.05)' }}>
 
-              {/* ── Summary row (always visible) ── */}
-              <div style={{ padding:'16px 18px', display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12 }}>
-                <div style={{ flex:1, minWidth:0 }}>
-                  <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:6 }}>
-                    <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{job.serviceType}</div>
-                    {applied && <span style={{ fontSize:11, fontWeight:700, padding:'2px 8px', borderRadius:99, background:'#ECFDF5', color:'#059669', flexShrink:0 }}>{t(lang,'nurse.applied')}</span>}
-                  </div>
-                  <div style={{ display:'flex', flexWrap:'wrap', gap:'4px 14px', fontSize:12, color:C.textSecondary }}>
-                    <span style={{ display:'flex', alignItems:'center', gap:4 }}><span style={{ color:C.textTertiary }}>{iconPin}</span>{job.city||'Albania'}</span>
-                    <span style={{ display:'flex', alignItems:'center', gap:4 }}><span style={{ color:C.textTertiary }}>{iconCal}</span>{dateStr} · {timeStr}</span>
-                    {job.relativeName && <span style={{ display:'flex', alignItems:'center', gap:4 }}><span style={{ color:C.textTertiary }}>{iconUser}</span>{job.relativeName}</span>}
-                  </div>
-                </div>
-
-                {/* Buttons */}
-                <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, flexShrink:0 }}>
-                  {applied ? (
-                    <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:13, fontWeight:600, color:'#059669' }}>
-                      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
-                      {t(lang,'nurse.applied')}
+              {/* ── Main card body ── */}
+              <div style={{ padding:'18px 20px' }}>
+                {/* Top row: service + pay + applied/posted */}
+                <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12, marginBottom:12 }}>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', marginBottom:6 }}>
+                      <div style={{ fontSize:15, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.2px' }}>{job.serviceType}</div>
+                      {applied && <span style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:99, background:'#ECFDF5', color:'#059669', border:'1px solid rgba(5,150,105,0.2)' }}>✓ {t(lang,'nurse.applied')}</span>}
                     </div>
-                  ) : (
-                    <button onClick={()=>setExpandedJob(isExpanded?null:job.id)} style={{ fontSize:13, fontWeight:700, padding:'8px 18px', background:isExpanded?C.bgSubtle:C.primary, color:isExpanded?C.textSecondary:'#fff', border:'none', borderRadius:9, cursor:'pointer', fontFamily:F }}>
-                      {isExpanded ? t(lang,'nurse.close') : t(lang,'nurse.applyArrow')}
-                    </button>
-                  )}
-                  <button
-                    onClick={()=>setExpandedJob(expandedJob===`details-${job.id}`?null:`details-${job.id}`)}
-                    style={{ fontSize:11, fontWeight:600, padding:'5px 10px', borderRadius:7, border:`1px solid ${C.border}`, background:'transparent', color:C.textTertiary, cursor:'pointer', display:'flex', alignItems:'center', gap:4 }}>
-                    {expandedJob===`details-${job.id}` ? t(lang,'nurse.hideDetails') : t(lang,'nurse.viewDetails')}
-                    <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                      {expandedJob===`details-${job.id}` ? <polyline points="18 15 12 9 6 15"/> : <polyline points="6 9 12 15 18 9"/>}
-                    </svg>
-                  </button>
+                    {/* Pay chip */}
+                    <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'#F5F3FF', borderRadius:99, padding:'4px 11px', border:'1px solid rgba(124,58,237,0.15)' }}>
+                      <svg width="12" height="12" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                      <span style={{ fontSize:12, fontWeight:800, color:'#7C3AED' }}>€{payRate} {lang==='sq'?'për vizitë':'per visit'}</span>
+                    </div>
+                  </div>
+                  {postedAgo && <span style={{ fontSize:11, color:C.textTertiary, flexShrink:0, marginTop:2 }}>{postedAgo}</span>}
                 </div>
+
+                {/* Info rows */}
+                <div style={{ display:'flex', flexDirection:'column', gap:7, marginBottom:14 }}>
+                  {/* Date + time */}
+                  <div style={{ display:'flex', alignItems:'center', gap:7, fontSize:13, color:C.textSecondary }}>
+                    <div style={{ width:28, height:28, borderRadius:8, background:'#EFF6FF', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:'#2563EB' }}>{iconCal}</div>
+                    <span><strong style={{ color:C.textPrimary }}>{dateStr}</strong> · {timeStr}</span>
+                  </div>
+                  {/* Location */}
+                  <div style={{ display:'flex', alignItems:'center', gap:7, fontSize:13, color:C.textSecondary }}>
+                    <div style={{ width:28, height:28, borderRadius:8, background:'#ECFDF5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:'#059669' }}>{iconPin}</div>
+                    <span>{job.relativeAddress || job.city || 'Albania'}</span>
+                  </div>
+                  {/* Patient */}
+                  {(job.relativeName || job.relativeAge) && (
+                    <div style={{ display:'flex', alignItems:'center', gap:7, fontSize:13, color:C.textSecondary }}>
+                      <div style={{ width:28, height:28, borderRadius:8, background:'#F1F5F9', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:C.textTertiary }}>{iconUser}</div>
+                      <span>{job.relativeName || t(lang,'nurse.patientLabel')}{job.relativeAge ? `, ${lang==='sq'?'mosha':'age'} ${job.relativeAge}` : ''}</span>
+                    </div>
+                  )}
+                  {/* Posted by */}
+                  {job.postedBy && (
+                    <div style={{ display:'flex', alignItems:'center', gap:7, fontSize:12, color:C.textTertiary }}>
+                      <div style={{ width:28, height:28, borderRadius:8, background:'#F8FAFC', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:C.textTertiary }}>{iconNote}</div>
+                      <span>{lang==='sq'?'Postuar nga':'Posted by'} <strong style={{ color:C.textSecondary }}>{job.postedBy}</strong>{job.clientCountry ? ` · ${job.clientCountry}` : ''}</span>
+                    </div>
+                  )}
+                </div>
+
+                {/* Notes strip */}
+                {job.notes && (
+                  <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:9, padding:'9px 12px', marginBottom:14 }}>
+                    <div style={{ fontSize:10, fontWeight:700, color:'#92400E', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'nurse.clientInstructions')}</div>
+                    <div style={{ fontSize:12, color:'#78350F', lineHeight:1.6 }}>{job.notes}</div>
+                  </div>
+                )}
+
+                {/* CTA */}
+                {applied ? (
+                  <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:700, color:'#059669', background:'#ECFDF5', borderRadius:10, padding:'11px 14px', border:'1px solid rgba(5,150,105,0.2)' }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    {lang==='sq'?'Aplikimi u dërgua':'Application submitted'}
+                  </div>
+                ) : (
+                  <button className="jc-apply" onClick={()=>setExpandedJob(isExpanded?null:job.id)} style={{ width:'100%', background:isExpanded?C.bgSubtle:C.primary, color:isExpanded?C.textSecondary:'#fff', border:isExpanded?`1px solid ${C.border}`:'none', borderRadius:10, padding:'12px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>
+                    {isExpanded ? t(lang,'nurse.close') : t(lang,'nurse.applyArrow')}
+                  </button>
+                )}
               </div>
 
-              {/* ── Expanded details panel ── */}
-              {expandedJob===`details-${job.id}` && (
-                <div style={{ borderTop:`1px solid ${C.border}`, padding:'14px 18px', background:C.bgSubtle, display:'flex', flexDirection:'column', gap:10 }}>
-                  <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-                    <div>
-                      <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'nurse.patientLabel')}</div>
-                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{job.relativeName||'—'}</div>
-                      {job.relativeAge && <div style={{ fontSize:11, color:C.textTertiary }}>{t(lang,'nurse.agePrefix')} {job.relativeAge}</div>}
-                    </div>
-                    <div>
-                      <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'nurse.addressLabel')}</div>
-                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{job.relativeAddress||job.city||'—'}</div>
-                    </div>
-                    <div>
-                      <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'nurse.postedBy')}</div>
-                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{job.postedBy}</div>
-                      {job.clientCountry && <div style={{ fontSize:11, color:C.textTertiary }}>{job.clientCountry}</div>}
-                    </div>
-                    <div>
-                      <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'nurse.postedLabel')}</div>
-                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{job.createdAt ? new Date(job.createdAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—'}</div>
-                    </div>
-                  </div>
-                  {job.notes && (
-                    <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:9, padding:'10px 13px' }}>
-                      <div style={{ fontSize:10, fontWeight:700, color:'#92400E', textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:4 }}>{t(lang,'nurse.clientInstructions')}</div>
-                      <div style={{ fontSize:13, color:'#78350F', lineHeight:1.6 }}>{job.notes}</div>
-                    </div>
-                  )}
-                </div>
-              )}
-
               {/* ── Apply panel ── */}
-              {expandedJob === job.id && !applied && (
-                <div style={{ borderTop:`1px solid ${C.border}`, padding:'16px 18px', background:C.bgSubtle }}>
+              {isExpanded && !applied && (
+                <div style={{ borderTop:`1px solid ${C.border}`, padding:'16px 20px', background:'#F8FAFC' }}>
                   <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>{t(lang,'nurse.messageToClient')} <span style={{ fontWeight:400, color:C.textTertiary }}>({t(lang,'nurse.optional')})</span></div>
                   <textarea value={message} onChange={e=>setMessage(e.target.value)} placeholder={t(lang,'nurse.messagePlaceholder')} style={{ width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:13, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box', resize:'vertical', minHeight:70, lineHeight:1.5 }} />
                   <div style={{ display:'flex', gap:8, marginTop:10 }}>
@@ -779,7 +780,7 @@ function BrowseJobs({ nurse, lang='en' }) {
                 </div>
               )}
 
-              {failed && <div style={{ margin:'0 18px 14px', fontSize:12, color:C.error, background:C.errorLight, borderRadius:7, padding:'8px 12px' }}>{statuses[job.id]}</div>}
+              {failed && <div style={{ margin:'0 20px 14px', fontSize:12, color:C.error, background:C.errorLight, borderRadius:7, padding:'8px 12px' }}>{statuses[job.id]}</div>}
             </div>
           );
         })}
