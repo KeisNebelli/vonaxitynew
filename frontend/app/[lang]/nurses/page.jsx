@@ -169,32 +169,35 @@ export default function NursesPage({ params }) {
       <Nav lang={lang} />
 
       {/* Hero */}
-      <section style={{ position:'relative', minHeight:480, display:'flex', alignItems:'center', justifyContent:'center', textAlign:'center', overflow:'hidden' }}>
-        {/* Background image */}
-        <img src="https://images.unsplash.com/photo-1576091160550-2173dba999ef?w=1400&auto=format&fit=crop&q=80" alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
-        {/* Dark gradient overlay */}
-        <div style={{ position:'absolute', inset:0, background:'linear-gradient(160deg, rgba(10,15,40,0.72) 0%, rgba(10,30,80,0.65) 100%)' }} />
-        {/* Content */}
-        <div style={{ position:'relative', zIndex:1, padding:'80px 24px 64px', maxWidth:720, width:'100%' }}>
+      <section style={{ position:'relative', overflow:'hidden', background:'linear-gradient(155deg,#0F172A 0%,#1E3A5F 50%,#1D4ED8 100%)', padding:'80px 24px 72px', textAlign:'center' }}>
+        {/* Grid texture */}
+        <div style={{ position:'absolute', inset:0, opacity:0.05, pointerEvents:'none' }}>
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="ng" width="40" height="40" patternUnits="userSpaceOnUse"><path d="M 40 0 L 0 0 0 40" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#ng)"/></svg>
+        </div>
+        {/* Glow blobs */}
+        <div style={{ position:'absolute', top:-80, right:-80, width:320, height:320, borderRadius:'50%', background:'rgba(37,99,235,0.18)', filter:'blur(80px)', pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', bottom:-60, left:-60, width:250, height:250, borderRadius:'50%', background:'rgba(5,150,105,0.1)', filter:'blur(70px)', pointerEvents:'none' }}/>
+
+        <div style={{ position:'relative', zIndex:1, maxWidth:720, margin:'0 auto' }}>
           <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(147,197,253,1)', background:'rgba(37,99,235,0.25)', border:'1px solid rgba(96,165,250,0.3)', padding:'5px 14px', borderRadius:99, marginBottom:20 }}>
             {tr('nurses.tag')}
           </div>
           <h1 style={{ fontSize:'clamp(30px,5vw,52px)', fontWeight:800, color:'#fff', letterSpacing:'-1.5px', marginBottom:16, lineHeight:1.1 }}>
             {tr('nurses.title')}
           </h1>
-          <p style={{ fontSize:17, color:'rgba(255,255,255,0.78)', maxWidth:520, margin:'0 auto 44px', lineHeight:1.75 }}>
+          <p style={{ fontSize:17, color:'rgba(255,255,255,0.72)', maxWidth:520, margin:'0 auto 44px', lineHeight:1.75 }}>
             {tr('nurses.subtitle')}
           </p>
           {/* Trust badges */}
           <div style={{ display:'flex', justifyContent:'center', gap:12, flexWrap:'wrap' }}>
             {trustBadges.map(([title, sub]) => (
-              <div key={title} style={{ display:'flex', alignItems:'center', gap:10, background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.18)', borderRadius:12, padding:'10px 16px', backdropFilter:'blur(8px)' }}>
-                <div style={{ width:30, height:30, borderRadius:8, background:'rgba(37,99,235,0.5)', display:'flex', alignItems:'center', justifyContent:'center', color:'#93C5FD', flexShrink:0 }}>
+              <div key={title} style={{ display:'flex', alignItems:'center', gap:10, background:'rgba(255,255,255,0.08)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:14, padding:'10px 16px' }}>
+                <div style={{ width:32, height:32, borderRadius:9, background:'rgba(37,99,235,0.4)', display:'flex', alignItems:'center', justifyContent:'center', color:'#93C5FD', flexShrink:0 }}>
                   <ShieldIcon />
                 </div>
                 <div style={{ textAlign:'left' }}>
-                  <div style={{ fontSize:13, fontWeight:600, color:'#fff' }}>{title}</div>
-                  <div style={{ fontSize:11, color:'rgba(255,255,255,0.6)', marginTop:1 }}>{sub}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color:'#fff' }}>{title}</div>
+                  <div style={{ fontSize:11, color:'rgba(255,255,255,0.55)', marginTop:1 }}>{sub}</div>
                 </div>
               </div>
             ))}
@@ -252,12 +255,20 @@ export default function NursesPage({ params }) {
             <style>{`.nurse-cta:hover{background:#1D4ED8!important;transform:translateY(-1px)}.nurse-cta:active{transform:translateY(0)}.nurse-card:hover{box-shadow:0 8px 28px rgba(0,0,0,0.1)!important;transform:translateY(-2px)}`}</style>
           </div>
 
+          <style>{`
+            @keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}
+            .nurse-shimmer{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:600px 100%;animation:shimmer 1.4s infinite}
+            .nurse-card:hover{box-shadow:0 12px 32px rgba(0,0,0,0.1)!important;transform:translateY(-3px)!important}
+            .nurse-card{transition:box-shadow 0.2s,transform 0.2s}
+            .nurse-book:hover{background:#1D4ED8!important;transform:translateY(-1px)}
+            .nurse-book{transition:background 0.15s,transform 0.15s}
+          `}</style>
           {loading ? (
             <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(320px,1fr))', gap:20 }}>
               {[...Array(6)].map((_,i) => (
-                <div key={i} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden', padding:24 }}>
+                <div key={i} style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, overflow:'hidden', padding:24 }}>
                   <div style={{ display:'flex', gap:16, marginBottom:16 }}>
-                    <div style={{ width:64, height:64, borderRadius:16, flexShrink:0 }} className="nurse-shimmer" />
+                    <div style={{ width:68, height:68, borderRadius:18, flexShrink:0 }} className="nurse-shimmer" />
                     <div style={{ flex:1 }}>
                       <div style={{ height:16, borderRadius:8, marginBottom:8, width:'70%' }} className="nurse-shimmer" />
                       <div style={{ height:12, borderRadius:8, marginBottom:8, width:'50%' }} className="nurse-shimmer" />
@@ -266,10 +277,9 @@ export default function NursesPage({ params }) {
                   </div>
                   <div style={{ height:12, borderRadius:8, marginBottom:8, width:'100%' }} className="nurse-shimmer" />
                   <div style={{ height:12, borderRadius:8, marginBottom:8, width:'85%' }} className="nurse-shimmer" />
-                  <div style={{ height:12, borderRadius:8, width:'60%' }} className="nurse-shimmer" />
+                  <div style={{ height:40, borderRadius:10, marginTop:20 }} className="nurse-shimmer" />
                 </div>
               ))}
-              <style>{`@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}.nurse-shimmer{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:600px 100%;animation:shimmer 1.4s infinite}`}</style>
             </div>
           ) : nurses.length === 0 ? (
             <div style={{ textAlign:'center', padding:'80px 24px', color:C.textTertiary }}>
@@ -282,66 +292,82 @@ export default function NursesPage({ params }) {
               {nurses.slice(0, 6).map(nurse => {
                 const available = nurse.available !== false && (nurse.availability?.length > 0 || nurse.available === true);
                 return (
-                  <div key={nurse.id} className="nurse-card" style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 1px 6px rgba(0,0,0,0.05)', transition:'box-shadow 0.2s, transform 0.2s' }}>
-                    <div style={{ padding:'24px 24px 0' }}>
-                      <div style={{ display:'flex', gap:16, alignItems:'flex-start', marginBottom:16 }}>
-                        <NurseAvatar name={nurse.name} photo={nurse.profilePhotoUrl||null} size={64} verified={available} />
+                  <div key={nurse.id} className="nurse-card" style={{ background:C.bgWhite, borderRadius:20, border:`1.5px solid ${C.border}`, overflow:'hidden', boxShadow:'0 2px 8px rgba(0,0,0,0.05)', display:'flex', flexDirection:'column' }}>
+
+                    {/* Card header */}
+                    <div style={{ padding:'22px 22px 0' }}>
+                      <div style={{ display:'flex', gap:14, alignItems:'flex-start', marginBottom:16 }}>
+                        <div style={{ position:'relative', flexShrink:0 }}>
+                          <NurseAvatar name={nurse.name} photo={nurse.profilePhotoUrl||null} size={68} verified={false} />
+                          {available && (
+                            <div style={{ position:'absolute', bottom:2, right:2, width:14, height:14, borderRadius:'50%', background:C.secondary, border:`2px solid ${C.bgWhite}` }} />
+                          )}
+                        </div>
                         <div style={{ flex:1, minWidth:0 }}>
-                          <div style={{ fontSize:17, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{nurse.name}</div>
-                          <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:13, color:C.textTertiary, marginBottom:6 }}>
-                            <MapPinIcon /> {nurse.city}
-                            {nurse.experience && <>
-                              <span style={{ margin:'0 4px', color:C.border }}>·</span>
-                              <BriefcaseIcon /> {nurse.experience} {tr('nurses.yearsExp')}
-                            </>}
+                          <div style={{ fontSize:17, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{nurse.name}</div>
+                          <div style={{ display:'flex', alignItems:'center', gap:5, fontSize:12, color:C.textTertiary, marginBottom:7 }}>
+                            <MapPinIcon /><span>{nurse.city}</span>
+                            {nurse.experience && <><span style={{ color:C.border }}>·</span><BriefcaseIcon /><span>{nurse.experience} {tr('nurses.yearsExp')}</span></>}
                           </div>
-                          {nurse.rating > 0 && <StarRating rating={nurse.rating} size={13} />}
-                          {(nurse.reviewCount > 0 || nurse.totalVisits > 0) && (
-                            <div style={{ fontSize:11, color:C.textTertiary, marginTop:2 }}>
-                              {nurse.reviewCount > 0 && `${nurse.reviewCount} ${tr('nurses.reviews')}`}
-                              {nurse.reviewCount > 0 && nurse.totalVisits > 0 && ' · '}
-                              {nurse.totalVisits > 0 && `${nurse.totalVisits} ${tr('nurses.visits')}`}
+                          {nurse.rating > 0 && (
+                            <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+                              <StarRating rating={nurse.rating} size={12} />
+                              <span style={{ fontSize:11, color:C.textTertiary }}>
+                                {nurse.rating.toFixed(1)}{nurse.reviewCount > 0 && ` (${nurse.reviewCount})`}
+                              </span>
                             </div>
                           )}
                         </div>
                         <div style={{ flexShrink:0 }}>
                           {available ? (
-                            <span style={{ fontSize:11, fontWeight:700, color:C.secondary, background:C.secondaryLight, padding:'4px 10px', borderRadius:99, display:'inline-flex', alignItems:'center', gap:4 }}>
-                              <div style={{ width:6, height:6, borderRadius:'50%', background:C.secondary }} />
+                            <span style={{ fontSize:10, fontWeight:700, color:C.secondary, background:C.secondaryLight, padding:'4px 10px', borderRadius:99, border:`1px solid rgba(5,150,105,0.2)` }}>
                               {tr('nurses.available')}
                             </span>
                           ) : (
-                            <span style={{ fontSize:11, fontWeight:600, color:C.textTertiary, background:C.bgSubtle, padding:'4px 10px', borderRadius:99 }}>
+                            <span style={{ fontSize:10, fontWeight:600, color:C.textTertiary, background:'#F1F5F9', padding:'4px 10px', borderRadius:99 }}>
                               {tr('nurses.unavailable')}
                             </span>
                           )}
                         </div>
                       </div>
 
+                      {/* Bio */}
                       {nurse.bio && (
-                        <p style={{ fontSize:13, color:C.textSecondary, lineHeight:1.65, marginBottom:16, display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
+                        <p style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7, marginBottom:14, display:'-webkit-box', WebkitLineClamp:3, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
                           {nurse.bio}
                         </p>
                       )}
 
-                      {nurse.specialties?.length > 0 && (
-                        <div style={{ display:'flex', flexWrap:'wrap', gap:6, marginBottom:16 }}>
-                          {nurse.specialties.slice(0,4).map(s => (
-                            <span key={s} style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{s}</span>
-                          ))}
-                        </div>
-                      )}
+                      {/* Stat chips */}
+                      <div style={{ display:'flex', gap:8, marginBottom:14, flexWrap:'wrap' }}>
+                        {nurse.totalVisits > 0 && (
+                          <div style={{ display:'flex', alignItems:'center', gap:5, background:'#F0FDF4', borderRadius:99, padding:'5px 10px', border:'1px solid rgba(5,150,105,0.15)' }}>
+                            <svg width="11" height="11" fill="none" stroke={C.secondary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                            <span style={{ fontSize:11, fontWeight:700, color:C.secondary }}>{nurse.totalVisits} {tr('nurses.visits')}</span>
+                          </div>
+                        )}
+                        {nurse.languages?.length > 0 && (
+                          <div style={{ display:'flex', alignItems:'center', gap:5, background:C.primaryLight, borderRadius:99, padding:'5px 10px', border:'1px solid rgba(37,99,235,0.15)' }}>
+                            <svg width="11" height="11" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>
+                            <span style={{ fontSize:11, fontWeight:700, color:C.primary }}>{nurse.languages.join(' · ')}</span>
+                          </div>
+                        )}
+                      </div>
 
-                      {nurse.languages?.length > 0 && (
-                        <div style={{ fontSize:12, color:C.textTertiary, marginBottom:20 }}>
-                          <strong style={{ color:C.textSecondary }}>{tr('nurses.languages')}:</strong>{' '}
-                          {nurse.languages.join(', ')}
+                      {/* Specialty tags */}
+                      {nurse.specialties?.length > 0 && (
+                        <div style={{ display:'flex', flexWrap:'wrap', gap:5, marginBottom:18 }}>
+                          {nurse.specialties.slice(0,4).map(s => (
+                            <span key={s} style={{ fontSize:11, fontWeight:600, padding:'3px 10px', borderRadius:99, background:'#F8FAFC', color:C.textSecondary, border:`1px solid ${C.border}` }}>{s}</span>
+                          ))}
                         </div>
                       )}
                     </div>
 
-                    <div style={{ borderTop:`1px solid ${C.border}`, padding:'14px 24px' }}>
-                      <Link href={`/${lang}/login`} className="nurse-cta" style={{ display:'block', textAlign:'center', padding:'10px', borderRadius:9, background:C.primary, color:'#fff', fontSize:13, fontWeight:700, textDecoration:'none', transition:'background 0.15s, transform 0.15s' }}>
+                    {/* Footer CTA */}
+                    <div style={{ marginTop:'auto', borderTop:`1px solid ${C.border}`, padding:'14px 22px', background:'#FAFBFC' }}>
+                      <Link href={`/${lang}/login`} className="nurse-book" style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:8, padding:'11px', borderRadius:11, background:C.primary, color:'#fff', fontSize:13, fontWeight:700, textDecoration:'none' }}>
+                        <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
                         {lang==='sq' ? 'Hyr për të rezervuar' : 'Sign in to book →'}
                       </Link>
                     </div>

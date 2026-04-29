@@ -298,29 +298,70 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits }) {
       {/* ── Loved one card ── */}
       {relative && (
         <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
-          <div style={{ padding:'16px 20px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', alignItems:'center', gap:14 }}>
-            <div style={{ width:46, height:46, borderRadius:13, background:`linear-gradient(135deg,${C.primary},${C.primaryDark})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-              <span style={{ fontSize:18, fontWeight:800, color:'#fff' }}>{(relative.name||'?').charAt(0).toUpperCase()}</span>
+          {/* Header */}
+          <div style={{ padding:'18px 20px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', alignItems:'center', gap:14 }}>
+            <div style={{ width:50, height:50, borderRadius:14, background:`linear-gradient(135deg,${C.primary},${C.primaryDark})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 4px 12px rgba(37,99,235,0.25)' }}>
+              <span style={{ fontSize:20, fontWeight:800, color:'#fff' }}>{(relative.name||'?').charAt(0).toUpperCase()}</span>
             </div>
             <div style={{ flex:1 }}>
-              <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:2 }}>{relative.name}</div>
-              <div style={{ fontSize:12, color:C.textSecondary }}>{relative.city}{relative.age?` · ${relative.age} ${lang==='sq'?'vjeç':'yrs'}`:''}</div>
-            </div>
-            <span style={{ fontSize:11, fontWeight:700, padding:'4px 12px', borderRadius:99, background:C.secondaryLight, color:C.secondary, flexShrink:0 }}>{tr('dashboard.activeCare')}</span>
-          </div>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr' }}>
-            {[
-              { label:tr('dashboard.address'), val:relative.address||'—', icon:<svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
-              { label:tr('dashboard.assignedNurse'), val:next?.nurse?.user?.name||tr('dashboard.beingAssigned'), icon:<svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
-            ].map(({label,val,icon},i)=>(
-              <div key={i} style={{ padding:'14px 20px', borderRight:i===0?`1px solid ${C.borderSubtle}`:'none' }}>
-                <div style={{ display:'flex', alignItems:'center', gap:5, color:C.textTertiary, marginBottom:5 }}>
-                  {icon}
-                  <span style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{label}</span>
-                </div>
-                <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{val}</div>
+              <div style={{ fontSize:16, fontWeight:800, color:C.textPrimary, marginBottom:6, letterSpacing:'-0.3px' }}>{relative.name}</div>
+              <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                {relative.city && <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{relative.city}</span>}
+                {relative.age && <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.bgSubtle, color:C.textSecondary }}>{relative.age} {lang==='sq'?'vjeç':'yrs'}</span>}
               </div>
-            ))}
+            </div>
+            <span style={{ fontSize:11, fontWeight:700, padding:'5px 13px', borderRadius:99, background:C.secondaryLight, color:C.secondary, flexShrink:0, border:`1px solid rgba(5,150,105,0.2)` }}>{tr('dashboard.activeCare')}</span>
+          </div>
+
+          {/* Address — full width */}
+          <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.borderSubtle}` }}>
+            <div style={{ display:'flex', alignItems:'center', gap:5, color:C.textTertiary, marginBottom:5 }}>
+              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+              <span style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{tr('dashboard.address')}</span>
+            </div>
+            <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{relative.address||'—'}</div>
+          </div>
+
+          {/* 2-col info grid */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr' }}>
+            {/* Assigned Nurse */}
+            <div style={{ padding:'14px 20px', borderRight:`1px solid ${C.borderSubtle}`, borderBottom:`1px solid ${C.borderSubtle}` }}>
+              <div style={{ display:'flex', alignItems:'center', gap:5, color:C.textTertiary, marginBottom:5 }}>
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{tr('dashboard.assignedNurse')}</span>
+              </div>
+              <div style={{ fontSize:13, fontWeight:600, color: next?.nurse?.user?.name ? C.secondary : C.textTertiary }}>
+                {next?.nurse?.user?.name || tr('dashboard.beingAssigned')}
+              </div>
+            </div>
+            {/* Completed visits */}
+            <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.borderSubtle}` }}>
+              <div style={{ display:'flex', alignItems:'center', gap:5, color:C.textTertiary, marginBottom:5 }}>
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+                <span style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{lang==='sq'?'Vizita Kompletuar':'Completed Visits'}</span>
+              </div>
+              <div style={{ fontSize:13, fontWeight:700, color:C.secondary }}>{completed.length}</div>
+            </div>
+            {/* Last visit */}
+            <div style={{ padding:'14px 20px', borderRight:`1px solid ${C.borderSubtle}` }}>
+              <div style={{ display:'flex', alignItems:'center', gap:5, color:C.textTertiary, marginBottom:5 }}>
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                <span style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{lang==='sq'?'Vizita e Fundit':'Last Visit'}</span>
+              </div>
+              <div style={{ fontSize:13, fontWeight:600, color: last ? C.textPrimary : C.textTertiary }}>
+                {last ? new Date(last.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—'}
+              </div>
+            </div>
+            {/* Upcoming */}
+            <div style={{ padding:'14px 20px' }}>
+              <div style={{ display:'flex', alignItems:'center', gap:5, color:C.textTertiary, marginBottom:5 }}>
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                <span style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{lang==='sq'?'Të Ardhshme':'Upcoming'}</span>
+              </div>
+              <div style={{ fontSize:13, fontWeight:600, color: upcoming.length > 0 ? C.primary : C.textTertiary }}>
+                {upcoming.length > 0 ? `${upcoming.length} ${lang==='sq'?'planifikuar':'scheduled'}` : (lang==='sq'?'Asnjë':'None')}
+              </div>
+            </div>
           </div>
         </div>
       )}
