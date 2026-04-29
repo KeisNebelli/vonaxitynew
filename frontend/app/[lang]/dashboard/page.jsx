@@ -489,8 +489,25 @@ function Visits({ visits, lang, onViewApplicants, onRefresh, viewingDetail: _vie
   const [reviewed, setReviewed] = useState({});
   const [submitting, setSubmitting] = useState(false);
   const [reviewError, setReviewError] = useState('');
-  const [editing, setEditing] = useState(null); // visit object
-  const [deleting, setDeleting] = useState(null); // visit object
+  const [editing, setEditing] = useState(null);
+  const [deleting, setDeleting] = useState(null);
+  const [filter, setFilter] = useState('all');
+
+  const OPEN_STATUSES = ['UNASSIGNED','PENDING','ACCEPTED','NURSE_ON_WAY','NURSE_ARRIVED'];
+  const FILTERS = [
+    { id:'all',       label: lang==='sq' ? 'Të gjitha' : 'All' },
+    { id:'open',      label: lang==='sq' ? 'Hapura'    : 'Open' },
+    { id:'pending',   label: lang==='sq' ? 'Në pritje' : 'Pending' },
+    { id:'completed', label: lang==='sq' ? 'Kompletuar': 'Completed' },
+  ];
+
+  const filteredVisits = visits.filter(v => {
+    if (filter === 'all')       return true;
+    if (filter === 'open')      return OPEN_STATUSES.includes(v.status);
+    if (filter === 'pending')   return v.status === 'UNASSIGNED';
+    if (filter === 'completed') return v.status === 'COMPLETED';
+    return true;
+  });
 
   const canEdit = (v) => v.status === 'UNASSIGNED';
   const canDelete = (v) => !['COMPLETED'].includes(v.status) && !['PENDING','ACCEPTED'].includes(v.status);
@@ -516,8 +533,41 @@ function Visits({ visits, lang, onViewApplicants, onRefresh, viewingDetail: _vie
   );
   return (
     <>
+    {/* Filter tabs */}
+    <div style={{ display:'flex', gap:6, marginBottom:16, background:C.bgSubtle, borderRadius:10, padding:4, width:'fit-content' }}>
+      {FILTERS.map(f => {
+        const count = f.id === 'all' ? visits.length
+          : f.id === 'open'      ? visits.filter(v => OPEN_STATUSES.includes(v.status)).length
+          : f.id === 'pending'   ? visits.filter(v => v.status === 'UNASSIGNED').length
+          : visits.filter(v => v.status === 'COMPLETED').length;
+        return (
+          <button key={f.id} onClick={() => setFilter(f.id)} style={{
+            padding: '6px 14px', borderRadius: 7, border: 'none', cursor: 'pointer',
+            fontSize: 13, fontWeight: 600, fontFamily: F,
+            background: filter === f.id ? C.bgWhite : 'transparent',
+            color: filter === f.id ? C.textPrimary : C.textTertiary,
+            boxShadow: filter === f.id ? '0 1px 4px rgba(0,0,0,0.08)' : 'none',
+            display: 'flex', alignItems: 'center', gap: 6,
+            transition: 'all 0.15s',
+          }}>
+            {f.label}
+            {count > 0 && (
+              <span style={{ fontSize: 11, fontWeight: 700, background: filter === f.id ? C.primaryLight : C.border, color: filter === f.id ? C.primary : C.textTertiary, borderRadius: 99, padding: '1px 6px', minWidth: 18, textAlign: 'center' }}>
+                {count}
+              </span>
+            )}
+          </button>
+        );
+      })}
+    </div>
+
+    {filteredVisits.length === 0 && (
+      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'36px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
+        {lang==='sq' ? 'Nuk ka vizita në këtë kategori.' : 'No visits in this category.'}
+      </div>
+    )}
     <div>
-      {visits.map(v=>(
+      {filteredVisits.map(v=>(
         <div key={v.id} style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'18px 20px', marginBottom:12, boxShadow:SSM }}>
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:v.bpSystolic||v.status==='UNASSIGNED'?14:0 }}>
             <div>
