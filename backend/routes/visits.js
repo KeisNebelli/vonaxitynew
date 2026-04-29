@@ -503,6 +503,41 @@ router.post('/:id/complete', ...requireRole('NURSE'), async (req, res) => {
   }
 });
 
+// GET /visits/vitals/:relativeId — health vitals history for a patient
+router.get('/vitals/:relativeId', authMiddleware, async (req, res) => {
+  try {
+    const { userId, role } = req.user;
+    const { relativeId } = req.params;
+    const relative = await prisma.relative.findUnique({ where: { id: relativeId }, select: { id:true, name:true, age:true, city:true, clientId:true } });
+    if (!relative) return res.status(404).json({ error: 'Patient not found' });
+    if (role === 'CLIENT' && relative.clientId !== userId) return res.status(403).json({ error: 'Access denied' });
+    if (role === 'NURSE') {
+      const nurse = await prisma.nurse.findUnique({ where: { userId } });
+      if (!nurse) return res.status(404).json({ error: 'Nurse not found' });
+      const linked = await prisma.visit.findFirst({ where: { relativeId, nurseId: nurse.id } });
+      if (!linked) return res.status(403).json({ error: 'Access denied' });
+    }
+    const visits = await prisma.visit.findMany({
+      where: {
+        relativeId,
+        status: 'COMPLETED',
+        OR: [{ bpSystolic: { not: null } }, { heartRate: { not: null } }, { glucose: { not: null } }, { oxygenSat: { not: null } }, { temperature: { not: null } }],
+      },
+      orderBy: { completedAt: 'asc' },
+      select: {
+        id: true, completedAt: true, scheduledAt: true, serviceType: true,
+        bpSystolic: true, bpDiastolic: true, heartRate: true, glucose: true,
+        temperature: true, oxygenSat: true, nurseNotes: true,
+        nurse: { select: { user: { select: { name: true } } } },
+      },
+    });
+    res.json({ vitals: visits, relative });
+  } catch (err) {
+    console.error('Vitals fetch error:', err);
+    res.status(500).json({ error: 'Failed to fetch vitals' });
+  }
+});
+
 module.exports = router;
 
 // POST /visits/:id/review — client submits review after completed visit

@@ -106,6 +106,9 @@ export const api = {
   markPayoutPaid: (id) => apiFetch(`/payouts/${id}/pay`, { method: 'PUT' }),
   rejectPayout: (id) => apiFetch(`/payouts/${id}/reject`, { method: 'PUT' }),
 
+  // Health / Vitals
+  getVitals: (relativeId) => apiFetch(`/visits/vitals/${relativeId}`),
+
   // Analytics
   getAnalytics: () => apiFetch('/analytics'),
 
