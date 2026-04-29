@@ -2,7 +2,6 @@ import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { t } from '@/translations';
-import AlbaniaMap from '@/components/visuals/AlbaniaMap';
 
 const C = {
   primary: '#2563EB', primaryLight: '#EFF6FF', primaryDark: '#1D4ED8',
@@ -13,15 +12,25 @@ const C = {
   warning: '#D97706', warningLight: '#FFFBEB',
 };
 
-const CITIES = [
-  { name: 'Tirana', note: { en: 'Capital · Most nurses', sq: 'Kryeqyteti' } },
-  { name: 'Durrës', note: { en: 'Coastal city', sq: 'Bregdetar' } },
-  { name: 'Elbasan', note: { en: 'Central Albania', sq: 'Shqipëria qendrore' } },
-  { name: 'Fier', note: { en: 'Southern hub', sq: 'Jugu' } },
-  { name: 'Berat', note: { en: 'UNESCO city', sq: 'UNESCO' } },
-  { name: 'Sarandë', note: { en: 'Riviera region', sq: 'Riviera' } },
-  { name: 'Kukës', note: { en: 'Northern Albania', sq: 'Veriu' } },
-  { name: 'Shkodër', note: { en: 'Northern hub', sq: 'Veri-qendër' } },
+const LAUNCH_CITIES = [
+  {
+    name: 'Tirana',
+    icon: '🏛️',
+    stat1: { en: 'Albania\'s capital', sq: 'Kryeqyteti' },
+    stat2: { en: 'Largest nurse network', sq: 'Rrjeti më i madh' },
+    gradient: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
+    accentColor: '#2563EB',
+    accentLight: '#DBEAFE',
+  },
+  {
+    name: 'Durrës',
+    icon: '🌊',
+    stat1: { en: 'Coastal hub', sq: 'Qendra bregdetare' },
+    stat2: { en: 'Full coverage at launch', sq: 'Mbulim i plotë' },
+    gradient: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)',
+    accentColor: '#059669',
+    accentLight: '#D1FAE5',
+  },
 ];
 
 const DEFAULT_PRICING = { basicPrice: 30, standardPrice: 50, premiumPrice: 120, basicVisits: 1, standardVisits: 2, premiumVisits: 4 };
@@ -297,28 +306,94 @@ export default async function HomePage({ params }) {
         </div>
       </section>
 
-      {/* ── Cities with Albania Map ── */}
-      <section style={{ padding:'80px 24px', background:C.bgWhite }}>
+      {/* ── Cities ── */}
+      <section style={{ padding:'96px 24px', background:'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)' }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 400px', gap:60, alignItems:'center' }}>
-            <div>
-              <TAG>{t(lang,'cities.tag')}</TAG>
-              <h2 style={{ fontSize:'clamp(28px,4vw,42px)', fontWeight:700, color:C.textPrimary, margin:'0 0 16px', letterSpacing:'-1px' }}>{t(lang,'cities.title')}</h2>
-              <p style={{ fontSize:16, color:C.textSecondary, lineHeight:1.7, marginBottom:32, maxWidth:440 }}>{t(lang,'cities.subtitle')}</p>
-              <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
-                {CITIES.map(city => (
-                  <div key={city.name} className="hp-city-card" style={{ background:C.bg, borderRadius:12, border:`1px solid ${C.border}`, padding:'12px 16px', display:'flex', alignItems:'center', gap:10 }}>
-                    <div style={{ width:8, height:8, borderRadius:'50%', background:C.secondary, flexShrink:0 }} />
-                    <div>
-                      <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{city.name}</div>
-                      <div style={{ fontSize:11, color:C.textTertiary }}>{city.note[lang]||city.note.en}</div>
+          {/* Header */}
+          <div style={{ textAlign:'center', marginBottom:56 }}>
+            <TAG>{t(lang,'cities.tag')}</TAG>
+            <h2 style={{ fontSize:'clamp(30px,4vw,46px)', fontWeight:800, color:C.textPrimary, margin:'0 0 16px', letterSpacing:'-1.5px' }}>
+              {t(lang,'cities.title')}
+            </h2>
+            <p style={{ fontSize:17, color:C.textSecondary, lineHeight:1.7, maxWidth:520, margin:'0 auto' }}>
+              {t(lang,'cities.subtitle')}
+            </p>
+          </div>
+
+          {/* Launch city cards */}
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:24, maxWidth:780, margin:'0 auto 24px' }}>
+            {LAUNCH_CITIES.map(city => (
+              <div key={city.name} style={{
+                background: city.gradient,
+                borderRadius: 20,
+                border: `1.5px solid ${city.accentColor}22`,
+                padding: '32px 28px',
+                position: 'relative',
+                overflow: 'hidden',
+                boxShadow: `0 4px 32px ${city.accentColor}18`,
+              }}>
+                {/* Launch badge */}
+                <div style={{
+                  display: 'inline-flex',
+                  alignItems: 'center',
+                  gap: 6,
+                  background: city.accentColor,
+                  color: '#fff',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  letterSpacing: '0.5px',
+                  padding: '5px 12px',
+                  borderRadius: 99,
+                  marginBottom: 20,
+                  textTransform: 'uppercase',
+                }}>
+                  <span style={{ width:6, height:6, borderRadius:'50%', background:'rgba(255,255,255,0.7)', display:'inline-block', animation:'pulse 2s infinite' }}/>
+                  {t(lang,'cities.launchBadge')}
+                </div>
+
+                {/* City name */}
+                <div style={{ fontSize: 36, fontWeight: 800, color: C.textPrimary, letterSpacing: '-1.5px', lineHeight: 1, marginBottom: 8 }}>
+                  {city.name}
+                </div>
+
+                {/* Stats */}
+                <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
+                  {[city.stat1, city.stat2].map((stat, i) => (
+                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                      <div style={{ width: 7, height: 7, borderRadius: '50%', background: city.accentColor, flexShrink: 0 }} />
+                      <span style={{ fontSize: 13, fontWeight: 600, color: city.accentColor }}>
+                        {stat[lang] || stat.en}
+                      </span>
                     </div>
-                  </div>
-                ))}
+                  ))}
+                </div>
+
+                {/* Decorative map-pin */}
+                <div style={{ position: 'absolute', bottom: 20, right: 24, opacity: 0.08 }}>
+                  <svg width="80" height="80" viewBox="0 0 24 24" fill={city.accentColor} stroke="none">
+                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
+                  </svg>
+                </div>
               </div>
+            ))}
+          </div>
+
+          {/* Coming soon strip */}
+          <div style={{ maxWidth: 780, margin: '0 auto', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 14, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
+            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+              </svg>
+              <span style={{ fontSize: 12, fontWeight: 600, color: C.textTertiary, whiteSpace: 'nowrap' }}>
+                {t(lang,'cities.comingSoonLabel')}
+              </span>
             </div>
-            <div style={{ display:'flex', justifyContent:'center' }}>
-              <AlbaniaMap lang={lang} />
+            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', flex: 1 }}>
+              {['Elbasan','Fier','Berat','Sarandë','Shkodër','Kukës'].map(c => (
+                <span key={c} style={{ fontSize: 12, fontWeight: 600, color: C.textSecondary, background: C.bgWhite, border: `1px solid ${C.border}`, borderRadius: 99, padding: '4px 12px' }}>
+                  {c}
+                </span>
+              ))}
             </div>
           </div>
         </div>
