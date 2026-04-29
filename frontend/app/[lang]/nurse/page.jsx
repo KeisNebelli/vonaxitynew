@@ -537,37 +537,138 @@ function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
   );
 }
 
-function Earnings({ lang='en', nurse=null }) {
-  const tr = (key) => t(lang, key);
-  const payRate = nurse?.payRatePerVisit || 20;
-  const totalEarnings = nurse?.totalEarnings || 0;
-  const totalVisits = nurse?.totalVisits || 0;
-  const rating = nurse?.rating || 0;
+function EarningsRow({ visit, payRate, lang }) {
+  const [hov, setHov] = useState(false);
+  const date = visit.completedAt || visit.scheduledAt;
+  const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
+  const patient = visit.relative?.name || visit.clientName || '—';
+  const service = visit.serviceType || '—';
   return (
-    <div>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12, marginBottom:24 }}>
-        {[[tr('nurse.totalEarned'),`€${totalEarnings}`,C.secondary],[tr('nurse.totalVisits'),totalVisits,C.primary],[tr('nurse.rating'),rating>0?rating:'N/A',C.warning],[tr('nurse.payRate'),`€${payRate}/visit`,C.purple]].map(([label,value,color]) => (
-          <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'16px 18px' }}>
-            <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
-            <div style={{ fontSize:22, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
+    <tr
+      onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
+      style={{ borderBottom:`1px solid ${C.borderSubtle}`, background:hov?C.bgSubtle:C.bgWhite, transition:'background 0.1s' }}>
+      <td style={{ padding:'13px 16px', fontSize:13, color:C.textPrimary, whiteSpace:'nowrap', fontWeight:500 }}>
+        {fmtDate(date)}
+      </td>
+      <td style={{ padding:'13px 16px', fontSize:13, color:C.textSecondary }}>
+        {patient}
+      </td>
+      <td style={{ padding:'13px 16px', fontSize:12, color:C.textTertiary, maxWidth:180, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+        {service}
+      </td>
+      <td style={{ padding:'13px 16px' }}>
+        <span style={{ fontSize:14, fontWeight:800, color:C.secondary }}>€{payRate}</span>
+      </td>
+      <td style={{ padding:'13px 16px' }}>
+        <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99,
+          background:'#ECFDF5', color:'#059669', border:'1px solid #86efac44' }}>
+          {lang==='sq'?'E fituar':'Earned'}
+        </span>
+      </td>
+    </tr>
+  );
+}
+
+function Earnings({ lang='en', nurse=null, visits=[] }) {
+  const tr = (key) => t(lang, key);
+  const payRate     = nurse?.payRatePerVisit || 20;
+  const rating      = nurse?.rating || 0;
+
+  // Use real completed visits for history
+  const completedVisits = [...visits]
+    .filter(v => v.status === 'COMPLETED')
+    .sort((a,b) => new Date(b.completedAt||b.scheduledAt) - new Date(a.completedAt||a.scheduledAt));
+
+  const totalVisits   = completedVisits.length;
+  const totalEarnings = totalVisits * payRate;
+
+  const statCards = [
+    { label: lang==='sq'?'Fituar gjithsej':'Total Earned',    value:`€${totalEarnings}`, color:C.secondary },
+    { label: lang==='sq'?'Gjithsej vizita':'Total Visits',    value:totalVisits,          color:C.primary   },
+    { label: lang==='sq'?'Vlerësimi':'Rating',                value:rating>0?rating:'N/A',color:C.warning   },
+    { label: lang==='sq'?'Tarifa e pagesës':'Pay Per Visit',  value:`€${payRate}/visit`,  color:C.purple    },
+  ];
+
+  return (
+    <div style={{ display:'flex', flexDirection:'column', gap:16, fontFamily:F }}>
+
+      {/* Stat cards */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(140px,1fr))', gap:12 }}>
+        {statCards.map(({ label, value, color }) => (
+          <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'16px 18px', boxShadow:'0 1px 3px rgba(15,23,42,0.05)' }}>
+            <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.6px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
+            <div style={{ fontSize:22, fontWeight:800, color, letterSpacing:'-0.5px' }}>{value}</div>
           </div>
         ))}
       </div>
-      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
-        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:6 }}>{tr('nurse.paymentHistoryTitle')}</div>
-        <div style={{ fontSize:12, color:C.textTertiary, marginBottom:20 }}>{tr('nurse.payRateLabel')}: <strong style={{ color:C.textPrimary }}>€{payRate} {tr('nurse.perVisit')}</strong> · {tr('nurse.processedViaWise')}</div>
-        {totalVisits > 0 ? (
-          <div style={{ background:C.bgSubtle, borderRadius:10, padding:'16px 18px' }}>
-            <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:4 }}>{tr('nurse.totalEarnedToDate')}</div>
-            <div style={{ fontSize:28, fontWeight:800, color:C.secondary, letterSpacing:'-0.5px' }}>€{totalEarnings}</div>
-            <div style={{ fontSize:12, color:C.textTertiary, marginTop:6 }}>{tr('nurse.fromVisits')} {totalVisits} {totalVisits!==1?tr('nurse.completedVisitsPlural'):tr('nurse.completedVisits')} · €{payRate} {tr('nurse.perVisit')}</div>
-            <div style={{ marginTop:16, fontSize:12, color:C.textTertiary, background:C.primaryLight, borderRadius:8, padding:'10px 14px', border:`1px solid rgba(37,99,235,0.15)` }}>
-              {tr('nurse.payoutInfo')} <strong>hello@vonaxity.com</strong> {tr('nurse.payoutContact')}
+
+      {/* Payout info strip */}
+      <div style={{ background:'#EFF6FF', borderRadius:10, border:'1px solid #BFDBFE', padding:'11px 16px',
+        display:'flex', alignItems:'center', gap:10, fontSize:12, color:'#1E40AF' }}>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+          <circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/>
+        </svg>
+        <span>
+          {lang==='sq'
+            ? <>Pagesat përpunohen javore nëpërmjet Wise. Kontaktoni <strong>hello@vonaxity.com</strong> për pyetje.</>
+            : <>Payments processed weekly via Wise. Contact <strong>hello@vonaxity.com</strong> for questions.</>}
+        </span>
+      </div>
+
+      {/* Per-visit history */}
+      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 1px 3px rgba(15,23,42,0.05)' }}>
+        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.border}`,
+          display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+          <div>
+            <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>
+              {lang==='sq'?'Historia e pagesave':'Payment History'}
+            </div>
+            <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>
+              {lang==='sq'?'Tarifa':'Rate'}: <strong style={{ color:C.textPrimary }}>€{payRate} {lang==='sq'?'për vizitë':'per visit'}</strong>
             </div>
           </div>
+          <span style={{ fontSize:12, color:C.textTertiary }}>
+            {totalVisits} {lang==='sq'?'vizita':'visits'}
+          </span>
+        </div>
+
+        {completedVisits.length > 0 ? (
+          <div style={{ overflowX:'auto' }}>
+            <table style={{ width:'100%', borderCollapse:'collapse' }}>
+              <thead>
+                <tr style={{ background:C.bgSubtle }}>
+                  {[lang==='sq'?'Data':'Date', lang==='sq'?'Pacienti':'Patient',
+                    lang==='sq'?'Shërbimi':'Service', lang==='sq'?'Shuma':'Amount',
+                    lang==='sq'?'Statusi':'Status'].map(h=>(
+                    <th key={h} style={{ padding:'9px 16px', textAlign:'left', fontSize:10,
+                      fontWeight:700, color:C.textTertiary, textTransform:'uppercase',
+                      letterSpacing:'0.5px', borderBottom:`1px solid ${C.border}`, whiteSpace:'nowrap' }}>{h}</th>
+                  ))}
+                </tr>
+              </thead>
+              <tbody>
+                {completedVisits.map((v,i) => (
+                  <EarningsRow key={v.id||i} visit={v} payRate={payRate} lang={lang}/>
+                ))}
+              </tbody>
+            </table>
+          </div>
         ) : (
-          <div style={{ textAlign:'center', padding:'24px 0', color:C.textTertiary, fontSize:13 }}>
-            {tr('nurse.noVisitsEarning')}
+          <div style={{ textAlign:'center', padding:'48px 24px', color:C.textTertiary }}>
+            <div style={{ width:44, height:44, borderRadius:12, background:C.bgSubtle,
+              display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 12px' }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke={C.textTertiary} strokeWidth="2" strokeLinecap="round">
+                <line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/>
+              </svg>
+            </div>
+            <div style={{ fontSize:14, fontWeight:600, color:C.textSecondary, marginBottom:4 }}>
+              {lang==='sq'?'Nuk ka pagesa akoma':'No payments yet'}
+            </div>
+            <div style={{ fontSize:12, lineHeight:1.7 }}>
+              {lang==='sq'
+                ? 'Pagesat do të shfaqen pasi të kompletoni vizitat tuaja.'
+                : 'Payments will appear here after you complete visits.'}
+            </div>
           </div>
         )}
       </div>
@@ -1461,7 +1562,7 @@ export default function NursePage({ params }) {
               {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} />}
               {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} onStatusChange={handleStatusChange} lang={lang} />}
               {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
-              {active==='earnings' && <Earnings lang={lang} nurse={nurse} />}
+              {active==='earnings' && <Earnings lang={lang} nurse={nurse} visits={visits} />}
               {active==='profile' && <NurseProfile lang={lang} nurse={nurse} />}
               {active==='health' && <HealthProgress visits={visits} lang={lang} nurseMode={true} />}
             </div>
