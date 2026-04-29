@@ -9,7 +9,7 @@ const translations = {
       signOut:'Sign out', ourNurses:'Our Nurses',
     },
     hero: {
-      badge:'Serving Albania · Est. 2024',
+      badge:'Serving Albania · Est. 2026',
       headline1:'Care for your loved ones',
       headline2:'wherever you are.',
       subtitle:'Vonaxity brings professional nurse home visits to your family in Albania. Book from anywhere in the world.',
@@ -571,7 +571,7 @@ const translations = {
       signOut:'Dil', ourNurses:'Infermierët tanë',
     },
     hero: {
-      badge:'Duke shërbyer Shqipërinë · Est. 2024',
+      badge:'Duke shërbyer Shqipërinë · Est. 2026',
       headline1:'Kujdesi për të dashurit tuaj',
       headline2:'kudo që të jeni.',
       subtitle:'Vonaxity sjell vizita shtëpiake profesionale nga infermierë certifikuar për familjen tuaj në Shqipëri.',
