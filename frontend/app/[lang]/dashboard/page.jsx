@@ -658,21 +658,26 @@ function VisitDetailModal({ visit, lang, onClose }) {
 
   return (
     <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', zIndex:9000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }} onClick={onClose}>
-      <div onClick={e=>e.stopPropagation()} style={{ background:C.bgWhite, borderRadius:20, padding:'28px', maxWidth:540, width:'100%', boxShadow:'0 24px 64px rgba(0,0,0,0.18)', maxHeight:'90vh', overflowY:'auto' }}>
+      <div onClick={e=>e.stopPropagation()} style={{ background:C.bgWhite, borderRadius:20, maxWidth:540, width:'100%', boxShadow:'0 24px 64px rgba(0,0,0,0.18)', maxHeight:'90vh', display:'flex', flexDirection:'column', overflow:'hidden' }}>
 
-        {/* Header */}
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:22 }}>
-          <div>
-            <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:6 }}>{lang==='sq'?'Raport Vizite':'Visit Report'}</div>
-            <div style={{ fontSize:20, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4 }}>{serviceLabel(visit.serviceType)}</div>
-            <div style={{ fontSize:13, color:C.textSecondary }}>
-              {new Date(visit.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
-              {' · '}
-              {new Date(visit.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+        {/* Sticky header */}
+        <div style={{ padding:'24px 28px 18px', borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+            <div>
+              <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:6 }}>{lang==='sq'?'Raport Vizite':'Visit Report'}</div>
+              <div style={{ fontSize:20, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4 }}>{serviceLabel(visit.serviceType)}</div>
+              <div style={{ fontSize:13, color:C.textSecondary }}>
+                {new Date(visit.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
+                {' · '}
+                {new Date(visit.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+              </div>
             </div>
+            <button onClick={onClose} style={{ background:C.bgSubtle, border:'none', borderRadius:9, width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary, fontSize:16, flexShrink:0 }}>✕</button>
           </div>
-          <button onClick={onClose} style={{ background:C.bgSubtle, border:'none', borderRadius:9, width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary, fontSize:16, flexShrink:0 }}>✕</button>
         </div>
+
+        {/* Scrollable body */}
+        <div style={{ overflowY:'auto', padding:'20px 28px', flex:1 }}>
 
         {/* Patient */}
         {visit.relative && (
@@ -759,14 +764,17 @@ function VisitDetailModal({ visit, lang, onClose }) {
           </div>
         )}
 
-        {/* Footer */}
-        <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:16, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+        </div>{/* end scrollable body */}
+
+        {/* Sticky footer */}
+        <div style={{ padding:'14px 28px', borderTop:`1px solid ${C.border}`, flexShrink:0, display:'flex', justifyContent:'space-between', alignItems:'center', background:C.bgWhite }}>
           <Badge s="COMPLETED" lang={lang} />
           {visit.workOrderNumber && <span style={{ fontSize:12, color:C.textTertiary, fontWeight:500 }}>#{visit.workOrderNumber}</span>}
           <button onClick={onClose} style={{ fontSize:13, fontWeight:600, padding:'9px 20px', borderRadius:9, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.textSecondary }}>
             {lang==='sq'?'Mbyll':'Close'}
           </button>
         </div>
+
       </div>
     </div>
   );
