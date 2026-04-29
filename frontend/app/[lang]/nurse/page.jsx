@@ -19,6 +19,28 @@ const CITIES = ['Tirana','Durrës','Elbasan','Fier','Berat','Sarandë','Kukës',
 const SPECIALTIES_LIST = ['Blood Pressure','Glucose Monitoring','Vitals','Blood Work','Welfare Check','General Nursing','Post-surgical Care','Paediatric Care'];
 const SERVICES_LIST = ['Blood Pressure Check','Glucose Monitoring','Vitals Monitoring','Blood Work Collection','Welfare Check','Post-surgical Care','Medication Administration','General Nursing'];
 const LANGUAGES_LIST = ['Albanian','English','Italian','Greek','German','French'];
+
+// Service-type translations (en → sq)
+const SERVICE_SQ = {
+  'Blood Pressure Check':      'Kontroll i Presionit të Gjakut',
+  'Glucose Monitoring':        'Monitorim i Glukozës',
+  'Vitals Monitoring':         'Monitorim i Shenjave Vitale',
+  'Blood Work Collection':     'Marrja e Mostrave të Gjakut',
+  'Welfare Check':             'Kontroll i Mirëqenies',
+  'Post-surgical Care':        'Kujdes Post-operativ',
+  'Medication Administration': 'Administrim i Barnave',
+  'General Nursing':           'Kujdes i Përgjithshëm Infermieristik',
+  'Blood Pressure + Glucose Check': 'Presioni + Glukoza',
+  'Vitals Check':              'Kontroll Vital',
+  'Blood Work':                'Analizë Gjaku',
+  'Paediatric Care':           'Kujdes Pediatrik',
+};
+
+function trService(serviceType, lang) {
+  if (!serviceType) return '—';
+  if (lang !== 'sq') return serviceType;
+  return SERVICE_SQ[serviceType] || serviceType;
+}
 const EXPERIENCE_LIST = ['Less than 1 year','1-2 years','3-5 years','6-10 years','10+ years'];
 
 const NAV_ITEMS = [
@@ -511,7 +533,7 @@ function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
           <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>{visit.relative?.name || visit.clientName || 'Patient'}</div>
           {visit.workOrderNumber && <span style={{ fontSize:10, fontWeight:700, color:'#fff', background:'rgba(37,99,235,0.5)', padding:'2px 8px', borderRadius:99, letterSpacing:'0.5px' }}>{visit.workOrderNumber}</span>}
         </div>
-        <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{visit.serviceType} · {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
+        <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{trService(visit.serviceType, lang)} · {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
         {visit.relative?.address && <div style={{ fontSize:12, color:'#3B82F6', marginTop:2, opacity:0.8 }}>📍 {visit.relative.address}</div>}
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:16 }}>
@@ -542,7 +564,7 @@ function EarningsRow({ visit, payRate, lang }) {
   const date = visit.completedAt || visit.scheduledAt;
   const fmtDate = (d) => d ? new Date(d).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'}) : '—';
   const patient = visit.relative?.name || visit.clientName || '—';
-  const service = visit.serviceType || '—';
+  const service = trService(visit.serviceType, lang) || '—';
   return (
     <tr
       onMouseEnter={()=>setHov(true)} onMouseLeave={()=>setHov(false)}
@@ -808,7 +830,7 @@ function BrowseJobs({ nurse, lang='en' }) {
                 <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12, marginBottom:12 }}>
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', marginBottom:6 }}>
-                      <div style={{ fontSize:15, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.2px' }}>{job.serviceType}</div>
+                      <div style={{ fontSize:15, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.2px' }}>{trService(job.serviceType, lang)}</div>
                       {applied && <span style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:99, background:'#ECFDF5', color:'#059669', border:'1px solid rgba(5,150,105,0.2)' }}>✓ {t(lang,'nurse.applied')}</span>}
                     </div>
                     {/* Pay chip */}
