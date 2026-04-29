@@ -163,60 +163,165 @@ function NotificationBell({ lang, onNavigate }) {
   );
 }
 
-function Overview({ user, visits, relative, lang, onBook }) {
+function Overview({ user, visits, relative, lang, onBook, onViewVisits }) {
   const tr = (key) => t(lang, key);
   const upcoming = visits.filter(v=>!['COMPLETED','CANCELLED'].includes(v.status));
   const completed = visits.filter(v=>v.status==='COMPLETED');
   const next = upcoming[0], last = completed[0];
   const sub = user?.subscription || { plan:'standard', status:'TRIAL', visitsPerMonth:2, visitsUsed:0 };
   const planLabel = (sub?.plan||'standard').charAt(0).toUpperCase()+(sub?.plan||'standard').slice(1);
+  const usedPct = sub?.visitsPerMonth >= 999 ? 0 : Math.min(100, Math.round(((sub?.visitsUsed||0) / (sub?.visitsPerMonth||2)) * 100));
+  const visitsLeft = sub?.visitsPerMonth >= 999 ? null : Math.max(0, (sub?.visitsPerMonth||2) - (sub?.visitsUsed||0));
+
   return (
-    <div>
+    <div style={{ display:'flex', flexDirection:'column', gap:16 }}>
+      <style>{`
+        .ov-next:hover { transform:translateY(-2px); box-shadow:0 10px 28px rgba(37,99,235,0.35) !important; }
+        .ov-next { transition:transform 0.15s, box-shadow 0.15s; }
+        .ov-action:hover { opacity:0.87 !important; transform:translateY(-1px); }
+        .ov-action { transition:opacity 0.15s, transform 0.15s; }
+        .ov-stat:hover { border-color:#2563EB !important; transform:translateY(-2px); }
+        .ov-stat { transition:border-color 0.15s, transform 0.15s; }
+      `}</style>
+
+      {/* ── Next Visit banner ── */}
       {next ? (
-        <div style={{ background:C.primary, borderRadius:16, padding:'20px 22px', marginBottom:20, color:'#fff', boxShadow:SMD, display:'flex', gap:14, alignItems:'center', flexWrap:'wrap' }}>
-          <div style={{ width:46,height:46,borderRadius:13,background:'rgba(255,255,255,0.15)',display:'flex',alignItems:'center',justifyContent:'center',flexShrink:0 }}>
-            <svg width="22" height="22" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        <div className="ov-next" onClick={onViewVisits} style={{ background:'linear-gradient(135deg,#1D4ED8 0%,#2563EB 60%,#3B82F6 100%)', borderRadius:18, padding:'22px 24px', color:'#fff', boxShadow:'0 4px 16px rgba(37,99,235,0.25)', cursor:'pointer', position:'relative', overflow:'hidden' }}>
+          <div style={{ position:'absolute', inset:0, opacity:0.06, pointerEvents:'none' }}>
+            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="og" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#og)"/></svg>
           </div>
-          <div style={{ flex:1, minWidth:160 }}>
-            <div style={{ fontSize:10, fontWeight:700, opacity:.65, letterSpacing:'1px', textTransform:'uppercase', marginBottom:4 }}>{tr('dashboard.nextVisit')}</div>
-            <div style={{ fontSize:16, fontWeight:700, marginBottom:3 }}>{new Date(next.scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long'})} at {new Date(next.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}</div>
-            <div style={{ fontSize:12, opacity:.8 }}>{next.nurse?.user?.name||tr('dashboard.nurseTBCLabel')} · {(() => { const s = SERVICES_MAP.find(x=>x.en===next.serviceType); return lang==='sq'&&s?s.sq:next.serviceType; })()}</div>
+          <div style={{ position:'absolute', bottom:-30, right:-30, width:130, height:130, borderRadius:'50%', background:'rgba(255,255,255,0.08)', pointerEvents:'none' }}/>
+          <div style={{ position:'relative', zIndex:1, display:'flex', alignItems:'center', gap:14, flexWrap:'wrap' }}>
+            <div style={{ width:48, height:48, borderRadius:14, background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <svg width="22" height="22" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+            </div>
+            <div style={{ flex:1, minWidth:150 }}>
+              <div style={{ fontSize:10, fontWeight:700, opacity:.65, letterSpacing:'1.2px', textTransform:'uppercase', marginBottom:4 }}>{tr('dashboard.nextVisit')}</div>
+              <div style={{ fontSize:17, fontWeight:800, marginBottom:3, letterSpacing:'-0.3px' }}>
+                {new Date(next.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'long',day:'numeric',month:'long'})} · {new Date(next.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+              </div>
+              <div style={{ fontSize:12, opacity:.78 }}>{next.nurse?.user?.name||tr('dashboard.nurseTBCLabel')} · {(()=>{const s=SERVICES_MAP.find(x=>x.en===next.serviceType);return lang==='sq'&&s?s.sq:next.serviceType;})()}</div>
+            </div>
+            <div style={{ display:'flex', alignItems:'center', gap:10, flexShrink:0 }}>
+              <Badge s={next.status} lang={lang} />
+              <div style={{ display:'flex', alignItems:'center', gap:3, fontSize:12, opacity:.75 }}>
+                <span>{lang==='sq'?'Shiko':'View'}</span>
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </div>
+            </div>
           </div>
-          <Badge s={next.status} lang={lang} />
         </div>
       ) : (
-        <div style={{ background:C.primaryLight, border:`1px solid rgba(37,99,235,0.15)`, borderRadius:16, padding:'20px 22px', marginBottom:20, display:'flex', alignItems:'center', justifyContent:'space-between', gap:16 }}>
-          <div>
-            <div style={{ fontSize:14, fontWeight:700, color:C.primary, marginBottom:4 }}>{tr('dashboard.noUpcomingVisits')}</div>
-            <div style={{ fontSize:13, color:C.textSecondary }}>{tr('dashboard.bookNurseDesc')}</div>
+        <div style={{ background:C.primaryLight, border:`1.5px dashed rgba(37,99,235,0.3)`, borderRadius:18, padding:'22px 24px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+            <div style={{ width:48, height:48, borderRadius:14, background:C.bgWhite, border:`1px solid rgba(37,99,235,0.15)`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <svg width="22" height="22" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+            </div>
+            <div>
+              <div style={{ fontSize:14, fontWeight:700, color:C.primary, marginBottom:3 }}>{tr('dashboard.noUpcomingVisits')}</div>
+              <div style={{ fontSize:13, color:C.textSecondary }}>{tr('dashboard.bookNurseDesc')}</div>
+            </div>
           </div>
-          <button onClick={onBook} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'11px 20px', fontSize:13, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', fontFamily:F }}>{tr('dashboard.bookVisitBtn')}</button>
+          <button onClick={onBook} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:11, padding:'11px 20px', fontSize:13, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', fontFamily:F, flexShrink:0 }}>{tr('dashboard.bookVisitBtn')}</button>
         </div>
       )}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))', gap:12, marginBottom:20 }}>
-        {[[tr('dashboard.plan'),planLabel,C.primary,''],
-          [tr('dashboard.visitsUsed'), sub?.visitsPerMonth>=999 ? '∞' : `${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`, C.textPrimary, sub?.visitsPerMonth>=999 ? 'Unlimited' : tr('dashboard.thisMonth')],
-          [tr('dashboard.completed'),completed.length,C.secondary,tr('dashboard.total')],
-          [tr('dashboard.lastBP'),last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—',last?.bpSystolic?C.warning:C.textTertiary,last?.bpSystolic?'mmHg':'']].map(([label,val,color,sub2])=>(
-          <div key={label} style={{ background:C.bgWhite, borderRadius:13, border:`1px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM }}>
-            <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
-            <div style={{ fontSize:24, fontWeight:800, color, letterSpacing:'-0.5px', lineHeight:1 }}>{val}</div>
-            {sub2 && <div style={{ fontSize:11, color:C.textTertiary, marginTop:5 }}>{sub2}</div>}
+
+      {/* ── Stat cards ── */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(130px,1fr))', gap:12 }}>
+
+        {/* Plan */}
+        <div className="ov-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM }}>
+          <div style={{ width:34, height:34, borderRadius:10, background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
+            <svg width="16" height="16" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
           </div>
-        ))}
-      </div>
-      {relative && (
-        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
-          <div style={{ padding:'14px 18px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
-            <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>{tr('dashboard.lovedOne')}</div>
-            <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary }}>{tr('dashboard.activeCare')}</span>
+          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('dashboard.plan')}</div>
+          <div style={{ fontSize:20, fontWeight:800, color:C.primary, letterSpacing:'-0.5px', lineHeight:1 }}>{planLabel}</div>
+          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5, fontWeight:500 }}>{sub?.status||'Active'}</div>
+        </div>
+
+        {/* Visits used */}
+        <div className="ov-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM }}>
+          <div style={{ width:34, height:34, borderRadius:10, background:'#F0FDF4', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
+            <svg width="16" height="16" fill="none" stroke={C.secondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
           </div>
-          {[[tr('dashboard.fullName'),relative.name],[tr('dashboard.city'),relative.city],[tr('dashboard.address'),relative.address||'—'],[tr('dashboard.age'),relative.age?`${relative.age} years`:'—'],[tr('dashboard.assignedNurse'),next?.nurse?.user?.name||tr('dashboard.beingAssigned')]].map(([k,v])=>(
-            <div key={k} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'11px 18px', borderBottom:`1px solid ${C.borderSubtle}` }}>
-              <span style={{ fontSize:13, color:C.textSecondary }}>{k}</span>
-              <span style={{ fontSize:13, color:C.textPrimary, fontWeight:600, textAlign:'right', maxWidth:'60%' }}>{v}</span>
+          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('dashboard.visitsUsed')}</div>
+          <div style={{ fontSize:20, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px', lineHeight:1 }}>
+            {sub?.visitsPerMonth>=999 ? '∞' : `${sub?.visitsUsed||0}/${sub?.visitsPerMonth||2}`}
+          </div>
+          {sub?.visitsPerMonth < 999 ? (
+            <div style={{ marginTop:8 }}>
+              <div style={{ height:4, borderRadius:99, background:C.bgSubtle, overflow:'hidden' }}>
+                <div style={{ height:'100%', borderRadius:99, width:`${usedPct}%`, background:usedPct>=100?C.error:C.secondary, transition:'width 0.4s' }}/>
+              </div>
+              <div style={{ fontSize:10, color:C.textTertiary, marginTop:4 }}>{visitsLeft} {lang==='sq'?'mbetur':'remaining'}</div>
             </div>
-          ))}
+          ) : (
+            <div style={{ fontSize:11, color:C.secondary, marginTop:5, fontWeight:600 }}>Unlimited</div>
+          )}
+        </div>
+
+        {/* Completed */}
+        <div className="ov-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM }}>
+          <div style={{ width:34, height:34, borderRadius:10, background:C.secondaryLight, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
+            <svg width="16" height="16" fill="none" stroke={C.secondary} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          </div>
+          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('dashboard.completed')}</div>
+          <div style={{ fontSize:20, fontWeight:800, color:C.secondary, letterSpacing:'-0.5px', lineHeight:1 }}>{completed.length}</div>
+          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5 }}>{lang==='sq'?'gjithsej':'total visits'}</div>
+        </div>
+
+        {/* Last BP */}
+        <div className="ov-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM }}>
+          <div style={{ width:34, height:34, borderRadius:10, background:last?.bpSystolic?'#FEF3C7':C.bgSubtle, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
+            <svg width="16" height="16" fill="none" stroke={last?.bpSystolic?C.warning:C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+          </div>
+          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('dashboard.lastBP')}</div>
+          <div style={{ fontSize:20, fontWeight:800, color:last?.bpSystolic?C.warning:C.textTertiary, letterSpacing:'-0.5px', lineHeight:1 }}>
+            {last?.bpSystolic?`${last.bpSystolic}/${last.bpDiastolic}`:'—'}
+          </div>
+          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5 }}>{last?.bpSystolic?'mmHg':(lang==='sq'?'pa të dhëna':'no data yet')}</div>
+        </div>
+      </div>
+
+      {/* ── Quick actions ── */}
+      <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+        <button className="ov-action" onClick={onBook} style={{ flex:1, minWidth:120, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'13px 20px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.2)' }}>
+          <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+          {tr('dashboard.bookVisitBtn')}
+        </button>
+        <button className="ov-action" onClick={onViewVisits} style={{ flex:1, minWidth:120, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:C.bgWhite, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:12, padding:'13px 20px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>
+          <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+          {lang==='sq'?'Vizitat e Mia':'My Visits'}
+        </button>
+      </div>
+
+      {/* ── Loved one card ── */}
+      {relative && (
+        <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
+          <div style={{ padding:'16px 20px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', alignItems:'center', gap:14 }}>
+            <div style={{ width:46, height:46, borderRadius:13, background:`linear-gradient(135deg,${C.primary},${C.primaryDark})`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <span style={{ fontSize:18, fontWeight:800, color:'#fff' }}>{(relative.name||'?').charAt(0).toUpperCase()}</span>
+            </div>
+            <div style={{ flex:1 }}>
+              <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:2 }}>{relative.name}</div>
+              <div style={{ fontSize:12, color:C.textSecondary }}>{relative.city}{relative.age?` · ${relative.age} ${lang==='sq'?'vjeç':'yrs'}`:''}</div>
+            </div>
+            <span style={{ fontSize:11, fontWeight:700, padding:'4px 12px', borderRadius:99, background:C.secondaryLight, color:C.secondary, flexShrink:0 }}>{tr('dashboard.activeCare')}</span>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr' }}>
+            {[
+              { label:tr('dashboard.address'), val:relative.address||'—', icon:<svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+              { label:tr('dashboard.assignedNurse'), val:next?.nurse?.user?.name||tr('dashboard.beingAssigned'), icon:<svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
+            ].map(({label,val,icon},i)=>(
+              <div key={i} style={{ padding:'14px 20px', borderRight:i===0?`1px solid ${C.borderSubtle}`:'none' }}>
+                <div style={{ display:'flex', alignItems:'center', gap:5, color:C.textTertiary, marginBottom:5 }}>
+                  {icon}
+                  <span style={{ fontSize:10, fontWeight:700, textTransform:'uppercase', letterSpacing:'0.5px' }}>{label}</span>
+                </div>
+                <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{val}</div>
+              </div>
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -1246,7 +1351,7 @@ export default function Dashboard({ params }) {
                   </div>
                 )}
                 <div key={active} className="dash-section">
-                  {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')}/>}
+                  {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')} onViewVisits={()=>setActive('visits')}/>}
                   {active==='book' && !isExpired && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
                   {active==='book' && isExpired && <SubscriptionSection userData={userData} lang={lang} />}
                   {active==='nurses' && <FindNurses lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')} />}
