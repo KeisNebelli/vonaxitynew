@@ -292,68 +292,80 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
       `}</style>
 
       {/* ── Profile hero card ── */}
-      <div style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 4px 20px rgba(15,23,42,0.1)', border:`1px solid rgba(0,0,0,0.06)` }}>
-        {/* Dark gradient banner */}
-        <div style={{ background:'linear-gradient(135deg,#2563EB 0%,#4F46E5 50%,#7C3AED 100%)', padding:'28px 24px 70px', position:'relative', overflow:'hidden' }}>
-          <div style={{ position:'absolute', inset:0, opacity:0.05, pointerEvents:'none' }}>
-            <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="nd" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#nd)"/></svg>
-          </div>
-          <div style={{ position:'absolute', top:-40, right:-40, width:180, height:180, borderRadius:'50%', background:'rgba(37,99,235,0.2)', filter:'blur(50px)', pointerEvents:'none' }}/>
-          <div style={{ position:'relative', zIndex:1 }}>
-            <div style={{ fontSize:13, color:'rgba(255,255,255,0.55)', marginBottom:4 }}>{greeting},</div>
-            <div style={{ fontSize:22, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>{firstName} 👋</div>
-          </div>
+      <div style={{ borderRadius:20, overflow:'hidden', background:'linear-gradient(135deg,#2563EB 0%,#4F46E5 55%,#7C3AED 100%)', boxShadow:'0 6px 24px rgba(37,99,235,0.28)', position:'relative' }}>
+        {/* Subtle noise texture */}
+        <div style={{ position:'absolute', inset:0, opacity:0.04, pointerEvents:'none' }}>
+          <svg width="100%" height="100%"><defs><pattern id="nd" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#nd)"/></svg>
         </div>
+        {/* Glow orbs */}
+        <div style={{ position:'absolute', top:-60, right:-40, width:200, height:200, borderRadius:'50%', background:'rgba(124,58,237,0.35)', filter:'blur(60px)', pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', bottom:-40, left:20, width:140, height:140, borderRadius:'50%', background:'rgba(37,99,235,0.3)', filter:'blur(50px)', pointerEvents:'none' }}/>
 
-        {/* Avatar + info pulled up over banner */}
-        <div style={{ background:C.bgWhite, padding:'0 24px 22px', marginTop:-44, position:'relative' }}>
-          <div style={{ display:'flex', alignItems:'flex-end', gap:16, marginBottom:16 }}>
+        {/* Content */}
+        <div style={{ position:'relative', zIndex:1, padding:'22px 22px 20px' }}>
+          {/* Top row: greeting + avatar */}
+          <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12, marginBottom:18 }}>
+            <div>
+              <div style={{ fontSize:12, fontWeight:500, color:'rgba(255,255,255,0.55)', marginBottom:3, letterSpacing:'0.2px' }}>{greeting}</div>
+              <div style={{ fontSize:24, fontWeight:800, color:'#fff', letterSpacing:'-0.6px', lineHeight:1.1 }}>{firstName}</div>
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:8, flexWrap:'wrap' }}>
+                <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:'rgba(255,255,255,0.15)', color:'#fff', backdropFilter:'blur(4px)' }}>
+                  <span style={{ display:'inline-block', width:6, height:6, borderRadius:'50%', background:statusColor, marginRight:5, verticalAlign:'middle' }}/>{statusLabel}
+                </span>
+                {nurse?.city && (
+                  <span style={{ fontSize:11, fontWeight:600, padding:'3px 10px', borderRadius:99, background:'rgba(255,255,255,0.12)', color:'rgba(255,255,255,0.85)' }}>
+                    {nurse.city}
+                  </span>
+                )}
+              </div>
+            </div>
             {/* Avatar */}
             <div style={{ flexShrink:0, position:'relative' }}>
               {nurse?.profilePhotoUrl ? (
-                <img src={nurse.profilePhotoUrl} alt={nurseName} style={{ width:80, height:80, borderRadius:20, objectFit:'cover', border:`3px solid ${C.bgWhite}`, boxShadow:'0 4px 14px rgba(0,0,0,0.12)' }} />
+                <img src={nurse.profilePhotoUrl} alt={nurseName}
+                  style={{ width:64, height:64, borderRadius:18, objectFit:'cover', border:'2.5px solid rgba(255,255,255,0.3)', boxShadow:'0 4px 16px rgba(0,0,0,0.2)' }}/>
               ) : (
-                <div style={{ width:80, height:80, borderRadius:20, background:'linear-gradient(135deg,#2563EB,#1D4ED8)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:28, fontWeight:800, color:'#fff', border:`3px solid ${C.bgWhite}`, boxShadow:'0 4px 14px rgba(0,0,0,0.12)' }}>
+                <div style={{ width:64, height:64, borderRadius:18, background:'rgba(255,255,255,0.18)', backdropFilter:'blur(8px)', border:'2px solid rgba(255,255,255,0.25)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, fontWeight:800, color:'#fff', boxShadow:'0 4px 16px rgba(0,0,0,0.15)' }}>
                   {nurseInitials}
                 </div>
               )}
-              <div style={{ position:'absolute', bottom:-4, right:-4, width:18, height:18, borderRadius:'50%', background:statusColor, border:`2.5px solid ${C.bgWhite}` }} />
+              <div style={{ position:'absolute', bottom:-3, right:-3, width:16, height:16, borderRadius:'50%', background:statusColor, border:'2px solid rgba(255,255,255,0.6)', boxShadow:'0 1px 4px rgba(0,0,0,0.2)' }}/>
             </div>
-            {/* Name + status */}
-            <div style={{ flex:1, paddingBottom:4 }}>
-              <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.4px', marginBottom:5 }}>{nurseName}</div>
-              <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap' }}>
-                <span style={{ fontSize:11, fontWeight:700, padding:'3px 11px', borderRadius:99, background:statusBg, color:statusColor, border:`1px solid ${statusColor}22` }}>● {statusLabel}</span>
-                {nurse?.city && <span style={{ fontSize:11, fontWeight:600, padding:'3px 10px', borderRadius:99, background:'#F1F5F9', color:C.textSecondary }}>📍 {nurse.city}</span>}
+          </div>
+
+          {/* Divider */}
+          <div style={{ height:1, background:'rgba(255,255,255,0.1)', marginBottom:16 }}/>
+
+          {/* Bottom row: rating + visits + specialties */}
+          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+              <div style={{ display:'flex', gap:2 }}>
+                {[1,2,3,4,5].map(idx => (
+                  <svg key={idx} width="13" height="13" viewBox="0 0 24 24" style={{ fill: ratingValue && idx <= Math.round(ratingValue) ? '#FCD34D' : 'rgba(255,255,255,0.2)', stroke:'none' }}>
+                    <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
+                  </svg>
+                ))}
               </div>
+              <span style={{ fontSize:13, fontWeight:700, color:'#fff' }}>
+                {ratingValue ? ratingValue.toFixed(1) : <span style={{ fontWeight:500, opacity:0.6, fontSize:12 }}>{lang==='sq'?'Infermiere e re':'New'}</span>}
+              </span>
+              <span style={{ fontSize:11, color:'rgba(255,255,255,0.45)' }}>·</span>
+              <span style={{ fontSize:12, color:'rgba(255,255,255,0.65)', fontWeight:500 }}>
+                {totalVisits} {lang==='sq'?'vizita':'visits'}
+              </span>
             </div>
-          </div>
-
-          {/* Rating row */}
-          <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:14, padding:'10px 14px', background:'#F8FAFC', borderRadius:12, border:`1px solid ${C.border}` }}>
-            <div style={{ display:'flex', gap:3 }}>
-              {[1,2,3,4,5].map(idx => (
-                <svg key={idx} width="15" height="15" viewBox="0 0 24 24" style={{ fill: ratingValue && idx <= Math.round(ratingValue) ? '#F59E0B' : '#E2E8F0', stroke:'none' }}>
-                  <path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>
-                </svg>
-              ))}
-            </div>
-            {ratingValue ? (
-              <span style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>{ratingValue.toFixed(1)}<span style={{ fontWeight:500, color:C.textTertiary }}> / 5</span></span>
-            ) : (
-              <span style={{ fontSize:13, fontWeight:600, color:C.textTertiary }}>{lang==='sq'?'Infermiere e re':'New Nurse'}</span>
+            {/* Specialty pills */}
+            {specialtiesArray.length > 0 && (
+              <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
+                {specialtiesArray.slice(0,2).map(spec => (
+                  <span key={spec} style={{ fontSize:10, fontWeight:600, padding:'3px 9px', borderRadius:99, background:'rgba(255,255,255,0.13)', color:'rgba(255,255,255,0.85)', border:'1px solid rgba(255,255,255,0.15)' }}>{spec}</span>
+                ))}
+                {specialtiesArray.length > 2 && (
+                  <span style={{ fontSize:10, fontWeight:600, padding:'3px 9px', borderRadius:99, background:'rgba(255,255,255,0.1)', color:'rgba(255,255,255,0.6)' }}>+{specialtiesArray.length-2}</span>
+                )}
+              </div>
             )}
-            <span style={{ fontSize:12, color:C.textTertiary, marginLeft:'auto' }}>{totalVisits} {lang==='sq'?'vizita gjithsej':'total visits'}</span>
           </div>
-
-          {/* Specialties */}
-          {specialtiesArray.length > 0 && (
-            <div style={{ display:'flex', flexWrap:'wrap', gap:6 }}>
-              {specialtiesArray.map(spec => (
-                <span key={spec} style={{ fontSize:11, fontWeight:600, padding:'4px 11px', borderRadius:99, background:'#EFF6FF', color:'#2563EB', border:'1px solid rgba(37,99,235,0.15)' }}>{spec}</span>
-              ))}
-            </div>
-          )}
         </div>
       </div>
 
