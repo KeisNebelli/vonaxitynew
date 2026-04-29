@@ -35,6 +35,12 @@ const LAUNCH_CITIES = [
 
 const DEFAULT_PRICING = { basicPrice: 30, standardPrice: 50, premiumPrice: 120, basicVisits: 1, standardVisits: 2, premiumVisits: 4 };
 
+const FEATURED_NURSES = [
+  { name:'Elona Berberi', city:'Tirana', experience:'8 years', rating:4.9, reviews:34, photo:'https://randomuser.me/api/portraits/women/44.jpg', specialties:['Blood Pressure','Glucose','Vitals'] },
+  { name:'Besa Marku', city:'Tirana', experience:'9 years', rating:4.9, reviews:41, photo:'https://randomuser.me/api/portraits/women/26.jpg', specialties:['Vitals','Welfare Check','BP'] },
+  { name:'Mirjeta Doshi', city:'Durrës', experience:'6 years', rating:4.8, reviews:27, photo:'https://randomuser.me/api/portraits/women/68.jpg', specialties:['Post-surgical','Blood Work','Vitals'] },
+];
+
 const TRUST_ICONS = [<ShieldIcon />, <CheckIcon />, <HomeIcon />, <GlobeIcon />];
 
 function ShieldIcon() {
@@ -269,6 +275,64 @@ export default async function HomePage({ params }) {
             <p style={{ fontSize: 13, color: '#92400E', margin: 0, lineHeight: 1.6 }}>
               <strong>{t(lang, 'services.nonEmergencyStrong')}</strong> {t(lang, 'services.emergency')} <strong>127</strong> {t(lang, 'services.immediately')}
             </p>
+          </div>
+        </div>
+      </section>
+
+      {/* ── Featured Nurses ── */}
+      <section style={{ padding:'80px 24px', background:C.bgWhite }}>
+        <div style={{ maxWidth:1100, margin:'0 auto' }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:40, flexWrap:'wrap', gap:16 }}>
+            <div>
+              <TAG>{lang==='sq' ? 'Infermierët tanë' : 'Our Nurses'}</TAG>
+              <h2 style={{ fontSize:'clamp(26px,4vw,40px)', fontWeight:800, color:C.textPrimary, margin:'0', letterSpacing:'-1px' }}>
+                {lang==='sq' ? 'Infermiere të certifikuara & të verifikuara' : 'Certified & verified nurses'}
+              </h2>
+            </div>
+            <Link href={`/${lang}/nurses`} style={{ fontSize:14, fontWeight:700, color:C.primary, textDecoration:'none', whiteSpace:'nowrap', display:'flex', alignItems:'center', gap:6 }}>
+              {lang==='sq' ? 'Shiko të gjitha' : 'View all nurses'}
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </Link>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:20 }}>
+            {FEATURED_NURSES.map(nurse => (
+              <div key={nurse.name} style={{ background:C.bg, borderRadius:20, border:`1px solid ${C.border}`, padding:24, boxShadow:'0 2px 12px rgba(0,0,0,0.04)', display:'flex', flexDirection:'column', gap:16 }}>
+                <div style={{ display:'flex', gap:14, alignItems:'center' }}>
+                  <div style={{ position:'relative', flexShrink:0 }}>
+                    <img src={nurse.photo} alt={nurse.name} style={{ width:60, height:60, borderRadius:'50%', objectFit:'cover', border:'3px solid #fff', boxShadow:'0 2px 8px rgba(0,0,0,0.1)' }} />
+                    <div style={{ position:'absolute', bottom:0, right:0, width:18, height:18, borderRadius:'50%', background:C.secondary, border:'2px solid #fff', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                  </div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.2px', marginBottom:3 }}>{nurse.name}</div>
+                    <div style={{ fontSize:12, color:C.textTertiary, display:'flex', alignItems:'center', gap:4 }}>
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                      {nurse.city} · {nurse.experience}
+                    </div>
+                    <div style={{ display:'flex', alignItems:'center', gap:4, marginTop:5 }}>
+                      {[...Array(5)].map((_,i) => (
+                        <svg key={i} width="12" height="12" viewBox="0 0 24 24" fill={i < Math.floor(nurse.rating) ? '#F59E0B' : '#E5E7EB'} stroke="none"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>
+                      ))}
+                      <span style={{ fontSize:12, fontWeight:600, color:C.textPrimary, marginLeft:2 }}>{nurse.rating}</span>
+                      <span style={{ fontSize:11, color:C.textTertiary }}>({nurse.reviews})</span>
+                    </div>
+                  </div>
+                  <span style={{ fontSize:11, fontWeight:700, color:C.secondary, background:C.secondaryLight, padding:'4px 10px', borderRadius:99, flexShrink:0, display:'flex', alignItems:'center', gap:5 }}>
+                    <div style={{ width:5, height:5, borderRadius:'50%', background:C.secondary }}/>
+                    {lang==='sq' ? 'Aktive' : 'Active'}
+                  </span>
+                </div>
+                <div style={{ display:'flex', gap:6, flexWrap:'wrap' }}>
+                  {nurse.specialties.map(s => (
+                    <span key={s} style={{ fontSize:11, fontWeight:600, color:C.primary, background:C.primaryLight, padding:'4px 10px', borderRadius:99 }}>{s}</span>
+                  ))}
+                </div>
+                <Link href={`/${lang}/signup`} style={{ display:'block', textAlign:'center', padding:'11px', borderRadius:10, background:C.primary, color:'#fff', fontSize:13, fontWeight:700, textDecoration:'none' }}>
+                  {lang==='sq' ? 'Rezervo një vizitë' : 'Book a visit'}
+                </Link>
+              </div>
+            ))}
           </div>
         </div>
       </section>
