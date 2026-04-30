@@ -1,6 +1,7 @@
 import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/HeroSection';
+import OrganicBackground from '@/components/OrganicBackground';
 import Link from 'next/link';
 import { t } from '@/translations';
 
@@ -111,7 +112,7 @@ export default async function HomePage({ params }) {
   ];
 
   return (
-    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: C.bg }}>
+    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: 'linear-gradient(168deg, #FFFFFF 0%, #F8F6FF 40%, #F0FFFE 75%, #F8F6FF 100%)' }}>
       <style>{`
         .hp-hero-btn-primary{transition:all 0.18s ease;background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)!important;}
         .hp-hero-btn-primary:hover{background:linear-gradient(135deg,#1D4ED8 0%,#1E40AF 100%)!important;box-shadow:0 6px 22px rgba(37,99,235,0.5)!important;transform:translateY(-1px)}
@@ -135,6 +136,7 @@ export default async function HomePage({ params }) {
         .hp-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.35)!important;}
 
       `}</style>
+      <OrganicBackground />
       <Nav lang={lang} />
 
       {/* ── Hero ── */}
@@ -164,7 +166,7 @@ export default async function HomePage({ params }) {
       />
 
       {/* ── Trust bar ── */}
-      <section style={{ background: C.bgWhite, borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '28px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
+      <section style={{ background: 'rgba(255,255,255,0.88)', backdropFilter:'blur(8px)', borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '28px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', position:'relative', zIndex:1 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20 }}>
           {TRUST_ITEMS.map((item, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
