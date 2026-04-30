@@ -49,7 +49,14 @@ export default function VisitLocationCard({ visit, onStatusChange, onComplete, c
       <div style={{ padding:'18px 18px 14px' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:14 }}>
           <div>
-            <div style={{ fontSize:18, fontWeight:700, color:C.textPrimary, marginBottom:3, letterSpacing:'-0.3px' }}>{visit.clientName}</div>
+            <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:3, flexWrap:'wrap' }}>
+              <div style={{ fontSize:18, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.3px' }}>{visit.clientName}</div>
+              {visit.workOrderNumber && (
+                <span style={{ fontSize:10, fontWeight:800, color:C.primary, background:C.primaryLight, padding:'2px 9px', borderRadius:99, letterSpacing:'0.6px', border:'1px solid rgba(37,99,235,0.18)', whiteSpace:'nowrap' }}>
+                  {visit.workOrderNumber}
+                </span>
+              )}
+            </div>
             <div style={{ fontSize:13, fontWeight:600, color:C.primary, marginBottom:4 }}>{visit.service}</div>
             <div style={{ fontSize:12, color:C.textTertiary }}>{t(lang,'nurse.ageLabel')} {visit.age} · {visit.date}</div>
           </div>
@@ -137,7 +144,10 @@ export function DailyRouteCard({ visits, onVisitSelect, lang = 'en' }) {
         <div key={v.id} onClick={()=>onVisitSelect?.(v)} style={{ padding:'14px 20px', borderBottom:i<visits.length-1?`1px solid ${C.borderSubtle}`:'none', cursor:'pointer', display:'flex', gap:14, alignItems:'center' }}>
           <div style={{ width:32, height:32, borderRadius:'50%', background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:13, fontWeight:700, color:C.primary, flexShrink:0 }}>{i+1}</div>
           <div style={{ flex:1, minWidth:0 }}>
-            <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{v.clientName}</div>
+            <div style={{ display:'flex', alignItems:'center', gap:6, flexWrap:'wrap' }}>
+              <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{v.clientName}</div>
+              {v.workOrderNumber && <span style={{ fontSize:10, fontWeight:800, color:C.primary, background:C.primaryLight, padding:'1px 7px', borderRadius:99, letterSpacing:'0.6px', border:'1px solid rgba(37,99,235,0.18)', whiteSpace:'nowrap' }}>{v.workOrderNumber}</span>}
+            </div>
             <div style={{ fontSize:12, color:C.textTertiary, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', marginTop:2 }}>{v.address}</div>
           </div>
           <div style={{ fontSize:13, fontWeight:700, color:C.primary, flexShrink:0 }}>{v.time}</div>

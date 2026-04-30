@@ -861,6 +861,11 @@ function BrowseJobs({ nurse, lang='en' }) {
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', marginBottom:6 }}>
                       <div style={{ fontSize:15, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.2px' }}>{trService(job.serviceType, lang)}</div>
+                      {job.workOrderNumber && (
+                        <span style={{ fontSize:10, fontWeight:800, color:C.primary, background:C.primaryLight, padding:'2px 9px', borderRadius:99, letterSpacing:'0.6px', border:'1px solid rgba(37,99,235,0.18)' }}>
+                          {job.workOrderNumber}
+                        </span>
+                      )}
                       {applied && <span style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:99, background:'#ECFDF5', color:'#059669', border:'1px solid rgba(5,150,105,0.2)' }}>✓ {t(lang,'nurse.applied')}</span>}
                     </div>
                     {/* Pay chip */}
