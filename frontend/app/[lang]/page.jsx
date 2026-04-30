@@ -233,6 +233,110 @@ export default async function HomePage({ params }) {
         </div>
       </section>
 
+      {/* ── Our Nurses ── */}
+      <section id="our-nurses" style={{ padding: '88px 24px', background: C.bgWhite, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+          {/* Header */}
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 16 }}>
+            <div>
+              <TAG>{t(lang, 'nurses.tag') || 'OUR NURSES'}</TAG>
+              <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1px' }}>
+                {t(lang, 'nurses.title') || 'Meet our certified nurses'}
+              </h2>
+              <p style={{ fontSize: 16, color: C.textSecondary, maxWidth: 460, margin: 0, lineHeight: 1.65 }}>
+                {t(lang, 'nurses.subtitle') || 'Every nurse on Vonaxity is licensed, background-checked, and rated by real patients.'}
+              </p>
+            </div>
+            {/* Trust badges row */}
+            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              {[
+                { icon: '✓', label: lang === 'sq' ? 'E licensuar' : 'Licensed & Certified' },
+                { icon: '🛡', label: lang === 'sq' ? 'I verifikuar' : 'Background Checked' },
+                { icon: '⭐', label: lang === 'sq' ? 'E vlerësuar' : 'Patient Rated' },
+              ].map(b => (
+                <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: C.secondary, background: C.secondaryLight, border: '1px solid rgba(5,150,105,0.15)', padding: '6px 12px', borderRadius: 99 }}>
+                  <span style={{ fontSize: 11 }}>{b.icon}</span>{b.label}
+                </div>
+              ))}
+            </div>
+          </div>
+
+          {/* Nurse cards */}
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 20, marginBottom: 40 }}>
+            {[
+              { initials:'EB', name:'Elona Berberi',    bg:'#DBEAFE', color:'#1D4ED8', specialty: lang==='sq'?'Kujdes i Përgjithshëm':'General Nursing',       rating:5.0, reviews:38, years:6,  langs:['AL','EN'] },
+              { initials:'MG', name:'Mirela Gjoka',     bg:'#D1FAE5', color:'#065F46', specialty: lang==='sq'?'Kujdes për të Moshuarit':'Elderly Care',          rating:4.9, reviews:61, years:11, langs:['AL'] },
+              { initials:'AH', name:'Artan Hoxha',      bg:'#EDE9FE', color:'#5B21B6', specialty: lang==='sq'?'Kujdes Post-Operativ':'Post-Op Recovery',        rating:5.0, reviews:24, years:8,  langs:['AL','EN','IT'] },
+              { initials:'BL', name:'Besmir Lika',      bg:'#FEF3C7', color:'#92400E', specialty: lang==='sq'?'Kujdesi i Plagëve':'Wound & IV Care',             rating:4.8, reviews:45, years:7,  langs:['AL','EN'] },
+            ].map((n) => (
+              <div key={n.name} className="hp-service-card" style={{ background: '#FAFAF9', borderRadius: 18, border: `1px solid ${C.border}`, padding: '24px 22px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', gap: 0 }}>
+                {/* Avatar + verified */}
+                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+                  <div style={{ width: 60, height: 60, borderRadius: '50%', background: n.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: n.color, letterSpacing: '-0.5px', flexShrink: 0, border: `2px solid ${n.color}22` }}>
+                    {n.initials}
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: C.secondary, background: C.secondaryLight, border: '1px solid rgba(5,150,105,0.2)', padding: '4px 10px', borderRadius: 99 }}>
+                    <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M5 0L6.12 3.45H9.76L6.82 5.59L7.94 9.05L5 6.91L2.06 9.05L3.18 5.59L0.24 3.45H3.88L5 0Z" fill="#059669"/></svg>
+                    {lang === 'sq' ? 'E Verifikuar' : 'Verified'}
+                  </div>
+                </div>
+                {/* Name + specialty */}
+                <div style={{ fontSize: 16, fontWeight: 700, color: C.textPrimary, marginBottom: 3 }}>{n.name}</div>
+                <div style={{ fontSize: 13, fontWeight: 500, color: C.primary, marginBottom: 14 }}>{n.specialty}</div>
+                {/* Rating */}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
+                  <div style={{ display: 'flex', gap: 1 }}>
+                    {[1,2,3,4,5].map(s => (
+                      <svg key={s} width="13" height="13" viewBox="0 0 24 24" fill={s <= Math.round(n.rating) ? '#F59E0B' : '#E5E7EB'} stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                    ))}
+                  </div>
+                  <span style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary }}>{n.rating.toFixed(1)}</span>
+                  <span style={{ fontSize: 12, color: C.textTertiary }}>({n.reviews})</span>
+                </div>
+                {/* Stats row */}
+                <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
+                  <div style={{ flex: 1, background: C.bgWhite, borderRadius: 10, padding: '8px 10px', border: `1px solid ${C.borderSubtle || C.border}`, textAlign: 'center' }}>
+                    <div style={{ fontSize: 17, fontWeight: 800, color: C.textPrimary, letterSpacing: '-0.5px' }}>{n.years}</div>
+                    <div style={{ fontSize: 10, color: C.textTertiary, fontWeight: 500 }}>{lang === 'sq' ? 'vjet' : 'yrs exp'}</div>
+                  </div>
+                  <div style={{ flex: 2, background: C.bgWhite, borderRadius: 10, padding: '8px 10px', border: `1px solid ${C.borderSubtle || C.border}` }}>
+                    <div style={{ fontSize: 10, color: C.textTertiary, fontWeight: 500, marginBottom: 3 }}>{lang === 'sq' ? 'Gjuhë' : 'Languages'}</div>
+                    <div style={{ display: 'flex', gap: 4 }}>
+                      {n.langs.map(l => (
+                        <span key={l} style={{ fontSize: 10, fontWeight: 700, color: C.primary, background: C.primaryLight, padding: '2px 7px', borderRadius: 6 }}>{l}</span>
+                      ))}
+                    </div>
+                  </div>
+                </div>
+                {/* Book CTA */}
+                <Link href={`/${lang}/signup`} style={{ display: 'block', marginTop: 'auto' }}>
+                  <button style={{ width: '100%', padding: '10px', fontSize: 13, fontWeight: 600, borderRadius: 10, border: `1.5px solid ${C.border}`, background: 'transparent', color: C.textPrimary, cursor: 'pointer', transition: 'all 0.15s' }}
+                    onMouseEnter={e => { e.currentTarget.style.background = C.primaryLight; e.currentTarget.style.borderColor = C.primary; e.currentTarget.style.color = C.primary; }}
+                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.textPrimary; }}>
+                    {lang === 'sq' ? 'Rezervo' : 'Book this nurse'}
+                  </button>
+                </Link>
+              </div>
+            ))}
+          </div>
+
+          {/* Bottom stat strip */}
+          <div style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)', borderRadius: 16, padding: '24px 32px', display: 'flex', gap: 48, justifyContent: 'center', flexWrap: 'wrap', border: '1px solid rgba(37,99,235,0.1)' }}>
+            {[
+              ['500+', lang === 'sq' ? 'Infermierë Aktivë' : 'Active Nurses'],
+              ['4.9★', lang === 'sq' ? 'Vlerësim Mesatar' : 'Avg Rating'],
+              ['100%', lang === 'sq' ? 'Të Licencuar' : 'Licensed'],
+              ['48h', lang === 'sq' ? 'Kohë Reagimi' : 'Avg Response'],
+            ].map(([n, l]) => (
+              <div key={l} style={{ textAlign: 'center' }}>
+                <div style={{ fontSize: 26, fontWeight: 800, background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', letterSpacing: '-1px' }}>{n}</div>
+                <div style={{ fontSize: 12, color: C.textTertiary, marginTop: 2, fontWeight: 500 }}>{l}</div>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
       {/* ── Pricing ── */}
       <section id="pricing" style={{ padding: '80px 24px', background: C.primaryLight, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
@@ -266,8 +370,8 @@ export default async function HomePage({ params }) {
         </div>
       </section>
 
-      {/* ── Cities / Our Nurses ── */}
-      <section id="our-nurses" style={{ padding:'96px 24px', background:'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      {/* ── Cities ── */}
+      <section style={{ padding:'96px 24px', background:'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           {/* Header */}
           <div style={{ textAlign:'center', marginBottom:56 }}>
