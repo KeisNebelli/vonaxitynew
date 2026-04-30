@@ -289,6 +289,22 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
         .nd-stat { transition:border-color 0.15s,transform 0.15s; }
         .nd-route-btn:hover { background:#1D4ED8!important; }
         .nd-route-btn { transition:background 0.15s; }
+        /* ── Mobile overrides ── */
+        @media(max-width:480px){
+          .nd-stat-grid { grid-template-columns: 1fr 1fr !important; }
+          .nd-stat-earn { grid-column: span 2; flex-direction:row!important; align-items:center!important; gap:14px!important; padding:14px 16px!important; }
+          .nd-stat-earn .nd-stat-val { font-size:20px!important; }
+          .nd-stat { padding:14px 14px!important; }
+          .nd-stat .nd-stat-val { font-size:20px!important; }
+          .nd-actions { flex-direction:column!important; }
+          .nd-actions button { flex:unset!important; width:100%!important; }
+          .nd-hero-content { padding:18px 18px 16px!important; }
+          .nd-hero-name { font-size:20px!important; }
+          .nd-hero-bottom { flex-direction:column!important; align-items:flex-start!important; gap:8px!important; }
+        }
+        @media(max-width:360px){
+          .nd-stat-earn .nd-stat-val { font-size:17px!important; }
+        }
       `}</style>
 
       {/* ── Profile hero card ── */}
@@ -302,12 +318,12 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
         <div style={{ position:'absolute', bottom:-40, left:20, width:140, height:140, borderRadius:'50%', background:'rgba(37,99,235,0.3)', filter:'blur(50px)', pointerEvents:'none' }}/>
 
         {/* Content */}
-        <div style={{ position:'relative', zIndex:1, padding:'22px 22px 20px' }}>
+        <div className="nd-hero-content" style={{ position:'relative', zIndex:1, padding:'22px 22px 20px' }}>
           {/* Top row: greeting + avatar */}
           <div style={{ display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12, marginBottom:18 }}>
             <div>
               <div style={{ fontSize:12, fontWeight:500, color:'rgba(255,255,255,0.55)', marginBottom:3, letterSpacing:'0.2px' }}>{greeting}</div>
-              <div style={{ fontSize:24, fontWeight:800, color:'#fff', letterSpacing:'-0.6px', lineHeight:1.1 }}>{firstName}</div>
+              <div className="nd-hero-name" style={{ fontSize:24, fontWeight:800, color:'#fff', letterSpacing:'-0.6px', lineHeight:1.1 }}>{firstName}</div>
               <div style={{ display:'flex', alignItems:'center', gap:6, marginTop:8, flexWrap:'wrap' }}>
                 <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:'rgba(255,255,255,0.15)', color:'#fff', backdropFilter:'blur(4px)' }}>
                   <span style={{ display:'inline-block', width:6, height:6, borderRadius:'50%', background:statusColor, marginRight:5, verticalAlign:'middle' }}/>{statusLabel}
@@ -337,7 +353,7 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
           <div style={{ height:1, background:'rgba(255,255,255,0.1)', marginBottom:16 }}/>
 
           {/* Bottom row: rating + visits + specialties */}
-          <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
+          <div className="nd-hero-bottom" style={{ display:'flex', alignItems:'center', justifyContent:'space-between', flexWrap:'wrap', gap:10 }}>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
               <div style={{ display:'flex', gap:2 }}>
                 {[1,2,3,4,5].map(idx => (
@@ -370,49 +386,51 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
       </div>
 
       {/* ── Stat cards ── */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
+      <div className="nd-stat-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10 }}>
         {/* Today's visits */}
         <div className="nd-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer' }} onClick={()=>setActive('visits')}>
-          <div style={{ width:34, height:34, borderRadius:10, background:'#EFF6FF', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
-            <svg width="16" height="16" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <div style={{ width:32, height:32, borderRadius:10, background:'#EFF6FF', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10 }}>
+            <svg width="15" height="15" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
-          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('nurse.todayLabel')}</div>
-          <div style={{ fontSize:24, fontWeight:800, color:'#2563EB', letterSpacing:'-0.5px', lineHeight:1 }}>{today.length}</div>
-          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5 }}>{lang==='sq'?'vizita sot':'visits today'}</div>
+          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:4 }}>{tr('nurse.todayLabel')}</div>
+          <div className="nd-stat-val" style={{ fontSize:24, fontWeight:800, color:'#2563EB', letterSpacing:'-0.5px', lineHeight:1 }}>{today.length}</div>
+          <div style={{ fontSize:11, color:C.textTertiary, marginTop:4 }}>{lang==='sq'?'sot':'today'}</div>
         </div>
         {/* Total visits */}
         <div className="nd-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer' }} onClick={()=>setActive('visits')}>
-          <div style={{ width:34, height:34, borderRadius:10, background:'#ECFDF5', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
-            <svg width="16" height="16" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div style={{ width:32, height:32, borderRadius:10, background:'#ECFDF5', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10 }}>
+            <svg width="15" height="15" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
-          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('nurse.totalVisits')}</div>
-          <div style={{ fontSize:24, fontWeight:800, color:'#059669', letterSpacing:'-0.5px', lineHeight:1 }}>{totalVisits}</div>
-          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5 }}>{lang==='sq'?'gjithsej':'all time'}</div>
+          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:4 }}>{tr('nurse.totalVisits')}</div>
+          <div className="nd-stat-val" style={{ fontSize:24, fontWeight:800, color:'#059669', letterSpacing:'-0.5px', lineHeight:1 }}>{totalVisits}</div>
+          <div style={{ fontSize:11, color:C.textTertiary, marginTop:4 }}>{lang==='sq'?'gjithsej':'all time'}</div>
         </div>
-        {/* Earnings */}
-        <div className="nd-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer' }} onClick={()=>setActive('earnings')}>
-          <div style={{ width:34, height:34, borderRadius:10, background:'#F5F3FF', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:12 }}>
-            <svg width="16" height="16" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+        {/* Earnings — spans full width on mobile */}
+        <div className="nd-stat nd-stat-earn" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer', display:'flex', flexDirection:'column' }} onClick={()=>setActive('earnings')}>
+          <div style={{ width:32, height:32, borderRadius:10, background:'#F5F3FF', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10, flexShrink:0 }}>
+            <svg width="15" height="15" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
           </div>
-          <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('nurse.earningsLabel')}</div>
-          <div style={{ fontSize:24, fontWeight:800, color:'#7C3AED', letterSpacing:'-0.5px', lineHeight:1 }}>€{nurse?.totalEarnings||0}</div>
-          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5 }}>{lang==='sq'?'fituar':'earned'}</div>
+          <div>
+            <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:4 }}>{tr('nurse.earningsLabel')}</div>
+            <div className="nd-stat-val" style={{ fontSize:24, fontWeight:800, color:'#7C3AED', letterSpacing:'-0.5px', lineHeight:1 }}>€{(visits.filter(v=>v.status==='COMPLETED').length*(nurse?.payRatePerVisit||20))}</div>
+            <div style={{ fontSize:11, color:C.textTertiary, marginTop:4 }}>{lang==='sq'?'fituar':'earned'}</div>
+          </div>
         </div>
       </div>
 
       {/* ── Quick actions ── */}
-      <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
-        <button className="nd-route-btn" onClick={()=>setActive('jobs')} style={{ flex:1, minWidth:120, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:'#2563EB', color:'#fff', border:'none', borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.2)' }}>
+      <div className="nd-actions" style={{ display:'flex', gap:10 }}>
+        <button className="nd-route-btn" onClick={()=>setActive('jobs')} style={{ flex:2, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:'#2563EB', color:'#fff', border:'none', borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.2)' }}>
           <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           {lang==='sq'?'Shfleto Punët':'Browse Jobs'}
         </button>
-        <button onClick={()=>setActive('visits')} style={{ flex:1, minWidth:120, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:C.bgWhite, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>
+        <button onClick={()=>setActive('visits')} style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:C.bgWhite, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>
           <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-          {lang==='sq'?'Vizitat e Mia':'My Visits'}
+          {lang==='sq'?'Vizitat':'Visits'}
         </button>
-        <button onClick={()=>setActive('profile')} style={{ flex:1, minWidth:120, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:C.bgWhite, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>
+        <button onClick={()=>setActive('profile')} style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:C.bgWhite, color:C.textPrimary, border:`1.5px solid ${C.border}`, borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}>
           <svg width="15" height="15" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-          {lang==='sq'?'Profili Im':'My Profile'}
+          {lang==='sq'?'Profili':'Profile'}
         </button>
       </div>
 
