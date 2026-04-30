@@ -134,6 +134,8 @@ export default async function HomePage({ params }) {
         .hp-faq-card:hover{border-color:#BFDBFE!important;box-shadow:0 4px 16px rgba(37,99,235,0.06)!important;}
         .hp-cta-btn{transition:all 0.18s ease;}
         .hp-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.35)!important;}
+        .hp-nurse-btn{width:100%;padding:10px;font-size:13px;font-weight:600;border-radius:10px;border:1.5px solid #E5E7EB;background:transparent;color:#111827;cursor:pointer;transition:all 0.15s ease;font-family:inherit;}
+        .hp-nurse-btn:hover{background:#EFF6FF;border-color:#2563EB;color:#2563EB;}
 
       `}</style>
       <OrganicBackground />
@@ -310,9 +312,7 @@ export default async function HomePage({ params }) {
                 </div>
                 {/* Book CTA */}
                 <Link href={`/${lang}/signup`} style={{ display: 'block', marginTop: 'auto' }}>
-                  <button style={{ width: '100%', padding: '10px', fontSize: 13, fontWeight: 600, borderRadius: 10, border: `1.5px solid ${C.border}`, background: 'transparent', color: C.textPrimary, cursor: 'pointer', transition: 'all 0.15s' }}
-                    onMouseEnter={e => { e.currentTarget.style.background = C.primaryLight; e.currentTarget.style.borderColor = C.primary; e.currentTarget.style.color = C.primary; }}
-                    onMouseLeave={e => { e.currentTarget.style.background = 'transparent'; e.currentTarget.style.borderColor = C.border; e.currentTarget.style.color = C.textPrimary; }}>
+                  <button className="hp-nurse-btn">
                     {lang === 'sq' ? 'Rezervo' : 'Book this nurse'}
                   </button>
                 </Link>
