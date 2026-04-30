@@ -132,12 +132,88 @@ export default async function HomePage({ params }) {
         .hp-faq-card:hover{border-color:#BFDBFE!important;box-shadow:0 4px 16px rgba(37,99,235,0.06)!important;}
         .hp-cta-btn{transition:all 0.18s ease;}
         .hp-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.35)!important;}
+
+        /* ── Medical background animations ── */
+        @keyframes hp-orb1{0%,100%{transform:translate(0,0) scale(1)}33%{transform:translate(22px,-16px) scale(1.06)}66%{transform:translate(-10px,14px) scale(0.96)}}
+        @keyframes hp-orb2{0%,100%{transform:translate(0,0) scale(1)}40%{transform:translate(-18px,22px) scale(1.04)}80%{transform:translate(14px,-10px) scale(0.97)}}
+        @keyframes hp-orb3{0%,100%{transform:translate(0,0) scale(1)}50%{transform:translate(12px,16px) scale(1.05)}}
+        @keyframes hp-orb4{0%,100%{transform:translate(0,0)}50%{transform:translate(-14px,-12px)}}
+        @keyframes hp-ekg{0%{transform:translateX(0)}100%{transform:translateX(-50%)}}
+        @keyframes hp-pulse-dot{0%,100%{opacity:0.5;transform:scale(1)}50%{opacity:0.85;transform:scale(1.15)}}
+        @keyframes hp-pulse-ring1{0%{transform:scale(1);opacity:0.35}100%{transform:scale(2.8);opacity:0}}
+        @keyframes hp-pulse-ring2{0%{transform:scale(1);opacity:0.2}100%{transform:scale(4);opacity:0}}
+        @keyframes hp-cross-drift{0%,100%{transform:translate(0,0) rotate(0deg);opacity:0.04}50%{transform:translate(6px,-8px) rotate(8deg);opacity:0.07}}
+        @keyframes hp-cross-drift2{0%,100%{transform:translate(0,0) rotate(0deg);opacity:0.035}50%{transform:translate(-8px,6px) rotate(-6deg);opacity:0.06}}
+        @keyframes hp-grid-pulse{0%,100%{opacity:0.025}50%{opacity:0.045}}
+        @media(prefers-reduced-motion:reduce){
+          .hp-orb,.hp-ekg-wrap,.hp-pulse-wrap,.hp-cross,.hp-dot-grid{animation:none!important;}
+          .hp-pulse-ring{animation:none!important;}
+        }
       `}</style>
       <Nav lang={lang} />
 
       {/* ── Hero ── */}
-      <section style={{ padding: '80px 24px 96px', background: 'linear-gradient(150deg, #FFFFFF 0%, #EFF6FF 100%)' }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 60, alignItems: 'center' }}>
+      <section style={{ padding: '80px 24px 96px', background: 'linear-gradient(150deg, #FFFFFF 0%, #EFF6FF 100%)', position: 'relative', overflow: 'hidden' }}>
+
+        {/* Medical background layer — purely decorative */}
+        <div aria-hidden="true" style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
+
+          {/* Floating glow orbs */}
+          <div className="hp-orb" style={{ position:'absolute', top:'-5%', right:'8%', width:440, height:440, borderRadius:'50%', background:'radial-gradient(circle at 40% 40%, rgba(37,99,235,0.11), transparent 68%)', filter:'blur(48px)', animation:'hp-orb1 16s ease-in-out infinite' }} />
+          <div className="hp-orb" style={{ position:'absolute', bottom:'-8%', left:'2%', width:360, height:360, borderRadius:'50%', background:'radial-gradient(circle at 60% 60%, rgba(20,184,166,0.09), transparent 68%)', filter:'blur(40px)', animation:'hp-orb2 20s ease-in-out infinite' }} />
+          <div className="hp-orb" style={{ position:'absolute', top:'40%', left:'38%', width:280, height:280, borderRadius:'50%', background:'radial-gradient(circle, rgba(37,99,235,0.07), transparent 70%)', filter:'blur(36px)', animation:'hp-orb3 24s ease-in-out infinite' }} />
+          <div className="hp-orb" style={{ position:'absolute', top:'15%', left:'20%', width:180, height:180, borderRadius:'50%', background:'radial-gradient(circle, rgba(124,58,237,0.06), transparent 70%)', filter:'blur(28px)', animation:'hp-orb4 18s ease-in-out infinite 3s' }} />
+
+          {/* EKG / heartbeat line — scrolling slowly across the bottom of the hero */}
+          <div className="hp-ekg-wrap" style={{ position:'absolute', bottom:'12%', left:0, width:'200%', height:56, opacity:1, animation:'hp-ekg 28s linear infinite', willChange:'transform' }}>
+            <svg width="100%" height="56" viewBox="0 0 2400 56" preserveAspectRatio="none" style={{ display:'block' }}>
+              {/* Pattern repeats twice for seamless loop */}
+              {[0, 1200].map(offset => (
+                <path key={offset} d={`M${offset},28 L${offset+80},28 L${offset+100},28 L${offset+114},14 L${offset+122},42 L${offset+130},6 L${offset+138},50 L${offset+146},28 L${offset+162},24 L${offset+172},28 L${offset+340},28 L${offset+360},28 L${offset+374},14 L${offset+382},42 L${offset+390},6 L${offset+398},50 L${offset+406},28 L${offset+422},24 L${offset+432},28 L${offset+600},28 L${offset+620},28 L${offset+634},14 L${offset+642},42 L${offset+650},6 L${offset+658},50 L${offset+666},28 L${offset+682},24 L${offset+692},28 L${offset+900},28 L${offset+920},28 L${offset+934},14 L${offset+942},42 L${offset+950},6 L${offset+958},50 L${offset+966},28 L${offset+982},24 L${offset+992},28 L${offset+1200},28`}
+                  fill="none" stroke="rgba(37,99,235,0.12)" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" />
+              ))}
+            </svg>
+          </div>
+
+          {/* Pulse dot — top right area */}
+          <div className="hp-pulse-wrap" style={{ position:'absolute', top:'28%', right:'22%', width:10, height:10 }}>
+            <div style={{ position:'absolute', inset:0, borderRadius:'50%', background:'rgba(37,99,235,0.55)', animation:'hp-pulse-dot 3s ease-in-out infinite' }} />
+            <div className="hp-pulse-ring" style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:10, height:10, borderRadius:'50%', border:'1.5px solid rgba(37,99,235,0.3)', animation:'hp-pulse-ring1 3s ease-out infinite' }} />
+            <div className="hp-pulse-ring" style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:10, height:10, borderRadius:'50%', border:'1px solid rgba(37,99,235,0.15)', animation:'hp-pulse-ring2 3s ease-out infinite 0.5s' }} />
+          </div>
+
+          {/* Second pulse — bottom left */}
+          <div className="hp-pulse-wrap" style={{ position:'absolute', bottom:'30%', left:'18%', width:8, height:8 }}>
+            <div style={{ position:'absolute', inset:0, borderRadius:'50%', background:'rgba(20,184,166,0.5)', animation:'hp-pulse-dot 4s ease-in-out infinite 1s' }} />
+            <div className="hp-pulse-ring" style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:8, height:8, borderRadius:'50%', border:'1px solid rgba(20,184,166,0.25)', animation:'hp-pulse-ring1 4s ease-out infinite 1s' }} />
+          </div>
+
+          {/* Very subtle floating medical cross icons */}
+          <div className="hp-cross" style={{ position:'absolute', top:'18%', left:'60%', animation:'hp-cross-drift 14s ease-in-out infinite' }}>
+            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" style={{ opacity:0.06 }}>
+              <rect x="9" y="2" width="6" height="20" rx="2" fill="#2563EB" />
+              <rect x="2" y="9" width="20" height="6" rx="2" fill="#2563EB" />
+            </svg>
+          </div>
+          <div className="hp-cross" style={{ position:'absolute', bottom:'22%', right:'12%', animation:'hp-cross-drift2 18s ease-in-out infinite 2s' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" style={{ opacity:0.05 }}>
+              <rect x="9" y="2" width="6" height="20" rx="2" fill="#2563EB" />
+              <rect x="2" y="9" width="20" height="6" rx="2" fill="#2563EB" />
+            </svg>
+          </div>
+
+          {/* Subtle dot grid pattern */}
+          <svg className="hp-dot-grid" style={{ position:'absolute', inset:0, width:'100%', height:'100%', animation:'hp-grid-pulse 8s ease-in-out infinite' }} xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <pattern id="med-dots" x="0" y="0" width="32" height="32" patternUnits="userSpaceOnUse">
+                <circle cx="1" cy="1" r="1" fill="rgba(37,99,235,0.35)" />
+              </pattern>
+            </defs>
+            <rect width="100%" height="100%" fill="url(#med-dots)" />
+          </svg>
+        </div>
+
+        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(300px,1fr))', gap: 60, alignItems: 'center', position: 'relative', zIndex: 1 }}>
           <div>
             <TAG>{t(lang, 'hero.badge')}</TAG>
             <h1 style={{ fontSize: 'clamp(38px,5vw,56px)', fontWeight: 700, lineHeight: 1.08, letterSpacing: '-1.5px', color: C.textPrimary, margin: '0 0 20px' }}>
