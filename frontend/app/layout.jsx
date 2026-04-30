@@ -37,6 +37,7 @@ export default function RootLayout({ children }) {
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
         <style>{`
           *, *::before, *::after { box-sizing: border-box; }
+          html { scroll-behavior: smooth; }
           body { margin: 0; font-family: 'Inter', system-ui, -apple-system, sans-serif; background: #FAFAF9; color: #111827; -webkit-font-smoothing: antialiased; }
           a { text-decoration: none; color: inherit; }
           button { font-family: inherit; }

@@ -183,7 +183,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── How it works ── */}
-      <section style={{ padding: '80px 24px', background: C.bgWhite }}>
+      <section id="how-it-works" style={{ padding: '80px 24px', background: C.bgWhite, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 56 }}>
             <TAG>{t(lang, 'howItWorks.tag')}</TAG>
@@ -202,7 +202,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Services ── */}
-      <section style={{ padding: '80px 24px', background: C.bg }}>
+      <section id="services" style={{ padding: '80px 24px', background: C.bg, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <div style={{ marginBottom: 48 }}>
             <TAG>{t(lang, 'services.tag')}</TAG>
@@ -234,7 +234,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Pricing ── */}
-      <section style={{ padding: '80px 24px', background: C.primaryLight }}>
+      <section id="pricing" style={{ padding: '80px 24px', background: C.primaryLight, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
           <TAG>{t(lang, 'pricing.tag')}</TAG>
           <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1px' }}>{t(lang, 'pricing.title')}</h2>
@@ -266,8 +266,8 @@ export default async function HomePage({ params }) {
         </div>
       </section>
 
-      {/* ── Cities ── */}
-      <section style={{ padding:'96px 24px', background:'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)' }}>
+      {/* ── Cities / Our Nurses ── */}
+      <section id="our-nurses" style={{ padding:'96px 24px', background:'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           {/* Header */}
           <div style={{ textAlign:'center', marginBottom:56 }}>
@@ -359,8 +359,8 @@ export default async function HomePage({ params }) {
         </div>
       </section>
 
-      {/* ── FAQ ── */}
-      <section style={{ padding: '80px 24px', background: C.bg }}>
+      {/* ── FAQ / About ── */}
+      <section id="about" style={{ padding: '80px 24px', background: C.bg, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <div style={{ textAlign: 'center', marginBottom: 48 }}>
             <TAG>{t(lang, 'faq.tag')}</TAG>
