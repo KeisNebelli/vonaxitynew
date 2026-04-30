@@ -173,7 +173,7 @@ function AdminSidebar({ active, setActive, onLogout, alertCount, open, setOpen, 
 }
 
 // ── Overview ──────────────────────────────────────────────────────────────────
-function Overview({ setActive, nurses, clients, visits, payments, lang='en' }) {
+function Overview({ setActive, onNavigateToVisit, nurses, clients, visits, payments, lang='en' }) {
   const tr = (key) => t(lang, key);
   const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
   const pending = nurses.filter(n=>['PENDING','INCOMPLETE'].includes(n.status));
@@ -233,9 +233,14 @@ function Overview({ setActive, nurses, clients, visits, payments, lang='en' }) {
       {/* Recent visits */}
       <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20 }}>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
-          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.recentVisits')||'Recent visits'}</div>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+            <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{tr('admin.recentVisits')||'Recent visits'}</div>
+            <button onClick={()=>setActive('visits')} style={{ fontSize:12, fontWeight:600, color:C.primary, background:'transparent', border:'none', cursor:'pointer', padding:0 }}>View all →</button>
+          </div>
           {visits.slice(0,4).map((v,i) => (
-            <div key={v.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 0', borderBottom:i<3?`1px solid ${C.borderSubtle}`:'none' }}>
+            <div key={v.id} onClick={()=>onNavigateToVisit && onNavigateToVisit(v.id)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 8px', borderBottom:i<3?`1px solid ${C.borderSubtle}`:'none', cursor:'pointer', borderRadius:6, margin:'0 -8px', transition:'background 0.1s' }}
+              onMouseEnter={e=>e.currentTarget.style.background=C.bgSubtle}
+              onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
               <div>
                 <div style={{ fontSize:13, fontWeight:500, color:C.textPrimary }}>{v.clientName}</div>
                 <div style={{ fontSize:11, color:C.textTertiary, marginTop:2 }}>{v.service} · {v.city}</div>
@@ -245,9 +250,14 @@ function Overview({ setActive, nurses, clients, visits, payments, lang='en' }) {
           ))}
         </div>
         <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
-          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.recentPayments')||'Recent payments'}</div>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+            <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{tr('admin.recentPayments')||'Recent payments'}</div>
+            <button onClick={()=>setActive('payments')} style={{ fontSize:12, fontWeight:600, color:C.primary, background:'transparent', border:'none', cursor:'pointer', padding:0 }}>View all →</button>
+          </div>
           {payments.slice(0,4).map((p,i) => (
-            <div key={p.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 0', borderBottom:i<3?`1px solid ${C.borderSubtle}`:'none' }}>
+            <div key={p.id} onClick={()=>setActive('payments')} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'10px 8px', borderBottom:i<3?`1px solid ${C.borderSubtle}`:'none', cursor:'pointer', borderRadius:6, margin:'0 -8px', transition:'background 0.1s' }}
+              onMouseEnter={e=>e.currentTarget.style.background=C.bgSubtle}
+              onMouseLeave={e=>e.currentTarget.style.background='transparent'}>
               <div>
                 <div style={{ fontSize:13, fontWeight:500, color:C.textPrimary }}>{p.clientName}</div>
                 <div style={{ fontSize:11, color:C.textTertiary, marginTop:2 }}>{p.plan} · {p.date}</div>
@@ -265,7 +275,7 @@ function Overview({ setActive, nurses, clients, visits, payments, lang='en' }) {
 }
 
 // ── Clients ───────────────────────────────────────────────────────────────────
-function Clients({ clients, visits, onStatusChange, lang='en' }) {
+function Clients({ clients, visits, onStatusChange, lang='en', onNavigateToVisit }) {
   const tr = (key) => t(lang, key);
   const [search, setSearch] = useState('');
   const [filterPlan, setFilterPlan] = useState('all');
@@ -283,7 +293,7 @@ function Clients({ clients, visits, onStatusChange, lang='en' }) {
     return matchSearch && matchPlan && matchStatus;
   }), [search, filterPlan, filterStatus, clients]);
 
-  if (selected) return <ClientDetail client={selected} onBack={()=>setSelected(null)} visits={visits} onStatusChange={onStatusChange} lang={lang} />;
+  if (selected) return <ClientDetail client={selected} onBack={()=>setSelected(null)} visits={visits} onStatusChange={onStatusChange} onNavigateToVisit={onNavigateToVisit} lang={lang} />;
 
   return (
     <div>
@@ -307,14 +317,14 @@ function Clients({ clients, visits, onStatusChange, lang='en' }) {
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ background:C.bgSubtle }}>
-              {[tr('admin.clientTable.client'),tr('admin.clientTable.country'),tr('admin.clientTable.plan'),tr('admin.clientTable.status'),tr('admin.clientTable.visitsUsed'),tr('admin.clientTable.joined'),''].map(h => (
+              {[tr('admin.clientTable.client'),tr('admin.clientTable.country'),tr('admin.clientTable.plan'),tr('admin.clientTable.status'),tr('admin.clientTable.visitsUsed'),tr('admin.clientTable.joined')].map(h => (
                 <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', borderBottom:`1px solid ${C.border}` }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.map((c,i) => (
-              <tr key={c.id} style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none', cursor:'pointer' }} onClick={()=>setSelected(c)}>
+              <tr key={c.id} className="adm-row" onClick={()=>setSelected(c)} style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none', cursor:'pointer' }}>
                 <td style={{ padding:'12px 16px' }}>
                   <div style={{ fontWeight:600, color:C.textPrimary }}>{c.name}</div>
                   <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{c.email}</div>
@@ -324,7 +334,6 @@ function Clients({ clients, visits, onStatusChange, lang='en' }) {
                 <td style={{ padding:'12px 16px' }}>{statusBadge(c.status, lang)}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{c.visitsUsed}/{c.visitsTotal}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary }}>{c.joinedAt}</td>
-                <td style={{ padding:'12px 16px' }}><button className="adm-btn-ghost">{tr('admin.viewBtn')}</button></td>
               </tr>
             ))}
           </tbody>
@@ -335,7 +344,7 @@ function Clients({ clients, visits, onStatusChange, lang='en' }) {
   );
 }
 
-function ClientDetail({ client, onBack, visits=[], onStatusChange, lang='en' }) {
+function ClientDetail({ client, onBack, visits=[], onStatusChange, onNavigateToVisit, lang='en' }) {
   const tr = (key) => t(lang, key);
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState({ name:client.name||'', phone:client.phone||'', country:client.country||'' });
@@ -425,9 +434,14 @@ function ClientDetail({ client, onBack, visits=[], onStatusChange, lang='en' }) 
         </div>
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginTop:20 }}>
-        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.visitHistory')} ({clientVisits.length})</div>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{tr('admin.visitHistory')} ({clientVisits.length})</div>
+          {onNavigateToVisit && clientVisits.length>0 && <button onClick={()=>onNavigateToVisit(null)} style={{ fontSize:12, fontWeight:600, color:C.primary, background:'transparent', border:'none', cursor:'pointer', padding:0 }}>View all visits →</button>}
+        </div>
         {clientVisits.length===0 ? <div style={{ fontSize:13, color:C.textTertiary }}>{tr('admin.noVisitsYet')}</div> : clientVisits.map((v,i) => (
-          <div key={v.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0', borderBottom:i<clientVisits.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
+          <div key={v.id} onClick={()=>onNavigateToVisit && onNavigateToVisit(v.id)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 8px', borderBottom:i<clientVisits.length-1?`1px solid ${C.borderSubtle}`:'none', cursor:onNavigateToVisit?'pointer':'default', borderRadius:6, margin:'0 -8px', transition:'background 0.1s' }}
+            onMouseEnter={e=>{ if(onNavigateToVisit) e.currentTarget.style.background=C.bgSubtle; }}
+            onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; }}>
             <div>
               <div style={{ fontSize:14, fontWeight:500, color:C.textPrimary }}>{v.service}</div>
               <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{new Date(v.scheduledAt).toLocaleDateString()} · {v.nurseName||'No nurse'}</div>
@@ -441,12 +455,12 @@ function ClientDetail({ client, onBack, visits=[], onStatusChange, lang='en' }) 
 }
 
 // ── Nurses ────────────────────────────────────────────────────────────────────
-function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, onRefresh, lang='en' }) {
+function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, onRefresh, lang='en', initialSelected=null, onNavigateToVisit }) {
   const tr = (key) => t(lang, key);
   const [search, setSearch] = useState('');
   const [filterCity, setFilterCity] = useState('all');
   const [filterStatus, setFilterStatus] = useState('all');
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(initialSelected);
 
   const filtered = useMemo(() => nurses.map(n => ({
     ...n,
@@ -466,7 +480,7 @@ function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, onRefresh, 
   const handleApprove = (id) => onApprove(id);
   const handleSuspend = (id) => onSuspend(id);
 
-  if (selected) return <NurseDetail nurse={nurses.find(n=>n.id===selected)} onBack={()=>setSelected(null)} onApprove={handleApprove} onSuspend={handleSuspend} onReject={onReject} onRefresh={onRefresh} lang={lang} />;
+  if (selected) return <NurseDetail nurse={nurses.find(n=>n.id===selected)} onBack={()=>setSelected(null)} onApprove={handleApprove} onSuspend={handleSuspend} onReject={onReject} onRefresh={onRefresh} onNavigateToVisit={onNavigateToVisit} lang={lang} />;
 
   return (
     <div>
@@ -497,8 +511,8 @@ function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, onRefresh, 
           </thead>
           <tbody>
             {filtered.map((n,i) => (
-              <tr key={n.id} style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
-                <td style={{ padding:'12px 16px', cursor:'pointer' }} onClick={()=>setSelected(n.id)}>
+              <tr key={n.id} className="adm-row" onClick={()=>setSelected(n.id)} style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none', cursor:'pointer' }}>
+                <td style={{ padding:'12px 16px' }}>
                   <div style={{ fontWeight:600, color:C.textPrimary }}>{n.user?.name || n.name || '—'}</div>
                   <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{n.user?.email || n.email || '—'}</div>
                 </td>
@@ -507,14 +521,14 @@ function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, onRefresh, 
                 <td style={{ padding:'12px 16px', color:n.rating>0?C.warning:C.textTertiary, fontWeight:600 }}>{n.rating>0?`${n.rating}`:tr('admin.notYetRated')}</td>
                 <td style={{ padding:'12px 16px', color:C.textSecondary }}>{n.totalVisits || 0}</td>
                 <td style={{ padding:'12px 16px', color:C.textTertiary, fontSize:12 }}>{n.licenseNumber || '—'}</td>
-                <td style={{ padding:'12px 16px' }}>
+                <td style={{ padding:'12px 16px' }} onClick={e=>e.stopPropagation()}>
                   <div style={{ display:'flex', gap:6 }}>
                     {(n.status==='PENDING'||n.status==='INCOMPLETE') && <>
-                      <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.approve')}</button>
-                      <button onClick={()=>onReject(n.id, 'Rejected by admin')} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.errorLight, color:C.error, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.reject')}</button>
+                      <button onClick={e=>{ e.stopPropagation(); handleApprove(n.id); }} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.approve')}</button>
+                      <button onClick={e=>{ e.stopPropagation(); onReject(n.id, 'Rejected by admin'); }} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.errorLight, color:C.error, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.reject')}</button>
                     </>}
-                    {n.status==='APPROVED' && <button onClick={()=>handleSuspend(n.id)} style={{ fontSize:11, padding:'5px 10px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:6, cursor:'pointer' }}>{tr('admin.suspend')}</button>}
-                    {(n.status==='SUSPENDED'||n.status==='REJECTED') && <button onClick={()=>handleApprove(n.id)} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.reinstate')}</button>}
+                    {n.status==='APPROVED' && <button onClick={e=>{ e.stopPropagation(); handleSuspend(n.id); }} style={{ fontSize:11, padding:'5px 10px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:6, cursor:'pointer' }}>{tr('admin.suspend')}</button>}
+                    {(n.status==='SUSPENDED'||n.status==='REJECTED') && <button onClick={e=>{ e.stopPropagation(); handleApprove(n.id); }} style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.secondaryLight, color:C.secondary, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.reinstate')}</button>}
                   </div>
                 </td>
               </tr>
@@ -527,7 +541,7 @@ function Nurses({ nurses, setNurses, onApprove, onSuspend, onReject, onRefresh, 
   );
 }
 
-function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh, lang='en' }) {
+function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh, onNavigateToVisit, lang='en' }) {
   const tr = (key) => t(lang, key);
   const [editing, setEditing] = useState(false);
   const [editData, setEditData] = useState({ city:'', bio:'', licenseNumber:'', paypalEmail:'', payRatePerVisit:20 });
@@ -654,9 +668,14 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh,
         </div>
       </div>
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24 }}>
-        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('admin.visitHistory')} ({nurseVisits.length})</div>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
+          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{tr('admin.visitHistory')} ({nurseVisits.length})</div>
+          {onNavigateToVisit && nurseVisits.length>0 && <button onClick={()=>onNavigateToVisit(null)} style={{ fontSize:12, fontWeight:600, color:C.primary, background:'transparent', border:'none', cursor:'pointer', padding:0 }}>View all visits →</button>}
+        </div>
         {nurseVisits.length===0 ? <div style={{ fontSize:13, color:C.textTertiary }}>{tr('admin.noVisitsYet')}</div> : nurseVisits.map((v,i) => (
-          <div key={v.id} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 0', borderBottom:i<nurseVisits.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
+          <div key={v.id} onClick={()=>onNavigateToVisit && onNavigateToVisit(v.id)} style={{ display:'flex', justifyContent:'space-between', alignItems:'center', padding:'12px 8px', borderBottom:i<nurseVisits.length-1?`1px solid ${C.borderSubtle}`:'none', cursor:onNavigateToVisit?'pointer':'default', borderRadius:6, margin:'0 -8px', transition:'background 0.1s' }}
+            onMouseEnter={e=>{ if(onNavigateToVisit) e.currentTarget.style.background=C.bgSubtle; }}
+            onMouseLeave={e=>{ e.currentTarget.style.background='transparent'; }}>
             <div>
               <div style={{ fontSize:14, fontWeight:500, color:C.textPrimary }}>{v.clientName}</div>
               <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{v.service} · {new Date(v.scheduledAt).toLocaleDateString()}</div>
@@ -671,13 +690,13 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh,
 }
 
 // ── Visits ────────────────────────────────────────────────────────────────────
-function Visits({ visits, setVisits, nurses, onAssign, lang='en' }) {
+function Visits({ visits, setVisits, nurses, onAssign, lang='en', initialSelected=null }) {
   const tr = (key) => t(lang, key);
   const [search, setSearch] = useState('');
   const [filterStatus, setFilterStatus] = useState('all');
   const [filterCity, setFilterCity] = useState('all');
   const [assigning, setAssigning] = useState(null);
-  const [selected, setSelected] = useState(null);
+  const [selected, setSelected] = useState(initialSelected);
   const [statusUpdating, setStatusUpdating] = useState(false);
   const [newVisitStatus, setNewVisitStatus] = useState('');
 
@@ -782,14 +801,14 @@ function Visits({ visits, setVisits, nurses, onAssign, lang='en' }) {
         <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
           <thead>
             <tr style={{ background:C.bgSubtle }}>
-              {[tr('admin.visitTable.patient'),tr('admin.visitTable.service'),tr('admin.visitTable.city'),tr('admin.visitTable.date'),tr('admin.visitTable.nurse'),tr('admin.visitTable.status'),''].map(h => (
+              {[tr('admin.visitTable.patient'),tr('admin.visitTable.service'),tr('admin.visitTable.city'),tr('admin.visitTable.date'),tr('admin.visitTable.nurse'),tr('admin.visitTable.status')].map(h => (
                 <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', borderBottom:`1px solid ${C.border}` }}>{h}</th>
               ))}
             </tr>
           </thead>
           <tbody>
             {filtered.map((v,i) => (
-              <tr key={v.id} style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
+              <tr key={v.id} className="adm-row" onClick={()=>setSelected(v.id)} style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none', cursor:'pointer' }}>
                 <td style={{ padding:'12px 16px' }}>
                   <div style={{ fontWeight:600, color:C.textPrimary }}>{v.clientName}</div>
                   {v.workOrderNumber && <div style={{ fontSize:10, fontWeight:700, color:C.primary, marginTop:2, letterSpacing:'0.5px' }}>{v.workOrderNumber}</div>}
@@ -799,7 +818,6 @@ function Visits({ visits, setVisits, nurses, onAssign, lang='en' }) {
                 <td style={{ padding:'12px 16px', color:C.textTertiary, fontSize:12 }}>{new Date(v.scheduledAt).toLocaleDateString()}</td>
                 <td style={{ padding:'12px 16px', color:v.nurseName?C.textPrimary:C.error, fontWeight:v.nurseName?400:600 }}>{v.nurseName||tr('admin.unassignedLabel')}</td>
                 <td style={{ padding:'12px 16px' }}>{statusBadge(v.status, lang)}</td>
-                <td style={{ padding:'12px 16px' }}><button onClick={()=>setSelected(v.id)} style={{ fontSize:12, fontWeight:600, color:C.primary, background:'transparent', border:'none', cursor:'pointer' }}>{tr('admin.viewBtn')}</button></td>
               </tr>
             ))}
           </tbody>
@@ -823,7 +841,7 @@ function AlertGroup({ title, count, color, children, lang='en' }) {
   );
 }
 
-function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, onReject, onAssign, lang='en' }) {
+function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, onReject, onAssign, onNavigateToVisit, lang='en' }) {
   const tr = (key) => t(lang, key);
   const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
   const noShow = visits.filter(v=>v.status==='NO_SHOW');
@@ -839,8 +857,8 @@ function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, on
       <AlertGroup title={tr('admin.unassignedLabel')} count={unassigned.length} color="red" lang={lang}>
         {unassigned.length===0 ? <div style={{ padding:'16px 20px', fontSize:13, color:C.textTertiary }}>{tr('admin.allAssigned')}</div> : unassigned.map(v => (
           <div key={v.id} style={{ padding:'14px 20px', borderBottom:`1px solid ${C.borderSubtle}`, display:'flex', justifyContent:'space-between', alignItems:'center', flexWrap:'wrap', gap:10 }}>
-            <div>
-              <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{v.clientName}</div>
+            <div onClick={()=>onNavigateToVisit && onNavigateToVisit(v.id)} style={{ cursor:onNavigateToVisit?'pointer':'default', flex:1 }}>
+              <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, display:'flex', alignItems:'center', gap:6 }}>{v.clientName} {onNavigateToVisit && <span style={{ fontSize:11, color:C.primary, fontWeight:500 }}>View →</span>}</div>
               <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{v.service} · {v.city} · {new Date(v.scheduledAt).toLocaleDateString()}</div>
             </div>
             <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
@@ -1445,8 +1463,16 @@ export default function AdminPage({ params }) {
   const router = useRouter();
   const tr = (key) => t(lang, key);
   const switchLang = (l) => { document.cookie=`vonaxity-locale=${l};path=/;max-age=31536000`; const path = window.location.pathname.replace(/^\/(en|sq)/,`/${l}`); window.location.href = path; };
-  const [active, setActive] = useState('overview');
+  const [active, setActiveRaw] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
+  const [visitNavTarget, setVisitNavTarget] = useState(null);
+  const [nurseNavTarget, setNurseNavTarget] = useState(null);
+
+  // Clear nav targets when manually switching tabs
+  const setActive = (tab) => { setVisitNavTarget(null); setNurseNavTarget(null); setActiveRaw(tab); };
+  // Deep-link navigation: jump to a specific record in another tab
+  const navigateToVisit = (visitId) => { setVisitNavTarget(visitId); setActiveRaw('visits'); };
+  const navigateToNurse = (nurseId) => { setNurseNavTarget(nurseId); setActiveRaw('nurses'); };
   const [nurses, setNurses] = useState([]);
   const [visits, setVisits] = useState([]);
   const [clients, setClients] = useState([]);
@@ -1583,11 +1609,11 @@ export default function AdminPage({ params }) {
               </div>
             ) : (
               <>
-                {active==='overview' && <Overview setActive={setActive} nurses={nurses} clients={clients} visits={visits} payments={payments} lang={lang} />}
-                {active==='clients' && <Clients clients={clients} visits={visits} onStatusChange={loadData} lang={lang} />}
-                {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onRefresh={loadData} lang={lang} />}
-                {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} onAssign={handleAssign} lang={lang} />}
-                {active==='alerts' && <Alerts visits={visits} nurses={nurses} setVisits={setVisits} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onAssign={handleAssign} lang={lang} />}
+                {active==='overview' && <Overview setActive={setActive} onNavigateToVisit={navigateToVisit} nurses={nurses} clients={clients} visits={visits} payments={payments} lang={lang} />}
+                {active==='clients' && <Clients clients={clients} visits={visits} onStatusChange={loadData} onNavigateToVisit={navigateToVisit} lang={lang} />}
+                {active==='nurses' && <Nurses nurses={nurses} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onRefresh={loadData} initialSelected={nurseNavTarget} onNavigateToVisit={navigateToVisit} lang={lang} />}
+                {active==='visits' && <Visits visits={visits} setVisits={setVisits} nurses={nurses} onAssign={handleAssign} initialSelected={visitNavTarget} lang={lang} />}
+                {active==='alerts' && <Alerts visits={visits} nurses={nurses} setVisits={setVisits} setNurses={setNurses} onApprove={handleApprove} onSuspend={handleSuspend} onReject={handleReject} onAssign={handleAssign} onNavigateToVisit={navigateToVisit} lang={lang} />}
                 {active==='payments' && <Payments payments={payments} lang={lang} />}
                 {active==='analytics' && <Analytics clients={clients} nurses={nurses} visits={visits} payments={payments} lang={lang} />}
                 {active==='payouts' && <Payouts payouts={payouts} onRefresh={loadData} lang={lang} />}
