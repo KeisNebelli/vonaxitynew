@@ -37,6 +37,9 @@ router.get('/', ...requireRole('ADMIN'), async (req, res) => {
       submittedAt: n.submittedAt || null,
       approvedAt: n.approvedAt || null,
       createdAt: n.createdAt,
+      payRatePerVisit: n.payRatePerVisit ?? 20,
+      paypalEmail: n.paypalEmail || '',
+      profilePhotoUrl: n.profilePhotoUrl || null,
     }));
     res.json({ nurses: normalized });
   } catch (err) {
