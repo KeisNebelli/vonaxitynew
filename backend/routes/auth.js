@@ -131,6 +131,11 @@ router.post('/register-nurse', async (req, res) => {
       token,
       user: { id: user.id, name: user.name, email: user.email, role: user.role },
     });
+
+    // Send welcome email (non-blocking — don't await)
+    const { sendEmail, emailTemplates } = require('../lib/email');
+    sendEmail({ to: user.email, ...emailTemplates.welcomeNurse({ name: user.name }) })
+      .catch(e => console.error('Nurse welcome email error:', e));
   } catch (err) {
     console.error('Nurse register error:', err);
     res.status(500).json({ error: 'Registration failed' });

@@ -73,7 +73,7 @@ export default function NurseSignup({ params }) {
 
   return (
     <div style={{ minHeight:'100vh', background:'linear-gradient(150deg,#EFF6FF 0%,#F8FAFC 50%,#F0FDF4 100%)', display:'flex', alignItems:'center', justifyContent:'center', padding:24, fontFamily:"'Inter',system-ui,sans-serif" }}>
-      <style>{`.ns-btn:not(:disabled):hover{background:#1D4ED8!important;transform:translateY(-1px)}.ns-btn{transition:all 0.15s}`}</style>
+      <style>{`.ns-btn:not(:disabled):hover{background:#1D4ED8!important;transform:translateY(-1px)}.ns-btn{transition:all 0.15s}@media(max-width:480px){.ns-pw-grid{grid-template-columns:1fr!important}}`}</style>
       <div style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'36px 32px', maxWidth:460, width:'100%', boxShadow:'0 8px 32px rgba(0,0,0,0.08)' }}>
         <Link href={`/${lang}`} style={{ fontSize:20, fontWeight:700, color:C.primary, letterSpacing:'-0.5px', display:'block', marginBottom:8 }}>Vonaxity</Link>
         <div style={{ fontSize:11, fontWeight:700, color:C.secondary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:24 }}>{tr.nurseAccount}</div>
@@ -93,7 +93,7 @@ export default function NurseSignup({ params }) {
           <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr.phone}</label>
           <input style={inp} value={form.phone} onChange={e=>setForm(f=>({...f,phone:e.target.value}))} placeholder="+355 69 000 0000" />
         </div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:14 }}>
+        <div className="ns-pw-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:12, marginBottom:14 }}>
           <div>
             <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:6 }}>{tr.password}</label>
             <input style={inp} type="password" name="password" autoComplete="new-password" value={form.password} onChange={e=>setForm(f=>({...f,password:e.target.value}))} placeholder={tr.passwordPh} />

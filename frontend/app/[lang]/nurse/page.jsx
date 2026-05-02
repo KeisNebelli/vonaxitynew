@@ -228,7 +228,7 @@ function NotificationBell({ lang, onNavigate }) {
       </button>
 
       {open && (
-        <div style={{ position:'absolute', top:42, right:0, width:320, background:C2.bgWhite, borderRadius:14, boxShadow:'0 8px 30px rgba(15,23,42,0.12)', border:`1px solid ${C2.border}`, zIndex:9999, overflow:'hidden' }}>
+        <div style={{ position:'absolute', top:42, right:0, width:'min(320px, calc(100vw - 32px))', background:C2.bgWhite, borderRadius:14, boxShadow:'0 8px 30px rgba(15,23,42,0.12)', border:`1px solid ${C2.border}`, zIndex:9999, overflow:'hidden' }}>
           <div style={{ padding:'14px 16px 10px', borderBottom:`1px solid ${C2.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <div style={{ fontSize:13, fontWeight:700, color:C2.textPrimary }}>{t(lang,'notifications.header')} {unread > 0 && <span style={{ fontSize:11, fontWeight:600, padding:'2px 7px', borderRadius:99, background:C2.primaryLight, color:C2.primary, marginLeft:6 }}>{unread}</span>}</div>
             {unread > 0 && <button onClick={markAll} style={{ fontSize:11, fontWeight:600, color:C2.primary, background:'none', border:'none', cursor:'pointer', padding:0 }}>{t(lang,'notifications.markAllRead')}</button>}
@@ -1020,8 +1020,20 @@ function NurseProfile({ lang='en', nurse=null }) {
   const statusMap = { APPROVED:['#ECFDF5','#059669'], PENDING:['#FEF3C7','#D97706'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
   const [statusBg, statusColor] = statusMap[nurse?.status] || statusMap.INCOMPLETE;
 
+  const isPending = (nurse?.status || 'INCOMPLETE') === 'PENDING';
+
   return (
     <div style={{ maxWidth:620 }}>
+
+      {/* Pending review notice — profile edits locked */}
+      {isPending && (
+        <div style={{ background:'#EFF6FF', border:'1px solid rgba(37,99,235,0.22)', borderRadius:12, padding:'14px 18px', marginBottom:20, display:'flex', gap:12, alignItems:'center' }}>
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <div style={{ fontSize:13, color:'#1E40AF', lineHeight:1.5 }}>
+            <strong>Profile under review.</strong> Your profile details are locked while our team reviews your application. You can still update your password and photo below.
+          </div>
+        </div>
+      )}
 
       {/* Your Public Profile - Read-only display */}
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'24px', marginBottom:28 }}>
@@ -1196,8 +1208,8 @@ function NurseProfile({ lang='en', nurse=null }) {
           <span style={{ fontSize:14, color:C.error }}>{tr('settings.savedError')}</span>
         </div>
       )}
-      <button onClick={handleSave} disabled={saving} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:'pointer', marginBottom:28, opacity:saving?0.7:1, boxShadow:'0 2px 8px rgba(37,99,235,0.2)' }}>
-        {saving ? tr('dashboard.saving') : tr('dashboard.saveProfile')}
+      <button onClick={isPending ? undefined : handleSave} disabled={saving || isPending} style={{ width:'100%', background:isPending?C.textTertiary:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:isPending?'not-allowed':'pointer', marginBottom:28, opacity:saving||isPending?0.5:1, boxShadow: isPending?'none':'0 2px 8px rgba(37,99,235,0.2)' }}>
+        {isPending ? '🔒 Locked — under review' : saving ? tr('dashboard.saving') : tr('dashboard.saveProfile')}
       </button>
 
       {/* Security */}
@@ -1252,7 +1264,11 @@ function tryParse(val, fallback) {
   try { return val ? JSON.parse(val) : fallback; } catch { return fallback; }
 }
 
-function OnboardingWizard({ nurse, user, onComplete, onSave }) {
+function OnboardingWizard({ nurse, user, onComplete, onSave, lang='en' }) {
+  const nurseStatus = nurse?.status || 'INCOMPLETE';
+  const isLocked = nurseStatus === 'PENDING';
+  const isRejected = nurseStatus === 'REJECTED';
+  const tr = (k) => t(lang, k);
   const [step, setStep] = useState(1);
   const [saving, setSaving] = useState(false);
   const [submitting, setSubmitting] = useState(false);
@@ -1313,8 +1329,45 @@ function OnboardingWizard({ nurse, user, onComplete, onSave }) {
 
   const STEPS = [tr('onboarding.step1'),tr('onboarding.step2'),tr('onboarding.step3'),tr('onboarding.step4'),tr('onboarding.step5')];
 
+  /* ── Locked view for PENDING status ── */
+  if (isLocked) {
+    return (
+      <div style={{ maxWidth:620 }}>
+        <div style={{ background:'#EFF6FF', border:'1px solid rgba(37,99,235,0.25)', borderRadius:14, padding:'24px 22px', marginBottom:20 }}>
+          <div style={{ display:'flex', gap:14, alignItems:'flex-start' }}>
+            <div style={{ width:42, height:42, borderRadius:12, background:'#DBEAFE', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+            </div>
+            <div>
+              <div style={{ fontSize:16, fontWeight:700, color:'#1E40AF', marginBottom:6 }}>{tr('nurse.underReview')}</div>
+              <div style={{ fontSize:14, color:'#3B82F6', lineHeight:1.6 }}>{tr('nurse.underReviewSub')}</div>
+            </div>
+          </div>
+        </div>
+        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
+          <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:14 }}>Submitted profile summary</div>
+          {[['City', nurse?.city],['Experience', nurse?.experience],['License No.', nurse?.licenseNumber]].filter(([,v])=>v).map(([k,v]) => (
+            <div key={k} style={{ display:'flex', gap:10, marginBottom:10 }}>
+              <div style={{ fontSize:12, color:C.textTertiary, width:100, flexShrink:0 }}>{k}</div>
+              <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{v}</div>
+            </div>
+          ))}
+          {nurse?.bio && <div style={{ marginTop:10, padding:'12px 14px', background:C.bgSubtle, borderRadius:10, fontSize:13, color:C.textSecondary, lineHeight:1.6 }}>{nurse.bio}</div>}
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div style={{ maxWidth:620 }}>
+      {/* Rejection notice */}
+      {isRejected && (
+        <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:14, padding:'18px 20px', marginBottom:24 }}>
+          <div style={{ fontSize:14, fontWeight:700, color:C.error, marginBottom:4 }}>{tr('nurse.applicationRejected')}</div>
+          <div style={{ fontSize:13, color:'#991B1B', lineHeight:1.6 }}>{nurse?.rejectionReason || tr('nurse.underReviewSub')}</div>
+          <div style={{ marginTop:10, fontSize:12, color:C.error, fontWeight:600 }}>Update your profile below and submit again.</div>
+        </div>
+      )}
       {/* Step indicator */}
       <div style={{ display:'flex', gap:4, marginBottom:28 }}>
         {STEPS.map((s,i) => (
@@ -1613,7 +1666,7 @@ export default function NursePage({ params }) {
           <main className="nurse-cont" style={{ flex:1, padding:24, overflowY:'auto', maxWidth:720, width:'100%' }}>
             <OnboardingBanner nurse={nurse} onStartOnboarding={()=>setActive('onboarding')} lang={lang} />
             <div key={active} className="nurse-section">
-              {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} />}
+              {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} lang={lang} />}
               {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} />}
               {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
               {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} />}

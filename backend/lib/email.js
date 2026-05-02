@@ -155,6 +155,80 @@ const emailTemplates = {
         <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
       </div>`,
   }),
+  // ── Welcome email to new nurse ──────────────────────────────────────────────
+  welcomeNurse: ({ name }) => ({
+    subject: 'Welcome to Vonaxity — complete your profile',
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
+        <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Welcome aboard, ${esc(name)}!</h2>
+        <p style="color:#475569;margin-bottom:24px">Your nurse account has been created. The next step is to complete your profile so our team can review and approve you to start receiving visit requests.</p>
+        <div style="background:#F0FDF4;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #BBF7D0">
+          <div style="font-weight:600;margin-bottom:8px;color:#065F46">Here's what to do next:</div>
+          <ol style="margin:0;padding-left:20px;color:#047857;line-height:1.8">
+            <li>Fill in your professional details (city, experience, certifications)</li>
+            <li>Add your languages and specialties</li>
+            <li>Submit for admin review</li>
+          </ol>
+        </div>
+        <a href="${BASE_URL}/en/nurse/profile" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">Complete my profile →</a>
+        <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
+      </div>`,
+  }),
+
+  // ── To client: visit cancelled ──────────────────────────────────────────────
+  visitCancelled: ({ clientName, serviceType, scheduledAt }) => ({
+    subject: `Your ${esc(serviceType)} visit has been cancelled`,
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
+        <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Visit cancelled</h2>
+        <p style="color:#475569;margin-bottom:24px">Hi ${esc(clientName)}, we're sorry to inform you that the following visit has been cancelled.</p>
+        <div style="background:#FEF2F2;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #FECACA">
+          <div style="margin-bottom:8px"><strong>Service:</strong> ${esc(serviceType)}</div>
+          <div><strong>Scheduled:</strong> ${new Date(scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+        </div>
+        <p style="color:#475569;margin-bottom:24px">You can book a new visit at any time from your dashboard. We apologise for any inconvenience.</p>
+        <a href="${BASE_URL}/en/dashboard" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">Book a new visit →</a>
+        <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
+      </div>`,
+  }),
+
+  // ── To nurse: assigned visit was cancelled ───────────────────────────────────
+  visitCancelledNurse: ({ nurseName, serviceType, scheduledAt }) => ({
+    subject: `Job cancelled — ${esc(serviceType)}`,
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
+        <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Job cancelled</h2>
+        <p style="color:#475569;margin-bottom:24px">Hi ${esc(nurseName)}, a job you were assigned has been cancelled by the client or admin.</p>
+        <div style="background:#FEF2F2;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #FECACA">
+          <div style="margin-bottom:8px"><strong>Service:</strong> ${esc(serviceType)}</div>
+          <div><strong>Scheduled:</strong> ${new Date(scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}</div>
+        </div>
+        <a href="${BASE_URL}/en/nurse" style="display:inline-block;background:#059669;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">View available jobs →</a>
+        <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Professional home nurse visits across Albania</p>
+      </div>`,
+  }),
+
+  // ── Admin: nurse submitted profile for review ────────────────────────────────
+  adminNurseSubmission: ({ nurseName, nurseEmail, nurseId }) => ({
+    subject: `New nurse profile submitted — ${esc(nurseName)}`,
+    html: `
+      <div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
+        <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity Admin</div>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">New nurse profile ready for review</h2>
+        <p style="color:#475569;margin-bottom:24px">A nurse has submitted their profile and is waiting for approval.</p>
+        <div style="background:#F8FAFC;border-radius:12px;padding:20px;margin-bottom:24px;border:1px solid #E2E8F0">
+          <div style="margin-bottom:8px"><strong>Name:</strong> ${esc(nurseName)}</div>
+          <div style="margin-bottom:8px"><strong>Email:</strong> ${esc(nurseEmail)}</div>
+          <div><strong>Nurse ID:</strong> ${esc(String(nurseId))}</div>
+        </div>
+        <a href="${BASE_URL}/en/admin" style="display:inline-block;background:#2563EB;color:#fff;text-decoration:none;padding:12px 28px;border-radius:10px;font-weight:600;font-size:15px">Review in admin panel →</a>
+        <p style="color:#94A3B8;font-size:12px;margin-top:32px">Vonaxity · Internal notification</p>
+      </div>`,
+  }),
+
   // ── Welcome email to new client ─────────────────────────────────────────────
   welcomeClient: ({ name }) => ({
     subject: 'Welcome to Vonaxity',

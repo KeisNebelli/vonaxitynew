@@ -1,6 +1,7 @@
 const router = require('express').Router();
 const prisma = require('../lib/db');
 const { requireRole } = require('../middleware/auth');
+const { sendEmail, emailTemplates } = require('../lib/email');
 
 // GET /nurses — admin gets all nurses with full profile
 router.get('/', ...requireRole('ADMIN'), async (req, res) => {
@@ -73,6 +74,9 @@ router.put('/me/onboarding', ...requireRole('NURSE'), async (req, res) => {
     if (!city || !bio || !licenseNumber || !issuingAuthority) {
       return res.status(400).json({ error: 'Please complete all required fields before submitting.' });
     }
+    // Check current status for admin email subject
+    const existing = await prisma.nurse.findUnique({ where: { userId: req.user.userId }, select: { status: true } });
+    const isResubmission = existing?.status === 'REJECTED';
     const nurse = await prisma.nurse.update({
       where: { userId: req.user.userId },
       data: {
@@ -86,8 +90,20 @@ router.put('/me/onboarding', ...requireRole('NURSE'), async (req, res) => {
         status: 'PENDING',
         submittedAt: new Date(),
       },
+      include: { user: true },
     });
     res.json({ success: true, nurse });
+
+    // Notify admin (non-blocking)
+    const adminEmail = process.env.ADMIN_EMAIL || 'admin@vonaxity.com';
+    const tmpl = emailTemplates.adminNurseSubmission({
+      nurseName: nurse.user.name,
+      nurseEmail: nurse.user.email,
+      nurseId: nurse.id,
+    });
+    if (isResubmission) tmpl.subject = `[RESUBMISSION] ${tmpl.subject}`;
+    sendEmail({ to: adminEmail, ...tmpl })
+      .catch(e => console.error('Admin nurse submission email error:', e));
   } catch (err) {
     console.error('Onboarding submit error:', err);
     res.status(500).json({ error: 'Failed to submit onboarding' });

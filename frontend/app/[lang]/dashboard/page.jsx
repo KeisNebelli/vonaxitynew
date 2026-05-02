@@ -124,7 +124,7 @@ function NotificationBell({ lang, onNavigate }) {
       </button>
 
       {open && (
-        <div style={{ position:'absolute', top:42, right:0, width:320, background:C.bgWhite, borderRadius:14, boxShadow:'0 8px 30px rgba(15,23,42,0.12)', border:`1px solid ${C.border}`, zIndex:9999, overflow:'hidden' }}>
+        <div style={{ position:'absolute', top:42, right:0, width:'min(320px, calc(100vw - 32px))', background:C.bgWhite, borderRadius:14, boxShadow:'0 8px 30px rgba(15,23,42,0.12)', border:`1px solid ${C.border}`, zIndex:9999, overflow:'hidden' }}>
           {/* Header */}
           <div style={{ padding:'14px 16px 10px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
             <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary }}>{t(lang,'notifications.header')} {unread > 0 && <span style={{ fontSize:11, fontWeight:600, padding:'2px 7px', borderRadius:99, background:C.primaryLight, color:C.primary, marginLeft:6 }}>{unread}</span>}</div>

@@ -398,6 +398,17 @@ router.put('/:id', ...requireRole('ADMIN'), async (req, res) => {
       const nurseUserId = visit.nurse?.userId;
       if (clientId) await createNotification({ userId: clientId, type: 'VISIT_CANCELLED', title: 'Visit cancelled', message: `Your ${visit.serviceType} visit has been cancelled.`, relatedId: req.params.id });
       if (nurseUserId) await createNotification({ userId: nurseUserId, type: 'VISIT_CANCELLED', title: 'Job cancelled', message: `A ${visit.serviceType} job you were assigned has been cancelled.`, relatedId: req.params.id });
+
+      // Send cancellation emails
+      const clientUser = visit.relative?.client;
+      if (clientUser?.email) {
+        sendEmail({ to: clientUser.email, ...emailTemplates.visitCancelled({ clientName: clientUser.name, serviceType: visit.serviceType, scheduledAt: visit.scheduledAt }) })
+          .catch(e => console.error('Cancellation email (client) error:', e));
+      }
+      if (visit.nurse?.user?.email) {
+        sendEmail({ to: visit.nurse.user.email, ...emailTemplates.visitCancelledNurse({ nurseName: visit.nurse.user.name, serviceType: visit.serviceType, scheduledAt: visit.scheduledAt }) })
+          .catch(e => console.error('Cancellation email (nurse) error:', e));
+      }
     }
 
     // visit updated
