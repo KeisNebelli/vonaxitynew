@@ -108,19 +108,6 @@ export default function Nav({ lang = 'en' }) {
           align-items: center;
           gap: 9px;
         }
-        .vx-coming-soon {
-          font-size: 10px;
-          font-weight: 700;
-          letter-spacing: 0.4px;
-          padding: 3px 9px;
-          border-radius: 99px;
-          background: linear-gradient(135deg, #6366F1, #2563EB);
-          color: #fff;
-          white-space: nowrap;
-          position: relative;
-          top: -1px;
-          box-shadow: 0 2px 8px rgba(99,102,241,0.35);
-        }
         .vx-desktop-links {
           display: flex;
           gap: 4px;
@@ -319,7 +306,6 @@ export default function Nav({ lang = 'en' }) {
           {/* Logo */}
           <Link href={`/${lang}`} className="vx-logo">
             Vonaxity
-            <span className="vx-coming-soon">✦ {lang === 'sq' ? 'Së shpejti' : 'Coming Soon'}</span>
           </Link>
 
           {/* Desktop links */}

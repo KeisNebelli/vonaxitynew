@@ -313,7 +313,7 @@ export default async function HomePage({ params }) {
                 {/* Book CTA */}
                 <Link href={`/${lang}/signup`} style={{ display: 'block', marginTop: 'auto' }}>
                   <button className="hp-nurse-btn">
-                    {lang === 'sq' ? 'Rezervo' : 'Book this nurse'}
+                    {lang === 'sq' ? 'Rezervo një vizitë' : 'Book a visit'}
                   </button>
                 </Link>
               </div>

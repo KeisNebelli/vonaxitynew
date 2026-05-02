@@ -4,14 +4,11 @@
   OrganicBackground — Vonaxity landing page
   ─────────────────────────────────────────
   Fixed, full-viewport layer sitting behind all content.
-  Uses CSS border-radius morphing (universally supported, 60fps)
-  to produce organic, petal-like forms that breathe slowly.
-  All blobs are heavily blurred and very low-opacity so they
-  never compete with text or UI.
+  On mobile (≤768px) we cut to 3 blobs with reduced blur,
+  hide the SVG arcs and pulse nodes — keeps it 60fps on iOS Safari.
 */
 
 const KEYFRAMES = `
-  /* ── blob morph shapes ── */
   @keyframes org-m1 {
     0%,100% { border-radius:62% 38% 46% 54% / 60% 44% 56% 40%; transform:scale(1)    translate(0px, 0px)   rotate(0deg);  }
     20%     { border-radius:48% 52% 60% 40% / 44% 62% 38% 56%; transform:scale(1.04) translate(14px,-10px)  rotate(2deg);  }
@@ -43,14 +40,10 @@ const KEYFRAMES = `
     0%,100% { border-radius:52% 48% 44% 56% / 46% 54% 46% 54%; transform:scale(1)    translate(0px, 0px);  }
     50%     { border-radius:36% 64% 58% 42% / 60% 40% 52% 48%; transform:scale(1.08) translate(-4px, 6px);  }
   }
-
-  /* ── subtle pulsing glow rings ── */
   @keyframes org-ring {
-    0%,100% { transform:scale(1);   opacity:0.6; }
+    0%,100% { transform:scale(1);    opacity:0.6; }
     50%     { transform:scale(1.12); opacity:1;   }
   }
-
-  /* ── flowing circuit arcs ── */
   @keyframes org-arc-draw {
     0%   { stroke-dashoffset: 900; opacity:0;   }
     10%  {                         opacity:0.7; }
@@ -61,11 +54,20 @@ const KEYFRAMES = `
     0%,100% { opacity:0.25; }
     50%     { opacity:0.55; }
   }
-
-  /* ── overall breathe ── */
   @keyframes org-breathe {
     0%,100% { opacity:1;    }
     50%     { opacity:0.82; }
+  }
+
+  /* ── mobile: hide expensive layers, reduce blur on remaining blobs ── */
+  @media (max-width: 768px) {
+    .org-blob-4, .org-blob-5, .org-blob-6 { display: none !important; }
+    .org-arcs { display: none !important; }
+    .org-ring-wrap { display: none !important; }
+    .org-noise { display: none !important; }
+    .org-blob-1 { filter: blur(40px) !important; width: 320px !important; height: 300px !important; }
+    .org-blob-2 { filter: blur(36px) !important; width: 280px !important; height: 260px !important; }
+    .org-blob-3 { filter: blur(32px) !important; width: 260px !important; height: 240px !important; }
   }
 
   @media (prefers-reduced-motion: reduce) {
@@ -73,10 +75,9 @@ const KEYFRAMES = `
   }
 `;
 
-/* ─── blob definitions ─────────────────────────────────────── */
 const BLOBS = [
   {
-    /* 1 — large blue petal, top-right */
+    cls: 'org-blob org-blob-1',
     style: {
       top: '-12%', right: '-8%',
       width: 780, height: 700,
@@ -87,7 +88,7 @@ const BLOBS = [
     },
   },
   {
-    /* 2 — teal form, mid-left */
+    cls: 'org-blob org-blob-2',
     style: {
       top: '22%', left: '-10%',
       width: 660, height: 600,
@@ -98,7 +99,7 @@ const BLOBS = [
     },
   },
   {
-    /* 3 — indigo petal, bottom-right */
+    cls: 'org-blob org-blob-3',
     style: {
       bottom: '-8%', right: '-4%',
       width: 620, height: 580,
@@ -109,7 +110,7 @@ const BLOBS = [
     },
   },
   {
-    /* 4 — vast soft teal wash, center-page */
+    cls: 'org-blob org-blob-4',
     style: {
       top: '38%', left: '22%',
       width: 860, height: 700,
@@ -120,7 +121,7 @@ const BLOBS = [
     },
   },
   {
-    /* 5 — soft violet, bottom-left */
+    cls: 'org-blob org-blob-5',
     style: {
       bottom: '8%', left: '4%',
       width: 500, height: 460,
@@ -131,7 +132,7 @@ const BLOBS = [
     },
   },
   {
-    /* 6 — small bright teal accent, upper-left */
+    cls: 'org-blob org-blob-6',
     style: {
       top: '6%', left: '8%',
       width: 380, height: 340,
@@ -143,7 +144,6 @@ const BLOBS = [
   },
 ];
 
-/* ─── subtle glow rings (pinpoint medical energy nodes) ─── */
 const RINGS = [
   { top: '18%', left: '62%', size: 6, color: 'rgba(37,99,235,0.55)',  delay: '0s',   dur: '5s'  },
   { top: '52%', left: '8%',  size: 5, color: 'rgba(20,184,166,0.50)', delay: '2s',   dur: '7s'  },
@@ -151,7 +151,6 @@ const RINGS = [
   { top: '35%', left: '88%', size: 4, color: 'rgba(6,182,212,0.45)',  delay: '3s',   dur: '4.5s'},
 ];
 
-/* ─── flowing arc paths (AI/circuit feel) ─── */
 const ARCS = [
   {
     d: 'M -40 320 Q 280 80 620 260 T 1300 180',
@@ -189,7 +188,7 @@ export default function OrganicBackground() {
         {BLOBS.map((b, i) => (
           <div
             key={i}
-            className="org-blob"
+            className={b.cls}
             style={{
               position: 'absolute',
               ...b.style,
@@ -198,9 +197,9 @@ export default function OrganicBackground() {
           />
         ))}
 
-        {/* ── flowing circuit arcs ── */}
+        {/* ── flowing circuit arcs (desktop only) ── */}
         <svg
-          className="org-arc"
+          className="org-arcs"
           style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', overflow: 'visible' }}
           viewBox="0 0 1440 900"
           preserveAspectRatio="xMidYMid slice"
@@ -222,27 +221,19 @@ export default function OrganicBackground() {
           ))}
         </svg>
 
-        {/* ── pulse nodes ── */}
+        {/* ── pulse nodes (desktop only) ── */}
         {RINGS.map((r, i) => (
           <div
             key={i}
             className="org-ring-wrap"
-            style={{
-              position: 'absolute',
-              top: r.top,
-              left: r.left,
-              width: r.size,
-              height: r.size,
-            }}
+            style={{ position: 'absolute', top: r.top, left: r.left, width: r.size, height: r.size }}
           >
-            {/* core dot */}
             <div style={{
               position: 'absolute', inset: 0,
               borderRadius: '50%',
               background: r.color,
               animation: `org-ring ${r.dur} ease-in-out infinite ${r.delay}`,
             }} />
-            {/* ring 1 */}
             <div style={{
               position: 'absolute',
               inset: `-${r.size * 1.5}px`,
@@ -251,7 +242,6 @@ export default function OrganicBackground() {
               animation: `org-ring ${r.dur} ease-in-out infinite calc(${r.delay} + 0.4s)`,
               opacity: 0.4,
             }} />
-            {/* ring 2 */}
             <div style={{
               position: 'absolute',
               inset: `-${r.size * 3.2}px`,
@@ -263,8 +253,8 @@ export default function OrganicBackground() {
           </div>
         ))}
 
-        {/* ── very subtle overall grain/noise texture ── */}
-        <svg style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.018 }} xmlns="http://www.w3.org/2000/svg">
+        {/* ── grain texture (desktop only) ── */}
+        <svg className="org-noise" style={{ position: 'absolute', inset: 0, width: '100%', height: '100%', opacity: 0.018 }} xmlns="http://www.w3.org/2000/svg">
           <filter id="org-noise">
             <feTurbulence type="fractalNoise" baseFrequency="0.68" numOctaves="4" stitchTiles="stitch" />
             <feColorMatrix type="saturate" values="0" />

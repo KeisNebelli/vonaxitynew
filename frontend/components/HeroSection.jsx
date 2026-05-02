@@ -1,5 +1,17 @@
 'use client';
 import Link from 'next/link';
+import { useEffect, useState } from 'react';
+
+function useIsMobile(breakpoint = 480) {
+  const [mobile, setMobile] = useState(false);
+  useEffect(() => {
+    const check = () => setMobile(window.innerWidth <= breakpoint);
+    check();
+    window.addEventListener('resize', check);
+    return () => window.removeEventListener('resize', check);
+  }, [breakpoint]);
+  return mobile;
+}
 
 /* ─── Tag pill ─── */
 const TAG = ({ children }) => (
@@ -9,6 +21,7 @@ const TAG = ({ children }) => (
 );
 
 export default function HeroSection({ lang, badge, headline1, headline2, subtitle, cta1, cta2, visitToday, nurseLabel, nurseName, timeLabel, timeVal, serviceLabel, serviceVal, patientName, patientSub, stat1, stat2, stat3, statN1, statN2, statN3 }) {
+  const isMobile = useIsMobile(480);
   return (
     <section style={{ position:'relative', padding:'80px 24px 96px', zIndex:1 }}>
       <div style={{ maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:60, alignItems:'center' }}>
@@ -45,10 +58,10 @@ export default function HeroSection({ lang, badge, headline1, headline2, subtitl
           </div>
 
           {/* Stats */}
-          <div style={{ display:'flex', gap:40 }}>
+          <div style={{ display:'grid', gridTemplateColumns: isMobile ? '1fr 1fr' : 'repeat(3, auto)', gap: isMobile ? '16px 24px' : '0 40px' }}>
             {[[statN1, stat1], [statN2, stat2], [statN3, stat3]].map(([n, l]) => (
               <div key={l}>
-                <div style={{ fontSize:32, fontWeight:800, background:'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', letterSpacing:'-1.5px' }}>{n}</div>
+                <div style={{ fontSize: isMobile ? 26 : 32, fontWeight:800, background:'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text', letterSpacing:'-1.5px' }}>{n}</div>
                 <div style={{ fontSize:12, color:'#9CA3AF', marginTop:2 }}>{l}</div>
               </div>
             ))}
