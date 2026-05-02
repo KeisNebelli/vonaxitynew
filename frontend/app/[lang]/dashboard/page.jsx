@@ -386,8 +386,8 @@ function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
     if (!relative) return setError(tr('dashboard.bookAddLovedFirst'));
     setLoading(true); setSubmitted(true); setError('');
     try {
-      await api.createVisit({ relativeId: relative.id, serviceType: form.serviceType, scheduledAt: form.scheduledAt, notes: form.notes });
-      onSuccess();
+      const data = await api.createVisit({ relativeId: relative.id, serviceType: form.serviceType, scheduledAt: form.scheduledAt, notes: form.notes });
+      onSuccess(data?.visit || data);
     } catch (err) {
       setError(err.message || tr('dashboard.bookFailed'));
       setSubmitted(false); // allow retry on error
@@ -441,6 +441,94 @@ function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
         <button onClick={handleSubmit} disabled={loading||!relative||(subscription&&subscription.visitsPerMonth<999&&subscription.visitsUsed>=subscription.visitsPerMonth)} style={{ flex:2, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:700, cursor:(loading||!relative||(subscription&&subscription.visitsPerMonth<999&&subscription.visitsUsed>=subscription.visitsPerMonth))?'not-allowed':'pointer', opacity:(loading||!relative||(subscription&&subscription.visitsPerMonth<999&&subscription.visitsUsed>=subscription.visitsPerMonth))?0.7:1, fontFamily:F }}>
           {loading ? tr('dashboard.booking') : tr('dashboard.bookVisitBtn')}
         </button>
+      </div>
+    </div>
+  );
+}
+
+function BookingConfirmation({ visit, onClose, onViewApplicants, lang='en' }) {
+  const tr = (key) => t(lang, key);
+  const serviceLabel = (en) => { const s = SERVICES_MAP.find(x => x.en === en); return lang === 'sq' && s ? s.sq : en; };
+  const dateStr = visit?.scheduledAt
+    ? new Date(visit.scheduledAt).toLocaleDateString(lang === 'sq' ? 'sq-AL' : 'en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric', hour:'2-digit', minute:'2-digit' })
+    : '';
+
+  return (
+    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.55)', zIndex:9999, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
+      onClick={e => { if (e.target === e.currentTarget) onClose(); }}>
+      <div style={{ background:C.bgWhite, borderRadius:24, padding:0, maxWidth:440, width:'100%', boxShadow:'0 24px 80px rgba(0,0,0,0.2)', overflow:'hidden', animation:'fadeSlideIn 0.25s ease' }}>
+
+        {/* Green success header */}
+        <div style={{ background:'linear-gradient(135deg, #059669 0%, #047857 100%)', padding:'32px 28px 24px', textAlign:'center', position:'relative' }}>
+          {/* Checkmark circle */}
+          <div style={{ width:64, height:64, borderRadius:'50%', background:'rgba(255,255,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', border:'2px solid rgba(255,255,255,0.4)' }}>
+            <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12"/>
+            </svg>
+          </div>
+          <div style={{ fontSize:20, fontWeight:800, color:'#fff', letterSpacing:'-0.3px', marginBottom:4 }}>
+            {lang === 'sq' ? 'Vizita u rezervua!' : 'Visit Booked!'}
+          </div>
+          <div style={{ fontSize:13, color:'rgba(255,255,255,0.8)' }}>
+            {lang === 'sq' ? 'Infermierët do të njoftohen menjëherë.' : 'Nurses in your area have been notified.'}
+          </div>
+        </div>
+
+        {/* Body */}
+        <div style={{ padding:'24px 28px 28px' }}>
+
+          {/* Work order pill */}
+          {visit?.workOrderNumber && (
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', background:'linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)', border:'1px solid rgba(37,99,235,0.15)', borderRadius:12, padding:'14px 18px', marginBottom:20 }}>
+              <div>
+                <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:3 }}>
+                  {lang === 'sq' ? 'Numri i Urdhrit' : 'Work Order'}
+                </div>
+                <div style={{ fontSize:20, fontWeight:800, color:C.primary, letterSpacing:'-0.5px', fontFamily:'monospace' }}>{visit.workOrderNumber}</div>
+              </div>
+              <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{ opacity:0.5 }}>
+                <path d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2"/>
+                <rect x="9" y="3" width="6" height="4" rx="1"/>
+                <path d="M9 12h6M9 16h4"/>
+              </svg>
+            </div>
+          )}
+
+          {/* Visit details */}
+          <div style={{ display:'flex', flexDirection:'column', gap:10, marginBottom:24 }}>
+            {[
+              { icon:'🩺', label: lang==='sq'?'Shërbimi':'Service', value: serviceLabel(visit?.serviceType) },
+              { icon:'📅', label: lang==='sq'?'Data':'Date & Time', value: dateStr },
+              { icon:'📍', label: lang==='sq'?'Vendndodhja':'Location', value: visit?.relative?.city || visit?.relativeCity || (lang==='sq'?'Do të konfirmohet':'To be confirmed') },
+            ].map(({ icon, label, value }) => (
+              <div key={label} style={{ display:'flex', alignItems:'flex-start', gap:12, padding:'10px 14px', background:C.bg, borderRadius:10 }}>
+                <span style={{ fontSize:16, flexShrink:0 }}>{icon}</span>
+                <div>
+                  <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:1 }}>{label}</div>
+                  <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary }}>{value}</div>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {/* What happens next */}
+          <div style={{ background:C.warningLight, border:'1px solid #FDE68A', borderRadius:10, padding:'12px 16px', marginBottom:20, fontSize:12, color:'#92400E', lineHeight:1.6 }}>
+            <strong>{lang === 'sq' ? 'Çfarë ndodh tani?' : 'What happens next?'}</strong>
+            {' '}{lang === 'sq' ? 'Infermierët e kualifikuar në zonën tuaj do të aplikojnë. Do të njoftoheni kur dikush aplikojë.' : 'Qualified nurses near you will apply. You\'ll be notified when someone applies — then you choose who to assign.'}
+          </div>
+
+          {/* Actions */}
+          <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+            <button onClick={() => { onClose(); onViewApplicants(visit); }}
+              style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:11, padding:'13px', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>
+              {lang === 'sq' ? '👀 Monitoroni Aplikimet' : '👀 Track Applicants'}
+            </button>
+            <button onClick={onClose}
+              style={{ width:'100%', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:11, padding:'12px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:F }}>
+              {lang === 'sq' ? 'Shko te Vizitat e Mia' : 'Go to My Visits'}
+            </button>
+          </div>
+        </div>
       </div>
     </div>
   );
@@ -1198,6 +1286,7 @@ export default function Dashboard({ params }) {
   const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewingApplicants, setViewingApplicants] = useState(null); // visit object
+  const [confirmVisit, setConfirmVisit] = useState(null); // newly booked visit
   const [viewingDetail, setViewingDetail] = useState(null); // visit object for report modal
 
   const TITLES = { overview:tr('dashboard.title'), book:tr('dashboard.bookVisitTitle'), nurses:tr('dashboard.findNurses'), visits:tr('dashboard.myVisits'), subscription:tr('dashboard.subscription'), settings:tr('dashboard.settings') };
@@ -1251,9 +1340,10 @@ export default function Dashboard({ params }) {
   const isExpired = userData.subscription?.status === 'EXPIRED';
   const initials = (userData.name||'U').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
 
-  const handleBookSuccess = async () => {
+  const handleBookSuccess = async (newVisit) => {
     await loadData(); // full sync — updates visits AND subscription count
     setActive('visits');
+    if (newVisit) setConfirmVisit(newVisit);
   };
 
   const handleApplicantSelect = async () => {
@@ -1407,6 +1497,21 @@ export default function Dashboard({ params }) {
             )}
           </main>
         </div>
+
+        {/* Booking confirmation modal */}
+        {confirmVisit && (
+          <BookingConfirmation
+            visit={confirmVisit}
+            lang={lang}
+            onClose={() => setConfirmVisit(null)}
+            onViewApplicants={(v) => {
+              setConfirmVisit(null);
+              // find the freshly-loaded visit by workOrderNumber in case id changed
+              const fresh = visits.find(x => x.workOrderNumber === v.workOrderNumber || x.id === v.id) || v;
+              setViewingApplicants(fresh);
+            }}
+          />
+        )}
 
         {/* Mobile bottom tabs */}
         <div className="mob-tabs" style={{ display:'none',position:'fixed',bottom:0,left:0,right:0,background:C.sidebarBg,borderTop:'1px solid rgba(255,255,255,0.08)',zIndex:48,padding:'8px 0 env(safe-area-inset-bottom,8px)' }}>
