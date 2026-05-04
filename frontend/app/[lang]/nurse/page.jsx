@@ -539,6 +539,43 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
         </div>
       </div>
 
+      {/* ── Performance Insights ── */}
+      {(() => {
+        const weekAgo = new Date(); weekAgo.setDate(weekAgo.getDate() - 7);
+        const thisWeek = visits.filter(v => v.status === 'COMPLETED' && new Date(v.completedAt||v.scheduledAt) >= weekAgo);
+        const completionRate = visits.filter(v=>!['PENDING','UNASSIGNED'].includes(v.status)).length > 0
+          ? Math.round((visits.filter(v=>v.status==='COMPLETED').length / visits.filter(v=>!['PENDING','UNASSIGNED'].includes(v.status)).length) * 100)
+          : null;
+        const ratingDisplay = ratingValue ? ratingValue.toFixed(1) : null;
+        if (!totalVisits && !thisWeek.length) return null;
+        return (
+          <div style={{ background:'linear-gradient(135deg,#0F172A 0%,#1E3A5F 100%)', borderRadius:16, padding:'18px 20px', boxShadow:'0 4px 16px rgba(15,23,42,0.2)', position:'relative', overflow:'hidden' }}>
+            <div style={{ position:'absolute', top:-30, right:-20, width:100, height:100, borderRadius:'50%', background:'rgba(255,255,255,0.04)', pointerEvents:'none' }}/>
+            <div style={{ position:'relative', zIndex:1 }}>
+              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.45)', letterSpacing:'1px', textTransform:'uppercase', marginBottom:12 }}>{lang==='sq'?'Performanca':'Performance'}</div>
+              <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:12 }}>
+                <div>
+                  <div style={{ fontSize:22, fontWeight:800, color:'#fff', letterSpacing:'-0.5px', lineHeight:1 }}>{thisWeek.length}</div>
+                  <div style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginTop:4 }}>{lang==='sq'?'Vizita këtë javë':'This week'}</div>
+                </div>
+                {completionRate !== null && (
+                  <div>
+                    <div style={{ fontSize:22, fontWeight:800, color:completionRate>=80?'#34D399':completionRate>=60?'#FCD34D':'#FCA5A5', letterSpacing:'-0.5px', lineHeight:1 }}>{completionRate}%</div>
+                    <div style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginTop:4 }}>{lang==='sq'?'Kompletimi':'Completion'}</div>
+                  </div>
+                )}
+                {ratingDisplay && (
+                  <div>
+                    <div style={{ fontSize:22, fontWeight:800, color:'#FCD34D', letterSpacing:'-0.5px', lineHeight:1 }}>★ {ratingDisplay}</div>
+                    <div style={{ fontSize:11, color:'rgba(255,255,255,0.5)', marginTop:4 }}>{lang==='sq'?'Vlerësimi':'Rating'}</div>
+                  </div>
+                )}
+              </div>
+            </div>
+          </div>
+        );
+      })()}
+
       {/* ── Stat cards ── */}
       <div className="nd-stat-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10 }}>
         {/* Today's visits */}

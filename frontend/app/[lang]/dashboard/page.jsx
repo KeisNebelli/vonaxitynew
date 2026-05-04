@@ -459,6 +459,44 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits, onViewNe
         </div>
       </div>
 
+      {/* ── Latest Health Reading ── */}
+      {(() => {
+        const lastWithVitals = completed.find(v => v.bpSystolic || v.glucose || v.heartRate || v.oxygenSat);
+        if (!lastWithVitals) return null;
+        const readingDate = new Date(lastWithVitals.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{day:'numeric',month:'short',year:'numeric'});
+        const vitals = [
+          lastWithVitals.bpSystolic && { label:'Blood Pressure', labelSq:'Presioni', value:`${lastWithVitals.bpSystolic}/${lastWithVitals.bpDiastolic}`, unit:'mmHg', bg:'#FEF3C7', col:'#92400E', iconCol:'#D97706' },
+          lastWithVitals.glucose && { label:'Glucose', labelSq:'Glukoza', value:lastWithVitals.glucose, unit:'mmol/L', bg:'#ECFDF5', col:'#14532D', iconCol:'#059669' },
+          lastWithVitals.heartRate && { label:'Heart Rate', labelSq:'Pulsi', value:lastWithVitals.heartRate, unit:'bpm', bg:'#FEF2F2', col:'#991B1B', iconCol:'#DC2626' },
+          lastWithVitals.oxygenSat && { label:'O₂ Sat', labelSq:'Oksigjen', value:`${lastWithVitals.oxygenSat}%`, unit:'SpO₂', bg:'#EFF6FF', col:'#1E40AF', iconCol:'#2563EB' },
+        ].filter(Boolean);
+        return (
+          <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
+            <div style={{ padding:'14px 18px 10px', borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div>
+                <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>{lang==='sq'?'Leximet e Fundit Shëndetësore':'Latest Health Reading'}</div>
+                <div style={{ fontSize:11, color:C.textTertiary, marginTop:2 }}>{readingDate}</div>
+              </div>
+              <button onClick={onViewVisits} style={{ fontSize:12, fontWeight:700, color:C.secondary, background:C.secondaryLight, border:'none', borderRadius:8, padding:'5px 12px', cursor:'pointer', fontFamily:F }}>{lang==='sq'?'Historia':'History'}</button>
+            </div>
+            <div style={{ padding:'14px 18px', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(100px,1fr))', gap:10 }}>
+              {vitals.map(v2 => (
+                <div key={v2.label} style={{ background:v2.bg, borderRadius:10, padding:'12px 14px' }}>
+                  <div style={{ fontSize:10, fontWeight:700, color:v2.iconCol, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:6 }}>{lang==='sq'?v2.labelSq:v2.label}</div>
+                  <div style={{ fontSize:20, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px', lineHeight:1 }}>{v2.value}</div>
+                  <div style={{ fontSize:10, color:v2.col, marginTop:4, fontWeight:500 }}>{v2.unit}</div>
+                </div>
+              ))}
+            </div>
+            {lastWithVitals.nurseNotes && (
+              <div style={{ padding:'0 18px 14px' }}>
+                <div style={{ background:'#F8FAFC', borderRadius:9, padding:'10px 12px', fontSize:12, color:C.textSecondary, fontStyle:'italic', borderLeft:'3px solid #CBD5E1' }}>"{lastWithVitals.nurseNotes}"</div>
+              </div>
+            )}
+          </div>
+        );
+      })()}
+
       {/* ── Quick actions ── */}
       <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
         <button className="ov-action" onClick={onBook} style={{ flex:1, minWidth:120, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'13px 20px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.2)' }}>
@@ -1709,23 +1747,43 @@ function SubscriptionSection({ userData, lang }) {
       <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>
         {currentPlan ? tr('dashboard.changePlan') : tr('dashboard.choosePlan')}
       </div>
+      <style>{`.sub-card{transition:transform 0.15s,box-shadow 0.15s}.sub-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(37,99,235,0.12)!important}.sub-btn:hover:not(:disabled){background:#1D4ED8!important}`}</style>
       <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:12 }}>
-        {plans.map(p => (
-          <div key={p.id} style={{ background:C.bgWhite, borderRadius:14, border:`2px solid ${p.id===currentPlan?C.primary:p.popular?'rgba(37,99,235,0.2)':C.border}`, padding:20, position:'relative' }}>
-            {p.popular && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.primary, color:'#fff', whiteSpace:'nowrap' }}>{tr('dashboard.mostPopular')}</div>}
-            {p.id===currentPlan && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondary, color:'#fff', whiteSpace:'nowrap' }}>{tr('dashboard.currentBadge')}</div>}
-            <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:4 }}>{p.name}</div>
-            <div style={{ fontSize:24, fontWeight:800, color:C.primary, letterSpacing:'-0.5px', marginBottom:4 }}>{p.price}<span style={{ fontSize:13, fontWeight:500, color:C.textTertiary }}>{tr('dashboard.perMonth')}</span></div>
-            <div style={{ fontSize:13, color:C.textSecondary, marginBottom:16, lineHeight:1.5 }}>{p.desc}</div>
-            <button
-              onClick={()=>handleCheckout(p.id)}
-              disabled={loading===p.id || p.id===currentPlan}
-              style={{ width:'100%', padding:'10px', borderRadius:9, border:'none', background:p.id===currentPlan?C.bgSubtle:C.primary, color:p.id===currentPlan?C.textTertiary:'#fff', fontSize:13, fontWeight:700, cursor:p.id===currentPlan?'not-allowed':'pointer', opacity:loading===p.id?0.7:1, fontFamily:F }}
-            >
-              {loading===p.id ? tr('dashboard.loadingPlan') : p.id===currentPlan ? tr('dashboard.currentPlanBtn') : tr('dashboard.selectPlanBtn')}
-            </button>
-          </div>
-        ))}
+        {plans.map(p => {
+          const featuresByPlan = {
+            basic:    [lang==='sq'?'1 vizitë/muaj':'1 visit/month', lang==='sq'?'Infermiere e çertifikuar':'Certified nurse', lang==='sq'?'Raport shëndetësor':'Health report'],
+            standard: [lang==='sq'?'2 vizita/muaj':'2 visits/month', lang==='sq'?'Infermiere e çertifikuar':'Certified nurse', lang==='sq'?'Raport shëndetësor':'Health report', lang==='sq'?'Prioritet i mesëm':'Mid priority'],
+            premium:  [lang==='sq'?'4 vizita/muaj':'4 visits/month', lang==='sq'?'Infermiere e çertifikuar':'Certified nurse', lang==='sq'?'Raport shëndetësor':'Health report', lang==='sq'?'Prioritet i lartë':'High priority', lang==='sq'?'Ndihmë 24/7':'24/7 support'],
+          };
+          const features = featuresByPlan[p.id] || [];
+          const isCurrent = p.id === currentPlan;
+          const isPopular = p.popular && !isCurrent;
+          return (
+            <div key={p.id} className="sub-card" style={{ background:C.bgWhite, borderRadius:14, border:`2px solid ${isCurrent?C.primary:isPopular?'rgba(37,99,235,0.25)':C.border}`, padding:20, position:'relative', boxShadow:isPopular?'0 4px 16px rgba(37,99,235,0.1)':SSM }}>
+              {isPopular && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.primary, color:'#fff', whiteSpace:'nowrap' }}>{tr('dashboard.mostPopular')}</div>}
+              {isCurrent && <div style={{ position:'absolute', top:-10, left:'50%', transform:'translateX(-50%)', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondary, color:'#fff', whiteSpace:'nowrap' }}>{tr('dashboard.currentBadge')}</div>}
+              <div style={{ fontSize:17, fontWeight:800, color:C.textPrimary, marginBottom:4 }}>{p.name}</div>
+              <div style={{ fontSize:24, fontWeight:800, color:C.primary, letterSpacing:'-0.5px', marginBottom:12 }}>{p.price}<span style={{ fontSize:12, fontWeight:500, color:C.textTertiary }}>{tr('dashboard.perMonth')}</span></div>
+              <div style={{ display:'flex', flexDirection:'column', gap:6, marginBottom:18 }}>
+                {features.map((f,i) => (
+                  <div key={i} style={{ display:'flex', alignItems:'center', gap:7, fontSize:12, color:C.textSecondary }}>
+                    <div style={{ width:16, height:16, borderRadius:'50%', background:C.secondaryLight, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <svg width="9" height="9" fill="none" stroke={C.secondary} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    </div>
+                    {f}
+                  </div>
+                ))}
+              </div>
+              <button className="sub-btn"
+                onClick={()=>handleCheckout(p.id)}
+                disabled={loading===p.id || isCurrent}
+                style={{ width:'100%', padding:'10px', borderRadius:9, border:'none', background:isCurrent?C.bgSubtle:isPopular?'linear-gradient(135deg,#2563EB,#4F46E5)':C.primary, color:isCurrent?C.textTertiary:'#fff', fontSize:13, fontWeight:700, cursor:isCurrent?'not-allowed':'pointer', opacity:loading===p.id?0.7:1, fontFamily:F, transition:'background 0.15s' }}
+              >
+                {loading===p.id ? tr('dashboard.loadingPlan') : isCurrent ? tr('dashboard.currentPlanBtn') : tr('dashboard.selectPlanBtn')}
+              </button>
+            </div>
+          );
+        })}
       </div>
       <div style={{ marginTop:16, fontSize:12, color:C.textTertiary, textAlign:'center' }}>
         {tr('dashboard.stripeInfo')}
