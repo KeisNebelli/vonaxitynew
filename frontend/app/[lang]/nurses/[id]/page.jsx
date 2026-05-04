@@ -218,7 +218,7 @@ export default function NurseProfilePage({ params }) {
             <div style={{ background:C.primary, borderRadius:18, padding:'24px', marginBottom:20, color:'#fff' }}>
               <div style={{ fontSize:16, fontWeight:700, marginBottom:8 }}>{tr('nurses.bookCTA')}</div>
               <div style={{ fontSize:13, opacity:0.8, marginBottom:18, lineHeight:1.6 }}>{tr('nurses.bookDesc')}</div>
-              <Link href={`/${lang}/signup`} style={{ display:'block', textAlign:'center', padding:'11px', borderRadius:10, background:'#fff', color:C.primary, fontSize:14, fontWeight:700, textDecoration:'none' }}>
+              <Link href={`/${lang}/signup?role=client`} style={{ display:'block', textAlign:'center', padding:'11px', borderRadius:10, background:'#fff', color:C.primary, fontSize:14, fontWeight:700, textDecoration:'none' }}>
                 {tr('pricing.getStarted')}
               </Link>
             </div>

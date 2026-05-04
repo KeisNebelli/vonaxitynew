@@ -103,7 +103,7 @@ export default async function HomePage({ params }) {
   const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://vonaxitynew-production.up.railway.app';
   let pricing = DEFAULT_PRICING;
   try {
-    const res = await fetch(`${BASE}/settings/public`, { next: { revalidate: 300 } });
+    const res = await fetch(`${BASE}/settings/public`, { cache: 'no-store' });
     if (res.ok) pricing = await res.json();
   } catch {}
 
@@ -332,7 +332,7 @@ export default async function HomePage({ params }) {
                       </div>
                     </div>
                   </div>
-                  <Link href={`/${lang}/signup`} style={{ display: 'block', marginTop: 'auto' }}>
+                  <Link href={`/${lang}/signup?role=client`} style={{ display: 'block', marginTop: 'auto' }}>
                     <button className="hp-nurse-btn">{lang === 'sq' ? 'Rezervo një vizitë' : 'Book a visit'}</button>
                   </Link>
                 </div>
@@ -386,7 +386,7 @@ export default async function HomePage({ params }) {
                     {p.visits} {p.visits === 1 ? t(lang, 'pricing.visitMonth') : t(lang, 'pricing.visitsMonth')}
                   </div>
                   <br />
-                  <Link href={`/${lang}/signup?plan=${p.name.toLowerCase()}`}>
+                  <Link href={`/${lang}/signup?role=client&plan=${p.name.toLowerCase()}`}>
                     <button className={p.featured ? 'hp-pricing-btn-featured' : 'hp-pricing-btn-outline'} style={{ width: '100%', padding: '13px', borderRadius: 12, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? 'linear-gradient(135deg,#7C3AED,#2563EB)' : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: p.featured ? '0 6px 20px rgba(124,58,237,0.3)' : 'none' }}>
                       {t(lang, 'pricing.getStarted')}
                     </button>
@@ -576,7 +576,7 @@ export default async function HomePage({ params }) {
             {t(lang, 'cta.subtitle')}
           </p>
           <div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }}>
-            <Link href={`/${lang}/signup`}>
+            <Link href={`/${lang}/signup?role=client`}>
               <button className="hp-cta-btn" style={{ background: '#fff', color: '#064E3B', border: 'none', borderRadius: 12, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 28px rgba(0,0,0,0.25)' }}>
                 {t(lang, 'cta.btn1')}
               </button>

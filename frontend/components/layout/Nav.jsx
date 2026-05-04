@@ -337,7 +337,7 @@ export default function Nav({ lang = 'en' }) {
             <Link href={`/${lang}/login`} className="vx-desktop-cta">
               <button className="vx-signin-btn">{t(lang,'nav.signIn')}</button>
             </Link>
-            <Link href={`/${lang}/signup`} className="vx-desktop-cta">
+            <Link href={`/${lang}/signup?role=client`} className="vx-desktop-cta">
               <button className="vx-getstarted-btn">{t(lang,'nav.getStarted')}</button>
             </Link>
             {/* Hamburger */}
@@ -365,7 +365,7 @@ export default function Nav({ lang = 'en' }) {
             <Link href={`/${lang}/login`} style={{ flex:1 }} onClick={() => setOpen(false)}>
               <button className="vx-mobile-signin" style={{ width:'100%' }}>{t(lang,'nav.signIn')}</button>
             </Link>
-            <Link href={`/${lang}/signup`} style={{ flex:1 }} onClick={() => setOpen(false)}>
+            <Link href={`/${lang}/signup?role=client`} style={{ flex:1 }} onClick={() => setOpen(false)}>
               <button className="vx-mobile-getstarted" style={{ width:'100%' }}>{t(lang,'nav.getStarted')}</button>
             </Link>
           </div>

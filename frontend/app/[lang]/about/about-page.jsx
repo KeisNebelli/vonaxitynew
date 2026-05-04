@@ -104,7 +104,7 @@ export default function AboutPage({ params }) {
         <p style={{ fontSize:16, color:'rgba(255,255,255,0.7)', maxWidth:400, margin:'0 auto 32px', lineHeight:1.7 }}>
           {t(lang, 'cta.subtitle')}
         </p>
-        <Link href={`/${lang}/signup`}>
+        <Link href={`/${lang}/signup?role=client`}>
           <button style={{ background:'#fff', color:'#1E3A5F', border:'none', borderRadius:10, padding:'14px 36px', fontSize:15, fontWeight:700, cursor:'pointer', boxShadow:'0 4px 20px rgba(0,0,0,0.2)' }}>
             {t(lang, 'cta.btn1')}
           </button>

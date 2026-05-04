@@ -80,7 +80,7 @@ export default function ServicesPage({ params }) {
             <p style={{ fontSize:13, color:'#92400E', margin:0 }}><strong>{t(lang,'services.nonEmergencyStrong')}</strong> {t(lang,'services.emergency')} <strong>127</strong> {t(lang,'services.immediately')}</p>
           </div>
           <div style={{ textAlign:'center' }}>
-            <Link href={`/${lang}/signup`}><button style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'14px 36px', fontSize:15, fontWeight:600, cursor:'pointer' }}>{t(lang,'nav.getStarted')}</button></Link>
+            <Link href={`/${lang}/signup?role=client`}><button style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'14px 36px', fontSize:15, fontWeight:600, cursor:'pointer' }}>{t(lang,'nav.getStarted')}</button></Link>
           </div>
         </div>
       </section>

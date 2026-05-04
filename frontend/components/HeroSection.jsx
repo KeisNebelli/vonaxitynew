@@ -49,7 +49,7 @@ export default function HeroSection({ lang, badge, headline1, headline2, subtitl
 
           {/* CTAs */}
           <div style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:52 }}>
-            <Link href={`/${lang}/signup`}>
+            <Link href={`/${lang}/signup?role=client`}>
               <button
                 style={{ fontSize:15, fontWeight:600, padding:'14px 28px', borderRadius:10, border:'none', background:'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', color:'#fff', cursor:'pointer', boxShadow:'0 4px 18px rgba(124,58,237,0.35)', transition:'all 0.18s ease' }}
                 onMouseEnter={e=>{e.currentTarget.style.transform='translateY(-1px)';e.currentTarget.style.boxShadow='0 8px 28px rgba(124,58,237,0.52)'}}
