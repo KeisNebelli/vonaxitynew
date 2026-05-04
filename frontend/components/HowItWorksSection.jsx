@@ -245,18 +245,23 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps })
           box-shadow: 0 16px 40px rgba(124,58,237,0.13);
           border-color: rgba(124,58,237,0.2);
         }
-        .hiw-card:hover .hiw-caret { opacity: 1; transform: translateX(0); }
         .hiw-caret {
-          opacity: 0;
-          transform: translateX(-6px);
-          transition: opacity 0.2s ease, transform 0.2s ease;
           display: inline-flex;
           align-items: center;
-          gap: 4px;
-          margin-top: 14px;
+          gap: 6px;
+          margin-top: 20px;
           font-size: 12px;
           font-weight: 600;
           color: #7C3AED;
+          background: rgba(124,58,237,0.07);
+          border: 1px solid rgba(124,58,237,0.15);
+          padding: 5px 12px;
+          border-radius: 99px;
+          transition: background 0.18s ease, gap 0.18s ease;
+        }
+        .hiw-card:hover .hiw-caret {
+          background: rgba(124,58,237,0.13);
+          gap: 9px;
         }
         /* ── Modal overlay ── */
         .hiw-overlay {
@@ -337,9 +342,6 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps })
               <h2 style={{ fontSize:'clamp(30px,4vw,46px)', fontWeight:800, color:'#111827', margin:'0 0 14px', letterSpacing:'-1.5px' }}>{title}</h2>
               <p style={{ fontSize:16, color:'#6B7280', maxWidth:460, margin:'0 auto', lineHeight:1.7 }}>
                 {subtitle || 'From booking to bedside — fast, simple, and completely transparent.'}
-              </p>
-              <p style={{ fontSize:13, color:'#9CA3AF', marginTop:10 }}>
-                👆 Click any step to see how it works
               </p>
             </div>
           </ScrollReveal>
