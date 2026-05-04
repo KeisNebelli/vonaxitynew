@@ -40,9 +40,7 @@ const MILESTONES = {
 };
 
 const TEAM = [
-  { initials:'AK', name:'Arben Kaçi', role:'Co-founder & CEO', bio:'Albanian diaspora in the UK. Built Vonaxity after struggling to care for his mother remotely.', grad:'linear-gradient(135deg,#7C3AED,#2563EB)' },
-  { initials:'EB', name:'Elvira Basha', role:'Co-founder & COO', bio:'Healthcare operations expert. 10 years coordinating medical services across Albania.', grad:'linear-gradient(135deg,#059669,#065F46)' },
-  { initials:'DM', name:'Drin Murati', role:'Head of Nursing', bio:'Registered nurse & Order of Nurses of Albania member. Leads nurse vetting and quality.', grad:'linear-gradient(135deg,#D97706,#92400E)' },
+  { initials:'KN', name:'Keis Nebelli', role:'CEO & Founder', bio:'Albanian student based in New Jersey, USA, pursuing a Bachelor\'s degree in Cybersecurity. Built Vonaxity to solve a deeply personal problem — ensuring families abroad can keep their loved ones in Albania safe and cared for.', grad:'linear-gradient(135deg,#2563EB,#4F46E5)' },
 ];
 
 export default function AboutPage({ params }) {
@@ -277,16 +275,37 @@ export default function AboutPage({ params }) {
             </p>
           </div>
 
-          <div className="ab-team-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:20 }}>
+          <div style={{ display:'flex', justifyContent:'center' }}>
             {TEAM.map((person, i) => (
-              <div key={i} className="ab-team-card" style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, padding:'28px 24px', boxShadow:'0 2px 12px rgba(0,0,0,0.04)', textAlign:'center' }}>
-                {/* Avatar */}
-                <div style={{ width:64, height:64, borderRadius:'50%', background:person.grad, display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:800, color:'#fff', margin:'0 auto 16px', boxShadow:`0 8px 20px rgba(0,0,0,0.2)` }}>
-                  {person.initials}
+              <div key={i} className="ab-team-card" style={{ background:C.bgWhite, borderRadius:24, border:`1px solid ${C.border}`, maxWidth:560, width:'100%', boxShadow:'0 4px 24px rgba(0,0,0,0.07)', overflow:'hidden' }}>
+                {/* Gradient header */}
+                <div style={{ background:person.grad, padding:'32px 32px 0', position:'relative', overflow:'hidden' }}>
+                  <div style={{ position:'absolute', top:-30, right:-30, width:150, height:150, borderRadius:'50%', background:'rgba(255,255,255,0.08)', pointerEvents:'none' }}/>
+                  <div style={{ display:'flex', alignItems:'flex-end', gap:20 }}>
+                    <div style={{ width:80, height:80, borderRadius:20, background:'rgba(255,255,255,0.2)', border:'2.5px solid rgba(255,255,255,0.35)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:26, fontWeight:800, color:'#fff', flexShrink:0, backdropFilter:'blur(4px)', marginBottom:-20, position:'relative', zIndex:1 }}>
+                      {person.initials}
+                    </div>
+                    <div style={{ paddingBottom:24, flex:1 }}>
+                      <div style={{ fontSize:22, fontWeight:800, color:'#fff', letterSpacing:'-0.5px', marginBottom:4 }}>{person.name}</div>
+                      <div style={{ fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.75)', letterSpacing:'0.5px', textTransform:'uppercase' }}>{person.role}</div>
+                    </div>
+                  </div>
                 </div>
-                <div style={{ fontSize:16, fontWeight:800, color:C.textPrimary, marginBottom:4 }}>{person.name}</div>
-                <div style={{ fontSize:12, fontWeight:600, color:C.primary, marginBottom:14, background:C.primaryLight, display:'inline-block', padding:'3px 12px', borderRadius:99 }}>{person.role}</div>
-                <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.7 }}>{person.bio}</div>
+                {/* Bio */}
+                <div style={{ padding:'28px 32px 32px', paddingTop:32 }}>
+                  <p style={{ fontSize:15, color:C.textSecondary, lineHeight:1.8, margin:0 }}>{person.bio}</p>
+                  <div style={{ marginTop:20, display:'flex', gap:10, flexWrap:'wrap' }}>
+                    {[
+                      { label:lang==='sq'?'New Jersey, SHBA':'New Jersey, USA', icon:'📍' },
+                      { label:lang==='sq'?'Siguria Kibernetike':'Cybersecurity B.Sc.', icon:'🎓' },
+                      { label:lang==='sq'?'Ndërtues':'Builder', icon:'🚀' },
+                    ].map(tag => (
+                      <span key={tag.label} style={{ fontSize:12, fontWeight:600, color:C.textSecondary, background:C.bg, border:`1px solid ${C.border}`, borderRadius:99, padding:'5px 13px', display:'flex', alignItems:'center', gap:5 }}>
+                        <span>{tag.icon}</span>{tag.label}
+                      </span>
+                    ))}
+                  </div>
+                </div>
               </div>
             ))}
           </div>
