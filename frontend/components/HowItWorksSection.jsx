@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, useRef } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
 
 /* ─────────────────────────────────────────────────────────
@@ -408,6 +408,9 @@ const STEPS = [
 export default function HowItWorksSection({ lang, tag, title, subtitle, steps, plans: plansProp }) {
   const [active, setActive] = useState(null);
   const [visible, setVisible] = useState(false);
+  const [dir, setDir] = useState('next');       // 'next' | 'prev' — slide direction
+  const [contentKey, setContentKey] = useState(0); // bumped on each step change to re-trigger animation
+  const touchStartX = useRef(null);
 
   // Fetch live pricing from CRM fresh on mount (bypasses Next.js page cache)
   const [plans, setPlans] = useState(plansProp);
@@ -426,30 +429,50 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
       .catch(() => {});
   }, []);
 
+  // Open modal — fade + scale in
   const open = useCallback((i) => {
+    setDir('next');
     setActive(i);
+    setContentKey(k => k + 1);
     requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
   }, []);
 
+  // Close modal — fade out
   const close = useCallback(() => {
     setVisible(false);
-    setTimeout(() => setActive(null), 320);
+    setTimeout(() => setActive(null), 300);
   }, []);
 
-  const goTo = useCallback((si) => {
-    setVisible(false);
-    setTimeout(() => {
-      setActive(si);
-      requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
-    }, 160);
-  }, []);
+  // Navigate between steps — modal stays open, only content slides
+  const goTo = useCallback((si, direction) => {
+    setDir(direction ?? (si > active ? 'next' : 'prev'));
+    setActive(si);
+    setContentKey(k => k + 1);
+  }, [active]);
 
+  const goPrev = useCallback(() => { if (active > 0) goTo(active - 1, 'prev'); }, [active, goTo]);
+  const goNext = useCallback(() => { if (active < STEPS.length - 1) goTo(active + 1, 'next'); }, [active, goTo]);
+
+  // Keyboard: ← → to navigate, Escape to close
   useEffect(() => {
     if (active === null) return;
-    const handler = (e) => { if (e.key === 'Escape') close(); };
+    const handler = (e) => {
+      if (e.key === 'ArrowRight' || e.key === 'ArrowDown') goNext();
+      else if (e.key === 'ArrowLeft' || e.key === 'ArrowUp') goPrev();
+      else if (e.key === 'Escape') close();
+    };
     window.addEventListener('keydown', handler);
     return () => window.removeEventListener('keydown', handler);
-  }, [active, close]);
+  }, [active, goNext, goPrev, close]);
+
+  // Touch swipe handlers
+  const onTouchStart = useCallback((e) => { touchStartX.current = e.touches[0].clientX; }, []);
+  const onTouchEnd = useCallback((e) => {
+    if (touchStartX.current === null) return;
+    const diff = touchStartX.current - e.changedTouches[0].clientX;
+    if (Math.abs(diff) > 48) { diff > 0 ? goNext() : goPrev(); }
+    touchStartX.current = null;
+  }, [goNext, goPrev]);
 
   useEffect(() => {
     document.body.style.overflow = active !== null ? 'hidden' : '';
@@ -465,6 +488,10 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
     <>
       <style>{`
         @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        @keyframes slideInNext { from { opacity:0; transform:translateX(28px); } to { opacity:1; transform:translateX(0); } }
+        @keyframes slideInPrev { from { opacity:0; transform:translateX(-28px); } to { opacity:1; transform:translateX(0); } }
+        .hiw-content-next { animation: slideInNext 0.28s cubic-bezier(0.4,0,0.2,1) both; }
+        .hiw-content-prev { animation: slideInPrev 0.28s cubic-bezier(0.4,0,0.2,1) both; }
         .hiw-card {
           cursor: pointer;
           background: #fff;
@@ -624,9 +651,21 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
 
       {/* ── Modal ── */}
       {active !== null && step && (
-        <div className={`hiw-overlay${visible ? ' vis' : ''}`} onClick={close}>
+        <div
+          className={`hiw-overlay${visible ? ' vis' : ''}`}
+          onClick={close}
+          onTouchStart={onTouchStart}
+          onTouchEnd={onTouchEnd}
+        >
           <div className="hiw-modal" onClick={(e) => e.stopPropagation()}>
             <button className="hiw-close" onClick={close} aria-label="Close">✕</button>
+
+            {/* Animated content wrapper — key changes on every step nav to re-trigger slide */}
+            <div
+              key={contentKey}
+              className={`hiw-content-${dir}`}
+              style={{ display:'contents' }}
+            >
 
             {/* Left: copy */}
             <div className="hiw-modal-left">
@@ -661,15 +700,15 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
               <div style={{ display:'flex', alignItems:'center', gap:10, marginTop:30 }}>
                 {/* Prev arrow */}
                 <button
-                  onClick={() => active > 0 && goTo(active - 1)}
+                  onClick={goPrev}
                   disabled={active === 0}
-                  style={{ width:34, height:34, borderRadius:'50%', border:'1.5px solid #E5E7EB', background: active === 0 ? '#F9FAFB' : '#fff', cursor: active === 0 ? 'default' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, opacity: active === 0 ? 0.35 : 1, transition:'all 0.15s ease' }}
+                  style={{ width:34, height:34, borderRadius:'50%', border:'1.5px solid #E5E7EB', background:'#fff', cursor: active === 0 ? 'default' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, opacity: active === 0 ? 0.3 : 1, transition:'all 0.15s ease' }}
                   aria-label="Previous step"
                 >
                   <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
                 </button>
                 {/* Dots */}
-                <div style={{ display:'flex', gap:5, flex:1 }}>
+                <div style={{ display:'flex', gap:5, flex:1, justifyContent:'center' }}>
                   {STEPS.map((_, si) => (
                     <button
                       key={si}
@@ -681,12 +720,12 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
                 </div>
                 {/* Next arrow */}
                 <button
-                  onClick={() => active < STEPS.length - 1 && goTo(active + 1)}
+                  onClick={goNext}
                   disabled={active === STEPS.length - 1}
-                  style={{ width:34, height:34, borderRadius:'50%', border:'1.5px solid #E5E7EB', background: active === STEPS.length - 1 ? '#F9FAFB' : step.color, cursor: active === STEPS.length - 1 ? 'default' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, opacity: active === STEPS.length - 1 ? 0.35 : 1, transition:'all 0.15s ease', boxShadow: active < STEPS.length - 1 ? `0 4px 12px ${step.color}44` : 'none' }}
+                  style={{ width:34, height:34, borderRadius:'50%', border:'none', background: active === STEPS.length - 1 ? '#F3F4F6' : step.color, cursor: active === STEPS.length - 1 ? 'default' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, opacity: active === STEPS.length - 1 ? 0.35 : 1, transition:'all 0.18s ease', boxShadow: active < STEPS.length - 1 ? `0 4px 14px ${step.color}55` : 'none' }}
                   aria-label="Next step"
                 >
-                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={active === STEPS.length - 1 ? '#374151' : '#fff'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={active === STEPS.length - 1 ? '#9CA3AF' : '#fff'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
                 </button>
               </div>
             </div>
@@ -697,6 +736,8 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
                 <step.Mockup plans={active === 0 ? plans : undefined} />
               </div>
             </div>
+
+            </div>{/* end animated content wrapper */}
           </div>
         </div>
       )}
