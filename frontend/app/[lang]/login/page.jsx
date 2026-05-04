@@ -4,8 +4,8 @@ import Link from 'next/link';
 import { api } from '@/lib/api';
 
 const ILLUSTRATIONS = {
-  CLIENT: '/family-login.png',
-  NURSE:  '/nurse-login.png',
+  CLIENT: '/cliendlandingpage.png',
+  NURSE:  '/nurselandingpage.png',
 };
 
 const TR = {
