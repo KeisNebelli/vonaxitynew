@@ -230,7 +230,7 @@ export default function NursesPage({ params }) {
               style={{ width:'100%', padding:'13px 14px 13px 40px', borderRadius:12, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textTertiary, background:C.bgWhite, outline:'none', boxSizing:'border-box', cursor:'pointer', caretColor:'transparent' }}
             />
             <div style={{ position:'absolute', right:12, top:'50%', transform:'translateY(-50%)', fontSize:12, fontWeight:700, color:C.primary, background:C.primaryLight, padding:'5px 12px', borderRadius:99, whiteSpace:'nowrap', pointerEvents:'none' }}>
-              {lang==='sq' ? '🔒 Hyr për të kërkuar' : '🔒 Sign in to search'}
+              {lang==='sq' ? 'Hyr për të kërkuar →' : 'Sign in to search →'}
             </div>
           </div>
         </div>

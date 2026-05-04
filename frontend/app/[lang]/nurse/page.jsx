@@ -1209,7 +1209,12 @@ function NurseProfile({ lang='en', nurse=null }) {
         </div>
       )}
       <button onClick={isPending ? undefined : handleSave} disabled={saving || isPending} style={{ width:'100%', background:isPending?C.textTertiary:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:isPending?'not-allowed':'pointer', marginBottom:28, opacity:saving||isPending?0.5:1, boxShadow: isPending?'none':'0 2px 8px rgba(37,99,235,0.2)' }}>
-        {isPending ? '🔒 Locked — under review' : saving ? tr('dashboard.saving') : tr('dashboard.saveProfile')}
+        {isPending ? (
+          <span style={{ display:'inline-flex', alignItems:'center', gap:7 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Locked — under review
+          </span>
+        ) : saving ? tr('dashboard.saving') : tr('dashboard.saveProfile')}
       </button>
 
       {/* Security */}

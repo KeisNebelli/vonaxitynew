@@ -118,14 +118,14 @@ function SidebarContent({ mobile=false, active, setActive, onLogout, alertCount,
           <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:16 }}>
             <div>
               <div style={{ fontSize:17, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>Vonaxity</div>
-              <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.5)', letterSpacing:'2px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
+              <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.5)', letterSpacing:'1.5px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
             </div>
             <button onClick={()=>setOpen(false)} style={{ background:'rgba(255,255,255,0.08)', border:'none', color:'rgba(255,255,255,0.6)', borderRadius:8, width:30,height:30, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center' }}>✕</button>
           </div>
         ) : (
           <div style={{ marginBottom:14 }}>
             <div style={{ fontSize:17, fontWeight:800, color:'#fff', letterSpacing:'-0.5px' }}>Vonaxity</div>
-            <div style={{ fontSize:9, fontWeight:700, color:'rgba(255,255,255,0.5)', letterSpacing:'2px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
+            <div style={{ fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.5)', letterSpacing:'1.5px', marginTop:2 }}>{t(lang, 'admin.adminCRM')}</div>
           </div>
         )}
         <div style={{ display:'flex', alignItems:'center', gap:9 }}>

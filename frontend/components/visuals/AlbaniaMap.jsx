@@ -52,7 +52,7 @@ export default function AlbaniaMap() {
         </div>
         <div style={{ marginTop:10, display:'flex', gap:16, fontSize:11, color:'#9CA3AF' }}>
           <div style={{ display:'flex', alignItems:'center', gap:4 }}><div style={{ width:6, height:6, borderRadius:'50%', background:'#2563EB' }}/> Active city</div>
-          <div style={{ display:'flex', alignItems:'center', gap:4 }}><div style={{ width:6, height:6, borderRadius:'50%', background:'#D1D5DB' }}/> Coming soon</div>
+          <div style={{ display:'flex', alignItems:'center', gap:4 }}><div style={{ width:6, height:6, borderRadius:'50%', background:'#D1D5DB' }}/> Expanding soon</div>
           <div style={{ display:'flex', alignItems:'center', gap:4 }}><div style={{ width:8, height:8, borderRadius:'50%', background:'#059669' }}/> Nurses available</div>
         </div>
       </div>

@@ -40,7 +40,7 @@ export default function HeroIllustration() {
       <circle cx="78" cy="168" r="8" fill="#ECFDF5" />
       <rect x="91" y="162" width="36" height="5" rx="2.5" fill="#E5E7EB" />
       <rect x="91" y="171" width="24" height="4" rx="2" fill="#DBEAFE" />
-      <text x="78" y="171" fontFamily="Inter,system-ui" fontSize="9" fontWeight="700" fill="#059669" textAnchor="middle">✓</text>
+      <text x="78" y="172" fontFamily="Inter,system-ui" fontSize="11" fontWeight="700" fill="#059669" textAnchor="middle">✓</text>
 
       <rect x="340" y="130" width="80" height="44" rx="10" fill="#fff" stroke="#E5E7EB" strokeWidth="1.5" />
       <circle cx="358" cy="148" r="8" fill="#EFF6FF" />

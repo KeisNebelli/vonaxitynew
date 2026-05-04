@@ -324,7 +324,7 @@ export default async function HomePage({ params }) {
           <div style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)', borderRadius: 16, padding: '24px 32px', display: 'flex', gap: 48, justifyContent: 'center', flexWrap: 'wrap', border: '1px solid rgba(37,99,235,0.1)' }}>
             {[
               ['500+', lang === 'sq' ? 'Infermierë Aktivë' : 'Active Nurses'],
-              ['4.9★', lang === 'sq' ? 'Vlerësim Mesatar' : 'Avg Rating'],
+              ['4.9', lang === 'sq' ? 'Vlerësim Mesatar' : 'Avg Rating'],
               ['100%', lang === 'sq' ? 'Të Licencuar' : 'Licensed'],
               ['48h', lang === 'sq' ? 'Kohë Reagimi' : 'Avg Response'],
             ].map(([n, l]) => (
