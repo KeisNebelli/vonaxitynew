@@ -299,16 +299,16 @@ export default async function HomePage({ params }) {
 
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 20, marginBottom: 40 }}>
             {[
-              { initials:'EB', name:'Elona Berberi',    bg:'#DBEAFE', color:'#1D4ED8', specialty: lang==='sq'?'Kujdes i Përgjithshëm':'General Nursing',   rating:5.0, reviews:38, years:6,  langs:['AL','EN'] },
-              { initials:'MG', name:'Mirela Gjoka',     bg:'#D1FAE5', color:'#065F46', specialty: lang==='sq'?'Kujdes për të Moshuarit':'Elderly Care',      rating:4.9, reviews:61, years:11, langs:['AL'] },
-              { initials:'AH', name:'Artan Hoxha',      bg:'#EDE9FE', color:'#5B21B6', specialty: lang==='sq'?'Kujdes Post-Operativ':'Post-Op Recovery',    rating:5.0, reviews:24, years:8,  langs:['AL','EN','IT'] },
-              { initials:'BL', name:'Besmir Lika',      bg:'#FEF3C7', color:'#92400E', specialty: lang==='sq'?'Kujdesi i Plagëve':'Wound & IV Care',         rating:4.8, reviews:45, years:7,  langs:['AL','EN'] },
+              { initials:'EB', photo:'/nurse-elona.png',  name:'Elona Berberi',    bg:'#DBEAFE', color:'#1D4ED8', specialty: lang==='sq'?'Kujdes i Përgjithshëm':'General Nursing',   rating:5.0, reviews:38, years:6,  langs:['AL','EN'] },
+              { initials:'MG', photo:'/nurse-mirela.png', name:'Mirela Gjoka',     bg:'#D1FAE5', color:'#065F46', specialty: lang==='sq'?'Kujdes për të Moshuarit':'Elderly Care',      rating:4.9, reviews:61, years:11, langs:['AL'] },
+              { initials:'AH', photo:'/nurse-artan.png',  name:'Artan Hoxha',      bg:'#EDE9FE', color:'#5B21B6', specialty: lang==='sq'?'Kujdes Post-Operativ':'Post-Op Recovery',    rating:5.0, reviews:24, years:8,  langs:['AL','EN','IT'] },
+              { initials:'BL', photo:'/nurse-besmir.png', name:'Besmir Lika',      bg:'#FEF3C7', color:'#92400E', specialty: lang==='sq'?'Kujdesi i Plagëve':'Wound & IV Care',         rating:4.8, reviews:45, years:7,  langs:['AL','EN'] },
             ].map((n, ni) => (
               <ScrollReveal key={n.name} delay={ni * 90}>
                 <div className="hp-service-card" style={{ background: '#FAFAF9', borderRadius: 20, border: `1px solid ${C.border}`, padding: '26px 22px', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
                   <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
-                    <div style={{ width: 60, height: 60, borderRadius: '50%', background: n.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: n.color, flexShrink: 0, border: `2px solid ${n.color}22`, boxShadow:`0 4px 12px ${n.color}22` }}>
-                      {n.initials}
+                    <div style={{ width: 64, height: 64, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, border: `2.5px solid ${n.color}33`, boxShadow:`0 4px 16px ${n.color}30` }}>
+                      <img src={n.photo} alt={n.name} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
                     </div>
                     <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: C.secondary, background: C.secondaryLight, border: '1px solid rgba(5,150,105,0.2)', padding: '4px 10px', borderRadius: 99 }}>
                       <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M5 0L6.12 3.45H9.76L6.82 5.59L7.94 9.05L5 6.91L2.06 9.05L3.18 5.59L0.24 3.45H3.88L5 0Z" fill="#059669"/></svg>
