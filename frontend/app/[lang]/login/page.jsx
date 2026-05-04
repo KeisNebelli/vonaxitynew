@@ -125,15 +125,24 @@ export default function LoginPage({ params }) {
         {/* CLIENT panel */}
         <div className="rp-panel" onClick={() => { setRole('CLIENT'); setError(''); }}
           style={{ background:'linear-gradient(160deg,#064e3b 0%,#059669 100%)' }}>
-          <div style={{ position:'absolute', inset:0, opacity:0.13 }}>
+          {/* dot grid texture */}
+          <div style={{ position:'absolute', inset:0, opacity:0.13, pointerEvents:'none' }}>
             <svg width="100%" height="100%"><defs><pattern id="gd" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#gd)"/></svg>
           </div>
-          <img className="rp-illus" src={ILLUSTRATIONS.CLIENT} alt="Family" style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'80%', maxWidth:380, objectFit:'contain', display:'block', opacity:0.9 }} />
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(6,78,59,0.55) 0%, transparent 60%)' }}/>
-          <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end', padding:'0 40px 60px', textAlign:'center', gap:14, animation:'fadeUp 0.5s ease both' }}>
-            <div style={{ fontSize:34, fontWeight:900, color:'#fff', letterSpacing:'-0.5px', lineHeight:1.1, textShadow:'0 2px 16px rgba(0,0,0,0.3)' }}>{tr('clientTitle')}</div>
-            <div style={{ fontSize:14, color:'rgba(255,255,255,0.85)', lineHeight:1.55, maxWidth:260 }}>{tr('clientSub')}</div>
-            <button className="rp-btn" style={{ background:'#fff', color:'#059669', border:'none', borderRadius:14, padding:'13px 36px', fontSize:15, fontWeight:800, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 16px rgba(0,0,0,0.2)' }}>
+          {/* bottom vignette so text stays readable */}
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(6,78,59,0.65) 0%, rgba(6,78,59,0.1) 55%, transparent 100%)', pointerEvents:'none' }}/>
+          {/* full-height flex layout: title → illustration → button */}
+          <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', padding:'100px 40px 52px', textAlign:'center', animation:'fadeUp 0.5s ease both' }}>
+            {/* Top: title + subtitle */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}>
+              <div style={{ fontSize:38, fontWeight:900, color:'#fff', letterSpacing:'-0.8px', lineHeight:1.1, textShadow:'0 2px 20px rgba(0,0,0,0.35)' }}>{tr('clientTitle')}</div>
+              <div style={{ fontSize:14, color:'rgba(255,255,255,0.82)', lineHeight:1.6, maxWidth:240 }}>{tr('clientSub')}</div>
+            </div>
+            {/* Middle: illustration */}
+            <img className="rp-illus" src={ILLUSTRATIONS.CLIENT} alt="Family"
+              style={{ width:'88%', maxWidth:400, flex:'1 1 auto', objectFit:'contain', display:'block', opacity:0.95, margin:'24px 0', maxHeight:'50vh' }} />
+            {/* Bottom: CTA button */}
+            <button className="rp-btn" style={{ background:'#fff', color:'#059669', border:'none', borderRadius:14, padding:'14px 40px', fontSize:16, fontWeight:800, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 20px rgba(0,0,0,0.22)', letterSpacing:'-0.2px' }}>
               {tr('continue')}
             </button>
           </div>
@@ -145,15 +154,24 @@ export default function LoginPage({ params }) {
         {/* NURSE panel */}
         <div className="rp-panel" onClick={() => { setRole('NURSE'); setError(''); }}
           style={{ background:'linear-gradient(160deg,#1e3a5f 0%,#2563EB 100%)' }}>
-          <div style={{ position:'absolute', inset:0, opacity:0.10 }}>
+          {/* dot grid texture */}
+          <div style={{ position:'absolute', inset:0, opacity:0.10, pointerEvents:'none' }}>
             <svg width="100%" height="100%"><defs><pattern id="bd" width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#bd)"/></svg>
           </div>
-          <img className="rp-illus" src={ILLUSTRATIONS.NURSE} alt="Nurse" style={{ position:'absolute', bottom:0, left:'50%', transform:'translateX(-50%)', width:'75%', maxWidth:340, objectFit:'contain', display:'block', opacity:0.9 }} />
-          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(30,58,95,0.55) 0%, transparent 60%)' }}/>
-          <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end', padding:'0 40px 60px', textAlign:'center', gap:14, animation:'fadeUp 0.5s ease both' }}>
-            <div style={{ fontSize:34, fontWeight:900, color:'#fff', letterSpacing:'-0.5px', lineHeight:1.1, textShadow:'0 2px 16px rgba(0,0,0,0.3)' }}>{tr('nurseTitle')}</div>
-            <div style={{ fontSize:14, color:'rgba(255,255,255,0.85)', lineHeight:1.55, maxWidth:260 }}>{tr('nurseSub')}</div>
-            <button className="rp-btn" style={{ background:'#fff', color:'#2563EB', border:'none', borderRadius:14, padding:'13px 36px', fontSize:15, fontWeight:800, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 16px rgba(0,0,0,0.2)' }}>
+          {/* bottom vignette */}
+          <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top, rgba(30,58,95,0.65) 0%, rgba(30,58,95,0.1) 55%, transparent 100%)', pointerEvents:'none' }}/>
+          {/* full-height flex layout: title → illustration → button */}
+          <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'space-between', padding:'100px 40px 52px', textAlign:'center', animation:'fadeUp 0.5s ease both' }}>
+            {/* Top: title + subtitle */}
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}>
+              <div style={{ fontSize:38, fontWeight:900, color:'#fff', letterSpacing:'-0.8px', lineHeight:1.1, textShadow:'0 2px 20px rgba(0,0,0,0.35)' }}>{tr('nurseTitle')}</div>
+              <div style={{ fontSize:14, color:'rgba(255,255,255,0.82)', lineHeight:1.6, maxWidth:240 }}>{tr('nurseSub')}</div>
+            </div>
+            {/* Middle: illustration */}
+            <img className="rp-illus" src={ILLUSTRATIONS.NURSE} alt="Nurse"
+              style={{ width:'82%', maxWidth:360, flex:'1 1 auto', objectFit:'contain', display:'block', opacity:0.95, margin:'24px 0', maxHeight:'50vh' }} />
+            {/* Bottom: CTA button */}
+            <button className="rp-btn" style={{ background:'#fff', color:'#2563EB', border:'none', borderRadius:14, padding:'14px 40px', fontSize:16, fontWeight:800, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 20px rgba(0,0,0,0.22)', letterSpacing:'-0.2px' }}>
               {tr('continue')}
             </button>
           </div>
