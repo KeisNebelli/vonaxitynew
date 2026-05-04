@@ -411,6 +411,13 @@ function DashboardCalendar({ visits=[], lang='en', onOpenCalendar, onVisitSelect
 
 function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=null, onTodayClick }) {
   const tr = (key) => t(lang, key);
+  const [openJobsCount, setOpenJobsCount] = useState(null);
+  useEffect(() => {
+    if (nurse?.status === 'APPROVED') {
+      api.getOpenVisits().then(d => setOpenJobsCount((d.visits||[]).length)).catch(()=>{});
+    }
+  }, [nurse?.status]);
+
   const todayStr = new Date().toISOString().split('T')[0];
   const today = visits.filter(v => {
     if (['COMPLETED','CANCELLED'].includes(v.status)) return false;
@@ -565,6 +572,32 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
         </div>
       </div>
 
+      {/* ── Available jobs banner ── */}
+      {nurse?.status === 'APPROVED' && openJobsCount !== null && (
+        <button
+          onClick={() => setActive('jobs')}
+          style={{ width:'100%', display:'flex', alignItems:'center', justifyContent:'space-between', gap:12, background:'linear-gradient(135deg,#0F4C8A,#2563EB)', borderRadius:14, padding:'14px 18px', border:'none', cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 14px rgba(37,99,235,0.22)', textAlign:'left' }}
+        >
+          <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+            <div style={{ width:38, height:38, borderRadius:11, background:'rgba(255,255,255,0.15)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <svg width="17" height="17" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+            </div>
+            <div>
+              <div style={{ fontSize:12, fontWeight:600, color:'rgba(255,255,255,0.7)', marginBottom:2 }}>
+                {lang==='sq' ? 'Punë të disponueshme' : 'Available jobs'}{nurse?.city ? ` · ${nurse.city}` : ''}
+              </div>
+              <div style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:'-0.3px', lineHeight:1 }}>
+                {openJobsCount} {lang==='sq' ? (openJobsCount===1?'vizitë e hapur':'vizita të hapura') : (openJobsCount===1?'open visit':'open visits')}
+              </div>
+            </div>
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:6, background:'rgba(255,255,255,0.18)', borderRadius:99, padding:'6px 14px', flexShrink:0 }}>
+            <span style={{ fontSize:12, fontWeight:700, color:'#fff' }}>{lang==='sq'?'Shfleto':'Browse'}</span>
+            <svg width="13" height="13" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </div>
+        </button>
+      )}
+
       {/* ── Quick actions ── */}
       <div className="nd-actions" style={{ display:'flex', gap:10 }}>
         <button className="nd-route-btn" onClick={()=>setActive('jobs')} style={{ flex:2, display:'flex', alignItems:'center', justifyContent:'center', gap:8, background:'#2563EB', color:'#fff', border:'none', borderRadius:12, padding:'13px 16px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.2)' }}>
@@ -613,6 +646,15 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusCha
   const tr = (key) => t(lang, key);
   const [filter, setFilter] = useState(initialFilter);
   const todayStr = new Date().toISOString().split('T')[0];
+
+  // Counts per tab
+  const counts = {
+    all:       visits.length,
+    today:     visits.filter(v => !['COMPLETED','CANCELLED'].includes(v.status) && new Date(v.scheduledAt).toISOString().split('T')[0] === todayStr).length,
+    upcoming:  visits.filter(v => !['COMPLETED','CANCELLED'].includes(v.status)).length,
+    completed: visits.filter(v => v.status === 'COMPLETED').length,
+  };
+
   const filtered = visits.filter(v => {
     if (filter === 'all') return true;
     if (filter === 'today') {
@@ -625,9 +667,9 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusCha
   });
 
   const filterLabels = {
-    all: t(lang,'nurse.visitsFilterAll'),
-    today: lang==='sq' ? 'Sot' : 'Today',
-    upcoming: t(lang,'nurse.visitsFilterUpcoming'),
+    all:       t(lang,'nurse.visitsFilterAll'),
+    today:     lang==='sq' ? 'Sot' : 'Today',
+    upcoming:  t(lang,'nurse.visitsFilterUpcoming'),
     completed: t(lang,'nurse.visitsFilterCompleted'),
   };
 
@@ -639,12 +681,20 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusCha
 
   return (
     <div>
-      <div style={{ display:'flex', gap:8, marginBottom:20 }}>
-        {['all','today','upcoming','completed'].map(f => (
-          <button key={f} onClick={()=>setFilter(f)} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', borderRadius:99, cursor:'pointer', background:filter===f?C.primary:C.bgWhite, color:filter===f?'#fff':C.textSecondary, border:filter===f?'none':`1px solid ${C.border}` }}>
-            {filterLabels[f]}
-          </button>
-        ))}
+      {/* Status tab bar with counts */}
+      <div style={{ display:'flex', gap:8, marginBottom:20, flexWrap:'wrap' }}>
+        {['all','today','upcoming','completed'].map(f => {
+          const active = filter === f;
+          const count = counts[f];
+          return (
+            <button key={f} onClick={()=>setFilter(f)} style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:600, padding:'7px 14px', borderRadius:99, cursor:'pointer', background:active ? C.primary : C.bgWhite, color:active ? '#fff' : C.textSecondary, border:active ? 'none' : `1px solid ${C.border}`, transition:'all 0.15s' }}>
+              {filterLabels[f]}
+              <span style={{ fontSize:11, fontWeight:700, padding:'1px 6px', borderRadius:99, background: active ? 'rgba(255,255,255,0.25)' : C.bgSubtle, color: active ? '#fff' : C.textTertiary, minWidth:18, textAlign:'center' }}>
+                {count}
+              </span>
+            </button>
+          );
+        })}
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
         {filtered.map(v => (
