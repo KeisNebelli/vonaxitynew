@@ -4,7 +4,12 @@ import ScrollReveal from '@/components/ScrollReveal';
 
 /* ── Inline dashboard mockups ───────────────────────────── */
 
-function MockupBooking() {
+function MockupBooking({ plans }) {
+  const displayPlans = plans && plans.length === 3 ? plans : [
+    { name:'Basic',    price:'€30',  visits:1, featured:false },
+    { name:'Standard', price:'€50',  visits:2, featured:true  },
+    { name:'Premium',  price:'€120', visits:4, featured:false },
+  ];
   return (
     <div style={{ background:'#F8FAFF', borderRadius:16, overflow:'hidden', border:'1px solid #E5E7EB', fontFamily:'Inter,system-ui,sans-serif', fontSize:12 }}>
       {/* Browser bar */}
@@ -16,14 +21,14 @@ function MockupBooking() {
       </div>
       <div style={{ padding:'20px 18px' }}>
         <div style={{ fontSize:13, fontWeight:700, color:'#111827', marginBottom:14 }}>Choose your plan</div>
-        {/* Plan cards */}
+        {/* Plan cards — live from CRM */}
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, marginBottom:16 }}>
-          {[['Basic','€30','1 visit'],['Standard','€50','2 visits'],['Premium','€120','4 visits']].map(([name,price,visits],i) => (
-            <div key={name} style={{ border: i===1 ? '2px solid #2563EB' : '1px solid #E5E7EB', borderRadius:10, padding:'10px 8px', textAlign:'center', background: i===1 ? '#EFF6FF' : '#fff', position:'relative' }}>
-              {i===1 && <div style={{ position:'absolute', top:-8, left:'50%', transform:'translateX(-50%)', background:'#2563EB', color:'#fff', fontSize:8, fontWeight:700, padding:'2px 7px', borderRadius:99, whiteSpace:'nowrap' }}>POPULAR</div>}
-              <div style={{ fontSize:10, fontWeight:600, color: i===1 ? '#2563EB':'#6B7280', marginBottom:3 }}>{name}</div>
-              <div style={{ fontSize:16, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>{price}</div>
-              <div style={{ fontSize:9, color:'#9CA3AF', marginTop:2 }}>{visits}/mo</div>
+          {displayPlans.map((p, i) => (
+            <div key={p.name} style={{ border: p.featured ? '2px solid #2563EB' : '1px solid #E5E7EB', borderRadius:10, padding:'10px 8px', textAlign:'center', background: p.featured ? '#EFF6FF' : '#fff', position:'relative' }}>
+              {p.featured && <div style={{ position:'absolute', top:-8, left:'50%', transform:'translateX(-50%)', background:'#2563EB', color:'#fff', fontSize:8, fontWeight:700, padding:'2px 7px', borderRadius:99, whiteSpace:'nowrap' }}>POPULAR</div>}
+              <div style={{ fontSize:10, fontWeight:600, color: p.featured ? '#2563EB':'#6B7280', marginBottom:3 }}>{p.name}</div>
+              <div style={{ fontSize:16, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>{p.price}</div>
+              <div style={{ fontSize:9, color:'#9CA3AF', marginTop:2 }}>{p.visits} {p.visits === 1 ? 'visit' : 'visits'}/mo</div>
             </div>
           ))}
         </div>
@@ -192,7 +197,7 @@ const STEPS = [
 ];
 
 /* ── Main component ─────────────────────────────────────── */
-export default function HowItWorksSection({ lang, tag, title, subtitle, steps }) {
+export default function HowItWorksSection({ lang, tag, title, subtitle, steps, plans }) {
   const [active, setActive] = useState(null);
   const [visible, setVisible] = useState(false);
 
@@ -440,7 +445,7 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps })
             {/* Right: mockup */}
             <div className="hiw-modal-right" style={{ background:'linear-gradient(145deg,#F8FAFF 0%,#F5F3FF 100%)', borderRadius:'0 24px 24px 0' }}>
               <div style={{ width:'100%' }}>
-                <step.Mockup />
+                <step.Mockup plans={active === 0 ? plans : undefined} />
               </div>
             </div>
           </div>

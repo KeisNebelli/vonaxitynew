@@ -196,6 +196,7 @@ export default async function HomePage({ params }) {
         title={t(lang, 'howItWorks.title')}
         subtitle={t(lang, 'howItWorks.subtitle')}
         steps={steps}
+        plans={PLANS}
       />
 
       {/* ── Services ── */}
