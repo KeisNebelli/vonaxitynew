@@ -135,13 +135,33 @@ router.post('/webhook', async (req, res) => {
 // GET /payments — admin gets all payments
 router.get('/', ...requireRole('ADMIN'), async (req, res) => {
   try {
-    const payments = await prisma.payment.findMany({
-      include: { user: { select: { name: true, email: true } } },
-      orderBy: { createdAt: 'desc' },
-      take: 100,
+    let payments = [];
+    try {
+      payments = await prisma.payment.findMany({
+        include: { user: { select: { name: true, email: true } } },
+        orderBy: { createdAt: 'desc' },
+        take: 100,
+      });
+    } catch (dbErr) {
+      // Table might not exist yet — return empty list gracefully
+      console.warn('Payments query failed (table may not be migrated):', dbErr.message);
+      return res.json({ payments: [] });
+    }
+    res.json({
+      payments: payments.map(p => ({
+        id: p.id,
+        clientName: p.user?.name || 'Unknown',
+        clientEmail: p.user?.email || '',
+        plan: p.description || 'subscription',
+        amount: p.amount,
+        currency: p.currency || 'eur',
+        status: p.status,
+        date: p.createdAt ? new Date(p.createdAt).toLocaleDateString('en-GB') : 'N/A',
+        stripeId: p.stripeId,
+      }))
     });
-    res.json({ payments: payments.map(p => ({ ...p, clientName: p.user?.name || 'Unknown' })) });
   } catch (err) {
+    console.error('Get payments error:', err);
     res.status(500).json({ error: 'Failed to fetch payments' });
   }
 });

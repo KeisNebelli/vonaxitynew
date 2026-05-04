@@ -916,52 +916,88 @@ function Alerts({ visits, nurses, setVisits, setNurses, onApprove, onSuspend, on
 // ── Payments ──────────────────────────────────────────────────────────────────
 function Payments({ payments, lang='en' }) {
   const tr = (key) => t(lang, key);
-  const total = payments.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
+  const [search, setSearch] = useState('');
+  const paid = payments.filter(p=>p.status==='paid');
   const failed = payments.filter(p=>p.status==='failed');
+  const total = paid.reduce((s,p)=>s+(p.amount||0),0);
+  const filtered = payments.filter(p => !search || (p.clientName||'').toLowerCase().includes(search.toLowerCase()) || (p.plan||'').toLowerCase().includes(search.toLowerCase()));
+
+  const statCards = [
+    { label: tr('admin.totalRevenue')||'Total Revenue', value:`€${total.toLocaleString()}`, color:C.secondary, bg:'#ECFDF5', icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.secondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
+    { label: tr('admin.successful')||'Successful', value: paid.length, color:C.primary, bg:C.primaryLight, icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
+    { label: tr('admin.failedPayments')||'Failed', value: failed.length, color: failed.length>0?C.error:C.textTertiary, bg: failed.length>0?'#FEF2F2':'#F8FAFC', icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={failed.length>0?C.error:C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> },
+    { label: 'This Month', value: `€${payments.filter(p=>{ const d=new Date(p.date||''); const n=new Date(); return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()&&p.status==='paid'; }).reduce((s,p)=>s+(p.amount||0),0).toLocaleString()}`, color:'#7C3AED', bg:'#F5F3FF', icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+  ];
+
   return (
-    <div>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(150px,1fr))', gap:14, marginBottom:24 }}>
-        {[[tr('admin.totalRevenue'),`€${total}`,C.secondary],[tr('admin.successful'),payments.filter(p=>p.status==='paid').length,C.secondary],[tr('admin.failedPayments'),failed.length,failed.length>0?C.error:C.textTertiary]].map(([label,value,color]) => (
-          <div key={label} style={{ background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, padding:'18px' }}>
-            <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:8 }}>{label}</div>
-            <div style={{ fontSize:24, fontWeight:700, color, letterSpacing:'-0.5px' }}>{value}</div>
+    <div style={{ display:'flex', flexDirection:'column', gap:20 }}>
+      {/* KPI cards */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(180px,1fr))', gap:14 }}>
+        {statCards.map(({label,value,color,bg,icon}) => (
+          <div key={label} className="adm-stat-card" style={{ background:'#fff', borderRadius:14, border:`1px solid ${C.border}`, padding:'20px', boxShadow:SSM }}>
+            <div style={{ width:40, height:40, borderRadius:11, background:bg, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:14 }}>{icon}</div>
+            <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.6px', marginBottom:6 }}>{label}</div>
+            <div style={{ fontSize:28, fontWeight:900, color, letterSpacing:'-1px', lineHeight:1 }}>{value}</div>
           </div>
         ))}
       </div>
+
+      {/* Failed payments alert */}
       {failed.length>0 && (
-        <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:12, padding:'14px 18px', marginBottom:20 }}>
-          <div style={{ fontSize:13, fontWeight:600, color:C.error, marginBottom:4 }}>{failed.length} {tr('admin.failedPayments')}</div>
-          {failed.map(p => <div key={p.id} style={{ fontSize:12, color:C.error }}>{p.clientName} · {p.plan} · €{p.amount} · {p.date}</div>)}
+        <div style={{ background:'#FEF2F2', border:'1.5px solid #FECACA', borderLeft:`4px solid ${C.error}`, borderRadius:12, padding:'14px 18px', display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+          <div>
+            <div style={{ fontSize:13, fontWeight:700, color:C.error, marginBottom:2 }}>{failed.length} failed payment{failed.length!==1?'s':''}</div>
+            <div style={{ fontSize:12, color:'#B91C1C' }}>{failed.map(p=>`${p.clientName} · €${p.amount}`).join(' · ')}</div>
+          </div>
+          <span style={{ fontSize:11, fontWeight:700, padding:'4px 10px', borderRadius:99, background:'#FEE2E2', color:C.error }}>Needs attention</span>
         </div>
       )}
-      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, overflow:'hidden' }}>
-        <div style={{ padding:'14px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary }}>{tr('admin.allTransactions')}</div>
-          <button style={{ fontSize:12, fontWeight:600, padding:'7px 14px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:8, cursor:'pointer' }}>{tr('admin.exportCSV')}</button>
+
+      {/* Transactions table */}
+      <div style={{ background:'#fff', borderRadius:16, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
+        <div style={{ padding:'16px 20px', borderBottom:`1px solid ${C.border}`, display:'flex', justifyContent:'space-between', alignItems:'center', gap:12 }}>
+          <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>{tr('admin.allTransactions')||'All Transactions'}</div>
+          <div style={{ display:'flex', gap:10, alignItems:'center' }}>
+            <SearchInput value={search} onChange={setSearch} placeholder="Search payments..." />
+            <button className="adm-btn-secondary adm-btn-sm">{tr('admin.exportCSV')||'Export CSV'}</button>
+          </div>
         </div>
-        <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
-          <thead>
-            <tr style={{ background:C.bgSubtle }}>
-              {[tr('admin.paymentTable.client'),tr('admin.paymentTable.plan'),tr('admin.paymentTable.amount'),tr('admin.paymentTable.date'),tr('admin.paymentTable.status'),''].map(h => (
-                <th key={h} style={{ padding:'10px 16px', textAlign:'left', fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', borderBottom:`1px solid ${C.border}` }}>{h}</th>
-              ))}
-            </tr>
-          </thead>
-          <tbody>
-            {payments.map((p,i) => (
-              <tr key={p.id} style={{ borderBottom:i<payments.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
-                <td style={{ padding:'12px 16px', fontWeight:600, color:C.textPrimary }}>{p.clientName}</td>
-                <td style={{ padding:'12px 16px', color:C.textSecondary }}>{p.plan}</td>
-                <td style={{ padding:'12px 16px', fontWeight:700, color:C.textPrimary }}>€{p.amount}</td>
-                <td style={{ padding:'12px 16px', color:C.textTertiary }}>{p.date}</td>
-                <td style={{ padding:'12px 16px' }}>{statusBadge(p.status, lang)}</td>
-                <td style={{ padding:'12px 16px' }}>
-                  {p.status==='failed' && <button style={{ fontSize:11, fontWeight:600, padding:'5px 10px', background:C.warningLight, color:C.warning, border:'none', borderRadius:6, cursor:'pointer' }}>{tr('admin.retry')}</button>}
-                </td>
+        {payments.length === 0 ? (
+          <div style={{ padding:'60px 28px', textAlign:'center' }}>
+            <div style={{ width:56, height:56, borderRadius:16, background:'#F8FAFC', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px' }}>
+              <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#94A3B8" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg>
+            </div>
+            <div style={{ fontSize:15, fontWeight:600, color:C.textSecondary, marginBottom:4 }}>No payments yet</div>
+            <div style={{ fontSize:13, color:C.textTertiary }}>Payments will appear here once clients subscribe</div>
+          </div>
+        ) : (
+          <table style={{ width:'100%', borderCollapse:'collapse', fontSize:13 }}>
+            <thead>
+              <tr style={{ background:'#F8FAFC' }}>
+                {['Client','Plan','Amount','Date','Status',''].map(h => (
+                  <th key={h} style={{ padding:'11px 18px', textAlign:'left', fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'0.6px', textTransform:'uppercase', borderBottom:`1px solid ${C.border}` }}>{h}</th>
+                ))}
               </tr>
-            ))}
-          </tbody>
-        </table>
+            </thead>
+            <tbody>
+              {filtered.map((p,i) => (
+                <tr key={p.id||i} className="adm-row" style={{ borderBottom:i<filtered.length-1?`1px solid ${C.borderSubtle}`:'none' }}>
+                  <td style={{ padding:'13px 18px' }}>
+                    <div style={{ fontWeight:600, color:C.textPrimary }}>{p.clientName}</div>
+                    {p.clientEmail && <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{p.clientEmail}</div>}
+                  </td>
+                  <td style={{ padding:'13px 18px' }}><PlanBadge label={(p.plan||'N/A').charAt(0).toUpperCase()+(p.plan||'N/A').slice(1)} /></td>
+                  <td style={{ padding:'13px 18px', fontWeight:800, color:C.textPrimary, fontSize:14 }}>€{(p.amount||0).toLocaleString()}</td>
+                  <td style={{ padding:'13px 18px', color:C.textTertiary }}>{p.date||'N/A'}</td>
+                  <td style={{ padding:'13px 18px' }}>{statusBadge(p.status, lang)}</td>
+                  <td style={{ padding:'13px 18px' }}>
+                    {p.status==='failed' && <button className="adm-btn-danger adm-btn-sm">{tr('admin.retry')||'Retry'}</button>}
+                  </td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        )}
       </div>
     </div>
   );
@@ -1480,15 +1516,19 @@ export default function AdminPage({ params }) {
   const [payouts, setPayouts] = useState([]);
   const [loading, setLoading] = useState(true);
 
+  // Wraps a promise with a timeout — if it hangs, resolve with fallback so page never freezes
+  const withTimeout = (promise, fallback, ms=12000) =>
+    Promise.race([promise, new Promise(resolve => setTimeout(() => resolve(fallback), ms))]);
+
   const loadData = async () => {
     setLoading(true);
     try {
       const [nursesData, usersData, visitsData, paymentsData, payoutsData] = await Promise.all([
-        api.getNurses().catch(()=>({ nurses:[] })),
-        api.getUsers().catch(()=>({ users:[] })),
-        api.getVisits().catch(()=>({ visits:[] })),
-        api.getPayments().catch(()=>({ payments:[] })),
-        api.getPayouts().catch(()=>({ payouts:[] })),
+        withTimeout(api.getNurses(), { nurses:[] }).catch(()=>({ nurses:[] })),
+        withTimeout(api.getUsers(), { users:[] }).catch(()=>({ users:[] })),
+        withTimeout(api.getVisits(), { visits:[] }).catch(()=>({ visits:[] })),
+        withTimeout(api.getPayments(), { payments:[] }).catch(()=>({ payments:[] })),
+        withTimeout(api.getPayouts(), { payouts:[] }).catch(()=>({ payouts:[] })),
       ]);
       setNurses((nursesData?.nurses || []).map(n => ({
         ...n,
@@ -1555,57 +1595,75 @@ export default function AdminPage({ params }) {
   return (
     <>
       <style>{`
-        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700;800&display=swap');
+        @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;0,9..40,800;0,9..40,900&display=swap');
         *{box-sizing:border-box;}body{margin:0;}
         @keyframes spin{to{transform:rotate(360deg)}}
-        @keyframes fadeSlideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
-        .admin-section{animation:fadeSlideIn 0.18s ease both;}
-        .adm-btn-primary{background:#2563EB;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.15s;}
-        .adm-btn-primary:hover:not(:disabled){background:#1D4ED8;}
-        .adm-btn-primary:disabled{opacity:0.55;cursor:not-allowed;}
-        .adm-btn-secondary{background:#fff;color:#374151;border:1px solid #E2E8F0;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.15s,border-color 0.15s;}
-        .adm-btn-secondary:hover:not(:disabled){background:#F9FAFB;border-color:#D1D5DB;}
-        .adm-btn-secondary:disabled{opacity:0.55;cursor:not-allowed;}
-        .adm-btn-danger{background:#fff;color:#DC2626;border:1px solid #FECACA;border-radius:8px;padding:8px 16px;font-size:13px;font-weight:500;cursor:pointer;font-family:inherit;transition:background 0.15s;}
-        .adm-btn-danger:hover:not(:disabled){background:#FEF2F2;}
-        .adm-btn-danger:disabled{opacity:0.55;cursor:not-allowed;}
-        .adm-btn-sm{padding:5px 12px!important;font-size:12px!important;}
-        .adm-btn-ghost{background:transparent;color:#2563EB;border:none;padding:0;font-size:12px;font-weight:500;cursor:pointer;font-family:inherit;}
-        .adm-btn-ghost:hover{text-decoration:underline;}
-        .adm-row:hover td{background:#F9FAFB!important;}
+        @keyframes fadeSlideIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+        @keyframes pulse{0%,100%{opacity:1}50%{opacity:0.5}}
+        .admin-section{animation:fadeSlideIn 0.22s cubic-bezier(0.4,0,0.2,1) both;}
+        .adm-btn-primary{background:linear-gradient(135deg,#2563EB,#1D4ED8);color:#fff;border:none;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;box-shadow:0 1px 4px rgba(37,99,235,0.3);}
+        .adm-btn-primary:hover:not(:disabled){background:linear-gradient(135deg,#1D4ED8,#1E40AF);transform:translateY(-1px);box-shadow:0 4px 12px rgba(37,99,235,0.35);}
+        .adm-btn-primary:disabled{opacity:0.5;cursor:not-allowed;transform:none;}
+        .adm-btn-secondary{background:#fff;color:#374151;border:1.5px solid #E5E7EB;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+        .adm-btn-secondary:hover:not(:disabled){background:#F9FAFB;border-color:#D1D5DB;transform:translateY(-1px);}
+        .adm-btn-secondary:disabled{opacity:0.5;cursor:not-allowed;}
+        .adm-btn-danger{background:#fff;color:#DC2626;border:1.5px solid #FECACA;border-radius:10px;padding:9px 18px;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit;transition:all 0.15s;}
+        .adm-btn-danger:hover:not(:disabled){background:#FEF2F2;border-color:#FCA5A5;}
+        .adm-btn-danger:disabled{opacity:0.5;cursor:not-allowed;}
+        .adm-btn-sm{padding:6px 12px!important;font-size:12px!important;}
+        .adm-btn-ghost{background:transparent;color:#2563EB;border:none;padding:0;font-size:12px;font-weight:600;cursor:pointer;font-family:inherit;transition:color 0.1s;}
+        .adm-btn-ghost:hover{color:#1D4ED8;}
+        .adm-row:hover td{background:#F8FAFC!important;}
+        .adm-row td{transition:background 0.1s;}
+        .adm-stat-card{transition:box-shadow 0.2s,transform 0.2s;}
+        .adm-stat-card:hover{box-shadow:0 8px 24px rgba(15,23,42,0.12)!important;transform:translateY(-2px);}
         @media(max-width:768px){
           .admin-cont{padding:16px 16px 140px!important;}
           .admin-ham{display:flex!important;}
           .admin-tabs{display:flex!important;}
         }
       `}</style>
-      <div style={{ display:'flex', minHeight:'100vh', fontFamily:F, background:'#F8FAFC' }}>
+      <div style={{ display:'flex', minHeight:'100vh', fontFamily:F, background:'#F1F5F9' }}>
         <AdminSidebar active={active} setActive={setActive} onLogout={logout} alertCount={alertCount} open={sidebarOpen} setOpen={setSidebarOpen} lang={lang} />
         <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
-          <div style={{ padding:'0 24px', height:58, borderBottom:'1px solid #E2E8F0', display:'flex', alignItems:'center', justifyContent:'space-between', background:'#FFFFFF', flexShrink:0 }}>
-            <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+          {/* ── Top header bar ── */}
+          <div style={{ padding:'0 28px', height:62, borderBottom:'1px solid #E2E8F0', display:'flex', alignItems:'center', justifyContent:'space-between', background:'#FFFFFF', flexShrink:0, boxShadow:'0 1px 3px rgba(15,23,42,0.05)' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:14 }}>
               <button onClick={()=>setSidebarOpen(true)} className="admin-ham" style={{ display:'none', flexDirection:'column', gap:4, background:'transparent', border:'none', cursor:'pointer', padding:'6px' }}>
                 <span style={{ display:'block',width:20,height:2,background:'#111827',borderRadius:2 }}/>
                 <span style={{ display:'block',width:20,height:2,background:'#111827',borderRadius:2 }}/>
                 <span style={{ display:'block',width:20,height:2,background:'#111827',borderRadius:2 }}/>
               </button>
-              <div style={{ fontSize:16, fontWeight:700, color:'#0F172A' }}>{TITLES[active]}</div>
+              <div>
+                <div style={{ fontSize:17, fontWeight:800, color:'#0F172A', letterSpacing:'-0.4px' }}>{TITLES[active]}</div>
+              </div>
             </div>
             <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-              {alertCount>0 && <button onClick={()=>setActive('alerts')} style={{ display:'inline-flex',alignItems:'center',gap:5,fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#374151',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}><span style={{ width:6,height:6,borderRadius:'50%',background:'#DC2626',display:'inline-block' }}/>{alertCount} {tr('admin.alerts')}</button>}
-              <button onClick={loadData} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#475569',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>↻ {tr('admin.refresh')}</button>
-              <button onClick={()=>setActive('ai')} style={{ fontSize:12,fontWeight:600,padding:'5px 12px',background:'#F1F5F9',color:'#374151',border:'1px solid #E2E8F0',borderRadius:8,cursor:'pointer',fontFamily:F }}>{tr('admin.ai')}</button>
-              <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:'1px solid #E2E8F0' }}>
+              {alertCount>0 && (
+                <button onClick={()=>setActive('alerts')} style={{ display:'inline-flex',alignItems:'center',gap:6,fontSize:12,fontWeight:700,padding:'7px 14px',background:'#FEF2F2',color:'#DC2626',border:'1.5px solid #FECACA',borderRadius:10,cursor:'pointer',fontFamily:F }}>
+                  <span style={{ width:7,height:7,borderRadius:'50%',background:'#DC2626',display:'inline-block',animation:'pulse 1.5s infinite' }}/>{alertCount} {tr('admin.alerts')}
+                </button>
+              )}
+              <button onClick={loadData} style={{ display:'inline-flex',alignItems:'center',gap:6,fontSize:12,fontWeight:600,padding:'7px 14px',background:'#F8FAFC',color:'#475569',border:'1.5px solid #E5E7EB',borderRadius:10,cursor:'pointer',fontFamily:F }}>
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
+                {tr('admin.refresh')}
+              </button>
+              <button onClick={()=>setActive('ai')} style={{ display:'inline-flex',alignItems:'center',gap:6,fontSize:12,fontWeight:600,padding:'7px 14px',background:'linear-gradient(135deg,#7C3AED,#5B21B6)',color:'#fff',border:'none',borderRadius:10,cursor:'pointer',fontFamily:F,boxShadow:'0 2px 8px rgba(124,58,237,0.3)' }}>
+                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>
+                {tr('admin.ai')}
+              </button>
+              <div style={{ display:'flex', background:'#F8FAFC', borderRadius:10, padding:3, border:'1.5px solid #E5E7EB' }}>
                 {['en','sq'].map(l=>(
-                  <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px', borderRadius:6, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:lang===l?'#2563EB':'transparent', color:lang===l?'#fff':'#475569', fontFamily:F }}>{l.toUpperCase()}</button>
+                  <button key={l} onClick={()=>switchLang(l)} style={{ padding:'5px 12px', borderRadius:7, border:'none', fontSize:11, fontWeight:700, cursor:'pointer', background:lang===l?'#2563EB':'transparent', color:lang===l?'#fff':'#475569', fontFamily:F, transition:'all 0.15s' }}>{l.toUpperCase()}</button>
                 ))}
               </div>
             </div>
           </div>
-          <main className="admin-cont" style={{ flex:1, padding:24, overflowY:'auto' }}>
+          <main className="admin-cont" style={{ flex:1, padding:28, overflowY:'auto' }}>
             {loading ? (
-              <div style={{ display:'flex',alignItems:'center',justifyContent:'center',height:200 }}>
-                <div style={{ width:32,height:32,borderRadius:'50%',border:'3px solid #EFF6FF',borderTopColor:'#2563EB',animation:'spin 0.8s linear infinite' }}/>
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', height:280, gap:16 }}>
+                <div style={{ width:40,height:40,borderRadius:'50%',border:'3px solid #EFF6FF',borderTopColor:'#2563EB',animation:'spin 0.75s linear infinite' }}/>
+                <div style={{ fontSize:13, color:'#94A3B8', fontWeight:500 }}>Loading data...</div>
               </div>
             ) : (
               <>
