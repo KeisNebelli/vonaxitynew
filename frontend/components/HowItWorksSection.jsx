@@ -589,6 +589,16 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
           .hiw-modal { grid-template-columns: 1fr; max-height: 88vh; }
           .hiw-modal-left  { padding: 36px 24px 16px; }
           .hiw-modal-right { padding: 0 24px 32px; }
+          .hiw-content-next, .hiw-content-prev { grid-template-columns: 1fr !important; }
+        }
+        @media (max-width: 640px) {
+          #how-it-works { padding: 60px 16px !important; }
+          .hiw-card { padding: 22px 18px !important; }
+          .hiw-overlay { padding: 0 !important; align-items: flex-end !important; }
+          .hiw-modal { border-radius: 24px 24px 0 0 !important; max-height: 92vh !important; }
+          .hiw-modal-left { padding: 28px 20px 14px !important; }
+          .hiw-modal-right { padding: 0 20px 28px !important; }
+          .hiw-nav-prev, .hiw-nav-next { width: 44px !important; height: 44px !important; }
         }
       `}</style>
 
@@ -664,7 +674,7 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
             <div
               key={contentKey}
               className={`hiw-content-${dir}`}
-              style={{ display:'contents' }}
+              style={{ display:'grid', gridColumn:'1 / -1', gridTemplateColumns:'1fr 1fr' }}
             >
 
             {/* Left: copy */}
@@ -702,6 +712,7 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
                 <button
                   onClick={goPrev}
                   disabled={active === 0}
+                  className="hiw-nav-prev"
                   style={{ width:34, height:34, borderRadius:'50%', border:'1.5px solid #E5E7EB', background:'#fff', cursor: active === 0 ? 'default' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, opacity: active === 0 ? 0.3 : 1, transition:'all 0.15s ease' }}
                   aria-label="Previous step"
                 >
@@ -722,6 +733,7 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
                 <button
                   onClick={goNext}
                   disabled={active === STEPS.length - 1}
+                  className="hiw-nav-next"
                   style={{ width:34, height:34, borderRadius:'50%', border:'none', background: active === STEPS.length - 1 ? '#F3F4F6' : step.color, cursor: active === STEPS.length - 1 ? 'default' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, opacity: active === STEPS.length - 1 ? 0.35 : 1, transition:'all 0.18s ease', boxShadow: active < STEPS.length - 1 ? `0 4px 14px ${step.color}55` : 'none' }}
                   aria-label="Next step"
                 >

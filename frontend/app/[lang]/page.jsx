@@ -136,6 +136,22 @@ export default async function HomePage({ params }) {
         .hp-faq-card:hover{border-color:#BFDBFE!important;box-shadow:0 4px 16px rgba(37,99,235,0.06)!important;}
         .hp-cta-btn{transition:all 0.18s ease;}
         .hp-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.35)!important;}
+
+        /* ── Mobile overrides ── */
+        @media (max-width: 640px) {
+          .hp-section-lg  { padding: 60px 20px !important; }
+          .hp-cta-section { padding: 72px 20px !important; }
+          .hp-cities-grid { grid-template-columns: 1fr !important; }
+          .hp-nurses-badges { display: none !important; }
+          .hp-stat-bar    { padding: 20px 20px !important; gap: 24px !important; }
+          .hp-trust-bar   { grid-template-columns: 1fr 1fr !important; gap: 14px !important; }
+          .hp-faq-card    { padding: 18px 18px !important; }
+          .hp-pricing-card-wrap { padding: 32px 20px !important; }
+        }
+        @media (max-width: 400px) {
+          .hp-cities-grid { gap: 14px !important; }
+          .hp-stat-bar    { gap: 18px !important; }
+        }
         .hp-nurse-btn{width:100%;padding:10px;font-size:13px;font-weight:600;border-radius:10px;border:1.5px solid #E5E7EB;background:transparent;color:#111827;cursor:pointer;transition:all 0.15s ease;font-family:inherit;}
         .hp-nurse-btn:hover{background:#EFF6FF;border-color:#2563EB;color:#2563EB;}
         @keyframes vx-cta-cross-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
@@ -174,7 +190,7 @@ export default async function HomePage({ params }) {
 
       {/* ── Trust bar ── */}
       <section style={{ background: 'rgba(255,255,255,0.88)', backdropFilter:'blur(8px)', borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '28px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', position:'relative', zIndex:1 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20 }}>
+        <div className="hp-trust-bar" style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20 }}>
           {TRUST_ITEMS.map((item, i) => (
             <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
               <div style={{ width: 42, height: 42, borderRadius: 12, background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 1px 4px rgba(37,99,235,0.12)' }}>
@@ -200,7 +216,7 @@ export default async function HomePage({ params }) {
       />
 
       {/* ── Services ── */}
-      <section id="services" style={{ padding: '96px 24px', background: 'linear-gradient(180deg,#F8FAFF 0%,#F0F4FF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="services" className="hp-section-lg" style={{ padding: '96px 24px', background: 'linear-gradient(180deg,#F8FAFF 0%,#F0F4FF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <ScrollReveal>
             <div style={{ marginBottom: 56, display:'flex', justifyContent:'space-between', alignItems:'flex-end', flexWrap:'wrap', gap:20 }}>
@@ -246,7 +262,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Our Nurses ── */}
-      <section id="our-nurses" style={{ padding: '96px 24px', background: C.bgWhite, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="our-nurses" className="hp-section-lg" style={{ padding: '96px 24px', background: C.bgWhite, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
           <ScrollReveal>
             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 52, flexWrap: 'wrap', gap: 16 }}>
@@ -259,7 +275,7 @@ export default async function HomePage({ params }) {
                   {t(lang, 'nurses.subtitle') || 'Every Vonaxity nurse is licensed by the Order of Nurses of Albania and personally verified by our team.'}
                 </p>
               </div>
-              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+              <div className="hp-nurses-badges" style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 {[
                   { icon: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>, label: lang === 'sq' ? 'E licensuar' : 'Licensed & Certified' },
                   { icon: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, label: lang === 'sq' ? 'I verifikuar' : 'Background Checked' },
@@ -325,7 +341,7 @@ export default async function HomePage({ params }) {
           </div>
 
           <ScrollReveal delay={100}>
-            <div style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)', borderRadius: 18, padding: '28px 36px', display: 'flex', gap: 48, justifyContent: 'center', flexWrap: 'wrap', border: '1px solid rgba(124,58,237,0.1)', boxShadow:'0 4px 24px rgba(124,58,237,0.06)' }}>
+            <div className="hp-stat-bar" style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)', borderRadius: 18, padding: '28px 36px', display: 'flex', gap: 48, justifyContent: 'center', flexWrap: 'wrap', border: '1px solid rgba(124,58,237,0.1)', boxShadow:'0 4px 24px rgba(124,58,237,0.06)' }}>
               {[
                 ['500+', lang === 'sq' ? 'Infermierë Aktivë' : 'Active Nurses'],
                 ['4.9', lang === 'sq' ? 'Vlerësim Mesatar' : 'Avg Rating'],
@@ -343,7 +359,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" style={{ padding: '96px 24px', background: 'linear-gradient(180deg, #F5F3FF 0%, #EFF6FF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="pricing" className="hp-section-lg" style={{ padding: '96px 24px', background: 'linear-gradient(180deg, #F5F3FF 0%, #EFF6FF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
           <ScrollReveal>
             <TAG>{t(lang, 'pricing.tag')}</TAG>
@@ -384,7 +400,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Cities ── */}
-      <section style={{ padding:'96px 24px', background:'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)', position: 'relative', zIndex: 1 }}>
+      <section className="hp-section-lg" style={{ padding:'96px 24px', background:'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           {/* Header */}
           <ScrollReveal>
@@ -401,7 +417,7 @@ export default async function HomePage({ params }) {
 
           {/* Launch city cards */}
           <ScrollReveal delay={100}>
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:24, maxWidth:780, margin:'0 auto 24px' }}>
+          <div className="hp-cities-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:24, maxWidth:780, margin:'0 auto 24px' }}>
             {LAUNCH_CITIES.map(city => (
               <div key={city.name} style={{
                 background: city.gradient,
@@ -483,7 +499,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── FAQ / About ── */}
-      <section id="about" style={{ padding: '96px 24px', background: C.bg, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="about" className="hp-section-lg" style={{ padding: '96px 24px', background: C.bg, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
           <ScrollReveal>
             <div style={{ textAlign: 'center', marginBottom: 52 }}>
@@ -518,7 +534,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── CTA ── */}
-      <section style={{ padding: '104px 24px', background: 'linear-gradient(158deg, #022c1a 0%, #064E3B 55%, #065f46 100%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hp-cta-section" style={{ padding: '104px 24px', background: 'linear-gradient(158deg, #022c1a 0%, #064E3B 55%, #065f46 100%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         {/* Decorative medicine crosses in background */}
         <div style={{ position:'absolute', inset:0, pointerEvents:'none' }}>
           {/* Large spinning cross — top right */}
