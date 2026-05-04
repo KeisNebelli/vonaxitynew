@@ -29,7 +29,71 @@ function Field({ label, children }) {
   );
 }
 
-export default function Settings({ initialUser, initialRelative, lang = 'en' }) {
+// Editable card for a single relative — self-contained state
+function RelativeCard({ relativeData, userId, lang, tr, inp }) {
+  const [rel, setRel] = useState({
+    name: relativeData?.name || '',
+    city: relativeData?.city || '',
+    address: relativeData?.address || '',
+    phone: relativeData?.phone || '',
+    age: relativeData?.age || '',
+    healthNotes: relativeData?.healthNotes || '',
+  });
+  const [saving, setSaving] = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    try {
+      await api.updateRelative(relativeData.id, { name:rel.name, city:rel.city, address:rel.address, phone:rel.phone, age:rel.age||null, healthNotes:rel.healthNotes });
+      toastSuccess(tr('settings.savedSuccess'));
+    } catch (err) {
+      toastError(err.message || tr('settings.savedError'));
+    } finally { setSaving(false); }
+  };
+
+  return (
+    <div style={{ background:C.bgSubtle, borderRadius:14, border:`1px solid ${C.border}`, padding:'20px', marginBottom:16 }}>
+      <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:16 }}>
+        <div style={{ width:34, height:34, borderRadius:99, background:C.primaryLight, border:`1.5px solid rgba(37,99,235,0.2)`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+          <svg width="16" height="16" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        </div>
+        <div>
+          <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>{rel.name || tr('settings.theirName')}</div>
+          {rel.city && <div style={{ fontSize:12, color:C.textTertiary }}>{rel.city}</div>}
+        </div>
+      </div>
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
+        <Field label={tr("settings.theirName")}>
+          <input style={inp} value={rel.name} onChange={e => setRel(r => ({...r, name:e.target.value}))} />
+        </Field>
+        <Field label={tr("settings.theirAge")}>
+          <input style={inp} type="number" value={rel.age} onChange={e => setRel(r => ({...r, age:e.target.value}))} placeholder="e.g. 74" />
+        </Field>
+        <Field label={tr("settings.theirCity")}>
+          <select style={inp} value={rel.city} onChange={e => setRel(r => ({...r, city:e.target.value}))}>
+            <option value="">{tr('settings.selectCity')}</option>
+            {CITIES_AL.map(c => <option key={c}>{c}</option>)}
+          </select>
+        </Field>
+        <Field label={tr("settings.theirPhone")}>
+          <input style={inp} value={rel.phone} onChange={e => setRel(r => ({...r, phone:e.target.value}))} placeholder="+355 69 000 0000" />
+        </Field>
+      </div>
+      <Field label={tr("settings.homeAddress")}>
+        <input style={inp} value={rel.address} onChange={e => setRel(r => ({...r, address:e.target.value}))} placeholder="Street address in Albania" />
+      </Field>
+      <Field label={tr("settings.healthNotes")}>
+        <textarea style={{...inp, minHeight:72, resize:'vertical'}} value={rel.healthNotes} onChange={e => setRel(r => ({...r, healthNotes:e.target.value}))} placeholder="e.g. Diabetes Type 2, takes Metformin daily..." />
+      </Field>
+      <button onClick={handleSave} disabled={saving} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:9, padding:'9px 20px', fontSize:13, fontWeight:600, cursor:'pointer', opacity:saving?0.7:1, fontFamily:'inherit' }}>
+        {saving ? tr('settings.saving') : tr('settings.saveChanges')}
+      </button>
+    </div>
+  );
+}
+
+export default function Settings({ initialUser, initialRelatives=[], lang = 'en' }) {
+  // backwards compat: if old single relative is passed, wrap it
   const tr = (key) => t(lang, key);
   const [profile, setProfile] = useState({
     name: initialUser?.name || '',
@@ -37,14 +101,6 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
     phone: initialUser?.phone || '',
     country: initialUser?.country || '',
     city: initialUser?.city || '',
-  });
-  const [rel, setRel] = useState({
-    name: initialRelative?.name || '',
-    city: initialRelative?.city || '',
-    address: initialRelative?.address || '',
-    phone: initialRelative?.phone || '',
-    age: initialRelative?.age || '',
-    healthNotes: initialRelative?.healthNotes || '',
   });
   const [password, setPassword] = useState({ current:'', newPass:'', confirm:'' });
   const [contact, setContact] = useState({ preferredContact:'email', emergencyName:'', emergencyPhone:'' });
@@ -62,9 +118,6 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
     setSaving(true);
     try {
       await api.updateProfile({ name:profile.name, phone:profile.phone, country:profile.country, city:profile.city });
-      if (initialRelative?.id) {
-        await api.updateRelative(initialRelative.id, { name:rel.name, city:rel.city, address:rel.address, phone:rel.phone, age:rel.age||null, healthNotes:rel.healthNotes });
-      }
       toastSuccess(tr('settings.savedSuccess'));
     } catch (err) {
       toastError(err.message || tr('settings.savedError'));
@@ -122,32 +175,30 @@ export default function Settings({ initialUser, initialRelative, lang = 'en' }) 
         </div>
       </SectionCard>
 
-      <SectionCard title={tr("settings.lovedOneTitle")} subtitle={tr("settings.lovedOneSub")}>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:16 }}>
-          <Field label={tr("settings.theirName")}>
-            <input style={inp} value={rel.name} onChange={e => setRel(r => ({...r, name:e.target.value}))} />
-          </Field>
-          <Field label={tr("settings.theirAge")}>
-            <input style={inp} type="number" value={rel.age} onChange={e => setRel(r => ({...r, age:e.target.value}))} placeholder="e.g. 74" />
-          </Field>
-          <Field label={tr("settings.theirCity")}>
-            <select style={inp} value={rel.city} onChange={e => setRel(r => ({...r, city:e.target.value}))}>
-              <option value="">{tr('settings.selectCity')}</option>
-              {CITIES_AL.map(c => <option key={c}>{c}</option>)}
-            </select>
-          </Field>
-          <Field label={tr("settings.theirPhone")}>
-            <input style={inp} value={rel.phone} onChange={e => setRel(r => ({...r, phone:e.target.value}))} placeholder="+355 69 000 0000" />
-          </Field>
-        </div>
-        <Field label={tr("settings.homeAddress")}>
-          <input style={inp} value={rel.address} onChange={e => setRel(r => ({...r, address:e.target.value}))} placeholder="Street address in Albania" />
-        </Field>
-        <Field label={tr("settings.healthNotes")}>
-          <textarea style={{...inp, minHeight:80, resize:'vertical'}} value={rel.healthNotes} onChange={e => setRel(r => ({...r, healthNotes:e.target.value}))} placeholder="e.g. Diabetes Type 2, takes Metformin daily..." />
-        </Field>
+      {/* Family members — one editable card per relative */}
+      <SectionCard
+        title={lang==='sq' ? 'Anëtarët e Familjes' : 'Family Members'}
+        subtitle={lang==='sq' ? 'Menaxhoni të gjithë anëtarët e familjes tuaj.' : 'Manage all your family members who receive care.'}
+      >
+        {initialRelatives.length === 0 && (
+          <div style={{ textAlign:'center', padding:'20px 0', color:C.textTertiary, fontSize:13 }}>
+            {lang==='sq' ? 'Nuk keni anëtarë familje të shtuar.' : 'No family members added yet.'}
+          </div>
+        )}
 
-        <div style={{ marginTop:8, paddingTop:20, borderTop:`1px solid ${C.borderSubtle}` }}>
+        {initialRelatives.map((rel, idx) => (
+          <RelativeCard
+            key={rel.id}
+            relativeData={rel}
+            userId={initialUser?.id}
+            lang={lang}
+            tr={tr}
+            inp={inp}
+          />
+        ))}
+
+        {/* Add new family member */}
+        <div style={{ marginTop: initialRelatives.length > 0 ? 8 : 0, paddingTop: initialRelatives.length > 0 ? 16 : 0, borderTop: initialRelatives.length > 0 ? `1px solid ${C.borderSubtle}` : 'none' }}>
           {!addingRelative ? (
             <button onClick={() => setAddingRelative(true)} style={{ display:'flex', alignItems:'center', gap:7, background:C.primaryLight, color:C.primary, border:`1.5px solid rgba(37,99,235,0.2)`, borderRadius:9, padding:'9px 16px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:'inherit' }}>
               <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>

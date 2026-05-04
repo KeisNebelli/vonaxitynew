@@ -548,9 +548,11 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits, onViewNe
   );
 }
 
-function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
+function BookVisit({ relatives=[], subscription, onSuccess, onCancel, lang='en' }) {
   const tr = (key) => t(lang, key);
   const serviceLabel = (en) => { const s = SERVICES_MAP.find(x => x.en === en); return lang === 'sq' && s ? s.sq : en; };
+  const [selectedRelativeId, setSelectedRelativeId] = useState(relatives[0]?.id || null);
+  const relative = relatives.find(r => r.id === selectedRelativeId) || relatives[0] || null;
   const [form, setForm] = useState({ serviceType: SERVICES[0], scheduledAt: '', notes: '' });
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -614,6 +616,47 @@ function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
 
       {/* Form body */}
       <div style={{ padding:'22px 24px 24px', display:'flex', flexDirection:'column', gap:16 }}>
+
+        {/* Relative picker — shown only when there are multiple family members */}
+        {relatives.length > 1 && (
+          <div>
+            <label style={{ fontSize:11, fontWeight:800, color:'#64748B', display:'block', marginBottom:7, letterSpacing:'0.6px', textTransform:'uppercase' }}>
+              {lang==='sq' ? 'ANËTAR I FAMILJES' : 'FAMILY MEMBER'}
+            </label>
+            <div style={{ display:'flex', flexWrap:'wrap', gap:8 }}>
+              {relatives.map(rel => {
+                const selected = rel.id === (relative?.id);
+                return (
+                  <button
+                    key={rel.id}
+                    onClick={() => setSelectedRelativeId(rel.id)}
+                    style={{
+                      display:'flex', alignItems:'center', gap:8,
+                      padding:'9px 14px', borderRadius:12,
+                      border: selected ? '2px solid #2563EB' : '1.5px solid #E2E8F0',
+                      background: selected ? '#EFF6FF' : '#fff',
+                      color: selected ? '#2563EB' : '#374151',
+                      fontFamily:F, fontSize:13, fontWeight: selected ? 700 : 500,
+                      cursor:'pointer', transition:'all 0.15s',
+                      boxShadow: selected ? '0 0 0 3px rgba(37,99,235,0.1)' : 'none'
+                    }}
+                  >
+                    <div style={{ width:28, height:28, borderRadius:99, background: selected ? '#2563EB' : '#E5E7EB', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      <svg width="14" height="14" fill="none" stroke={selected ? '#fff' : '#6B7280'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                    </div>
+                    <div style={{ textAlign:'left' }}>
+                      <div style={{ lineHeight:1.2 }}>{rel.name}</div>
+                      <div style={{ fontSize:11, fontWeight:400, color: selected ? '#3B82F6' : '#9CA3AF', lineHeight:1.1 }}>{rel.city}</div>
+                    </div>
+                    {selected && (
+                      <svg width="13" height="13" fill="none" stroke="#2563EB" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                    )}
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Service type */}
         <div>
@@ -1639,7 +1682,7 @@ export default function Dashboard({ params }) {
   const [active, setActive] = useState('overview');
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [u, setU] = useState(null);
-  const [r, setR] = useState(null);
+  const [relatives, setRelatives] = useState([]);
   const [visits, setVisits] = useState([]);
   const [loading, setLoading] = useState(true);
   const [viewingApplicants, setViewingApplicants] = useState(null); // visit object
@@ -1657,7 +1700,7 @@ export default function Dashboard({ params }) {
         ]);
         if (meData?.user) {
           setU(meData.user);
-          if (meData.user.relatives?.length>0) setR(meData.user.relatives[0]);
+          setRelatives(meData.user.relatives || []);
         } else {
           // No valid session - redirect to login
           router.push(`/${lang}/login`);
@@ -1679,7 +1722,7 @@ export default function Dashboard({ params }) {
       ]);
       if (meData?.user) {
         setU(meData.user);
-        if (meData.user.relatives?.length>0) setR(meData.user.relatives[0]);
+        setRelatives(meData.user.relatives || []);
       }
       setVisits(visitsData?.visits?.length > 0 ? visitsData.visits : []);
     } catch {}
@@ -1690,8 +1733,8 @@ export default function Dashboard({ params }) {
   if (loading) return <div style={{ display:'flex', alignItems:'center', justifyContent:'center', height:'100vh', fontFamily:F, color:C.textTertiary, fontSize:14 }}>Loading...</div>;
 
   const userData = u || { name:'', email:'', subscription:{ plan:'standard', status:'TRIAL', visitsPerMonth:2, visitsUsed:0 } };
-  const relative = r;
-  const relativeDisplay = r || null;
+  const relative = relatives[0] || null;
+  const relativeDisplay = relative;
   const plan = (userData.subscription?.plan||'standard').charAt(0).toUpperCase()+(userData.subscription?.plan||'standard').slice(1);
   const isTrial = userData.subscription?.status === 'TRIAL';
   const isExpired = userData.subscription?.status === 'EXPIRED';
@@ -1843,12 +1886,12 @@ export default function Dashboard({ params }) {
                 <div key={active} className="dash-section">
                   {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')} onViewVisits={()=>setActive('visits')} onViewNextVisit={(v)=>{ if (v?.status==='UNASSIGNED') { setViewingApplicants(v); } else { setViewingDetail(v); setActive('visits'); } }} />}
                   {active==='health' && <HealthProgress visits={visits} relative={relativeDisplay} lang={lang} />}
-                  {active==='book' && !isExpired && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
+                  {active==='book' && !isExpired && <BookVisit relatives={relatives} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
                   {active==='book' && isExpired && <SubscriptionSection userData={userData} lang={lang} />}
                   {active==='nurses' && <FindNurses lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')} />}
                   {active==='visits' && <Visits visits={visits} lang={lang} onViewApplicants={(v)=>setViewingApplicants(v)} onRefresh={loadData} viewingDetail={viewingDetail} setViewingDetail={setViewingDetail} />}
                   {active==='subscription' && <SubscriptionSection userData={userData} lang={lang} />}
-                  {active==='settings' && <Settings key="settings-page" initialUser={userData} initialRelative={relative} lang={lang}/>}
+                  {active==='settings' && <Settings key="settings-page" initialUser={userData} initialRelatives={relatives} lang={lang}/>}
                 </div>
               </>
             )}
