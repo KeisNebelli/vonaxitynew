@@ -267,9 +267,14 @@ function NotificationBell({ lang, onNavigate }) {
   );
 }
 
-function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=null }) {
+function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=null, onTodayClick }) {
   const tr = (key) => t(lang, key);
-  const today = visits.filter(v => !['COMPLETED','CANCELLED'].includes(v.status));
+  const todayStr = new Date().toISOString().split('T')[0];
+  const today = visits.filter(v => {
+    if (['COMPLETED','CANCELLED'].includes(v.status)) return false;
+    const visitDate = new Date(v.scheduledAt).toISOString().split('T')[0];
+    return visitDate === todayStr;
+  });
   const completed = visits.filter(v => v.status === 'COMPLETED');
   const nurseName = nurse?.user?.name || nurse?.name || 'Nurse';
   const nurseInitials = nurseName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
@@ -388,7 +393,7 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
       {/* ── Stat cards ── */}
       <div className="nd-stat-grid" style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:10 }}>
         {/* Today's visits */}
-        <div className="nd-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer' }} onClick={()=>setActive('visits')}>
+        <div className="nd-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer' }} onClick={()=>onTodayClick?.()}>
           <div style={{ width:32, height:32, borderRadius:10, background:'#EFF6FF', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10 }}>
             <svg width="15" height="15" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
           </div>
@@ -459,12 +464,27 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
   );
 }
 
-function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusChange }) {
+function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusChange, initialFilter='all' }) {
   const tr = (key) => t(lang, key);
-  const [filter, setFilter] = useState('all');
-  const filtered = filter==='all' ? visits : visits.filter(v=>filter==='upcoming'?!['COMPLETED','CANCELLED'].includes(v.status):v.status==='COMPLETED');
+  const [filter, setFilter] = useState(initialFilter);
+  const todayStr = new Date().toISOString().split('T')[0];
+  const filtered = visits.filter(v => {
+    if (filter === 'all') return true;
+    if (filter === 'today') {
+      if (['COMPLETED','CANCELLED'].includes(v.status)) return false;
+      return new Date(v.scheduledAt).toISOString().split('T')[0] === todayStr;
+    }
+    if (filter === 'upcoming') return !['COMPLETED','CANCELLED'].includes(v.status);
+    if (filter === 'completed') return v.status === 'COMPLETED';
+    return true;
+  });
 
-  const filterLabels = { all:t(lang,'nurse.visitsFilterAll'), upcoming:t(lang,'nurse.visitsFilterUpcoming'), completed:t(lang,'nurse.visitsFilterCompleted') };
+  const filterLabels = {
+    all: t(lang,'nurse.visitsFilterAll'),
+    today: lang==='sq' ? 'Sot' : 'Today',
+    upcoming: t(lang,'nurse.visitsFilterUpcoming'),
+    completed: t(lang,'nurse.visitsFilterCompleted'),
+  };
 
   if (!visits.length) return (
     <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center', color:C.textTertiary, fontSize:14 }}>
@@ -475,7 +495,7 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusCha
   return (
     <div>
       <div style={{ display:'flex', gap:8, marginBottom:20 }}>
-        {['all','upcoming','completed'].map(f => (
+        {['all','today','upcoming','completed'].map(f => (
           <button key={f} onClick={()=>setFilter(f)} style={{ fontSize:12, fontWeight:600, padding:'7px 16px', borderRadius:99, cursor:'pointer', background:filter===f?C.primary:C.bgWhite, color:filter===f?'#fff':C.textSecondary, border:filter===f?'none':`1px solid ${C.border}` }}>
             {filterLabels[f]}
           </button>
@@ -1549,6 +1569,11 @@ function OnboardingWizard({ nurse, user, onComplete, onSave, lang='en' }) {
 export default function NursePage({ params }) {
   const router = useRouter();
   const [active, setActive] = useState('dashboard');
+  const [visitsInitialFilter, setVisitsInitialFilter] = useState('all');
+  const navigateTo = (section) => {
+    if (section === 'visits') setVisitsInitialFilter('all');
+    setActive(section);
+  };
   const [sidebarOpen, setSidebarOpen] = useState(false);
   const [lang, setLang] = useState(params?.lang || 'en');
   _currentLang = lang; // Update module-level tr
@@ -1636,7 +1661,7 @@ export default function NursePage({ params }) {
         }
       `}</style>
       <div style={{ display:'flex', minHeight:'100vh', fontFamily:F, background:'#F8FAFC' }}>
-        <NurseSidebar nurse={displayNurse} active={active} setActive={setActive} onLogout={logout} open={sidebarOpen} setOpen={setSidebarOpen} lang={lang} />
+        <NurseSidebar nurse={displayNurse} active={active} setActive={navigateTo} onLogout={logout} open={sidebarOpen} setOpen={setSidebarOpen} lang={lang} />
 
         <div style={{ flex:1, display:'flex', flexDirection:'column', minWidth:0 }}>
           {/* Header */}
@@ -1651,12 +1676,12 @@ export default function NursePage({ params }) {
             </div>
             <div style={{ display:'flex', alignItems:'center', gap:8 }}>
               <NotificationBell lang={lang} onNavigate={(type, relatedId) => {
-                if (type === 'NEW_JOB') { setActive('jobs'); return; }
+                if (type === 'NEW_JOB') { navigateTo('jobs'); return; }
                 if (relatedId) {
                   const v = visits.find(x => x.id === relatedId);
                   if (v && type === 'JOB_ASSIGNED') { setSelectedVisit(v); setActive('map'); return; }
                 }
-                setActive('visits');
+                navigateTo('visits');
               }} />
               <div style={{ display:'flex', background:'#F1F5F9', borderRadius:8, padding:3, border:'1px solid #E2E8F0' }}>
                 {['en','sq'].map(l=>(
@@ -1672,9 +1697,9 @@ export default function NursePage({ params }) {
             <OnboardingBanner nurse={nurse} onStartOnboarding={()=>setActive('onboarding')} lang={lang} />
             <div key={active} className="nurse-section">
               {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} lang={lang} />}
-              {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} />}
+              {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} onTodayClick={()=>{ setVisitsInitialFilter('today'); setActive('visits'); }} />}
               {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
-              {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} />}
+              {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} initialFilter={visitsInitialFilter} />}
               {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} onStatusChange={handleStatusChange} lang={lang} />}
               {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
               {active==='earnings' && <Earnings lang={lang} nurse={nurse} visits={visits} />}
