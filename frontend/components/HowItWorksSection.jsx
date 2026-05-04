@@ -197,9 +197,26 @@ const STEPS = [
 ];
 
 /* ── Main component ─────────────────────────────────────── */
-export default function HowItWorksSection({ lang, tag, title, subtitle, steps, plans }) {
+export default function HowItWorksSection({ lang, tag, title, subtitle, steps, plans: plansProp }) {
   const [active, setActive] = useState(null);
   const [visible, setVisible] = useState(false);
+
+  // Fetch live pricing fresh from CRM on mount (bypasses Next.js page cache)
+  const [plans, setPlans] = useState(plansProp);
+  useEffect(() => {
+    fetch('/api/pricing')
+      .then(r => r.json())
+      .then(data => {
+        if (data?.basicPrice) {
+          setPlans([
+            { name: 'Basic',    price: `€${data.basicPrice}`,    visits: data.basicVisits    || 1, featured: false },
+            { name: 'Standard', price: `€${data.standardPrice}`, visits: data.standardVisits || 2, featured: true  },
+            { name: 'Premium',  price: `€${data.premiumPrice}`,  visits: data.premiumVisits  || 4, featured: false },
+          ]);
+        }
+      })
+      .catch(() => {}); // keep prop fallback on error
+  }, []);
 
   const open = useCallback((i) => {
     setActive(i);
