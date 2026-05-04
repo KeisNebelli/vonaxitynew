@@ -340,6 +340,15 @@ router.put('/:id/reject', ...requireRole('ADMIN'), async (req, res) => {
 router.put('/:id/availability', ...requireRole('NURSE', 'ADMIN'), async (req, res) => {
   try {
     const { availability } = req.body;
+
+    // Nurses can only update their own availability
+    if (req.user.role === 'NURSE') {
+      const ownProfile = await prisma.nurse.findUnique({ where: { userId: req.user.userId }, select: { id: true } });
+      if (!ownProfile || ownProfile.id !== req.params.id) {
+        return res.status(403).json({ error: 'You can only update your own availability.' });
+      }
+    }
+
     const nurse = await prisma.nurse.update({
       where: { id: req.params.id },
       data: { availability: JSON.stringify(availability) },

@@ -421,23 +421,44 @@ module.exports.cleanupRouter = cleanupRouter;
 
 // POST /contact — public contact form
 const contactRouter = require('express').Router();
-contactRouter.post('/', async (req, res) => {
+const rateLimit = require('express-rate-limit');
+const contactLimiter = rateLimit({
+  windowMs: 60 * 60 * 1000, // 1 hour
+  max: 5,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many messages sent. Please try again later.' },
+});
+
+// HTML escape helper to prevent injection in emails
+function escHtml(str) {
+  if (!str) return '';
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#39;')
+    .replace(/\n/g, '<br/>');
+}
+
+contactRouter.post('/', contactLimiter, async (req, res) => {
   try {
     const { name, email, message } = req.body;
     if (!name || !email || !message) return res.status(400).json({ error: 'All fields required' });
     const { sendEmail } = require('../lib/email');
     await sendEmail({
       to: 'hello@vonaxity.com',
-      subject: `Contact form: ${name}`,
+      subject: `Contact form: ${escHtml(name)}`,
       html: `<div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
         <h2 style="font-size:18px;font-weight:700;margin-bottom:16px">New contact form submission</h2>
         <div style="background:#F8FAFC;border-radius:12px;padding:20px;border:1px solid #E2E8F0">
-          <div style="margin-bottom:10px"><strong>Name:</strong> ${name}</div>
-          <div style="margin-bottom:10px"><strong>Email:</strong> ${email}</div>
-          <div style="margin-top:12px;padding-top:12px;border-top:1px solid #E2E8F0"><strong>Message:</strong><br/>${message.replace(/\n/g,'<br/>')}</div>
+          <div style="margin-bottom:10px"><strong>Name:</strong> ${escHtml(name)}</div>
+          <div style="margin-bottom:10px"><strong>Email:</strong> ${escHtml(email)}</div>
+          <div style="margin-top:12px;padding-top:12px;border-top:1px solid #E2E8F0"><strong>Message:</strong><br/>${escHtml(message)}</div>
         </div>
-        <p style="margin-top:16px;font-size:13px;color:#94A3B8">Reply directly to this email to respond to ${name}.</p>
+        <p style="margin-top:16px;font-size:13px;color:#94A3B8">Reply directly to this email to respond to ${escHtml(name)}.</p>
       </div>`,
     });
     // Auto-reply to sender
@@ -446,7 +467,7 @@ contactRouter.post('/', async (req, res) => {
       subject: 'We received your message — Vonaxity',
       html: `<div style="font-family:Inter,sans-serif;max-width:560px;margin:0 auto;padding:32px 24px;color:#0F172A">
         <div style="font-size:22px;font-weight:700;color:#2563EB;margin-bottom:24px">Vonaxity</div>
-        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Thanks for reaching out, ${name}!</h2>
+        <h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Thanks for reaching out, ${escHtml(name)}!</h2>
         <p style="color:#475569;margin-bottom:24px">We received your message and will get back to you within 24 hours.</p>
         <p style="color:#94A3B8;font-size:12px">Vonaxity · Professional home nurse visits across Albania</p>
       </div>`,

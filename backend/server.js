@@ -95,8 +95,6 @@ app.get('/health', (req, res) => {
   res.json({
     status: 'ok',
     service: 'Vonaxity API',
-    version: '1.0.0',
-    environment: process.env.NODE_ENV || 'development',
     timestamp: new Date().toISOString(),
   });
 });
@@ -141,7 +139,7 @@ app.post('/ai/chat', aiLimiter, async (req, res) => {
     res.json({ content: data.content?.[0]?.text || '' });
   } catch (err) {
     console.error('AI proxy error:', err);
-    res.status(500).json({ error: err.message });
+    res.status(500).json({ error: 'AI assistant is temporarily unavailable.' });
   }
 });
 
