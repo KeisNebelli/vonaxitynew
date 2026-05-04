@@ -202,7 +202,7 @@ export default function LoginPage({ params }) {
 
             <h2 style={{ fontSize:22, fontWeight:800, color:'#111827', letterSpacing:'-0.4px', marginBottom:6 }}>{tr('welcomeBack')}</h2>
             <p style={{ fontSize:13, color:'#6B7280', marginBottom:24 }}>
-              {tr('noAccount')} <Link href={`/${lang}/signup`} style={{ color:accent, fontWeight:600 }}>{tr('signUp')}</Link>
+              {tr('noAccount')} <Link href={`/${lang}/signup?role=${role === 'NURSE' ? 'nurse' : 'client'}`} style={{ color:accent, fontWeight:600 }}>{tr('signUp')}</Link>
             </p>
 
             <form onSubmit={handleLogin}>
