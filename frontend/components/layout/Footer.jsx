@@ -17,6 +17,7 @@ export default function Footer({ lang = 'en' }) {
 
   return (
     <footer style={{ background: 'linear-gradient(180deg, #051a0e 0%, #071510 100%)', color: 'rgba(255,255,255,0.7)', padding: '56px 24px 32px' }}>
+      <style>{`.vx-footer-svc-link:hover { color: #fff !important; }`}</style>
       <div style={{ maxWidth: 1100, margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 40, marginBottom: 48 }}>
           <div>
@@ -37,7 +38,7 @@ export default function Footer({ lang = 'en' }) {
 
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: headingColor, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: 16 }}>{t(lang, 'footer.services')}</div>
-            {services.map((s, i) => <Link key={s} href={`/${lang}/services`} style={{ display: 'block', fontSize: 13, marginBottom: 10, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#fff'} onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.55)'}>{s}</Link>)}
+            {services.map((s) => <Link key={s} href={`/${lang}/services`} className="vx-footer-svc-link" style={{ display: 'block', fontSize: 13, marginBottom: 10, color: 'rgba(255,255,255,0.55)', textDecoration: 'none' }}>{s}</Link>)}
           </div>
 
           <div>

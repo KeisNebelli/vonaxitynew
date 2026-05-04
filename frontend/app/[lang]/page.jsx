@@ -104,7 +104,7 @@ export default async function HomePage({ params }) {
   const BASE = process.env.NEXT_PUBLIC_API_URL || 'https://vonaxitynew-production.up.railway.app';
   let pricing = DEFAULT_PRICING;
   try {
-    const res = await fetch(`${BASE}/settings/public`, { cache: 'no-store' });
+    const res = await fetch(`${BASE}/settings/public`, { next: { revalidate: 60 } });
     if (res.ok) pricing = await res.json();
   } catch {}
 
