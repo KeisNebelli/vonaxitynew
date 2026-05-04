@@ -12,7 +12,6 @@ const SECTIONS = [
   { id: 'services',     labelKey: 'nav.services'   },
   { id: 'our-nurses',   labelKey: 'nav.ourNurses'  },
   { id: 'pricing',      labelKey: 'nav.pricing'    },
-  { id: 'about',        labelKey: 'nav.about'      },
 ];
 
 const NAV_HEIGHT = 64; // px — keep in sync with .vx-nav-bar height
@@ -322,6 +321,13 @@ export default function Nav({ lang = 'en' }) {
                 {t(lang, labelKey)}
               </a>
             ))}
+            <Link
+              href={`/${lang}/about`}
+              className="vx-nav-link"
+              style={{ textDecoration: 'none' }}
+            >
+              {t(lang, 'nav.about')}
+            </Link>
           </div>
 
           {/* Right: lang + CTA */}
@@ -361,6 +367,14 @@ export default function Nav({ lang = 'en' }) {
               {t(lang, labelKey)}
             </a>
           ))}
+          <Link
+            href={`/${lang}/about`}
+            className="vx-mobile-nav-link"
+            onClick={() => setOpen(false)}
+            style={{ textDecoration: 'none' }}
+          >
+            {t(lang, 'nav.about')}
+          </Link>
           <div className="vx-mobile-btns">
             <Link href={`/${lang}/login`} style={{ flex:1 }} onClick={() => setOpen(false)}>
               <button className="vx-mobile-signin" style={{ width:'100%' }}>{t(lang,'nav.signIn')}</button>
