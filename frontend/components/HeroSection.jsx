@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
+import LiveActivity from '@/components/LiveActivity';
 
 function useIsMobile(breakpoint = 480) {
   const [mobile, setMobile] = useState(false);
@@ -24,6 +25,10 @@ export default function HeroSection({ lang, badge, headline1, headline2, subtitl
   const isMobile = useIsMobile(480);
   return (
     <section style={{ position:'relative', padding:'80px 24px 96px', zIndex:1 }}>
+      <style>{`
+        @keyframes vx-medcross { 0%,100% { transform:scale(1) rotate(0deg); opacity:0.85; } 50% { transform:scale(1.12) rotate(6deg); opacity:1; } }
+        @keyframes vx-medcross2 { 0%,100% { transform:scale(1) rotate(0deg); opacity:0.55; } 50% { transform:scale(1.08) rotate(-4deg); opacity:0.75; } }
+      `}</style>
       <div style={{ maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(300px,1fr))', gap:60, alignItems:'center' }}>
 
         {/* Left: copy */}
@@ -33,9 +38,14 @@ export default function HeroSection({ lang, badge, headline1, headline2, subtitl
             {headline1}<br />
             <span style={{ background:'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', backgroundClip:'text' }}>{headline2}</span>
           </h1>
-          <p style={{ fontSize:17, lineHeight:1.75, color:'#6B7280', maxWidth:480, margin:'0 0 36px' }}>
+          <p style={{ fontSize:17, lineHeight:1.75, color:'#6B7280', maxWidth:480, margin:'0 0 24px' }}>
             {subtitle}
           </p>
+
+          {/* Live activity ticker */}
+          <div style={{ marginBottom:32 }}>
+            <LiveActivity />
+          </div>
 
           {/* CTAs */}
           <div style={{ display:'flex', gap:12, flexWrap:'wrap', marginBottom:52 }}>
@@ -70,6 +80,23 @@ export default function HeroSection({ lang, badge, headline1, headline2, subtitl
 
         {/* Right: photo + floating card */}
         <div style={{ position:'relative' }}>
+
+          {/* Medicine cross — top right corner */}
+          <div style={{ position:'absolute', top:-18, right:-18, zIndex:3 }}>
+            <svg width="54" height="54" viewBox="0 0 54 54" fill="none" style={{ animation:'vx-medcross 3.6s ease-in-out infinite', transformOrigin:'27px 27px', filter:'drop-shadow(0 2px 10px rgba(5,150,105,0.4))' }}>
+              <rect x="19" y="2" width="16" height="50" rx="7" fill="rgba(5,150,105,0.22)" stroke="#059669" strokeWidth="2"/>
+              <rect x="2" y="19" width="50" height="16" rx="7" fill="rgba(5,150,105,0.22)" stroke="#059669" strokeWidth="2"/>
+            </svg>
+          </div>
+
+          {/* Second smaller cross — bottom left */}
+          <div style={{ position:'absolute', bottom:96, left:-22, zIndex:3 }}>
+            <svg width="34" height="34" viewBox="0 0 34 34" fill="none" style={{ animation:'vx-medcross2 5s ease-in-out infinite', transformOrigin:'17px 17px', filter:'drop-shadow(0 1px 6px rgba(124,58,237,0.3))' }}>
+              <rect x="12" y="1" width="10" height="32" rx="4" fill="rgba(124,58,237,0.15)" stroke="rgba(124,58,237,0.5)" strokeWidth="1.5"/>
+              <rect x="1" y="12" width="32" height="10" rx="4" fill="rgba(124,58,237,0.15)" stroke="rgba(124,58,237,0.5)" strokeWidth="1.5"/>
+            </svg>
+          </div>
+
           <div style={{ borderRadius:20, overflow:'hidden', boxShadow:'0 8px 48px rgba(124,58,237,0.16)', border:'1px solid rgba(196,181,253,0.25)' }}>
             <img
               src="/hero.jpg"

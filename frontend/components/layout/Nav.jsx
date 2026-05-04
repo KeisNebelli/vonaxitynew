@@ -49,11 +49,13 @@ export default function Nav({ lang = 'en' }) {
 
   /* ── Smooth scroll helper ── */
   const scrollTo = (e, id) => {
-    if (!isHome) return; // fall through to Link href
-    e.preventDefault();
+    if (!isHome) return; // fall through to anchor href (browser navigates to /{lang}#id)
     const el = document.getElementById(id);
-    if (!el) return;
-
+    if (!el) {
+      // element not in DOM yet — let hash navigation do its job
+      return;
+    }
+    e.preventDefault();
     const top = el.getBoundingClientRect().top + window.scrollY - NAV_HEIGHT - 12;
     window.scrollTo({ top, behavior: 'smooth' });
     setActive(id);

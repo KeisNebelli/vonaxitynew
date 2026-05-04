@@ -136,6 +136,9 @@ export default async function HomePage({ params }) {
         .hp-cta-btn:hover{transform:translateY(-2px);box-shadow:0 8px 32px rgba(0,0,0,0.35)!important;}
         .hp-nurse-btn{width:100%;padding:10px;font-size:13px;font-weight:600;border-radius:10px;border:1.5px solid #E5E7EB;background:transparent;color:#111827;cursor:pointer;transition:all 0.15s ease;font-family:inherit;}
         .hp-nurse-btn:hover{background:#EFF6FF;border-color:#2563EB;color:#2563EB;}
+        @keyframes vx-cta-cross-spin{from{transform:rotate(0deg)}to{transform:rotate(360deg)}}
+        @keyframes vx-cta-cross-bob{0%,100%{transform:translateY(0px) rotate(12deg)}50%{transform:translateY(-10px) rotate(12deg)}}
+        @keyframes vx-cta-orb{0%,100%{transform:scale(1);opacity:0.6}50%{transform:scale(1.12);opacity:0.9}}
 
       `}</style>
       <OrganicBackground />
@@ -483,14 +486,60 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── CTA ── */}
-      <section style={{ padding: '96px 24px', background: 'linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%)', textAlign: 'center' }}>
-        <h2 style={{ fontSize: 'clamp(26px,4vw,44px)', fontWeight: 800, color: '#fff', marginBottom: 16, letterSpacing: '-1.5px' }}>{t(lang, 'cta.title')}</h2>
-        <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.7)', maxWidth: 420, margin: '0 auto 36px', lineHeight: 1.7 }}>{t(lang, 'cta.subtitle')}</p>
-        <Link href={`/${lang}/signup`}>
-          <button className="hp-cta-btn" style={{ background: '#fff', color: '#1E3A5F', border: 'none', borderRadius: 10, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 24px rgba(0,0,0,0.2)' }}>
-            {t(lang, 'cta.btn1')}
-          </button>
-        </Link>
+      <section style={{ padding: '104px 24px', background: 'linear-gradient(158deg, #022c1a 0%, #064E3B 55%, #065f46 100%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+        {/* Decorative medicine crosses in background */}
+        <div style={{ position:'absolute', inset:0, pointerEvents:'none' }}>
+          {/* Large spinning cross — top right */}
+          <svg style={{ position:'absolute', top:-24, right:'8%', opacity:0.07, animation:'vx-cta-cross-spin 28s linear infinite', transformOrigin:'center' }} width="180" height="180" viewBox="0 0 54 54" fill="none">
+            <rect x="19" y="0" width="16" height="54" rx="6" fill="#fff"/>
+            <rect x="0" y="19" width="54" height="16" rx="6" fill="#fff"/>
+          </svg>
+          {/* Medium bobbing cross — bottom left */}
+          <svg style={{ position:'absolute', bottom:-10, left:'6%', opacity:0.06, animation:'vx-cta-cross-bob 6s ease-in-out infinite', transformOrigin:'center' }} width="110" height="110" viewBox="0 0 54 54" fill="none">
+            <rect x="19" y="0" width="16" height="54" rx="6" fill="#4ade80"/>
+            <rect x="0" y="19" width="54" height="16" rx="6" fill="#4ade80"/>
+          </svg>
+          {/* Small spinning cross — mid-left */}
+          <svg style={{ position:'absolute', top:'38%', left:'14%', opacity:0.05, animation:'vx-cta-cross-spin 40s linear infinite reverse', transformOrigin:'center' }} width="68" height="68" viewBox="0 0 54 54" fill="none">
+            <rect x="19" y="0" width="16" height="54" rx="6" fill="#6ee7b7"/>
+            <rect x="0" y="19" width="54" height="16" rx="6" fill="#6ee7b7"/>
+          </svg>
+          {/* Tiny cross — top left */}
+          <svg style={{ position:'absolute', top:'18%', left:'3%', opacity:0.08, animation:'vx-cta-cross-spin 20s linear infinite', transformOrigin:'center' }} width="44" height="44" viewBox="0 0 54 54" fill="none">
+            <rect x="19" y="0" width="16" height="54" rx="6" fill="#fff"/>
+            <rect x="0" y="19" width="54" height="16" rx="6" fill="#fff"/>
+          </svg>
+          {/* Radial glow orb */}
+          <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:600, height:400, borderRadius:'50%', background:'radial-gradient(ellipse, rgba(16,185,129,0.12) 0%, transparent 70%)', animation:'vx-cta-orb 5s ease-in-out infinite' }} />
+        </div>
+
+        {/* Content */}
+        <div style={{ position:'relative', zIndex:1 }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:99, padding:'6px 16px', marginBottom:24, backdropFilter:'blur(8px)' }}>
+            <div style={{ width:7, height:7, borderRadius:'50%', background:'#4ade80', boxShadow:'0 0 8px #4ade80' }} />
+            <span style={{ fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.85)', letterSpacing:'0.8px', textTransform:'uppercase' }}>
+              {lang === 'sq' ? 'Tani disponueshëm' : 'Now available in Albania'}
+            </span>
+          </div>
+          <h2 style={{ fontSize: 'clamp(28px,4.5vw,48px)', fontWeight: 800, color: '#fff', marginBottom: 16, letterSpacing: '-1.5px', lineHeight:1.1 }}>
+            {t(lang, 'cta.title')}
+          </h2>
+          <p style={{ fontSize: 17, color: 'rgba(255,255,255,0.7)', maxWidth: 440, margin: '0 auto 40px', lineHeight: 1.75 }}>
+            {t(lang, 'cta.subtitle')}
+          </p>
+          <div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }}>
+            <Link href={`/${lang}/signup`}>
+              <button className="hp-cta-btn" style={{ background: '#fff', color: '#064E3B', border: 'none', borderRadius: 12, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 28px rgba(0,0,0,0.25)' }}>
+                {t(lang, 'cta.btn1')}
+              </button>
+            </Link>
+            <Link href={`/${lang}/nurse-signup`}>
+              <button className="hp-cta-btn" style={{ background: 'transparent', color: '#fff', border: '2px solid rgba(255,255,255,0.35)', borderRadius: 12, padding: '16px 32px', fontSize: 16, fontWeight: 600, cursor: 'pointer' }}>
+                {lang === 'sq' ? 'Bashkohu si infermier/e' : 'Join as a nurse'}
+              </button>
+            </Link>
+          </div>
+        </div>
       </section>
 
       <Footer lang={lang} />
