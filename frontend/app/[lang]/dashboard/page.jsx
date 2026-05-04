@@ -1453,20 +1453,26 @@ function FindNurses({ lang, onBook }) {
   if (loading) return (
     <div>
       <style>{`@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}.fn-shimmer{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:600px 100%;animation:shimmer 1.4s infinite}`}</style>
-      <div style={{ marginBottom:20, height:42, borderRadius:10 }} className="fn-shimmer"/>
-      {[1,2,3].map(i=>(
-        <div key={i} style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20, marginBottom:12 }}>
-          <div style={{ display:'flex', gap:14, alignItems:'center', marginBottom:14 }}>
-            <div style={{ width:52, height:52, borderRadius:13, flexShrink:0 }} className="fn-shimmer"/>
-            <div style={{ flex:1 }}>
-              <div style={{ height:14, borderRadius:6, marginBottom:8, width:'55%' }} className="fn-shimmer"/>
-              <div style={{ height:11, borderRadius:6, width:'35%' }} className="fn-shimmer"/>
+      <div style={{ marginBottom:20, height:44, borderRadius:12 }} className="fn-shimmer"/>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:16 }}>
+        {[1,2,3,4].map(i=>(
+          <div key={i} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden' }}>
+            <div style={{ height:76, marginBottom:0 }} className="fn-shimmer"/>
+            <div style={{ padding:'16px 18px' }}>
+              <div style={{ display:'flex', gap:12, alignItems:'center', marginBottom:14, marginTop:'-28px' }}>
+                <div style={{ width:54, height:54, borderRadius:14, flexShrink:0, border:'3px solid #fff', boxShadow:'0 2px 8px rgba(0,0,0,0.12)' }} className="fn-shimmer"/>
+                <div style={{ flex:1, marginTop:28 }}>
+                  <div style={{ height:13, borderRadius:6, marginBottom:7, width:'65%' }} className="fn-shimmer"/>
+                  <div style={{ height:10, borderRadius:6, width:'40%' }} className="fn-shimmer"/>
+                </div>
+              </div>
+              <div style={{ height:10, borderRadius:6, width:'90%', marginBottom:6 }} className="fn-shimmer"/>
+              <div style={{ height:10, borderRadius:6, width:'70%', marginBottom:16 }} className="fn-shimmer"/>
+              <div style={{ height:36, borderRadius:10 }} className="fn-shimmer"/>
             </div>
           </div>
-          <div style={{ height:11, borderRadius:6, width:'80%', marginBottom:6 }} className="fn-shimmer"/>
-          <div style={{ height:11, borderRadius:6, width:'60%' }} className="fn-shimmer"/>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 
@@ -1474,21 +1480,23 @@ function FindNurses({ lang, onBook }) {
 
   return (
     <div>
+      <style>{`.fn-card{transition:transform 0.18s,box-shadow 0.18s}.fn-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.11) !important}.fn-book:hover{background:linear-gradient(135deg,#1D4ED8,#4338CA) !important}`}</style>
+
       {/* Search + filter */}
       <div style={{ display:'flex', gap:10, marginBottom:20, flexWrap:'wrap' }}>
         <div style={{ flex:1, minWidth:200, position:'relative' }}>
-          <svg style={{ position:'absolute', left:12, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }} width="15" height="15" fill="none" stroke={C.textTertiary} strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <svg style={{ position:'absolute', left:13, top:'50%', transform:'translateY(-50%)', pointerEvents:'none' }} width="15" height="15" fill="none" stroke={C.textTertiary} strokeWidth="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
           <input
             value={query}
             onChange={e=>setQuery(e.target.value)}
             placeholder={tr('dashboard.searchNursesPlaceholder')}
-            style={{ width:'100%', paddingLeft:38, paddingRight:14, paddingTop:10, paddingBottom:10, borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:F, boxSizing:'border-box' }}
+            style={{ width:'100%', paddingLeft:40, paddingRight:14, paddingTop:11, paddingBottom:11, borderRadius:12, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:F, boxSizing:'border-box' }}
           />
         </div>
         <select
           value={cityFilter}
           onChange={e=>setCityFilter(e.target.value)}
-          style={{ padding:'10px 14px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:cityFilter?C.textPrimary:C.textTertiary, background:C.bgWhite, outline:'none', fontFamily:F, cursor:'pointer' }}
+          style={{ padding:'11px 16px', borderRadius:12, border:`1.5px solid ${C.border}`, fontSize:14, color:cityFilter?C.textPrimary:C.textTertiary, background:C.bgWhite, outline:'none', fontFamily:F, cursor:'pointer' }}
         >
           <option value="">{tr('dashboard.allCities')}</option>
           {CITIES.map(c=><option key={c} value={c}>{c}</option>)}
@@ -1503,64 +1511,84 @@ function FindNurses({ lang, onBook }) {
 
       {/* Empty state */}
       {filtered.length === 0 && (
-        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'48px 24px', textAlign:'center' }}>
-          <div style={{ fontSize:40, marginBottom:12 }}>🔍</div>
+        <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'56px 24px', textAlign:'center' }}>
+          <div style={{ fontSize:44, marginBottom:12 }}>🔍</div>
           <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:6 }}>{tr('dashboard.noNursesFound')}</div>
           <div style={{ fontSize:13, color:C.textSecondary }}>{tr('dashboard.noNursesFoundSub')}</div>
         </div>
       )}
 
-      {/* Nurse cards */}
-      {filtered.map(nurse => (
-        <div key={nurse.id} style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'20px', marginBottom:14, boxShadow:SSM }}>
-          <div style={{ display:'flex', gap:14, alignItems:'flex-start', marginBottom:14 }}>
-            <div style={{ width:52, height:52, borderRadius:13, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:18, fontWeight:800, color:'#fff', flexShrink:0, overflow:'hidden' }}>
-              {nurse.profilePhotoUrl
-                ? <img src={nurse.profilePhotoUrl} alt={nurse.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-                : (nurse.name||'N').charAt(0).toUpperCase()
-              }
-            </div>
-            <div style={{ flex:1, minWidth:0 }}>
-              <div style={{ fontSize:16, fontWeight:700, color:C.textPrimary, marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{nurse.name}</div>
-              <div style={{ fontSize:12, color:C.textTertiary, marginBottom:6 }}>
-                {nurse.city && <span>📍 {nurse.city}</span>}
-                {nurse.experience && <span style={{ marginLeft:10 }}>🩺 {nurse.experience}</span>}
+      {/* Nurse cards — grid */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:18 }}>
+        {filtered.map(nurse => (
+          <div key={nurse.id} className="fn-card" style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', display:'flex', flexDirection:'column' }}>
+
+            {/* Card accent header */}
+            <div style={{ height:72, background:'linear-gradient(135deg,#1e3a5f 0%,#2563EB 55%,#6366F1 100%)', position:'relative', overflow:'hidden', flexShrink:0 }}>
+              <div style={{ position:'absolute', inset:0, opacity:0.08 }}>
+                <svg width="100%" height="100%"><defs><pattern id={`fn-dots-${nurse.id}`} width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.1" fill="white"/></pattern></defs><rect width="100%" height="100%" fill={`url(#fn-dots-${nurse.id})`}/></svg>
               </div>
-              <div style={{ display:'flex', alignItems:'center', gap:6 }}>
-                <div style={{ display:'flex', gap:1 }}>{stars(nurse.rating||0)}</div>
-                <span style={{ fontSize:12, color:C.textSecondary, fontWeight:600 }}>{nurse.rating>0 ? nurse.rating.toFixed(1) : tr('dashboard.newNurse')}</span>
-                {nurse.reviewCount > 0 && <span style={{ fontSize:11, color:C.textTertiary }}>({nurse.reviewCount})</span>}
-                <span style={{ marginLeft:4, fontSize:11, color:C.textTertiary }}>· {nurse.totalVisits} {tr('dashboard.visitsApplicantLabel')}</span>
+              <div style={{ position:'absolute', top:-20, right:-20, width:90, height:90, borderRadius:'50%', background:'rgba(255,255,255,0.08)' }}/>
+              {/* Verified badge top-right */}
+              <div style={{ position:'absolute', top:10, right:12, fontSize:11, fontWeight:700, padding:'3px 9px', borderRadius:99, background:'rgba(255,255,255,0.18)', color:'#fff', backdropFilter:'blur(4px)', border:'1px solid rgba(255,255,255,0.25)', display:'flex', alignItems:'center', gap:4 }}>
+                <svg width="10" height="10" fill="none" stroke="#6EE7B7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                {tr('dashboard.nurseVerified')}
               </div>
             </div>
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, flexShrink:0 }}>
-              <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.secondaryLight, color:C.secondary, whiteSpace:'nowrap' }}>✓ {tr('dashboard.nurseVerified')}</span>
+
+            {/* Avatar — overlaps header */}
+            <div style={{ padding:'0 18px', marginTop:-28, marginBottom:10, display:'flex', alignItems:'flex-end', gap:12 }}>
+              <div style={{ width:58, height:58, borderRadius:16, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden', border:'3px solid #fff', boxShadow:'0 4px 14px rgba(0,0,0,0.18)' }}>
+                {nurse.profilePhotoUrl
+                  ? <img src={nurse.profilePhotoUrl} alt={nurse.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
+                  : (nurse.name||'N').charAt(0).toUpperCase()
+                }
+              </div>
+              <div style={{ paddingBottom:4 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                  <div style={{ display:'flex', gap:1 }}>{stars(nurse.rating||0)}</div>
+                  <span style={{ fontSize:12, fontWeight:700, color:C.textSecondary }}>{nurse.rating>0 ? nurse.rating.toFixed(1) : tr('dashboard.newNurse')}</span>
+                  {nurse.reviewCount > 0 && <span style={{ fontSize:11, color:C.textTertiary }}>({nurse.reviewCount})</span>}
+                </div>
+                <div style={{ fontSize:11, color:C.textTertiary }}>{nurse.totalVisits} {tr('dashboard.visitsApplicantLabel')}</div>
+              </div>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding:'0 18px 18px', flex:1, display:'flex', flexDirection:'column' }}>
+              <div style={{ fontSize:16, fontWeight:800, color:C.textPrimary, marginBottom:3, lineHeight:1.25 }}>{nurse.name}</div>
+              <div style={{ fontSize:12, color:C.textTertiary, marginBottom:10, display:'flex', alignItems:'center', gap:8 }}>
+                {nurse.city && <span style={{ display:'flex', alignItems:'center', gap:3 }}><svg width="11" height="11" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{nurse.city}</span>}
+                {nurse.experience && <span style={{ display:'flex', alignItems:'center', gap:3 }}><svg width="11" height="11" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>{nurse.experience}</span>}
+              </div>
+
+              {nurse.bio && (
+                <div style={{ fontSize:12.5, color:C.textSecondary, lineHeight:1.6, marginBottom:12, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', flex:1 }}>
+                  {nurse.bio}
+                </div>
+              )}
+
+              {nurse.specialties?.length > 0 && (
+                <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:14 }}>
+                  {nurse.specialties.slice(0,3).map(s=>(
+                    <span key={s} style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{s}</span>
+                  ))}
+                  {nurse.specialties.length > 3 && <span style={{ fontSize:11, color:C.textTertiary, padding:'3px 0' }}>+{nurse.specialties.length-3}</span>}
+                </div>
+              )}
+
+              <button
+                className="fn-book"
+                onClick={() => onBook()}
+                style={{ width:'100%', background:'linear-gradient(135deg,#2563EB,#4F46E5)', color:'#fff', border:'none', borderRadius:12, padding:'11px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:7, marginTop:'auto', transition:'background 0.15s' }}
+              >
+                {tr('dashboard.bookWithNurse')}
+                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+              </button>
             </div>
           </div>
-
-          {nurse.bio && (
-            <div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.65, marginBottom:12, padding:'10px 13px', background:C.bgSubtle, borderRadius:9, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
-              {nurse.bio}
-            </div>
-          )}
-
-          {nurse.specialties?.length > 0 && (
-            <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:14 }}>
-              {nurse.specialties.slice(0,4).map(s=>(
-                <span key={s} style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{s}</span>
-              ))}
-              {nurse.specialties.length > 4 && <span style={{ fontSize:11, color:C.textTertiary }}>+{nurse.specialties.length-4}</span>}
-            </div>
-          )}
-
-          <button
-            onClick={() => onBook()}
-            style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'11px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F }}
-          >
-            {tr('dashboard.bookWithNurse')}
-          </button>
-        </div>
-      ))}
+        ))}
+      </div>
     </div>
   );
 }
