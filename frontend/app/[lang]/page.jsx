@@ -260,12 +260,12 @@ export default async function HomePage({ params }) {
               </div>
               <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
                 {[
-                  { icon: '✓', label: lang === 'sq' ? 'E licensuar' : 'Licensed & Certified' },
-                  { icon: '🛡', label: lang === 'sq' ? 'I verifikuar' : 'Background Checked' },
-                  { icon: '⭐', label: lang === 'sq' ? 'E vlerësuar' : 'Patient Rated' },
+                  { icon: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>, label: lang === 'sq' ? 'E licensuar' : 'Licensed & Certified' },
+                  { icon: <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>, label: lang === 'sq' ? 'I verifikuar' : 'Background Checked' },
+                  { icon: <svg width="11" height="11" viewBox="0 0 24 24" fill="#059669" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>, label: lang === 'sq' ? 'E vlerësuar' : 'Patient Rated' },
                 ].map(b => (
                   <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: C.secondary, background: C.secondaryLight, border: '1px solid rgba(5,150,105,0.15)', padding: '6px 12px', borderRadius: 99 }}>
-                    <span style={{ fontSize: 11 }}>{b.icon}</span>{b.label}
+                    {b.icon}{b.label}
                   </div>
                 ))}
               </div>
