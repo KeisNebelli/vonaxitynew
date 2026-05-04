@@ -1524,7 +1524,7 @@ function FindNurses({ lang, onBook }) {
           <div key={nurse.id} className="fn-card" style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', display:'flex', flexDirection:'column' }}>
 
             {/* Card accent header */}
-            <div style={{ height:72, background:'linear-gradient(135deg,#1e3a5f 0%,#2563EB 55%,#6366F1 100%)', position:'relative', overflow:'hidden', flexShrink:0 }}>
+            <div style={{ height:58, background:'linear-gradient(135deg,#1e3a5f 0%,#2563EB 55%,#6366F1 100%)', position:'relative', overflow:'hidden', flexShrink:0 }}>
               <div style={{ position:'absolute', inset:0, opacity:0.08 }}>
                 <svg width="100%" height="100%"><defs><pattern id={`fn-dots-${nurse.id}`} width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.1" fill="white"/></pattern></defs><rect width="100%" height="100%" fill={`url(#fn-dots-${nurse.id})`}/></svg>
               </div>
@@ -1537,8 +1537,8 @@ function FindNurses({ lang, onBook }) {
             </div>
 
             {/* Avatar + name row — overlaps header */}
-            <div style={{ padding:'0 18px', marginTop:-26, marginBottom:14, display:'flex', alignItems:'flex-end', gap:13, position:'relative', zIndex:2 }}>
-              <div style={{ width:56, height:56, borderRadius:15, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:21, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden', border:'3px solid #fff', boxShadow:'0 4px 14px rgba(0,0,0,0.18)' }}>
+            <div style={{ padding:'0 16px', marginTop:-22, marginBottom:12, display:'flex', alignItems:'flex-end', gap:12, position:'relative', zIndex:2 }}>
+              <div style={{ width:52, height:52, borderRadius:14, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:19, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden', border:'3px solid #fff', boxShadow:'0 4px 12px rgba(0,0,0,0.20)' }}>
                 {nurse.profilePhotoUrl
                   ? <img src={nurse.profilePhotoUrl} alt={nurse.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   : (nurse.name||'N').charAt(0).toUpperCase()
@@ -1555,9 +1555,9 @@ function FindNurses({ lang, onBook }) {
             </div>
 
             {/* Body */}
-            <div style={{ padding:'0 18px 18px', flex:1, display:'flex', flexDirection:'column', position:'relative', zIndex:2 }}>
+            <div style={{ padding:'0 16px 16px', flex:1, display:'flex', flexDirection:'column', position:'relative', zIndex:2 }}>
               {/* Stars row */}
-              <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:10 }}>
+              <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:8 }}>
                 <div style={{ display:'flex', gap:1 }}>{stars(nurse.rating||0)}</div>
                 <span style={{ fontSize:12, fontWeight:700, color:C.textSecondary }}>{nurse.rating>0 ? nurse.rating.toFixed(1) : tr('dashboard.newNurse')}</span>
                 {nurse.reviewCount > 0 && <span style={{ fontSize:11, color:C.textTertiary }}>({nurse.reviewCount})</span>}
