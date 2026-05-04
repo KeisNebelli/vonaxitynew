@@ -916,11 +916,11 @@ function BrowseJobs({ nurse, lang='en' }) {
                       <span>{job.relativeName || t(lang,'nurse.patientLabel')}{job.relativeAge ? `, ${lang==='sq'?'mosha':'age'} ${job.relativeAge}` : ''}</span>
                     </div>
                   )}
-                  {/* Posted by */}
+                  {/* Booked by client */}
                   {job.postedBy && (
                     <div style={{ display:'flex', alignItems:'center', gap:7, fontSize:12, color:C.textTertiary }}>
-                      <div style={{ width:28, height:28, borderRadius:8, background:'#F8FAFC', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:C.textTertiary }}>{iconNote}</div>
-                      <span>{lang==='sq'?'Postuar nga':'Posted by'} <strong style={{ color:C.textSecondary }}>{job.postedBy}</strong>{job.clientCountry ? ` · ${job.clientCountry}` : ''}</span>
+                      <div style={{ width:28, height:28, borderRadius:8, background:'#F8FAFC', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:C.textTertiary }}>{iconUser}</div>
+                      <span>{lang==='sq'?'Klienti:':'Client:'} <strong style={{ color:C.textSecondary }}>{job.postedBy}</strong>{job.clientCountry ? ` · ${job.clientCountry}` : ''}</span>
                     </div>
                   )}
                 </div>

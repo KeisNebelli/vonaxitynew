@@ -165,7 +165,7 @@ function NotificationBell({ lang, onNavigate }) {
   );
 }
 
-function Overview({ user, visits, relative, lang, onBook, onViewVisits }) {
+function Overview({ user, visits, relative, lang, onBook, onViewVisits, onViewNextVisit }) {
   const tr = (key) => t(lang, key);
   const upcoming = visits.filter(v=>!['COMPLETED','CANCELLED'].includes(v.status));
   const completed = visits.filter(v=>v.status==='COMPLETED');
@@ -188,7 +188,7 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits }) {
 
       {/* ── Next Visit banner ── */}
       {next ? (
-        <div className="ov-next" onClick={onViewVisits} style={{ background:'linear-gradient(135deg,#1D4ED8 0%,#2563EB 60%,#3B82F6 100%)', borderRadius:18, padding:'22px 24px', color:'#fff', boxShadow:'0 4px 16px rgba(37,99,235,0.25)', cursor:'pointer', position:'relative', overflow:'hidden' }}>
+        <div className="ov-next" onClick={()=>(onViewNextVisit||onViewVisits)(next)} style={{ background:'linear-gradient(135deg,#1D4ED8 0%,#2563EB 60%,#3B82F6 100%)', borderRadius:18, padding:'22px 24px', color:'#fff', boxShadow:'0 4px 16px rgba(37,99,235,0.25)', cursor:'pointer', position:'relative', overflow:'hidden' }}>
           <div style={{ position:'absolute', inset:0, opacity:0.06, pointerEvents:'none' }}>
             <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg"><defs><pattern id="og" width="30" height="30" patternUnits="userSpaceOnUse"><path d="M 30 0 L 0 0 0 30" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs><rect width="100%" height="100%" fill="url(#og)"/></svg>
           </div>
@@ -422,7 +422,7 @@ function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
 
       <div style={{ marginBottom:16 }}>
         <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>{tr('dashboard.bookDateTime')}</label>
-        <input type="datetime-local" style={inp} value={form.scheduledAt} onChange={e=>setForm({...form, scheduledAt:e.target.value})} min={new Date().toISOString().slice(0,16)} />
+        <input type="datetime-local" style={inp} value={form.scheduledAt} onChange={e=>setForm({...form, scheduledAt:e.target.value})} min={toLocalDT(new Date().toISOString())} />
       </div>
 
       <div style={{ marginBottom:24 }}>
@@ -623,11 +623,18 @@ function Applicants({ visitId, visitInfo, onBack, onSelect, lang='en' }) {
 
 
 // ── Edit Visit Modal ────────────────────────────────────────────────────────
+function toLocalDT(isoStr) {
+  if (!isoStr) return '';
+  const d = new Date(isoStr);
+  const pad = n => String(n).padStart(2, '0');
+  return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())}T${pad(d.getHours())}:${pad(d.getMinutes())}`;
+}
+
 function EditVisit({ visit, onSave, onCancel, lang='en' }) {
   const tr = (key) => t(lang, key);
   const [form, setForm] = useState({
     serviceType: visit.serviceType || '',
-    scheduledAt: visit.scheduledAt ? new Date(visit.scheduledAt).toISOString().slice(0,16) : '',
+    scheduledAt: toLocalDT(visit.scheduledAt),
     notes: visit.notes || '',
   });
   const [loading, setLoading] = useState(false);
@@ -1484,7 +1491,7 @@ export default function Dashboard({ params }) {
                   </div>
                 )}
                 <div key={active} className="dash-section">
-                  {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')} onViewVisits={()=>setActive('visits')}/>}
+                  {active==='overview' && <Overview user={userData} visits={visits} relative={relativeDisplay} lang={lang} onBook={()=>isExpired ? setActive('subscription') : setActive('book')} onViewVisits={()=>setActive('visits')} onViewNextVisit={(v)=>{ if (v?.status==='UNASSIGNED') { setViewingApplicants(v); } else { setViewingDetail(v); setActive('visits'); } }} />}
                   {active==='health' && <HealthProgress visits={visits} relative={relativeDisplay} lang={lang} />}
                   {active==='book' && !isExpired && <BookVisit relative={relative} subscription={userData?.subscription} onSuccess={handleBookSuccess} onCancel={()=>setActive('overview')} lang={lang} />}
                   {active==='book' && isExpired && <SubscriptionSection userData={userData} lang={lang} />}
