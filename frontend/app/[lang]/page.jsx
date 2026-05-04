@@ -3,6 +3,7 @@ import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/HeroSection';
 import OrganicBackground from '@/components/OrganicBackground';
 import ScrollReveal from '@/components/ScrollReveal';
+import HowItWorksSection from '@/components/HowItWorksSection';
 import Link from 'next/link';
 import { t } from '@/translations';
 
@@ -189,39 +190,13 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── How it works ── */}
-      <section id="how-it-works" style={{ padding: '96px 24px', background: C.bgWhite, scrollMarginTop: '76px', position: 'relative', zIndex: 1, overflow:'hidden' }}>
-        {/* Subtle background cross watermark */}
-        <div style={{ position:'absolute', top:'50%', right:-60, transform:'translateY(-50%)', opacity:0.025, pointerEvents:'none' }}>
-          <svg width="340" height="340" viewBox="0 0 54 54" fill="none"><rect x="19" y="0" width="16" height="54" rx="6" fill="#7C3AED"/><rect x="0" y="19" width="54" height="16" rx="6" fill="#7C3AED"/></svg>
-        </div>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <ScrollReveal>
-            <div style={{ textAlign: 'center', marginBottom: 64 }}>
-              <TAG>{t(lang, 'howItWorks.tag')}</TAG>
-              <h2 style={{ fontSize: 'clamp(30px,4vw,46px)', fontWeight: 800, color: C.textPrimary, margin: '0 0 14px', letterSpacing: '-1.5px' }}>{t(lang, 'howItWorks.title')}</h2>
-              <p style={{ fontSize: 16, color: C.textSecondary, maxWidth: 460, margin: '0 auto', lineHeight: 1.7 }}>{t(lang, 'howItWorks.subtitle') || 'From booking to bedside — fast, simple, and completely transparent.'}</p>
-            </div>
-          </ScrollReveal>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20, position:'relative' }}>
-            {Array.isArray(steps) && steps.slice(0, 4).map((s, i) => (
-              <ScrollReveal key={i} delay={i * 100}>
-                <div className="hp-step-card" style={{ background: C.bgWhite, borderRadius: 22, border: `1px solid ${C.border}`, padding: '32px 26px', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', position:'relative', overflow:'hidden', height:'100%' }}>
-                  {/* Giant watermark number */}
-                  <div style={{ position:'absolute', right:14, bottom:8, fontSize:88, fontWeight:900, color:'rgba(124,58,237,0.04)', letterSpacing:'-4px', lineHeight:1, userSelect:'none', pointerEvents:'none' }}>
-                    {i + 1}
-                  </div>
-                  {/* Gradient step circle */}
-                  <div style={{ width:52, height:52, borderRadius:'50%', background:'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:22, boxShadow:'0 6px 18px rgba(124,58,237,0.28)', flexShrink:0 }}>
-                    <span style={{ fontSize:16, fontWeight:800, color:'#fff' }}>0{i+1}</span>
-                  </div>
-                  <div style={{ fontSize: 16, fontWeight: 700, color: C.textPrimary, marginBottom: 10, lineHeight: 1.35 }}>{s.title}</div>
-                  <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.7 }}>{s.desc}</div>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
-        </div>
-      </section>
+      <HowItWorksSection
+        lang={lang}
+        tag={t(lang, 'howItWorks.tag')}
+        title={t(lang, 'howItWorks.title')}
+        subtitle={t(lang, 'howItWorks.subtitle')}
+        steps={steps}
+      />
 
       {/* ── Services ── */}
       <section id="services" style={{ padding: '96px 24px', background: 'linear-gradient(180deg,#F8FAFF 0%,#F0F4FF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
