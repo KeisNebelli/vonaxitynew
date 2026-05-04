@@ -471,6 +471,51 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits, onViewNe
         </button>
       </div>
 
+      {/* ── Recent Activity ── */}
+      {visits.length > 0 && (() => {
+        const recent = [...visits].sort((a,b) => new Date(b.scheduledAt) - new Date(a.scheduledAt)).slice(0, 4);
+        const actMeta = {
+          COMPLETED:   { bar:'#22C55E', bg:'#F0FDF4', icon:<svg width="13" height="13" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
+          UNASSIGNED:  { bar:'#F59E0B', bg:'#FFFBEB', icon:<svg width="13" height="13" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
+          PENDING:     { bar:'#2563EB', bg:'#EFF6FF', icon:<svg width="13" height="13" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
+          ACCEPTED:    { bar:'#059669', bg:'#ECFDF5', icon:<svg width="13" height="13" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> },
+          NURSE_ON_WAY:{ bar:'#6366F1', bg:'#EEF2FF', icon:<svg width="13" height="13" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+          NURSE_ARRIVED:{ bar:'#059669', bg:'#ECFDF5', icon:<svg width="13" height="13" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+          CANCELLED:   { bar:'#EF4444', bg:'#FEF2F2', icon:<svg width="13" height="13" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> },
+        };
+        return (
+          <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
+            <div style={{ padding:'14px 18px 10px', borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>{lang==='sq'?'Aktiviteti i Fundit':'Recent Activity'}</div>
+              <button onClick={onViewVisits} style={{ fontSize:12, fontWeight:700, color:C.primary, background:'none', border:'none', cursor:'pointer', fontFamily:F }}>{lang==='sq'?'Shiko të gjitha':'View all'}</button>
+            </div>
+            <style>{`.ov-act-row:hover { background:${C.bgSubtle} !important; }`}</style>
+            {recent.map((v, i) => {
+              const meta = actMeta[v.status] || actMeta.UNASSIGNED;
+              const d = new Date(v.scheduledAt);
+              const dateStr2 = d.toLocaleDateString(lang==='sq'?'sq-AL':'en-GB', { day:'numeric', month:'short', year:'numeric' });
+              const timeStr2 = d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+              const svcLabel2 = (()=>{ const s=SERVICES_MAP.find(x=>x.en===v.serviceType); return lang==='sq'&&s?s.sq:v.serviceType; })();
+              return (
+                <div key={v.id} className="ov-act-row" onClick={onViewVisits} style={{ display:'flex', alignItems:'center', gap:12, padding:'11px 18px', borderBottom: i < recent.length-1 ? `1px solid ${C.borderSubtle}` : 'none', cursor:'pointer', transition:'background 0.15s' }}>
+                  <div style={{ width:32, height:32, borderRadius:9, background:meta.bg, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    {meta.icon}
+                  </div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{svcLabel2}</div>
+                    <div style={{ fontSize:11, color:C.textTertiary, marginTop:1 }}>{dateStr2} · {timeStr2}</div>
+                  </div>
+                  <div style={{ display:'flex', alignItems:'center', gap:6, flexShrink:0 }}>
+                    <div style={{ width:6, height:6, borderRadius:'50%', background:meta.bar }}/>
+                    <Badge s={v.status} lang={lang} />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
+
       {/* ── Client Calendar ── */}
       <ClientCalendar visits={visits} lang={lang} onBook={onBook} onViewVisits={onViewVisits} />
 

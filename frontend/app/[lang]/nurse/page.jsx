@@ -633,6 +633,51 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
         </div>
       )}
 
+      {/* ── Upcoming Visits ── */}
+      {(() => {
+        const todayStr2 = new Date().toISOString().split('T')[0];
+        const sevenDays = new Date(); sevenDays.setDate(sevenDays.getDate() + 7);
+        const upcoming = visits.filter(v => {
+          if (['COMPLETED','CANCELLED'].includes(v.status)) return false;
+          const d = new Date(v.scheduledAt);
+          const ds = d.toISOString().split('T')[0];
+          return ds > todayStr2 && d <= sevenDays;
+        }).sort((a,b) => new Date(a.scheduledAt) - new Date(b.scheduledAt)).slice(0, 4);
+        if (!upcoming.length) return null;
+        return (
+          <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 1px 3px rgba(15,23,42,0.05)' }}>
+            <div style={{ padding:'14px 18px 10px', borderBottom:`1px solid ${C.border}`, display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+              <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>{lang==='sq'?'Vizita të Ardhshme':'Upcoming Visits'}</div>
+              <button onClick={()=>setActive('visits')} style={{ fontSize:12, fontWeight:700, color:C.primary, background:'none', border:'none', cursor:'pointer', fontFamily:F }}>{lang==='sq'?'Shiko të gjitha':'View all'}</button>
+            </div>
+            <style>{`.nd-upc-row:hover { background:#F8FAFC !important; }`}</style>
+            {upcoming.map((v, i) => {
+              const d = new Date(v.scheduledAt);
+              const dayLabel = d.toLocaleDateString(lang==='sq'?'sq-AL':'en-GB', { weekday:'short', day:'numeric', month:'short' });
+              const timeLabel = d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
+              const svc = trService(v.serviceType, lang);
+              const statusColors = { ACCEPTED:'#059669', PENDING:'#2563EB', UNASSIGNED:'#D97706' };
+              const statusBg = { ACCEPTED:'#ECFDF5', PENDING:'#EFF6FF', UNASSIGNED:'#FFFBEB' };
+              const sc = statusColors[v.status] || C.textTertiary;
+              const sb = statusBg[v.status] || C.bgSubtle;
+              return (
+                <div key={v.id} className="nd-upc-row" onClick={()=>setActive('visits')} style={{ display:'flex', alignItems:'center', gap:12, padding:'12px 18px', borderBottom: i < upcoming.length-1 ? `1px solid ${C.borderSubtle}` : 'none', cursor:'pointer', transition:'background 0.15s' }}>
+                  <div style={{ width:40, height:40, borderRadius:11, background:'#EFF6FF', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <div style={{ fontSize:14, fontWeight:800, color:C.primary, lineHeight:1 }}>{d.getDate()}</div>
+                    <div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase' }}>{d.toLocaleDateString('en-GB',{month:'short'})}</div>
+                  </div>
+                  <div style={{ flex:1, minWidth:0 }}>
+                    <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:2, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{svc}</div>
+                    <div style={{ fontSize:11, color:C.textTertiary }}>{dayLabel} · {timeLabel}</div>
+                  </div>
+                  <span style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:99, background:sb, color:sc, flexShrink:0 }}>{v.status}</span>
+                </div>
+              );
+            })}
+          </div>
+        );
+      })()}
+
       {/* ── Emergency warning ── */}
       <div style={{ background:'#FFFBEB', border:`1px solid #FDE68A`, borderRadius:12, padding:'12px 16px', display:'flex', gap:10, alignItems:'center' }}>
         <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
@@ -868,6 +913,45 @@ function Earnings({ lang='en', nurse=null, visits=[] }) {
           </div>
         ))}
       </div>
+
+      {/* ── Monthly Earnings Chart ── */}
+      {completedVisits.length > 0 && (() => {
+        const now = new Date();
+        const months = Array.from({ length: 6 }, (_, i) => {
+          const d = new Date(now.getFullYear(), now.getMonth() - (5 - i), 1);
+          return { key: `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}`, label: d.toLocaleDateString('en-GB', { month:'short' }), year: d.getFullYear(), month: d.getMonth() };
+        });
+        const earnings = months.map(m => completedVisits.filter(v => {
+          const d = new Date(v.completedAt || v.scheduledAt);
+          return d.getFullYear() === m.year && d.getMonth() === m.month;
+        }).length * payRate);
+        const maxE = Math.max(...earnings, 1);
+        const total6m = earnings.reduce((a,b) => a+b, 0);
+        return (
+          <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'20px 22px', boxShadow:'0 1px 3px rgba(15,23,42,0.05)' }}>
+            <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+              <div>
+                <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>{lang==='sq'?'Fitimet 6 Muajt Fundit':'Last 6 Months Earnings'}</div>
+                <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>€{total6m} {lang==='sq'?'gjithsej':'total'}</div>
+              </div>
+              <div style={{ fontSize:22, fontWeight:800, color:C.purple, letterSpacing:'-0.5px' }}>€{total6m}</div>
+            </div>
+            <div style={{ display:'flex', alignItems:'flex-end', gap:6, height:72 }}>
+              {months.map((m, i) => {
+                const h = earnings[i] === 0 ? 4 : Math.max(8, Math.round((earnings[i] / maxE) * 64));
+                const isLatest = i === 5;
+                return (
+                  <div key={m.key} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
+                    <div style={{ fontSize:9, fontWeight:700, color: earnings[i]>0 ? C.purple : C.textTertiary, letterSpacing:'-0.2px' }}>{earnings[i]>0?`€${earnings[i]}`:''}</div>
+                    <div style={{ width:'100%', height:h, borderRadius:'6px 6px 3px 3px', background: isLatest ? 'linear-gradient(180deg,#7C3AED,#4F46E5)' : earnings[i]>0 ? 'rgba(124,58,237,0.35)' : C.bgSubtle, transition:'height 0.3s', minHeight:4 }}/>
+                    <div style={{ fontSize:10, fontWeight:600, color: isLatest ? C.textPrimary : C.textTertiary }}>{m.label}</div>
+                  </div>
+                );
+              })}
+            </div>
+          </div>
+        );
+      })()}
 
       {/* Payout info strip */}
       <div style={{ background:'#EFF6FF', borderRadius:10, border:'1px solid #BFDBFE', padding:'11px 16px',
