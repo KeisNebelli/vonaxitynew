@@ -2,8 +2,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
 
-/* ── Inline dashboard mockups ───────────────────────────── */
+/* ─────────────────────────────────────────────────────────
+   MOCKUP COMPONENTS — one per step
+───────────────────────────────────────────────────────── */
 
+/* Step 1 — Client picks a plan & books */
 function MockupBooking({ plans }) {
   const displayPlans = plans && plans.length === 3 ? plans : [
     { name:'Basic',    price:'€30',  visits:1, featured:false },
@@ -12,35 +15,27 @@ function MockupBooking({ plans }) {
   ];
   return (
     <div style={{ background:'#F8FAFF', borderRadius:16, overflow:'hidden', border:'1px solid #E5E7EB', fontFamily:'Inter,system-ui,sans-serif', fontSize:12 }}>
-      {/* Browser bar */}
-      <div style={{ background:'#1E293B', padding:'8px 14px', display:'flex', alignItems:'center', gap:6 }}>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:'#EF4444' }}/>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:'#F59E0B' }}/>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:'#22C55E' }}/>
-        <div style={{ flex:1, background:'#334155', borderRadius:4, padding:'3px 10px', marginLeft:8, fontSize:10, color:'rgba(255,255,255,0.5)' }}>vonaxity.com/signup</div>
-      </div>
-      <div style={{ padding:'20px 18px' }}>
-        <div style={{ fontSize:13, fontWeight:700, color:'#111827', marginBottom:14 }}>Choose your plan</div>
-        {/* Plan cards — live from CRM */}
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:8, marginBottom:16 }}>
-          {displayPlans.map((p, i) => (
-            <div key={p.name} style={{ border: p.featured ? '2px solid #2563EB' : '1px solid #E5E7EB', borderRadius:10, padding:'10px 8px', textAlign:'center', background: p.featured ? '#EFF6FF' : '#fff', position:'relative' }}>
-              {p.featured && <div style={{ position:'absolute', top:-8, left:'50%', transform:'translateX(-50%)', background:'#2563EB', color:'#fff', fontSize:8, fontWeight:700, padding:'2px 7px', borderRadius:99, whiteSpace:'nowrap' }}>POPULAR</div>}
-              <div style={{ fontSize:10, fontWeight:600, color: p.featured ? '#2563EB':'#6B7280', marginBottom:3 }}>{p.name}</div>
-              <div style={{ fontSize:16, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>{p.price}</div>
-              <div style={{ fontSize:9, color:'#9CA3AF', marginTop:2 }}>{p.visits} {p.visits === 1 ? 'visit' : 'visits'}/mo</div>
+      <BrowserBar url="vonaxity.com/signup" />
+      <div style={{ padding:'18px 16px' }}>
+        <div style={{ fontSize:13, fontWeight:700, color:'#111827', marginBottom:12 }}>Choose your plan</div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:7, marginBottom:14 }}>
+          {displayPlans.map((p) => (
+            <div key={p.name} style={{ border: p.featured ? '2px solid #7C3AED' : '1px solid #E5E7EB', borderRadius:10, padding:'9px 7px', textAlign:'center', background: p.featured ? '#F5F3FF' : '#fff', position:'relative' }}>
+              {p.featured && <div style={{ position:'absolute', top:-8, left:'50%', transform:'translateX(-50%)', background:'#7C3AED', color:'#fff', fontSize:8, fontWeight:700, padding:'2px 7px', borderRadius:99, whiteSpace:'nowrap' }}>POPULAR</div>}
+              <div style={{ fontSize:10, fontWeight:600, color: p.featured ? '#7C3AED':'#6B7280', marginBottom:2 }}>{p.name}</div>
+              <div style={{ fontSize:15, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>{p.price}</div>
+              <div style={{ fontSize:9, color:'#9CA3AF', marginTop:1 }}>{p.visits} {p.visits===1?'visit':'visits'}/mo</div>
             </div>
           ))}
         </div>
-        {/* Form fields */}
-        <div style={{ fontSize:10, fontWeight:600, color:'#6B7280', textTransform:'uppercase', letterSpacing:'0.8px', marginBottom:6 }}>Patient details</div>
+        <div style={{ fontSize:10, fontWeight:700, color:'#6B7280', textTransform:'uppercase', letterSpacing:'0.8px', marginBottom:7 }}>Patient details</div>
         {[['Full name','Fatmira Murati'],['City','Tirana'],['Services needed','Blood pressure, glucose check']].map(([label,val]) => (
-          <div key={label} style={{ marginBottom:8 }}>
+          <div key={label} style={{ marginBottom:7 }}>
             <div style={{ fontSize:10, color:'#9CA3AF', marginBottom:2 }}>{label}</div>
             <div style={{ background:'#fff', border:'1px solid #D1D5DB', borderRadius:7, padding:'6px 10px', fontSize:11, color:'#374151' }}>{val}</div>
           </div>
         ))}
-        <div style={{ background:'linear-gradient(135deg,#7C3AED,#2563EB)', borderRadius:8, padding:'9px', textAlign:'center', color:'#fff', fontWeight:700, fontSize:12, marginTop:4 }}>
+        <div style={{ background:'linear-gradient(135deg,#7C3AED,#2563EB)', borderRadius:8, padding:'9px', textAlign:'center', color:'#fff', fontWeight:700, fontSize:12, marginTop:6 }}>
           Confirm booking →
         </div>
       </div>
@@ -48,42 +43,122 @@ function MockupBooking({ plans }) {
   );
 }
 
-function MockupNurse() {
+/* Step 2 — Job posted to nurse network */
+function MockupJobBoard() {
   return (
     <div style={{ background:'#F8FAFF', borderRadius:16, overflow:'hidden', border:'1px solid #E5E7EB', fontFamily:'Inter,system-ui,sans-serif', fontSize:12 }}>
-      <div style={{ background:'#1E293B', padding:'8px 14px', display:'flex', alignItems:'center', gap:6 }}>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:'#EF4444' }}/>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:'#F59E0B' }}/>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:'#22C55E' }}/>
-        <div style={{ flex:1, background:'#334155', borderRadius:4, padding:'3px 10px', marginLeft:8, fontSize:10, color:'rgba(255,255,255,0.5)' }}>vonaxity.com/dashboard</div>
+      <BrowserBar url="vonaxity.com/nurse/jobs" />
+      <div style={{ padding:'16px' }}>
+        {/* Header */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+          <div style={{ fontSize:13, fontWeight:700, color:'#111827' }}>Available Jobs</div>
+          <div style={{ fontSize:10, fontWeight:600, background:'#ECFDF5', color:'#059669', padding:'3px 9px', borderRadius:99 }}>3 near you</div>
+        </div>
+        {/* NEW job card — highlighted */}
+        <div style={{ background:'#fff', border:'2px solid #7C3AED', borderRadius:13, padding:'13px 14px', marginBottom:10, position:'relative' }}>
+          <div style={{ position:'absolute', top:-9, left:14, background:'#7C3AED', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 9px', borderRadius:99, letterSpacing:'0.5px' }}>NEW JOB</div>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
+            <div>
+              <div style={{ fontSize:12, fontWeight:700, color:'#111827' }}>Home Visit — Tirana</div>
+              <div style={{ fontSize:10, color:'#7C3AED', fontWeight:600, marginTop:1 }}>Blood Pressure · Glucose Check</div>
+            </div>
+            <div style={{ textAlign:'right' }}>
+              <div style={{ fontSize:13, fontWeight:800, color:'#111827' }}>€28</div>
+              <div style={{ fontSize:9, color:'#9CA3AF' }}>per visit</div>
+            </div>
+          </div>
+          <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:10 }}>
+            {['Mon May 5','10:00 AM','Rruga Myslym Shyri'].map(tag => (
+              <div key={tag} style={{ fontSize:10, background:'#F5F3FF', color:'#7C3AED', borderRadius:6, padding:'3px 8px', fontWeight:500 }}>{tag}</div>
+            ))}
+          </div>
+          <div style={{ background:'linear-gradient(135deg,#7C3AED,#2563EB)', borderRadius:7, padding:'7px', textAlign:'center', color:'#fff', fontWeight:700, fontSize:11 }}>
+            Apply for this job
+          </div>
+        </div>
+        {/* Older job (greyed) */}
+        <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:12, padding:'11px 13px', opacity:0.55 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
+            <div style={{ fontSize:11, fontWeight:600, color:'#374151' }}>Home Visit — Durrës</div>
+            <div style={{ fontSize:12, fontWeight:700, color:'#374151' }}>€24</div>
+          </div>
+          <div style={{ fontSize:10, color:'#9CA3AF' }}>Vitals Check · Fri May 9 · 2:00 PM</div>
+        </div>
       </div>
-      <div style={{ padding:'20px 18px' }}>
+    </div>
+  );
+}
+
+/* Step 3 — Nurses apply, client/admin sees applicants */
+function MockupApplicants() {
+  const nurses = [
+    { name:'Elona Berberi',  spec:'General Nursing', exp:'6 yrs', rating:'5.0', reviews:38, photo:'/nurse-elona.png', top:true  },
+    { name:'Mirela Daka',    spec:'Blood Work',      exp:'4 yrs', rating:'4.9', reviews:21, photo:'/nurse-mirela.png', top:false },
+  ];
+  return (
+    <div style={{ background:'#F8FAFF', borderRadius:16, overflow:'hidden', border:'1px solid #E5E7EB', fontFamily:'Inter,system-ui,sans-serif', fontSize:12 }}>
+      <BrowserBar url="vonaxity.com/dashboard" />
+      <div style={{ padding:'16px' }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
+          <div style={{ fontSize:13, fontWeight:700, color:'#111827' }}>Nurses applied</div>
+          <div style={{ fontSize:10, fontWeight:600, background:'#EFF6FF', color:'#2563EB', padding:'3px 9px', borderRadius:99 }}>2 applicants</div>
+        </div>
+        {nurses.map((n) => (
+          <div key={n.name} style={{ background:'#fff', border: n.top ? '2px solid #059669':'1px solid #E5E7EB', borderRadius:12, padding:'12px 13px', marginBottom:9, position:'relative' }}>
+            {n.top && <div style={{ position:'absolute', top:-8, right:12, background:'#059669', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 8px', borderRadius:99 }}>TOP MATCH</div>}
+            <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:9 }}>
+              <img src={n.photo} alt={n.name} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover', border:'2px solid #DBEAFE', flexShrink:0 }} />
+              <div style={{ flex:1 }}>
+                <div style={{ fontWeight:700, color:'#111827', fontSize:12 }}>{n.name}</div>
+                <div style={{ fontSize:10, color:'#2563EB', fontWeight:500 }}>{n.spec} · {n.exp} exp</div>
+                <div style={{ display:'flex', gap:1, marginTop:2, alignItems:'center' }}>
+                  {[1,2,3,4,5].map(s=><svg key={s} width="9" height="9" viewBox="0 0 24 24" fill="#F59E0B" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}
+                  <span style={{ fontSize:10, color:'#6B7280', marginLeft:3 }}>{n.rating} ({n.reviews})</span>
+                </div>
+              </div>
+              <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:7, padding:'3px 8px', fontSize:10, fontWeight:700, color:'#059669', flexShrink:0 }}>Verified</div>
+            </div>
+            <div style={{ background: n.top ? '#059669':'#1E293B', borderRadius:7, padding:'6px', textAlign:'center', color:'#fff', fontWeight:700, fontSize:11 }}>
+              {n.top ? 'Select this nurse ✓':'View profile'}
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+/* Step 4 — Nurse assigned, client confirmed */
+function MockupNurseConfirmed() {
+  return (
+    <div style={{ background:'#F8FAFF', borderRadius:16, overflow:'hidden', border:'1px solid #E5E7EB', fontFamily:'Inter,system-ui,sans-serif', fontSize:12 }}>
+      <BrowserBar url="vonaxity.com/dashboard" />
+      <div style={{ padding:'16px' }}>
         {/* Confirmation banner */}
-        <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:10, padding:'10px 14px', display:'flex', gap:10, alignItems:'center', marginBottom:16 }}>
+        <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:10, padding:'10px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
           <div style={{ width:28, height:28, borderRadius:'50%', background:'#059669', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div>
             <div style={{ fontSize:12, fontWeight:700, color:'#065F46' }}>Nurse confirmed!</div>
-            <div style={{ fontSize:10, color:'#059669' }}>Arriving tomorrow · 10:00 AM</div>
+            <div style={{ fontSize:10, color:'#059669' }}>Arriving Mon May 5 · 10:00 AM</div>
           </div>
         </div>
         {/* Nurse card */}
-        <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:12, padding:'14px' }}>
-          <div style={{ display:'flex', gap:12, alignItems:'center', marginBottom:12 }}>
-            <img src="/nurse-elona.png" alt="Elona" style={{ width:48, height:48, borderRadius:'50%', objectFit:'cover', border:'2px solid #DBEAFE' }}/>
+        <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:12, padding:'13px' }}>
+          <div style={{ display:'flex', gap:11, alignItems:'center', marginBottom:11 }}>
+            <img src="/nurse-elona.png" alt="Elona" style={{ width:46, height:46, borderRadius:'50%', objectFit:'cover', border:'2px solid #DBEAFE' }} />
             <div>
-              <div style={{ fontWeight:700, color:'#111827', fontSize:13 }}>Elona Berberi</div>
+              <div style={{ fontWeight:700, color:'#111827', fontSize:12 }}>Elona Berberi</div>
               <div style={{ fontSize:10, color:'#2563EB', fontWeight:500 }}>General Nursing · 6 yrs exp</div>
-              <div style={{ display:'flex', gap:1, marginTop:3 }}>
-                {[1,2,3,4,5].map(s => <svg key={s} width="10" height="10" viewBox="0 0 24 24" fill="#F59E0B" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}
+              <div style={{ display:'flex', gap:1, marginTop:2 }}>
+                {[1,2,3,4,5].map(s=><svg key={s} width="9" height="9" viewBox="0 0 24 24" fill="#F59E0B" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}
                 <span style={{ fontSize:10, color:'#6B7280', marginLeft:3 }}>5.0 (38)</span>
               </div>
             </div>
-            <div style={{ marginLeft:'auto', background:'#EFF6FF', border:'1px solid #BFDBFE', borderRadius:8, padding:'4px 8px', fontSize:10, fontWeight:700, color:'#2563EB' }}>Verified</div>
+            <div style={{ marginLeft:'auto', background:'#EFF6FF', border:'1px solid #BFDBFE', borderRadius:8, padding:'3px 8px', fontSize:10, fontWeight:700, color:'#2563EB' }}>Verified</div>
           </div>
-          {/* Visit details */}
-          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:7 }}>
             {[['Date','Mon, May 5'],['Time','10:00 AM'],['Services','BP + Glucose'],['Location','Tirana, AL-01']].map(([k,v]) => (
               <div key={k} style={{ background:'#F9FAFB', borderRadius:7, padding:'7px 9px' }}>
                 <div style={{ fontSize:9, color:'#9CA3AF', marginBottom:2 }}>{k}</div>
@@ -91,52 +166,108 @@ function MockupNurse() {
               </div>
             ))}
           </div>
+          <div style={{ marginTop:10, background:'#F5F3FF', borderRadius:8, padding:'8px 10px', fontSize:10, color:'#7C3AED', fontWeight:600, textAlign:'center' }}>
+            📱 SMS + email reminder sent
+          </div>
         </div>
       </div>
     </div>
   );
 }
 
-function MockupCare() {
+/* Step 5 — Nurse on the way / visit in progress */
+function MockupVisitTracking() {
+  const steps = [
+    { label:'Booking confirmed', done:true  },
+    { label:'Nurse on the way',  done:true, active:false  },
+    { label:'Nurse arrived',     done:false, active:true  },
+    { label:'Visit in progress', done:false },
+    { label:'Visit complete',    done:false },
+  ];
   return (
     <div style={{ background:'#F8FAFF', borderRadius:16, overflow:'hidden', border:'1px solid #E5E7EB', fontFamily:'Inter,system-ui,sans-serif', fontSize:12 }}>
-      <div style={{ background:'#1E293B', padding:'8px 14px', display:'flex', alignItems:'center', gap:6 }}>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:'#EF4444' }}/>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:'#F59E0B' }}/>
-        <div style={{ width:8, height:8, borderRadius:'50%', background:'#22C55E' }}/>
-        <div style={{ flex:1, background:'#334155', borderRadius:4, padding:'3px 10px', marginLeft:8, fontSize:10, color:'rgba(255,255,255,0.5)' }}>vonaxity.com/dashboard</div>
+      <BrowserBar url="vonaxity.com/dashboard/visits" />
+      <div style={{ padding:'16px' }}>
+        {/* Live status pill */}
+        <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:13 }}>
+          <div style={{ width:8, height:8, borderRadius:'50%', background:'#059669', boxShadow:'0 0 0 3px rgba(5,150,105,0.2)', animation:'pulse 1.5s infinite' }} />
+          <div style={{ fontSize:12, fontWeight:700, color:'#059669' }}>Nurse has arrived · Live</div>
+        </div>
+        {/* Nurse strip */}
+        <div style={{ display:'flex', gap:10, alignItems:'center', background:'#fff', border:'1px solid #E5E7EB', borderRadius:11, padding:'10px 12px', marginBottom:14 }}>
+          <img src="/nurse-elona.png" alt="Elona" style={{ width:38, height:38, borderRadius:'50%', objectFit:'cover' }} />
+          <div style={{ flex:1 }}>
+            <div style={{ fontWeight:700, color:'#111827', fontSize:11 }}>Elona Berberi</div>
+            <div style={{ fontSize:10, color:'#6B7280' }}>ETA: Arrived 10:03 AM</div>
+          </div>
+          <div style={{ background:'#ECFDF5', borderRadius:7, padding:'4px 9px', fontSize:10, fontWeight:700, color:'#059669' }}>On site</div>
+        </div>
+        {/* Timeline */}
+        <div style={{ position:'relative', paddingLeft:20 }}>
+          <div style={{ position:'absolute', left:7, top:8, bottom:8, width:2, background:'#E5E7EB', borderRadius:99 }} />
+          {steps.map((s, i) => (
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:10, marginBottom:11, position:'relative' }}>
+              <div style={{ width:14, height:14, borderRadius:'50%', flexShrink:0, zIndex:1, position:'relative',
+                background: s.active ? '#059669' : s.done ? '#059669' : '#E5E7EB',
+                border: s.active ? '2px solid #fff' : 'none',
+                boxShadow: s.active ? '0 0 0 3px rgba(5,150,105,0.25)' : 'none',
+                display:'flex', alignItems:'center', justifyContent:'center',
+              }}>
+                {s.done && !s.active && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
+              </div>
+              <div style={{ fontSize:11, fontWeight: s.active ? 700 : s.done ? 600 : 400, color: s.active ? '#059669' : s.done ? '#374151' : '#9CA3AF' }}>
+                {s.label}
+                {s.active && <span style={{ marginLeft:6, fontSize:9, background:'#ECFDF5', color:'#059669', padding:'1px 6px', borderRadius:99, fontWeight:700 }}>NOW</span>}
+              </div>
+            </div>
+          ))}
+        </div>
+        <div style={{ background:'#EFF6FF', borderRadius:8, padding:'8px 12px', fontSize:10, color:'#2563EB', fontWeight:600, textAlign:'center', marginTop:4 }}>
+          Services in progress · Est. 45 min
+        </div>
       </div>
-      <div style={{ padding:'20px 18px' }}>
-        {/* Visit done banner */}
-        <div style={{ background:'linear-gradient(135deg,#EFF6FF,#F5F3FF)', border:'1px solid #C4B5FD', borderRadius:10, padding:'10px 14px', display:'flex', gap:10, alignItems:'center', marginBottom:16 }}>
-          <div style={{ fontSize:20 }}>✅</div>
+    </div>
+  );
+}
+
+/* Step 6 — Health report delivered */
+function MockupHealthReport() {
+  return (
+    <div style={{ background:'#F8FAFF', borderRadius:16, overflow:'hidden', border:'1px solid #E5E7EB', fontFamily:'Inter,system-ui,sans-serif', fontSize:12 }}>
+      <BrowserBar url="vonaxity.com/dashboard/health" />
+      <div style={{ padding:'16px' }}>
+        {/* Done banner */}
+        <div style={{ background:'linear-gradient(135deg,#EFF6FF,#F5F3FF)', border:'1px solid #C4B5FD', borderRadius:10, padding:'9px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
+          <div style={{ width:26, height:26, borderRadius:'50%', background:'linear-gradient(135deg,#7C3AED,#2563EB)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          </div>
           <div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#4C1D95' }}>Visit completed</div>
-            <div style={{ fontSize:10, color:'#7C3AED' }}>May 5 · 10:00–10:45 AM · Elona Berberi</div>
+            <div style={{ fontSize:11, fontWeight:700, color:'#4C1D95' }}>Visit completed · May 5</div>
+            <div style={{ fontSize:10, color:'#7C3AED' }}>10:00–10:48 AM · Elona Berberi</div>
           </div>
         </div>
-        {/* Health report */}
-        <div style={{ fontSize:11, fontWeight:700, color:'#111827', marginBottom:10 }}>Health Report</div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:8, marginBottom:12 }}>
+        {/* Vitals grid */}
+        <div style={{ fontSize:11, fontWeight:700, color:'#111827', marginBottom:9 }}>Health Report</div>
+        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:7, marginBottom:11 }}>
           {[
-            { label:'Blood Pressure', val:'118 / 76', unit:'mmHg', ok:true },
-            { label:'Glucose', val:'94', unit:'mg/dL', ok:true },
-            { label:'Heart Rate', val:'72', unit:'bpm', ok:true },
-            { label:'SpO₂', val:'98', unit:'%', ok:true },
+            { label:'Blood Pressure', val:'118 / 76', unit:'mmHg', ok:true  },
+            { label:'Glucose',        val:'94',       unit:'mg/dL', ok:true  },
+            { label:'Heart Rate',     val:'72',       unit:'bpm',   ok:true  },
+            { label:'SpO₂',          val:'98',       unit:'%',     ok:true  },
           ].map(r => (
-            <div key={r.label} style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:10, padding:'10px' }}>
-              <div style={{ fontSize:9, color:'#9CA3AF', marginBottom:4 }}>{r.label}</div>
-              <div style={{ fontSize:15, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>{r.val} <span style={{ fontSize:9, fontWeight:500, color:'#6B7280' }}>{r.unit}</span></div>
-              <div style={{ fontSize:9, fontWeight:600, color:'#059669', marginTop:3 }}>✓ Normal</div>
+            <div key={r.label} style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:10, padding:'9px 10px' }}>
+              <div style={{ fontSize:9, color:'#9CA3AF', marginBottom:3 }}>{r.label}</div>
+              <div style={{ fontSize:14, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>{r.val} <span style={{ fontSize:9, fontWeight:400, color:'#6B7280' }}>{r.unit}</span></div>
+              <div style={{ fontSize:9, fontWeight:700, color:'#059669', marginTop:3 }}>✓ Normal</div>
             </div>
           ))}
         </div>
         {/* Nurse note */}
-        <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:8, padding:'9px 11px' }}>
-          <div style={{ fontSize:9, fontWeight:700, color:'#92400E', marginBottom:3 }}>NURSE NOTE</div>
-          <div style={{ fontSize:10, color:'#78350F', lineHeight:1.6 }}>Patient is in stable condition. Recommend continuing current medication. Next check-in in 2 weeks.</div>
+        <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:8, padding:'8px 10px', marginBottom:9 }}>
+          <div style={{ fontSize:9, fontWeight:700, color:'#92400E', marginBottom:2, textTransform:'uppercase', letterSpacing:'0.5px' }}>Nurse Note</div>
+          <div style={{ fontSize:10, color:'#78350F', lineHeight:1.6 }}>Patient stable. Recommend continuing current medication. Next check-in in 2 weeks.</div>
         </div>
-        <div style={{ marginTop:12, background:'#EFF6FF', borderRadius:8, padding:'8px 12px', fontSize:10, fontWeight:600, color:'#2563EB', textAlign:'center' }}>
+        <div style={{ background:'#ECFDF5', borderRadius:8, padding:'7px 12px', fontSize:10, fontWeight:600, color:'#059669', textAlign:'center' }}>
           📧 Full report sent to your email
         </div>
       </div>
@@ -144,19 +275,33 @@ function MockupCare() {
   );
 }
 
-/* ── Step modal content ─────────────────────────────────── */
+/* ── Shared browser chrome bar ── */
+function BrowserBar({ url }) {
+  return (
+    <div style={{ background:'#1E293B', padding:'8px 14px', display:'flex', alignItems:'center', gap:6 }}>
+      <div style={{ width:8, height:8, borderRadius:'50%', background:'#EF4444' }}/>
+      <div style={{ width:8, height:8, borderRadius:'50%', background:'#F59E0B' }}/>
+      <div style={{ width:8, height:8, borderRadius:'50%', background:'#22C55E' }}/>
+      <div style={{ flex:1, background:'#334155', borderRadius:4, padding:'3px 10px', marginLeft:8, fontSize:10, color:'rgba(255,255,255,0.5)' }}>{url}</div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────────────────────
+   STEP DEFINITIONS
+───────────────────────────────────────────────────────── */
 const STEPS = [
   {
     num: '01',
-    title: 'Book online',
+    title: 'Pick a plan & book',
     color: '#7C3AED',
     colorLight: 'rgba(124,58,237,0.08)',
     badge: 'Takes 2 minutes',
     headline: 'Pick a plan, tell us about your loved one',
     description: 'Choose a subscription plan that fits your needs, then enter your family member\'s details — name, city, and the services required. No phone calls, no paperwork.',
     bullets: [
-      'Select Basic, Standard, or Premium',
-      'Enter patient name and location',
+      'Select Basic, Standard, or Premium plan',
+      'Enter patient name, city, and address',
       'Choose services (BP check, glucose, wound care…)',
       'Pay securely — confirmation arrives instantly',
     ],
@@ -164,44 +309,94 @@ const STEPS = [
   },
   {
     num: '02',
-    title: 'We assign a nurse',
-    color: '#2563EB',
-    colorLight: 'rgba(37,99,235,0.08)',
-    badge: 'Within 24 hours',
-    headline: 'A verified nurse is matched and confirmed',
-    description: 'Our team matches you with a licensed nurse in your city based on the services needed. You\'ll see their profile, rating, and credentials before they arrive.',
+    title: 'Job posted to nurses',
+    color: '#0EA5E9',
+    colorLight: 'rgba(14,165,233,0.08)',
+    badge: 'Instant posting',
+    headline: 'Your booking goes live to verified nurses nearby',
+    description: 'The moment you confirm, a job card is published to every verified nurse in your city. They see your service requirements, date, and compensation — and can apply immediately.',
     bullets: [
-      'Matched by specialty and proximity',
-      'View nurse profile, rating, and certifications',
-      'Appointment confirmed with exact time slot',
-      'SMS + email reminder sent to you',
+      'Job posted instantly to nurse network',
+      'Only verified, background-checked nurses can apply',
+      'Nurses see service type, location, and pay rate',
+      'Multiple nurses compete for your visit',
     ],
-    Mockup: MockupNurse,
+    Mockup: MockupJobBoard,
   },
   {
     num: '03',
-    title: 'Care is delivered',
+    title: 'Nurses apply',
+    color: '#2563EB',
+    colorLight: 'rgba(37,99,235,0.08)',
+    badge: 'You choose or we match',
+    headline: 'Review applicants or let us pick the best match',
+    description: 'You can browse nurse profiles — ratings, specialties, years of experience — and select the one you prefer. Or let our team pick the top-rated, best-matched nurse for you.',
+    bullets: [
+      'See full nurse profile: photo, rating, experience',
+      'View all certifications and specialties',
+      'Choose manually or let Vonaxity match you',
+      'Only nurses with 4.5★+ rating are eligible',
+    ],
+    Mockup: MockupApplicants,
+  },
+  {
+    num: '04',
+    title: 'Nurse confirmed',
     color: '#059669',
     colorLight: 'rgba(5,150,105,0.08)',
-    badge: 'At your doorstep',
-    headline: 'The nurse visits, you get a full health report',
-    description: 'The nurse arrives at the scheduled time and performs all requested health services. A detailed report with vitals and nurse notes is sent to you the same day.',
+    badge: 'Within 24 hours',
+    headline: 'Your nurse is confirmed with exact time and details',
+    description: 'Once a nurse is assigned, you\'ll see their full profile on your dashboard with the exact arrival time. You receive an SMS and email reminder so you\'re never caught off guard.',
     bullets: [
-      'Nurse arrives at your door on schedule',
-      'All requested services performed',
-      'Vitals recorded (BP, glucose, SpO₂…)',
-      'Full health report delivered to your email',
+      'Nurse profile, rating, and photo visible on dashboard',
+      'Exact date and time slot confirmed',
+      'SMS + email reminder sent automatically',
+      'Easy cancellation or rescheduling up to 4h before',
     ],
-    Mockup: MockupCare,
+    Mockup: MockupNurseConfirmed,
+  },
+  {
+    num: '05',
+    title: 'Nurse visits you',
+    color: '#D97706',
+    colorLight: 'rgba(217,119,6,0.08)',
+    badge: 'At your doorstep',
+    headline: 'Track your nurse in real-time as they arrive',
+    description: 'Follow your visit live on the dashboard — from confirmation through arrival to care in progress. The nurse performs all requested services at the scheduled time.',
+    bullets: [
+      'Live status: on the way → arrived → in progress',
+      'Nurse arrives at your door on schedule',
+      'All requested services performed at home',
+      'Any changes or notes updated in real-time',
+    ],
+    Mockup: MockupVisitTracking,
+  },
+  {
+    num: '06',
+    title: 'Health report delivered',
+    color: '#7C3AED',
+    colorLight: 'rgba(124,58,237,0.08)',
+    badge: 'Same day',
+    headline: 'Full vitals report and nurse notes — straight to your inbox',
+    description: 'Within hours of the visit, a detailed health report lands in your inbox with all recorded vitals, nurse observations, and follow-up recommendations. Every visit, every time.',
+    bullets: [
+      'BP, glucose, heart rate, SpO₂ all recorded',
+      'Nurse notes and clinical observations included',
+      'PDF report stored in your health dashboard',
+      'Trends tracked across all visits automatically',
+    ],
+    Mockup: MockupHealthReport,
   },
 ];
 
-/* ── Main component ─────────────────────────────────────── */
+/* ─────────────────────────────────────────────────────────
+   MAIN COMPONENT
+───────────────────────────────────────────────────────── */
 export default function HowItWorksSection({ lang, tag, title, subtitle, steps, plans: plansProp }) {
   const [active, setActive] = useState(null);
   const [visible, setVisible] = useState(false);
 
-  // Fetch live pricing fresh from CRM on mount (bypasses Next.js page cache)
+  // Fetch live pricing from CRM fresh on mount (bypasses Next.js page cache)
   const [plans, setPlans] = useState(plansProp);
   useEffect(() => {
     fetch('/api/pricing')
@@ -209,13 +404,13 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
       .then(data => {
         if (data?.basicPrice) {
           setPlans([
-            { name: 'Basic',    price: `€${data.basicPrice}`,    visits: data.basicVisits    || 1, featured: false },
-            { name: 'Standard', price: `€${data.standardPrice}`, visits: data.standardVisits || 2, featured: true  },
-            { name: 'Premium',  price: `€${data.premiumPrice}`,  visits: data.premiumVisits  || 4, featured: false },
+            { name:'Basic',    price:`€${data.basicPrice}`,    visits:data.basicVisits    || 1, featured:false },
+            { name:'Standard', price:`€${data.standardPrice}`, visits:data.standardVisits || 2, featured:true  },
+            { name:'Premium',  price:`€${data.premiumPrice}`,  visits:data.premiumVisits  || 4, featured:false },
           ]);
         }
       })
-      .catch(() => {}); // keep prop fallback on error
+      .catch(() => {});
   }, []);
 
   const open = useCallback((i) => {
@@ -228,7 +423,14 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
     setTimeout(() => setActive(null), 320);
   }, []);
 
-  // Close on Escape
+  const goTo = useCallback((si) => {
+    setVisible(false);
+    setTimeout(() => {
+      setActive(si);
+      requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
+    }, 160);
+  }, []);
+
   useEffect(() => {
     if (active === null) return;
     const handler = (e) => { if (e.key === 'Escape') close(); };
@@ -236,7 +438,6 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
     return () => window.removeEventListener('keydown', handler);
   }, [active, close]);
 
-  // Lock scroll when modal open
   useEffect(() => {
     document.body.style.overflow = active !== null ? 'hidden' : '';
     return () => { document.body.style.overflow = ''; };
@@ -244,16 +445,20 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
 
   const step = active !== null ? STEPS[active] : null;
 
+  /* Color for the step circle on cards — cycles through step colors */
+  const cardColor = (i) => STEPS[i].color;
+
   return (
     <>
       <style>{`
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
         .hiw-card {
           cursor: pointer;
           background: #fff;
-          border-radius: 22px;
+          border-radius: 20px;
           border: 1px solid #E5E7EB;
-          padding: 32px 26px;
-          box-shadow: 0 2px 16px rgba(0,0,0,0.05);
+          padding: 28px 24px;
+          box-shadow: 0 2px 12px rgba(0,0,0,0.04);
           position: relative;
           overflow: hidden;
           transition: transform 0.22s cubic-bezier(0.4,0,0.2,1),
@@ -261,17 +466,20 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
                       border-color 0.22s ease;
           height: 100%;
           outline: none;
+          display: flex;
+          flex-direction: column;
         }
         .hiw-card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 16px 40px rgba(124,58,237,0.13);
+          box-shadow: 0 16px 36px rgba(124,58,237,0.13);
           border-color: rgba(124,58,237,0.2);
         }
         .hiw-caret {
           display: inline-flex;
           align-items: center;
           gap: 6px;
-          margin-top: 20px;
+          margin-top: auto;
+          padding-top: 18px;
           font-size: 12px;
           font-weight: 600;
           color: #7C3AED;
@@ -279,18 +487,18 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
           border: 1px solid rgba(124,58,237,0.15);
           padding: 5px 12px;
           border-radius: 99px;
+          align-self: flex-start;
           transition: background 0.18s ease, gap 0.18s ease;
         }
         .hiw-card:hover .hiw-caret {
           background: rgba(124,58,237,0.13);
           gap: 9px;
         }
-        /* ── Modal overlay ── */
         .hiw-overlay {
           position: fixed;
           inset: 0;
-          background: rgba(15,23,42,0.55);
-          backdrop-filter: blur(6px);
+          background: rgba(15,23,42,0.58);
+          backdrop-filter: blur(7px);
           z-index: 1000;
           display: flex;
           align-items: center;
@@ -300,31 +508,30 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
           transition: opacity 0.3s ease;
         }
         .hiw-overlay.vis { opacity: 1; }
-        /* ── Modal card ── */
         .hiw-modal {
           background: #fff;
           border-radius: 24px;
           box-shadow: 0 32px 80px rgba(0,0,0,0.22);
           width: 100%;
-          max-width: 900px;
+          max-width: 920px;
           max-height: 90vh;
           overflow-y: auto;
           display: grid;
           grid-template-columns: 1fr 1fr;
-          gap: 0;
           transform: scale(0.93) translateY(18px);
           opacity: 0;
           transition: transform 0.32s cubic-bezier(0.34,1.26,0.64,1), opacity 0.28s ease;
+          position: relative;
         }
         .hiw-overlay.vis .hiw-modal { transform: scale(1) translateY(0); opacity: 1; }
         .hiw-modal-left  { padding: 44px 40px; }
         .hiw-modal-right { padding: 32px 32px 32px 0; display: flex; align-items: center; }
         .hiw-close {
           position: absolute;
-          top: 18px;
-          right: 18px;
-          width: 36px;
-          height: 36px;
+          top: 16px;
+          right: 16px;
+          width: 34px;
+          height: 34px;
           border-radius: 50%;
           border: 1.5px solid #E5E7EB;
           background: #fff;
@@ -332,18 +539,15 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
           align-items: center;
           justify-content: center;
           cursor: pointer;
-          font-size: 16px;
+          font-size: 15px;
           color: #6B7280;
           transition: background 0.15s, border-color 0.15s;
           z-index: 2;
         }
         .hiw-close:hover { background: #FEF2F2; border-color: #FCA5A5; color: #EF4444; }
-        @media (max-width: 680px) {
-          .hiw-modal {
-            grid-template-columns: 1fr;
-            max-height: 88vh;
-          }
-          .hiw-modal-left  { padding: 36px 24px 20px; }
+        @media (max-width: 700px) {
+          .hiw-modal { grid-template-columns: 1fr; max-height: 88vh; }
+          .hiw-modal-left  { padding: 36px 24px 16px; }
           .hiw-modal-right { padding: 0 24px 32px; }
         }
       `}</style>
@@ -355,47 +559,48 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
           <svg width="340" height="340" viewBox="0 0 54 54" fill="none"><rect x="19" y="0" width="16" height="54" rx="6" fill="#7C3AED"/><rect x="0" y="19" width="54" height="16" rx="6" fill="#7C3AED"/></svg>
         </div>
 
-        <div style={{ maxWidth:1100, margin:'0 auto' }}>
+        <div style={{ maxWidth:1140, margin:'0 auto' }}>
           <ScrollReveal>
             <div style={{ textAlign:'center', marginBottom:64 }}>
               <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:'#7C3AED', background:'rgba(124,58,237,0.08)', border:'1px solid rgba(124,58,237,0.15)', padding:'5px 13px', borderRadius:99, marginBottom:16 }}>
                 {tag}
               </div>
               <h2 style={{ fontSize:'clamp(30px,4vw,46px)', fontWeight:800, color:'#111827', margin:'0 0 14px', letterSpacing:'-1.5px' }}>{title}</h2>
-              <p style={{ fontSize:16, color:'#6B7280', maxWidth:460, margin:'0 auto', lineHeight:1.7 }}>
-                {subtitle || 'From booking to bedside — fast, simple, and completely transparent.'}
+              <p style={{ fontSize:16, color:'#6B7280', maxWidth:500, margin:'0 auto', lineHeight:1.7 }}>
+                {subtitle || 'From booking to bedside — transparent every step of the way.'}
               </p>
             </div>
           </ScrollReveal>
 
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(220px,1fr))', gap:20 }}>
+          {/* 6-card grid: 3 columns on desktop, 2 on tablet, 1 on mobile */}
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))', gap:18 }}>
             {STEPS.map((s, i) => (
-              <ScrollReveal key={i} delay={i * 100}>
+              <ScrollReveal key={i} delay={i * 70}>
                 <div
                   className="hiw-card"
                   role="button"
                   tabIndex={0}
                   onClick={() => open(i)}
                   onKeyDown={(e) => e.key === 'Enter' && open(i)}
-                  aria-label={`Learn more about step ${i+1}: ${s.title}`}
+                  aria-label={`Step ${i+1}: ${s.title}`}
                 >
-                  {/* Watermark number */}
-                  <div style={{ position:'absolute', right:14, bottom:8, fontSize:88, fontWeight:900, color:'rgba(124,58,237,0.04)', letterSpacing:'-4px', lineHeight:1, userSelect:'none', pointerEvents:'none' }}>
+                  {/* Faint watermark number */}
+                  <div style={{ position:'absolute', right:12, bottom:6, fontSize:72, fontWeight:900, color:'rgba(0,0,0,0.03)', letterSpacing:'-4px', lineHeight:1, userSelect:'none', pointerEvents:'none' }}>
                     {i + 1}
                   </div>
-                  {/* Step circle */}
-                  <div style={{ width:52, height:52, borderRadius:'50%', background:'linear-gradient(135deg,#7C3AED 0%,#2563EB 100%)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:22, boxShadow:'0 6px 18px rgba(124,58,237,0.28)' }}>
-                    <span style={{ fontSize:16, fontWeight:800, color:'#fff' }}>0{i+1}</span>
+                  {/* Step circle — uses each step's own color */}
+                  <div style={{ width:46, height:46, borderRadius:'50%', background:cardColor(i), display:'flex', alignItems:'center', justifyContent:'center', marginBottom:18, boxShadow:`0 6px 16px ${cardColor(i)}44` }}>
+                    <span style={{ fontSize:14, fontWeight:800, color:'#fff' }}>0{i+1}</span>
                   </div>
-                  <div style={{ fontSize:16, fontWeight:700, color:'#111827', marginBottom:10, lineHeight:1.35 }}>
+                  <div style={{ fontSize:15, fontWeight:700, color:'#111827', marginBottom:8, lineHeight:1.35 }}>
                     {Array.isArray(steps) && steps[i]?.title || s.title}
                   </div>
-                  <div style={{ fontSize:13, color:'#6B7280', lineHeight:1.7 }}>
+                  <div style={{ fontSize:13, color:'#6B7280', lineHeight:1.65, marginBottom:16, flex:1 }}>
                     {Array.isArray(steps) && steps[i]?.desc || s.description}
                   </div>
                   <div className="hiw-caret">
                     See how it works
-                    <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
                   </div>
                 </div>
               </ScrollReveal>
@@ -406,54 +611,47 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
 
       {/* ── Modal ── */}
       {active !== null && step && (
-        <div
-          className={`hiw-overlay${visible ? ' vis' : ''}`}
-          onClick={close}
-        >
-          <div
-            className="hiw-modal"
-            onClick={(e) => e.stopPropagation()}
-            style={{ position:'relative' }}
-          >
+        <div className={`hiw-overlay${visible ? ' vis' : ''}`} onClick={close}>
+          <div className="hiw-modal" onClick={(e) => e.stopPropagation()}>
             <button className="hiw-close" onClick={close} aria-label="Close">✕</button>
 
-            {/* Left: text */}
+            {/* Left: copy */}
             <div className="hiw-modal-left">
               {/* Step badge */}
-              <div style={{ display:'inline-flex', alignItems:'center', gap:8, background: step.colorLight, border:`1px solid ${step.color}22`, borderRadius:99, padding:'5px 14px', marginBottom:20 }}>
-                <div style={{ width:22, height:22, borderRadius:'50%', background:'linear-gradient(135deg,#7C3AED,#2563EB)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+              <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:step.colorLight, border:`1px solid ${step.color}33`, borderRadius:99, padding:'5px 14px', marginBottom:20 }}>
+                <div style={{ width:22, height:22, borderRadius:'50%', background:step.color, display:'flex', alignItems:'center', justifyContent:'center' }}>
                   <span style={{ fontSize:10, fontWeight:800, color:'#fff' }}>0{active+1}</span>
                 </div>
-                <span style={{ fontSize:11, fontWeight:700, color: step.color, textTransform:'uppercase', letterSpacing:'0.8px' }}>{step.badge}</span>
+                <span style={{ fontSize:11, fontWeight:700, color:step.color, textTransform:'uppercase', letterSpacing:'0.8px' }}>{step.badge}</span>
               </div>
 
-              <h3 style={{ fontSize:'clamp(20px,2.5vw,28px)', fontWeight:800, color:'#111827', margin:'0 0 14px', letterSpacing:'-0.8px', lineHeight:1.2 }}>
+              <h3 style={{ fontSize:'clamp(19px,2.5vw,27px)', fontWeight:800, color:'#111827', margin:'0 0 13px', letterSpacing:'-0.8px', lineHeight:1.2 }}>
                 {step.headline}
               </h3>
-              <p style={{ fontSize:15, color:'#6B7280', lineHeight:1.75, margin:'0 0 24px' }}>
+              <p style={{ fontSize:14, color:'#6B7280', lineHeight:1.75, margin:'0 0 22px' }}>
                 {step.description}
               </p>
 
               {/* Bullets */}
-              <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
+              <div style={{ display:'flex', flexDirection:'column', gap:9 }}>
                 {step.bullets.map((b, bi) => (
                   <div key={bi} style={{ display:'flex', gap:10, alignItems:'flex-start' }}>
-                    <div style={{ width:20, height:20, borderRadius:'50%', background: step.colorLight, border:`1.5px solid ${step.color}44`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
-                      <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={step.color} strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                    <div style={{ width:19, height:19, borderRadius:'50%', background:step.colorLight, border:`1.5px solid ${step.color}44`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
+                      <svg width="9" height="9" viewBox="0 0 24 24" fill="none" stroke={step.color} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
-                    <span style={{ fontSize:14, color:'#374151', lineHeight:1.55 }}>{b}</span>
+                    <span style={{ fontSize:13, color:'#374151', lineHeight:1.55 }}>{b}</span>
                   </div>
                 ))}
               </div>
 
-              {/* Nav between steps */}
-              <div style={{ display:'flex', gap:8, marginTop:32 }}>
+              {/* Step dots navigation */}
+              <div style={{ display:'flex', gap:6, marginTop:30, flexWrap:'wrap' }}>
                 {STEPS.map((_, si) => (
                   <button
                     key={si}
-                    onClick={() => { setVisible(false); setTimeout(() => { setActive(si); requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true))); }, 160); }}
-                    style={{ width: si === active ? 28 : 8, height:8, borderRadius:99, border:'none', background: si === active ? step.color : '#E5E7EB', cursor:'pointer', transition:'width 0.3s ease, background 0.2s ease', padding:0 }}
-                    aria-label={`Step ${si+1}`}
+                    onClick={() => goTo(si)}
+                    style={{ width: si === active ? 26 : 8, height:8, borderRadius:99, border:'none', background: si === active ? step.color : '#E5E7EB', cursor:'pointer', transition:'width 0.3s ease, background 0.2s ease', padding:0, flexShrink:0 }}
+                    aria-label={`Go to step ${si+1}`}
                   />
                 ))}
               </div>
