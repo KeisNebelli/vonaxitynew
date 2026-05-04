@@ -1454,22 +1454,19 @@ function FindNurses({ lang, onBook }) {
     <div>
       <style>{`@keyframes shimmer{0%{background-position:-600px 0}100%{background-position:600px 0}}.fn-shimmer{background:linear-gradient(90deg,#F1F5F9 25%,#E2E8F0 50%,#F1F5F9 75%);background-size:600px 100%;animation:shimmer 1.4s infinite}`}</style>
       <div style={{ marginBottom:20, height:44, borderRadius:12 }} className="fn-shimmer"/>
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:16 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))', gap:16 }}>
         {[1,2,3,4].map(i=>(
-          <div key={i} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, overflow:'hidden' }}>
-            <div style={{ height:76, marginBottom:0 }} className="fn-shimmer"/>
-            <div style={{ padding:'16px 18px' }}>
-              <div style={{ display:'flex', gap:12, alignItems:'center', marginBottom:14, marginTop:'-28px' }}>
-                <div style={{ width:54, height:54, borderRadius:14, flexShrink:0, border:'3px solid #fff', boxShadow:'0 2px 8px rgba(0,0,0,0.12)' }} className="fn-shimmer"/>
-                <div style={{ flex:1, marginTop:28 }}>
-                  <div style={{ height:13, borderRadius:6, marginBottom:7, width:'65%' }} className="fn-shimmer"/>
-                  <div style={{ height:10, borderRadius:6, width:'40%' }} className="fn-shimmer"/>
-                </div>
+          <div key={i} style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, padding:20 }}>
+            <div style={{ display:'flex', gap:14, alignItems:'center', marginBottom:14 }}>
+              <div style={{ width:54, height:54, borderRadius:14, flexShrink:0 }} className="fn-shimmer"/>
+              <div style={{ flex:1 }}>
+                <div style={{ height:13, borderRadius:6, marginBottom:8, width:'60%' }} className="fn-shimmer"/>
+                <div style={{ height:10, borderRadius:6, width:'40%' }} className="fn-shimmer"/>
               </div>
-              <div style={{ height:10, borderRadius:6, width:'90%', marginBottom:6 }} className="fn-shimmer"/>
-              <div style={{ height:10, borderRadius:6, width:'70%', marginBottom:16 }} className="fn-shimmer"/>
-              <div style={{ height:36, borderRadius:10 }} className="fn-shimmer"/>
             </div>
+            <div style={{ height:10, borderRadius:6, width:'80%', marginBottom:6 }} className="fn-shimmer"/>
+            <div style={{ height:10, borderRadius:6, width:'60%', marginBottom:16 }} className="fn-shimmer"/>
+            <div style={{ height:38, borderRadius:11 }} className="fn-shimmer"/>
           </div>
         ))}
       </div>
@@ -1519,75 +1516,65 @@ function FindNurses({ lang, onBook }) {
       )}
 
       {/* Nurse cards — grid */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(280px,1fr))', gap:18 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(260px,1fr))', gap:16 }}>
         {filtered.map(nurse => (
-          <div key={nurse.id} className="fn-card" style={{ background:C.bgWhite, borderRadius:20, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 2px 12px rgba(0,0,0,0.06)', display:'flex', flexDirection:'column' }}>
+          <div key={nurse.id} className="fn-card" style={{ background:C.bgWhite, borderRadius:18, border:`1px solid ${C.border}`, padding:20, boxShadow:'0 2px 10px rgba(0,0,0,0.05)', display:'flex', flexDirection:'column', gap:14 }}>
 
-            {/* Card accent header */}
-            <div style={{ height:58, background:'linear-gradient(135deg,#1e3a5f 0%,#2563EB 55%,#6366F1 100%)', position:'relative', overflow:'hidden', flexShrink:0 }}>
-              <div style={{ position:'absolute', inset:0, opacity:0.08 }}>
-                <svg width="100%" height="100%"><defs><pattern id={`fn-dots-${nurse.id}`} width="16" height="16" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.1" fill="white"/></pattern></defs><rect width="100%" height="100%" fill={`url(#fn-dots-${nurse.id})`}/></svg>
-              </div>
-              <div style={{ position:'absolute', top:-20, right:-20, width:90, height:90, borderRadius:'50%', background:'rgba(255,255,255,0.08)' }}/>
-              {/* Verified badge top-right */}
-              <div style={{ position:'absolute', top:10, right:12, fontSize:11, fontWeight:700, padding:'3px 9px', borderRadius:99, background:'rgba(255,255,255,0.18)', color:'#fff', backdropFilter:'blur(4px)', border:'1px solid rgba(255,255,255,0.25)', display:'flex', alignItems:'center', gap:4 }}>
-                <svg width="10" height="10" fill="none" stroke="#6EE7B7" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
-                {tr('dashboard.nurseVerified')}
-              </div>
-            </div>
-
-            {/* Avatar + name row — overlaps header */}
-            <div style={{ padding:'0 16px', marginTop:-22, marginBottom:12, display:'flex', alignItems:'flex-end', gap:12, position:'relative', zIndex:2 }}>
-              <div style={{ width:52, height:52, borderRadius:14, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:19, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden', border:'3px solid #fff', boxShadow:'0 4px 12px rgba(0,0,0,0.20)' }}>
+            {/* Top row: avatar + name + verified */}
+            <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+              <div style={{ width:54, height:54, borderRadius:14, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden' }}>
                 {nurse.profilePhotoUrl
                   ? <img src={nurse.profilePhotoUrl} alt={nurse.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   : (nurse.name||'N').charAt(0).toUpperCase()
                 }
               </div>
-              {/* Name + meta sit right next to avatar, pushed down to align with avatar bottom */}
-              <div style={{ paddingBottom:2, flex:1, minWidth:0 }}>
-                <div style={{ fontSize:15, fontWeight:800, color:C.textPrimary, lineHeight:1.2, marginBottom:3, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{nurse.name}</div>
-                <div style={{ fontSize:11.5, color:C.textTertiary, display:'flex', alignItems:'center', gap:7, flexWrap:'wrap' }}>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ fontSize:15, fontWeight:800, color:C.textPrimary, marginBottom:2, lineHeight:1.25 }}>{nurse.name}</div>
+                <div style={{ fontSize:12, color:C.textTertiary, display:'flex', alignItems:'center', gap:6 }}>
                   {nurse.city && <span style={{ display:'flex', alignItems:'center', gap:3 }}><svg width="10" height="10" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{nurse.city}</span>}
-                  {nurse.experience && <span style={{ display:'flex', alignItems:'center', gap:3 }}><svg width="10" height="10" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>{nurse.experience}</span>}
+                  {nurse.experience && <span>· {nurse.experience}</span>}
                 </div>
               </div>
+              <span style={{ fontSize:11, fontWeight:700, padding:'4px 9px', borderRadius:99, background:'#ECFDF5', color:'#059669', whiteSpace:'nowrap', flexShrink:0, display:'flex', alignItems:'center', gap:3 }}>
+                <svg width="9" height="9" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                {tr('dashboard.nurseVerified')}
+              </span>
             </div>
 
-            {/* Body */}
-            <div style={{ padding:'0 16px 16px', flex:1, display:'flex', flexDirection:'column', position:'relative', zIndex:2 }}>
-              {/* Stars row */}
-              <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:8 }}>
-                <div style={{ display:'flex', gap:1 }}>{stars(nurse.rating||0)}</div>
-                <span style={{ fontSize:12, fontWeight:700, color:C.textSecondary }}>{nurse.rating>0 ? nurse.rating.toFixed(1) : tr('dashboard.newNurse')}</span>
-                {nurse.reviewCount > 0 && <span style={{ fontSize:11, color:C.textTertiary }}>({nurse.reviewCount})</span>}
-                <span style={{ fontSize:11, color:C.textTertiary, marginLeft:2 }}>· {nurse.totalVisits} {tr('dashboard.visitsApplicantLabel')}</span>
+            {/* Stars */}
+            <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+              <div style={{ display:'flex', gap:1 }}>{stars(nurse.rating||0)}</div>
+              <span style={{ fontSize:12, fontWeight:700, color:C.textSecondary }}>{nurse.rating>0 ? nurse.rating.toFixed(1) : tr('dashboard.newNurse')}</span>
+              {nurse.reviewCount > 0 && <span style={{ fontSize:11, color:C.textTertiary }}>({nurse.reviewCount})</span>}
+              <span style={{ fontSize:11, color:C.textTertiary }}>· {nurse.totalVisits} {tr('dashboard.visitsApplicantLabel')}</span>
+            </div>
+
+            {/* Bio */}
+            {nurse.bio && (
+              <div style={{ fontSize:12.5, color:C.textSecondary, lineHeight:1.6, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden' }}>
+                {nurse.bio}
               </div>
+            )}
 
-              {nurse.bio && (
-                <div style={{ fontSize:12.5, color:C.textSecondary, lineHeight:1.6, marginBottom:12, display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical', overflow:'hidden', flex:1 }}>
-                  {nurse.bio}
-                </div>
-              )}
+            {/* Specialties */}
+            {nurse.specialties?.length > 0 && (
+              <div style={{ display:'flex', gap:5, flexWrap:'wrap' }}>
+                {nurse.specialties.slice(0,3).map(s=>(
+                  <span key={s} style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{s}</span>
+                ))}
+                {nurse.specialties.length > 3 && <span style={{ fontSize:11, color:C.textTertiary, alignSelf:'center' }}>+{nurse.specialties.length-3}</span>}
+              </div>
+            )}
 
-              {nurse.specialties?.length > 0 && (
-                <div style={{ display:'flex', gap:5, flexWrap:'wrap', marginBottom:14 }}>
-                  {nurse.specialties.slice(0,3).map(s=>(
-                    <span key={s} style={{ fontSize:11, fontWeight:600, padding:'3px 9px', borderRadius:99, background:C.primaryLight, color:C.primary }}>{s}</span>
-                  ))}
-                  {nurse.specialties.length > 3 && <span style={{ fontSize:11, color:C.textTertiary, padding:'3px 0' }}>+{nurse.specialties.length-3}</span>}
-                </div>
-              )}
-
-              <button
-                className="fn-book"
-                onClick={() => onBook()}
-                style={{ width:'100%', background:'linear-gradient(135deg,#2563EB,#4F46E5)', color:'#fff', border:'none', borderRadius:12, padding:'11px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.25)', display:'flex', alignItems:'center', justifyContent:'center', gap:7, marginTop:'auto', transition:'background 0.15s' }}
-              >
-                {tr('dashboard.bookWithNurse')}
-                <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
-              </button>
-            </div>
+            {/* Book button */}
+            <button
+              className="fn-book"
+              onClick={() => onBook()}
+              style={{ width:'100%', background:'linear-gradient(135deg,#2563EB,#4F46E5)', color:'#fff', border:'none', borderRadius:11, padding:'11px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.22)', display:'flex', alignItems:'center', justifyContent:'center', gap:7, marginTop:'auto', transition:'background 0.15s' }}
+            >
+              {tr('dashboard.bookWithNurse')}
+              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+            </button>
           </div>
         ))}
       </div>
