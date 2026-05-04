@@ -43,86 +43,99 @@ function MockupBooking({ plans }) {
   );
 }
 
-/* Step 2 — Job posted to nurse network */
+/* Step 2 — Client dashboard: booking confirmed, finding nurse */
 function MockupJobBoard() {
   return (
     <div style={{ background:'#F8FAFF', borderRadius:16, overflow:'hidden', border:'1px solid #E5E7EB', fontFamily:'Inter,system-ui,sans-serif', fontSize:12 }}>
-      <BrowserBar url="vonaxity.com/nurse/jobs" />
+      <BrowserBar url="vonaxity.com/dashboard" />
       <div style={{ padding:'16px' }}>
-        {/* Header */}
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
-          <div style={{ fontSize:13, fontWeight:700, color:'#111827' }}>Available Jobs</div>
-          <div style={{ fontSize:10, fontWeight:600, background:'#ECFDF5', color:'#059669', padding:'3px 9px', borderRadius:99 }}>3 near you</div>
-        </div>
-        {/* NEW job card — highlighted */}
-        <div style={{ background:'#fff', border:'2px solid #7C3AED', borderRadius:13, padding:'13px 14px', marginBottom:10, position:'relative' }}>
-          <div style={{ position:'absolute', top:-9, left:14, background:'#7C3AED', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 9px', borderRadius:99, letterSpacing:'0.5px' }}>NEW JOB</div>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:8 }}>
-            <div>
-              <div style={{ fontSize:12, fontWeight:700, color:'#111827' }}>Home Visit — Tirana</div>
-              <div style={{ fontSize:10, color:'#7C3AED', fontWeight:600, marginTop:1 }}>Blood Pressure · Glucose Check</div>
-            </div>
-            <div style={{ textAlign:'right' }}>
-              <div style={{ fontSize:13, fontWeight:800, color:'#111827' }}>€28</div>
-              <div style={{ fontSize:9, color:'#9CA3AF' }}>per visit</div>
-            </div>
+        {/* Success banner */}
+        <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:10, padding:'10px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
+          <div style={{ width:26, height:26, borderRadius:'50%', background:'#059669', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
-          <div style={{ display:'flex', gap:6, flexWrap:'wrap', marginBottom:10 }}>
-            {['Mon May 5','10:00 AM','Rruga Myslym Shyri'].map(tag => (
-              <div key={tag} style={{ fontSize:10, background:'#F5F3FF', color:'#7C3AED', borderRadius:6, padding:'3px 8px', fontWeight:500 }}>{tag}</div>
+          <div>
+            <div style={{ fontSize:11, fontWeight:700, color:'#065F46' }}>Booking confirmed!</div>
+            <div style={{ fontSize:10, color:'#059669' }}>We're matching you with a nurse now</div>
+          </div>
+        </div>
+        {/* Visit card — UNASSIGNED state */}
+        <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:12, padding:'13px', marginBottom:10 }}>
+          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', marginBottom:10 }}>
+            <div>
+              <div style={{ fontSize:12, fontWeight:700, color:'#111827' }}>Home Visit</div>
+              <div style={{ fontSize:10, color:'#6B7280', marginTop:2 }}>Blood Pressure · Glucose Check</div>
+            </div>
+            <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:99, padding:'3px 9px', fontSize:10, fontWeight:700, color:'#D97706' }}>Finding nurse…</div>
+          </div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:7, marginBottom:10 }}>
+            {[['Date','Mon, May 5'],['Time','10:00 AM'],['Location','Tirana'],['Plan','Standard']].map(([k,v]) => (
+              <div key={k} style={{ background:'#F9FAFB', borderRadius:7, padding:'6px 9px' }}>
+                <div style={{ fontSize:9, color:'#9CA3AF', marginBottom:2 }}>{k}</div>
+                <div style={{ fontSize:11, fontWeight:600, color:'#374151' }}>{v}</div>
+              </div>
             ))}
           </div>
-          <div style={{ background:'linear-gradient(135deg,#7C3AED,#2563EB)', borderRadius:7, padding:'7px', textAlign:'center', color:'#fff', fontWeight:700, fontSize:11 }}>
-            Apply for this job
+          {/* Matching progress bar */}
+          <div style={{ fontSize:9, color:'#6B7280', marginBottom:5, fontWeight:600 }}>Searching nearby nurses…</div>
+          <div style={{ height:5, borderRadius:99, background:'#F3F4F6', overflow:'hidden' }}>
+            <div style={{ height:'100%', width:'65%', borderRadius:99, background:'linear-gradient(90deg,#7C3AED,#2563EB)', opacity:0.85 }} />
           </div>
+          <div style={{ fontSize:9, color:'#9CA3AF', marginTop:5 }}>Typically matched within a few hours</div>
         </div>
-        {/* Older job (greyed) */}
-        <div style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:12, padding:'11px 13px', opacity:0.55 }}>
-          <div style={{ display:'flex', justifyContent:'space-between', marginBottom:4 }}>
-            <div style={{ fontSize:11, fontWeight:600, color:'#374151' }}>Home Visit — Durrës</div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#374151' }}>€24</div>
-          </div>
-          <div style={{ fontSize:10, color:'#9CA3AF' }}>Vitals Check · Fri May 9 · 2:00 PM</div>
+        {/* Notification hint */}
+        <div style={{ background:'#EFF6FF', borderRadius:8, padding:'8px 12px', fontSize:10, color:'#2563EB', fontWeight:600 }}>
+          📱 You'll be notified once a nurse is assigned
         </div>
       </div>
     </div>
   );
 }
 
-/* Step 3 — Nurses apply, client/admin sees applicants */
+/* Step 3 — Client dashboard: nurses available, pick yours */
 function MockupApplicants() {
   const nurses = [
-    { name:'Elona Berberi',  spec:'General Nursing', exp:'6 yrs', rating:'5.0', reviews:38, photo:'/nurse-elona.png', top:true  },
-    { name:'Mirela Daka',    spec:'Blood Work',      exp:'4 yrs', rating:'4.9', reviews:21, photo:'/nurse-mirela.png', top:false },
+    { name:'Elona Berberi', spec:'General Nursing', exp:'6 yrs', rating:'5.0', reviews:38, photo:'/nurse-elona.png', top:true  },
+    { name:'Mirela Daka',   spec:'Blood Work',      exp:'4 yrs', rating:'4.9', reviews:21, photo:'/nurse-mirela.png', top:false },
   ];
   return (
     <div style={{ background:'#F8FAFF', borderRadius:16, overflow:'hidden', border:'1px solid #E5E7EB', fontFamily:'Inter,system-ui,sans-serif', fontSize:12 }}>
       <BrowserBar url="vonaxity.com/dashboard" />
       <div style={{ padding:'16px' }}>
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:12 }}>
-          <div style={{ fontSize:13, fontWeight:700, color:'#111827' }}>Nurses applied</div>
-          <div style={{ fontSize:10, fontWeight:600, background:'#EFF6FF', color:'#2563EB', padding:'3px 9px', borderRadius:99 }}>2 applicants</div>
+        {/* Notification banner */}
+        <div style={{ background:'#EDE9FE', border:'1px solid #C4B5FD', borderRadius:10, padding:'9px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
+          <div style={{ width:26, height:26, borderRadius:'50%', background:'#7C3AED', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+          </div>
+          <div>
+            <div style={{ fontSize:11, fontWeight:700, color:'#4C1D95' }}>2 nurses ready for your visit</div>
+            <div style={{ fontSize:10, color:'#7C3AED' }}>Pick one or let us choose for you</div>
+          </div>
         </div>
+        {/* Nurse cards */}
         {nurses.map((n) => (
-          <div key={n.name} style={{ background:'#fff', border: n.top ? '2px solid #059669':'1px solid #E5E7EB', borderRadius:12, padding:'12px 13px', marginBottom:9, position:'relative' }}>
-            {n.top && <div style={{ position:'absolute', top:-8, right:12, background:'#059669', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 8px', borderRadius:99 }}>TOP MATCH</div>}
-            <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:9 }}>
-              <img src={n.photo} alt={n.name} style={{ width:40, height:40, borderRadius:'50%', objectFit:'cover', border:'2px solid #DBEAFE', flexShrink:0 }} />
+          <div key={n.name} style={{ background:'#fff', border: n.top ? '2px solid #059669':'1px solid #E5E7EB', borderRadius:12, padding:'11px 12px', marginBottom:8, position:'relative' }}>
+            {n.top && <div style={{ position:'absolute', top:-8, right:12, background:'#059669', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 8px', borderRadius:99 }}>RECOMMENDED</div>}
+            <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:8 }}>
+              <img src={n.photo} alt={n.name} style={{ width:38, height:38, borderRadius:'50%', objectFit:'cover', border:'2px solid #DBEAFE', flexShrink:0 }} />
               <div style={{ flex:1 }}>
-                <div style={{ fontWeight:700, color:'#111827', fontSize:12 }}>{n.name}</div>
+                <div style={{ fontWeight:700, color:'#111827', fontSize:11 }}>{n.name}</div>
                 <div style={{ fontSize:10, color:'#2563EB', fontWeight:500 }}>{n.spec} · {n.exp} exp</div>
                 <div style={{ display:'flex', gap:1, marginTop:2, alignItems:'center' }}>
-                  {[1,2,3,4,5].map(s=><svg key={s} width="9" height="9" viewBox="0 0 24 24" fill="#F59E0B" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}
-                  <span style={{ fontSize:10, color:'#6B7280', marginLeft:3 }}>{n.rating} ({n.reviews})</span>
+                  {[1,2,3,4,5].map(s=><svg key={s} width="8" height="8" viewBox="0 0 24 24" fill="#F59E0B" stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>)}
+                  <span style={{ fontSize:9, color:'#6B7280', marginLeft:3 }}>{n.rating} ({n.reviews})</span>
                 </div>
               </div>
-              <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:7, padding:'3px 8px', fontSize:10, fontWeight:700, color:'#059669', flexShrink:0 }}>Verified</div>
+              <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:6, padding:'2px 7px', fontSize:9, fontWeight:700, color:'#059669', flexShrink:0 }}>Verified</div>
             </div>
-            <div style={{ background: n.top ? '#059669':'#1E293B', borderRadius:7, padding:'6px', textAlign:'center', color:'#fff', fontWeight:700, fontSize:11 }}>
-              {n.top ? 'Select this nurse ✓':'View profile'}
+            <div style={{ background: n.top ? '#059669':'#F3F4F6', borderRadius:7, padding:'6px', textAlign:'center', color: n.top ? '#fff':'#374151', fontWeight:700, fontSize:10 }}>
+              {n.top ? 'Select · Confirm visit →':'View profile'}
             </div>
           </div>
         ))}
+        <div style={{ background:'#F9FAFB', border:'1px solid #E5E7EB', borderRadius:8, padding:'8px 12px', fontSize:10, color:'#6B7280', textAlign:'center' }}>
+          Or tap <strong style={{ color:'#7C3AED' }}>Let Vonaxity choose</strong> for the best match
+        </div>
       </div>
     </div>
   );
@@ -644,16 +657,37 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
                 ))}
               </div>
 
-              {/* Step dots navigation */}
-              <div style={{ display:'flex', gap:6, marginTop:30, flexWrap:'wrap' }}>
-                {STEPS.map((_, si) => (
-                  <button
-                    key={si}
-                    onClick={() => goTo(si)}
-                    style={{ width: si === active ? 26 : 8, height:8, borderRadius:99, border:'none', background: si === active ? step.color : '#E5E7EB', cursor:'pointer', transition:'width 0.3s ease, background 0.2s ease', padding:0, flexShrink:0 }}
-                    aria-label={`Go to step ${si+1}`}
-                  />
-                ))}
+              {/* Step navigation: arrows + dots */}
+              <div style={{ display:'flex', alignItems:'center', gap:10, marginTop:30 }}>
+                {/* Prev arrow */}
+                <button
+                  onClick={() => active > 0 && goTo(active - 1)}
+                  disabled={active === 0}
+                  style={{ width:34, height:34, borderRadius:'50%', border:'1.5px solid #E5E7EB', background: active === 0 ? '#F9FAFB' : '#fff', cursor: active === 0 ? 'default' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, opacity: active === 0 ? 0.35 : 1, transition:'all 0.15s ease' }}
+                  aria-label="Previous step"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#374151" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="15 18 9 12 15 6"/></svg>
+                </button>
+                {/* Dots */}
+                <div style={{ display:'flex', gap:5, flex:1 }}>
+                  {STEPS.map((_, si) => (
+                    <button
+                      key={si}
+                      onClick={() => goTo(si)}
+                      style={{ width: si === active ? 24 : 7, height:7, borderRadius:99, border:'none', background: si === active ? step.color : '#E5E7EB', cursor:'pointer', transition:'width 0.3s ease, background 0.2s ease', padding:0, flexShrink:0 }}
+                      aria-label={`Go to step ${si+1}`}
+                    />
+                  ))}
+                </div>
+                {/* Next arrow */}
+                <button
+                  onClick={() => active < STEPS.length - 1 && goTo(active + 1)}
+                  disabled={active === STEPS.length - 1}
+                  style={{ width:34, height:34, borderRadius:'50%', border:'1.5px solid #E5E7EB', background: active === STEPS.length - 1 ? '#F9FAFB' : step.color, cursor: active === STEPS.length - 1 ? 'default' : 'pointer', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, opacity: active === STEPS.length - 1 ? 0.35 : 1, transition:'all 0.15s ease', boxShadow: active < STEPS.length - 1 ? `0 4px 12px ${step.color}44` : 'none' }}
+                  aria-label="Next step"
+                >
+                  <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={active === STEPS.length - 1 ? '#374151' : '#fff'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="9 18 15 12 9 6"/></svg>
+                </button>
               </div>
             </div>
 
