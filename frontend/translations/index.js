@@ -548,6 +548,9 @@ const translations = {
       copyright:'© 2024 Vonaxity. All rights reserved.',
       terms:'Terms of Service', privacy:'Privacy Policy',
       companyLinks:['About Us','Pricing','FAQ','Contact'],
+      ourNurses:'Our Nurses',
+      emergency:'EMERGENCY IN ALBANIA', emergencyCall:'Call 127',
+      whatsapp:'WhatsApp Support',
     },
     status: {
       APPROVED:'Approved', PENDING:'Pending', INCOMPLETE:'Incomplete',
