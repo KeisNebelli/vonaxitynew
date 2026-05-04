@@ -1536,30 +1536,32 @@ function FindNurses({ lang, onBook }) {
               </div>
             </div>
 
-            {/* Avatar — overlaps header */}
-            <div style={{ padding:'0 18px', marginTop:-28, marginBottom:10, display:'flex', alignItems:'flex-end', gap:12 }}>
-              <div style={{ width:58, height:58, borderRadius:16, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:22, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden', border:'3px solid #fff', boxShadow:'0 4px 14px rgba(0,0,0,0.18)' }}>
+            {/* Avatar + name row — overlaps header */}
+            <div style={{ padding:'0 18px', marginTop:-26, marginBottom:14, display:'flex', alignItems:'flex-end', gap:13 }}>
+              <div style={{ width:56, height:56, borderRadius:15, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:21, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden', border:'3px solid #fff', boxShadow:'0 4px 14px rgba(0,0,0,0.18)' }}>
                 {nurse.profilePhotoUrl
                   ? <img src={nurse.profilePhotoUrl} alt={nurse.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   : (nurse.name||'N').charAt(0).toUpperCase()
                 }
               </div>
-              <div style={{ paddingBottom:4 }}>
-                <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-                  <div style={{ display:'flex', gap:1 }}>{stars(nurse.rating||0)}</div>
-                  <span style={{ fontSize:12, fontWeight:700, color:C.textSecondary }}>{nurse.rating>0 ? nurse.rating.toFixed(1) : tr('dashboard.newNurse')}</span>
-                  {nurse.reviewCount > 0 && <span style={{ fontSize:11, color:C.textTertiary }}>({nurse.reviewCount})</span>}
+              {/* Name + meta sit right next to avatar, pushed down to align with avatar bottom */}
+              <div style={{ paddingBottom:2, flex:1, minWidth:0 }}>
+                <div style={{ fontSize:15, fontWeight:800, color:C.textPrimary, lineHeight:1.2, marginBottom:3, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{nurse.name}</div>
+                <div style={{ fontSize:11.5, color:C.textTertiary, display:'flex', alignItems:'center', gap:7, flexWrap:'wrap' }}>
+                  {nurse.city && <span style={{ display:'flex', alignItems:'center', gap:3 }}><svg width="10" height="10" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{nurse.city}</span>}
+                  {nurse.experience && <span style={{ display:'flex', alignItems:'center', gap:3 }}><svg width="10" height="10" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>{nurse.experience}</span>}
                 </div>
-                <div style={{ fontSize:11, color:C.textTertiary }}>{nurse.totalVisits} {tr('dashboard.visitsApplicantLabel')}</div>
               </div>
             </div>
 
             {/* Body */}
             <div style={{ padding:'0 18px 18px', flex:1, display:'flex', flexDirection:'column' }}>
-              <div style={{ fontSize:16, fontWeight:800, color:C.textPrimary, marginBottom:3, lineHeight:1.25 }}>{nurse.name}</div>
-              <div style={{ fontSize:12, color:C.textTertiary, marginBottom:10, display:'flex', alignItems:'center', gap:8 }}>
-                {nurse.city && <span style={{ display:'flex', alignItems:'center', gap:3 }}><svg width="11" height="11" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{nurse.city}</span>}
-                {nurse.experience && <span style={{ display:'flex', alignItems:'center', gap:3 }}><svg width="11" height="11" fill="none" stroke="#9CA3AF" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg>{nurse.experience}</span>}
+              {/* Stars row */}
+              <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:10 }}>
+                <div style={{ display:'flex', gap:1 }}>{stars(nurse.rating||0)}</div>
+                <span style={{ fontSize:12, fontWeight:700, color:C.textSecondary }}>{nurse.rating>0 ? nurse.rating.toFixed(1) : tr('dashboard.newNurse')}</span>
+                {nurse.reviewCount > 0 && <span style={{ fontSize:11, color:C.textTertiary }}>({nurse.reviewCount})</span>}
+                <span style={{ fontSize:11, color:C.textTertiary, marginLeft:2 }}>· {nurse.totalVisits} {tr('dashboard.visitsApplicantLabel')}</span>
               </div>
 
               {nurse.bio && (
