@@ -2,6 +2,8 @@ require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
 const cookieParser = require('cookie-parser');
+const helmet = require('helmet');
+const rateLimit = require('express-rate-limit');
 
 const authRoutes = require('./routes/auth');
 const visitRoutes = require('./routes/visits');
@@ -16,6 +18,51 @@ const PORT = process.env.PORT || 4000;
 
 // Trust Railway's proxy so rate-limit can read the real client IP
 app.set('trust proxy', 1);
+
+// ── Security headers (Helmet) ─────────────────────────────────────────────────
+app.use(helmet({
+  // Allow our own CDN fonts & inline styles in the frontend (served separately)
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false,
+}));
+
+// ── Global rate limit — 200 req / 15 min per IP across all routes ─────────────
+const globalLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 200,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many requests. Please slow down.' },
+  skip: (req) => req.path === '/health', // don't limit health checks
+});
+app.use(globalLimiter);
+
+// ── Upload rate limit — 20 uploads / 15 min per IP ───────────────────────────
+const uploadLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many upload attempts. Please try again later.' },
+});
+
+// ── Booking rate limit — 30 requests / 15 min per IP ─────────────────────────
+const bookingLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 30,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many booking requests. Please try again later.' },
+});
+
+// ── AI chat rate limit — 20 requests / 15 min per IP ─────────────────────────
+const aiLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000,
+  max: 20,
+  standardHeaders: true,
+  legacyHeaders: false,
+  message: { error: 'Too many AI requests. Please try again later.' },
+});
 
 // ── Middleware ────────────────────────────────────────────────────────────────
 const allowedOrigins = [
@@ -56,10 +103,10 @@ app.get('/health', (req, res) => {
 
 // ── Routes ────────────────────────────────────────────────────────────────────
 app.use('/auth', authRoutes);
-app.use('/visits', visitRoutes);
+app.use('/visits', bookingLimiter, visitRoutes);
 app.use('/nurses', nurseRoutes);
 app.use('/payments', paymentsRoute); // Stripe checkout + admin payments
-app.use('/uploads', uploadsRoute);
+app.use('/uploads', uploadLimiter, uploadsRoute);
 app.use('/users', usersRouter);
 app.use('/analytics', analyticsRouter);
 app.use('/notifications', notificationsRouter);
@@ -72,7 +119,7 @@ app.use('/contact', contactRouter);
 app.use('/profile', profileRouter);
 
 // ── AI Assistant proxy ────────────────────────────────────────────────────────
-app.post('/ai/chat', async (req, res) => {
+app.post('/ai/chat', aiLimiter, async (req, res) => {
   try {
     const { messages, system } = req.body;
     const response = await fetch('https://api.anthropic.com/v1/messages', {
