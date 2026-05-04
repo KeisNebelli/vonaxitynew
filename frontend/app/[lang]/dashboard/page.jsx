@@ -900,23 +900,54 @@ function DeleteConfirm({ visit, onConfirm, onCancel, lang='en' }) {
     } catch (err) { setError(err.message || tr('dashboard.deleteFailed')); setLoading(false); }
   };
 
+  const svcLabel = (()=>{ const s = SERVICES_MAP.find(x=>x.en===visit.serviceType); return lang==='sq'&&s?s.sq:visit.serviceType; })();
+  const dateStr = new Date(visit.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{day:'numeric',month:'long',year:'numeric'});
+
   return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(0,0,0,0.45)', zIndex:9000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}>
-      <div style={{ background:C.bgWhite, borderRadius:20, padding:28, maxWidth:420, width:'100%', boxShadow:'0 20px 60px rgba(0,0,0,0.15)' }}>
-        <div style={{ width:48, height:48, borderRadius:'50%', background:C.errorLight, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:16 }}>
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+    <div style={{ position:'fixed', inset:0, background:'rgba(2,6,23,0.65)', backdropFilter:'blur(5px)', zIndex:9000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }}
+      onClick={e=>{ if(e.target===e.currentTarget) onCancel(); }}>
+      <div style={{ background:'#fff', borderRadius:24, maxWidth:400, width:'100%', boxShadow:'0 32px 80px rgba(0,0,0,0.25)', overflow:'hidden', animation:'fadeSlideIn 0.22s cubic-bezier(0.34,1.4,0.64,1) both' }}>
+        {/* Red gradient header */}
+        <div style={{ background:'linear-gradient(145deg,#7f1d1d 0%,#DC2626 55%,#EF4444 100%)', padding:'28px 24px 22px', position:'relative', overflow:'hidden' }}>
+          <div style={{ position:'absolute', inset:0, opacity:0.07, pointerEvents:'none' }}>
+            <svg width="100%" height="100%"><defs><pattern id="del-dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#del-dots)"/></svg>
+          </div>
+          <div style={{ position:'absolute', top:-25, right:-25, width:110, height:110, borderRadius:'50%', background:'rgba(255,255,255,0.08)', pointerEvents:'none' }}/>
+          <div style={{ position:'relative', zIndex:1, display:'flex', alignItems:'center', gap:14 }}>
+            <div style={{ width:48, height:48, borderRadius:14, background:'rgba(255,255,255,0.18)', border:'1.5px solid rgba(255,255,255,0.3)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 011-1h4a1 1 0 011 1v2"/></svg>
+            </div>
+            <div>
+              <div style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:'-0.3px', marginBottom:3 }}>{tr('dashboard.deleteVisitTitle')}</div>
+              <div style={{ fontSize:12, color:'rgba(255,255,255,0.7)' }}>{svcLabel} · {dateStr}</div>
+            </div>
+          </div>
         </div>
-        <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, marginBottom:8 }}>{tr('dashboard.deleteVisitTitle')}</div>
-        <div style={{ fontSize:14, color:C.textSecondary, marginBottom:6 }}>
-          <strong>{(() => { const s = SERVICES_MAP.find(x=>x.en===visit.serviceType); return lang==='sq'&&s?s.sq:visit.serviceType; })()}</strong> — {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}
-        </div>
-        <div style={{ fontSize:13, color:C.textTertiary, marginBottom:24 }}>{tr('dashboard.deleteCannotUndo')}</div>
-        {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
-        <div style={{ display:'flex', gap:10 }}>
-          <button onClick={onCancel} style={{ flex:1, padding:'12px', borderRadius:10, border:`1px solid ${C.border}`, background:'transparent', fontSize:14, fontWeight:600, cursor:'pointer', color:C.textSecondary }}>{tr('dashboard.cancel')}</button>
-          <button onClick={handleDelete} disabled={loading} style={{ flex:1, padding:'12px', borderRadius:10, border:'none', background:C.error, color:'#fff', fontSize:14, fontWeight:700, cursor:'pointer', opacity:loading?0.7:1, fontFamily:F }}>
-            {loading ? tr('dashboard.deleting') : tr('dashboard.delete')}
-          </button>
+
+        {/* Body */}
+        <div style={{ padding:'20px 24px 24px' }}>
+          <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:12, padding:'12px 16px', marginBottom:20, display:'flex', gap:10, alignItems:'flex-start' }}>
+            <svg width="16" height="16" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{ flexShrink:0, marginTop:1 }}><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+            <span style={{ fontSize:13, color:'#991B1B', lineHeight:1.5 }}>{tr('dashboard.deleteCannotUndo')}</span>
+          </div>
+
+          {error && (
+            <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:10, padding:'10px 14px', fontSize:13, color:'#DC2626', marginBottom:16, display:'flex', alignItems:'center', gap:8 }}>
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+              {error}
+            </div>
+          )}
+
+          <div style={{ display:'flex', gap:10 }}>
+            <button onClick={onCancel} style={{ flex:1, padding:'12px', borderRadius:11, border:'1.5px solid #E2E8F0', background:'transparent', fontSize:14, fontWeight:700, cursor:'pointer', color:'#64748B', fontFamily:F }}>{tr('dashboard.cancel')}</button>
+            <button onClick={handleDelete} disabled={loading} style={{ flex:1, padding:'12px', borderRadius:11, border:'none', background: loading?'#FCA5A5':'linear-gradient(135deg,#DC2626,#B91C1C)', color:'#fff', fontSize:14, fontWeight:800, cursor:loading?'not-allowed':'pointer', fontFamily:F, display:'flex', alignItems:'center', justifyContent:'center', gap:7 }}>
+              {loading ? (
+                <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation:'spin 0.8s linear infinite' }}><circle cx="12" cy="12" r="10" strokeOpacity="0.3"/><path d="M12 2a10 10 0 0110 10"/></svg>{tr('dashboard.deleting')}</>
+              ) : (
+                <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/></svg>{tr('dashboard.delete')}</>
+              )}
+            </button>
+          </div>
         </div>
       </div>
     </div>

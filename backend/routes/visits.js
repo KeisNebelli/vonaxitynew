@@ -373,6 +373,9 @@ router.delete('/:id', ...requireRole('CLIENT', 'ADMIN'), async (req, res) => {
       if (['PENDING', 'ACCEPTED'].includes(visit.status)) return res.status(400).json({ error: 'A nurse has already been assigned. Please contact support to cancel.' });
     }
 
+    // Delete related records first to avoid FK constraint errors
+    await prisma.visitApplication.deleteMany({ where: { visitId: req.params.id } });
+    await prisma.notification.deleteMany({ where: { relatedId: req.params.id } });
     await prisma.visit.delete({ where: { id: req.params.id } });
 
     // Restore visit count — only if it was UNASSIGNED (not yet completed)
