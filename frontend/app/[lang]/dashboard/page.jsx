@@ -1537,7 +1537,7 @@ function FindNurses({ lang, onBook }) {
             </div>
 
             {/* Avatar + name row — overlaps header */}
-            <div style={{ padding:'0 18px', marginTop:-26, marginBottom:14, display:'flex', alignItems:'flex-end', gap:13 }}>
+            <div style={{ padding:'0 18px', marginTop:-26, marginBottom:14, display:'flex', alignItems:'flex-end', gap:13, position:'relative', zIndex:2 }}>
               <div style={{ width:56, height:56, borderRadius:15, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:21, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden', border:'3px solid #fff', boxShadow:'0 4px 14px rgba(0,0,0,0.18)' }}>
                 {nurse.profilePhotoUrl
                   ? <img src={nurse.profilePhotoUrl} alt={nurse.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
@@ -1555,7 +1555,7 @@ function FindNurses({ lang, onBook }) {
             </div>
 
             {/* Body */}
-            <div style={{ padding:'0 18px 18px', flex:1, display:'flex', flexDirection:'column' }}>
+            <div style={{ padding:'0 18px 18px', flex:1, display:'flex', flexDirection:'column', position:'relative', zIndex:2 }}>
               {/* Stars row */}
               <div style={{ display:'flex', alignItems:'center', gap:5, marginBottom:10 }}>
                 <div style={{ display:'flex', gap:1 }}>{stars(nurse.rating||0)}</div>
