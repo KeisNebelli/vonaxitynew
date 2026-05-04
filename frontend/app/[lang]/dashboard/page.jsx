@@ -571,53 +571,104 @@ function BookVisit({ relative, subscription, onSuccess, onCancel, lang='en' }) {
     } finally { setLoading(false); }
   };
 
+  const isDisabled = loading || !relative || (subscription && subscription.visitsPerMonth < 999 && subscription.visitsUsed >= subscription.visitsPerMonth);
+
   return (
-    <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:28, boxShadow:SSM, maxWidth:520 }}>
-      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:24 }}>
-        <div>
-          <div style={{ fontSize:18, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.3px' }}>{tr('dashboard.bookVisitTitle')}</div>
-          <div style={{ fontSize:13, color:C.textSecondary, marginTop:3 }}>
-            {relative ? `${tr('dashboard.bookForPrefix')} ${relative.name} ${tr('dashboard.bookIn')} ${relative.city}` : tr('dashboard.bookAddLoved')}
-          </div>
-          {subscription && (
-            subscription.visitsPerMonth >= 999
-              ? <div style={{ fontSize:12, fontWeight:600, marginTop:4, color:'#059669' }}>⚡ Unlimited visits (test account)</div>
-              : <div style={{ fontSize:12, fontWeight:600, marginTop:4, color: subscription.visitsUsed >= subscription.visitsPerMonth ? '#DC2626' : '#059669' }}>
-                  {subscription.visitsPerMonth - subscription.visitsUsed} {subscription.visitsPerMonth - subscription.visitsUsed !== 1 ? tr('dashboard.bookVisitsLeftPlural') : tr('dashboard.bookVisitsLeft')}
-                </div>
-          )}
+    <div style={{ background:'#fff', borderRadius:24, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:'0 8px 32px rgba(0,0,0,0.10)', maxWidth:520 }}>
+      <style>{`
+        .bv-inp:focus { border-color:#2563EB !important; box-shadow:0 0 0 3px rgba(37,99,235,0.1) !important; outline:none; }
+        .bv-svc:hover { border-color:#2563EB !important; background:#F8FAFF !important; }
+      `}</style>
+
+      {/* Gradient header */}
+      <div style={{ background:'linear-gradient(145deg,#0F4C8A 0%,#2563EB 60%,#6366F1 100%)', padding:'24px 24px 20px', position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', inset:0, opacity:0.07, pointerEvents:'none' }}>
+          <svg width="100%" height="100%"><defs><pattern id="bv-dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#bv-dots)"/></svg>
         </div>
-        <button onClick={onCancel} style={{ background:C.bgSubtle, border:'none', borderRadius:8, width:32, height:32, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary, fontSize:16 }}>✕</button>
+        <div style={{ position:'absolute', top:-30, right:-30, width:120, height:120, borderRadius:'50%', background:'rgba(255,255,255,0.07)', pointerEvents:'none' }}/>
+        <div style={{ position:'relative', zIndex:1, display:'flex', alignItems:'flex-start', justifyContent:'space-between', gap:12 }}>
+          <div>
+            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
+              <div style={{ width:36, height:36, borderRadius:11, background:'rgba(255,255,255,0.18)', border:'1.5px solid rgba(255,255,255,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <svg width="17" height="17" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+              </div>
+              <div style={{ fontSize:18, fontWeight:900, color:'#fff', letterSpacing:'-0.3px' }}>{tr('dashboard.bookVisitTitle')}</div>
+            </div>
+            {relative && (
+              <div style={{ display:'flex', alignItems:'center', gap:6, marginBottom:4 }}>
+                <svg width="12" height="12" fill="none" stroke="rgba(255,255,255,0.7)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                <span style={{ fontSize:13, color:'rgba(255,255,255,0.8)', fontWeight:500 }}>{relative.name} · {relative.city}</span>
+              </div>
+            )}
+            {subscription && (
+              subscription.visitsPerMonth >= 999
+                ? <span style={{ fontSize:11, fontWeight:700, color:'#6EE7B7', background:'rgba(110,231,183,0.15)', padding:'3px 10px', borderRadius:99, border:'1px solid rgba(110,231,183,0.3)' }}>⚡ Unlimited visits</span>
+                : <span style={{ fontSize:11, fontWeight:700, color: subscription.visitsUsed >= subscription.visitsPerMonth ? '#FCA5A5':'#6EE7B7', background:'rgba(255,255,255,0.12)', padding:'3px 10px', borderRadius:99 }}>
+                    {subscription.visitsPerMonth - subscription.visitsUsed} {lang==='sq'?'vizita mbetur':'visits remaining'}
+                  </span>
+            )}
+          </div>
+          <button onClick={onCancel} style={{ background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.25)', borderRadius:9, width:32, height:32, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', fontSize:15, flexShrink:0 }}>✕</button>
+        </div>
       </div>
 
-      <div style={{ marginBottom:16 }}>
-        <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>{tr('dashboard.bookServiceType')}</label>
-        <select style={inp} value={form.serviceType} onChange={e=>setForm({...form, serviceType:e.target.value})}>
-          {SERVICES_MAP.map(s=><option key={s.en} value={s.en}>{lang==='sq' ? s.sq : s.en}</option>)}
-        </select>
-      </div>
+      {/* Form body */}
+      <div style={{ padding:'22px 24px 24px', display:'flex', flexDirection:'column', gap:16 }}>
 
-      <div style={{ marginBottom:16 }}>
-        <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>{tr('dashboard.bookDateTime')}</label>
-        <input type="datetime-local" style={inp} value={form.scheduledAt} onChange={e=>setForm({...form, scheduledAt:e.target.value})} min={toLocalDT(new Date().toISOString())} />
-      </div>
+        {/* Service type */}
+        <div>
+          <label style={{ fontSize:11, fontWeight:800, color:'#64748B', display:'block', marginBottom:7, letterSpacing:'0.6px', textTransform:'uppercase' }}>{tr('dashboard.bookServiceType')}</label>
+          <select className="bv-svc" style={{ width:'100%', padding:'11px 14px', borderRadius:11, border:'1.5px solid #E2E8F0', fontSize:14, color:C.textPrimary, background:'#fff', fontFamily:F, cursor:'pointer', transition:'border-color 0.15s, background 0.15s', boxSizing:'border-box', appearance:'none', backgroundImage:`url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 24 24' fill='none' stroke='%2394A3B8' stroke-width='2.5' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'/%3E%3C/svg%3E")`, backgroundRepeat:'no-repeat', backgroundPosition:'right 14px center' }}
+            value={form.serviceType} onChange={e=>setForm({...form, serviceType:e.target.value})}>
+            {SERVICES_MAP.map(s=><option key={s.en} value={s.en}>{lang==='sq' ? s.sq : s.en}</option>)}
+          </select>
+        </div>
 
-      <div style={{ marginBottom:24 }}>
-        <label style={{ fontSize:12, fontWeight:700, color:C.textPrimary, display:'block', marginBottom:6, letterSpacing:'0.3px' }}>{tr('dashboard.bookNotes')} <span style={{ fontWeight:400, color:C.textTertiary }}>({tr('dashboard.bookNotesOpt')})</span></label>
-        <textarea style={{ ...inp, height:90, resize:'vertical' }} value={form.notes} onChange={e=>setForm({...form, notes:e.target.value})} placeholder={tr('dashboard.bookNotesPh')} />
-      </div>
+        {/* Date & time */}
+        <div>
+          <label style={{ fontSize:11, fontWeight:800, color:'#64748B', display:'block', marginBottom:7, letterSpacing:'0.6px', textTransform:'uppercase' }}>{tr('dashboard.bookDateTime')}</label>
+          <input className="bv-inp" type="datetime-local"
+            style={{ width:'100%', padding:'11px 14px', borderRadius:11, border:'1.5px solid #E2E8F0', fontSize:14, color:C.textPrimary, background:'#fff', fontFamily:F, boxSizing:'border-box', transition:'border-color 0.15s, box-shadow 0.15s' }}
+            value={form.scheduledAt} onChange={e=>setForm({...form, scheduledAt:e.target.value})} min={toLocalDT(new Date().toISOString())} />
+        </div>
 
-      {error && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:9, padding:'10px 14px', fontSize:13, color:C.error, marginBottom:16 }}>{error}</div>}
+        {/* Notes */}
+        <div>
+          <label style={{ fontSize:11, fontWeight:800, color:'#64748B', display:'block', marginBottom:7, letterSpacing:'0.6px', textTransform:'uppercase' }}>
+            {tr('dashboard.bookNotes')} <span style={{ fontWeight:500, textTransform:'none', letterSpacing:0, color:'#94A3B8' }}>({tr('dashboard.bookNotesOpt')})</span>
+          </label>
+          <textarea className="bv-inp"
+            style={{ width:'100%', padding:'11px 14px', borderRadius:11, border:'1.5px solid #E2E8F0', fontSize:14, color:C.textPrimary, background:'#fff', fontFamily:F, boxSizing:'border-box', height:88, resize:'vertical', transition:'border-color 0.15s, box-shadow 0.15s' }}
+            value={form.notes} onChange={e=>setForm({...form, notes:e.target.value})} placeholder={tr('dashboard.bookNotesPh')} />
+        </div>
 
-      <div style={{ background:C.warningLight, border:'1px solid #FDE68A', borderRadius:9, padding:'10px 14px', fontSize:12, color:'#92400E', marginBottom:20 }}>
-        {tr('dashboard.bookAfterInfo').replace('{city}', relative?.city || '')}
-      </div>
+        {/* Error */}
+        {error && (
+          <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:10, padding:'10px 14px', fontSize:13, color:'#DC2626', display:'flex', alignItems:'center', gap:8 }}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+            {error}
+          </div>
+        )}
 
-      <div style={{ display:'flex', gap:10 }}>
-        <button onClick={onCancel} style={{ flex:1, background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:10, padding:'12px', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:F }}>{tr('dashboard.cancel')}</button>
-        <button onClick={handleSubmit} disabled={loading||!relative||(subscription&&subscription.visitsPerMonth<999&&subscription.visitsUsed>=subscription.visitsPerMonth)} style={{ flex:2, background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px', fontSize:14, fontWeight:700, cursor:(loading||!relative||(subscription&&subscription.visitsPerMonth<999&&subscription.visitsUsed>=subscription.visitsPerMonth))?'not-allowed':'pointer', opacity:(loading||!relative||(subscription&&subscription.visitsPerMonth<999&&subscription.visitsUsed>=subscription.visitsPerMonth))?0.7:1, fontFamily:F }}>
-          {loading ? tr('dashboard.booking') : tr('dashboard.bookVisitBtn')}
-        </button>
+        {/* Info banner */}
+        <div style={{ background:'linear-gradient(135deg,#FFFBEB,#FEF9C3)', border:'1px solid #FDE68A', borderRadius:11, padding:'11px 14px', display:'flex', gap:9, alignItems:'flex-start' }}>
+          <svg width="15" height="15" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24" style={{ flexShrink:0, marginTop:1 }}><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+          <span style={{ fontSize:12, color:'#92400E', lineHeight:1.55 }}>{tr('dashboard.bookAfterInfo').replace('{city}', relative?.city || '')}</span>
+        </div>
+
+        {/* Buttons */}
+        <div style={{ display:'flex', gap:10, marginTop:2 }}>
+          <button onClick={onCancel} style={{ flex:1, background:'transparent', color:'#64748B', border:'1.5px solid #E2E8F0', borderRadius:12, padding:'13px', fontSize:14, fontWeight:700, cursor:'pointer', fontFamily:F }}>
+            {tr('dashboard.cancel')}
+          </button>
+          <button onClick={handleSubmit} disabled={isDisabled}
+            style={{ flex:2, background: isDisabled ? '#94A3B8' : 'linear-gradient(135deg,#2563EB,#4F46E5)', color:'#fff', border:'none', borderRadius:12, padding:'13px', fontSize:14, fontWeight:800, cursor:isDisabled?'not-allowed':'pointer', fontFamily:F, boxShadow: isDisabled?'none':'0 4px 14px rgba(37,99,235,0.3)', display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'box-shadow 0.15s' }}>
+            {loading
+              ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation:'spin 0.8s linear infinite' }}><path d="M12 2a10 10 0 0110 10"/><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/></svg>{tr('dashboard.booking')}</>
+              : <>{tr('dashboard.bookVisitBtn')} <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></>
+            }
+          </button>
+        </div>
       </div>
     </div>
   );
