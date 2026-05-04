@@ -481,8 +481,6 @@ export default async function HomePage({ params }) {
               </div>
             ))}
           </div>
-
-          </div>
           </ScrollReveal>
 
           {/* Coming soon strip */}
