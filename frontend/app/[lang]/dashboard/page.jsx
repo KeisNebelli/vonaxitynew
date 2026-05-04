@@ -1012,74 +1012,129 @@ function Visits({ visits, lang, onViewApplicants, onRefresh, viewingDetail: _vie
         {lang==='sq' ? 'Nuk ka vizita në këtë kategori.' : 'No visits in this category.'}
       </div>
     )}
-    <div>
-      {filteredVisits.map(v=>(
-        <div key={v.id} style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'18px 20px', marginBottom:12, boxShadow:SSM }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:v.bpSystolic||v.status==='UNASSIGNED'?14:0 }}>
-            <div>
-              <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:3 }}>
-                <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{serviceLabel(v.serviceType)}</div>
-                {v.workOrderNumber && <span style={{ fontSize:10, fontWeight:700, color:C.primary, background:C.primaryLight, padding:'2px 8px', borderRadius:99, letterSpacing:'0.5px' }}>{v.workOrderNumber}</span>}
-              </div>
-              <div style={{ fontSize:12, color:C.textTertiary }}>{new Date(v.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})} · {v.nurse?.user?.name||tr('visits.nurseTBC')}</div>
-            </div>
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 }}>
-              <Badge s={v.status} lang={lang}/>
-              <div style={{ display:'flex', gap:6 }}>
-                {canEdit(v) && (
-                  <button onClick={()=>setEditing(v)} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:6, border:`1px solid ${C.border}`, background:'transparent', cursor:'pointer', color:C.textSecondary }}>{tr('dashboard.edit')}</button>
-                )}
-                {canDelete(v) && (
-                  <button onClick={()=>setDeleting(v)} style={{ fontSize:11, fontWeight:600, padding:'4px 10px', borderRadius:6, border:`1px solid #FECACA`, background:C.errorLight, cursor:'pointer', color:C.error }}>{tr('dashboard.delete')}</button>
-                )}
-              </div>
-            </div>
-          </div>
-          {v.bpSystolic && (
-            <div style={{ background:C.bgSubtle, borderRadius:10, padding:'12px 16px', display:'flex', gap:20, flexWrap:'wrap', marginBottom:8 }}>
-              <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'visits.bloodPressure')}</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.bpSystolic}/{v.bpDiastolic} <span style={{ fontSize:10, color:C.textTertiary }}>mmHg</span></div></div>
-              {v.glucose && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:3 }}>{t(lang,'visits.glucose')}</div><div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{v.glucose} <span style={{ fontSize:10, color:C.textTertiary }}>mmol/L</span></div></div>}
-              {v.nurseNotes && <div style={{ width:'100%', borderTop:`1px solid ${C.border}`, paddingTop:8, marginTop:4, fontSize:12, color:C.textSecondary, fontStyle:'italic' }}>"{v.nurseNotes}"</div>}
-            </div>
-          )}
-          {v.status === 'UNASSIGNED' && (
-            <button onClick={()=>onViewApplicants(v)} style={{ width:'100%', background:C.primaryLight, color:C.primary, border:`1px solid rgba(37,99,235,0.2)`, borderRadius:9, padding:'10px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, marginTop:4 }}>
-              {tr('dashboard.viewApplicants')}
-            </button>
-          )}
-          {v.status === 'COMPLETED' && (
-            <button onClick={()=>setViewingDetail(v)} style={{ width:'100%', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, padding:'9px', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:F, marginTop:8, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
-              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
-              {lang==='sq' ? 'Shiko Raportin e Vizitës' : 'View Full Report'}
-            </button>
-          )}
-          {v.status === 'COMPLETED' && !v.review && !reviewed[v.id] && (
-            reviewing === v.id ? (
-              <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:12, marginTop:8 }}>
-                <div style={{ fontSize:13, fontWeight:600, color:C.textPrimary, marginBottom:8 }}>{tr('dashboard.rateNurse')}</div>
-                <div style={{ display:'flex', gap:4, marginBottom:10 }}>
-                  {[1,2,3,4,5].map(s => (
-                    <button key={s} onClick={()=>setRating(s)} style={{ fontSize:24, background:'none', border:'none', cursor:'pointer', color:s<=rating?'#F59E0B':'#D1D5DB', padding:'0 2px' }}>&#9733;</button>
-                  ))}
+    <style>{`
+      .vc-card { transition: transform 0.15s, box-shadow 0.15s; }
+      .vc-card:hover { transform: translateY(-2px); box-shadow: 0 8px 28px rgba(0,0,0,0.10) !important; }
+    `}</style>
+    <div style={{ display:'flex', flexDirection:'column', gap:12 }}>
+      {filteredVisits.map(v=>{
+        const statusMeta = {
+          UNASSIGNED:  { bar:'#F59E0B', bg:'#FFFBEB' },
+          SCHEDULED:   { bar:'#2563EB', bg:'#EFF6FF' },
+          IN_PROGRESS: { bar:'#7C3AED', bg:'#F5F3FF' },
+          COMPLETED:   { bar:'#22C55E', bg:'#F0FDF4' },
+          CANCELLED:   { bar:'#EF4444', bg:'#FEF2F2' },
+        };
+        const sm = statusMeta[v.status] || { bar:'#94A3B8', bg:'#F8FAFC' };
+        const dt = new Date(v.scheduledAt);
+        const dateStr = dt.toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
+        const timeStr = dt.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+        return (
+        <div key={v.id} className="vc-card" style={{ background:'#fff', borderRadius:16, border:`1px solid ${C.border}`, boxShadow:'0 2px 8px rgba(0,0,0,0.06)', overflow:'hidden' }}>
+          {/* Coloured top bar */}
+          <div style={{ height:4, background:`linear-gradient(90deg,${sm.bar},${sm.bar}88)` }}/>
+          <div style={{ padding:'16px 18px' }}>
+            {/* Top row */}
+            <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:10, marginBottom:12 }}>
+              <div style={{ flex:1, minWidth:0 }}>
+                <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', marginBottom:5 }}>
+                  <span style={{ fontSize:15, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.2px' }}>{serviceLabel(v.serviceType)}</span>
+                  {v.workOrderNumber && (
+                    <span style={{ fontSize:10, fontWeight:800, color:sm.bar, background:sm.bg, padding:'2px 9px', borderRadius:99, letterSpacing:'0.6px', fontFamily:'monospace', border:`1px solid ${sm.bar}22` }}>{v.workOrderNumber}</span>
+                  )}
                 </div>
-                <input value={comment} onChange={e=>setComment(e.target.value)} placeholder={tr('dashboard.leaveComment')} style={{ width:'100%', padding:'9px 12px', borderRadius:8, border:`1px solid ${C.border}`, fontSize:13, fontFamily:F, marginBottom:10, boxSizing:'border-box' }} />
-                {reviewError && <div style={{ background:C.errorLight, border:`1px solid #FECACA`, borderRadius:8, padding:'8px 12px', fontSize:12, color:C.error, marginBottom:10 }}>{reviewError}</div>}
-                <div style={{ display:'flex', gap:8 }}>
-                  <button onClick={()=>{ setReviewing(null); setReviewError(''); }} style={{ flex:1, padding:'9px', borderRadius:8, border:`1px solid ${C.border}`, background:'transparent', fontSize:13, cursor:'pointer', color:C.textSecondary }}>{tr('dashboard.cancel')}</button>
-                  <button onClick={()=>submitReview(v.id)} disabled={!rating||submitting} style={{ flex:2, padding:'9px', borderRadius:8, border:'none', background:C.primary, color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity:!rating||submitting?0.6:1 }}>{submitting?tr('dashboard.submitting'):tr('dashboard.submitReview')}</button>
+                {/* Date / time / nurse row */}
+                <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+                  <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                    <svg width="11" height="11" fill="none" stroke={C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    <span style={{ fontSize:12, color:C.textTertiary, fontWeight:500 }}>{dateStr}</span>
+                  </div>
+                  <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                    <svg width="11" height="11" fill="none" stroke={C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                    <span style={{ fontSize:12, color:C.textTertiary, fontWeight:500 }}>{timeStr}</span>
+                  </div>
+                  {v.nurse?.user?.name && (
+                    <div style={{ display:'flex', alignItems:'center', gap:4 }}>
+                      <svg width="11" height="11" fill="none" stroke={C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                      <span style={{ fontSize:12, color:C.textTertiary, fontWeight:500 }}>{v.nurse.user.name}</span>
+                    </div>
+                  )}
                 </div>
               </div>
-            ) : (
-              <button onClick={()=>{ setReviewing(v.id); setRating(0); setComment(''); }} style={{ marginTop:8, fontSize:12, fontWeight:600, color:C.warning, background:C.warningLight, border:`1px solid #FDE68A`, borderRadius:8, padding:'7px 14px', cursor:'pointer' }}>
-                &#9733; {tr('dashboard.rateVisit')}
+              {/* Status + actions */}
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6, flexShrink:0 }}>
+                <Badge s={v.status} lang={lang}/>
+                <div style={{ display:'flex', gap:6 }}>
+                  {canEdit(v) && (
+                    <button onClick={()=>setEditing(v)} style={{ fontSize:11, fontWeight:700, padding:'4px 11px', borderRadius:7, border:`1px solid ${C.border}`, background:'transparent', cursor:'pointer', color:C.textSecondary, fontFamily:F }}>{tr('dashboard.edit')}</button>
+                  )}
+                  {canDelete(v) && (
+                    <button onClick={()=>setDeleting(v)} style={{ fontSize:11, fontWeight:700, padding:'4px 11px', borderRadius:7, border:'1px solid #FECACA', background:'#FEF2F2', cursor:'pointer', color:'#DC2626', fontFamily:F }}>{tr('dashboard.delete')}</button>
+                  )}
+                </div>
+              </div>
+            </div>
+
+            {/* Vitals strip */}
+            {v.bpSystolic && (
+              <div style={{ background:'#F8FAFC', borderRadius:10, padding:'10px 14px', display:'flex', gap:18, flexWrap:'wrap', marginBottom:10, border:'1px solid #F1F5F9' }}>
+                <div>
+                  <div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:2 }}>{t(lang,'visits.bloodPressure')}</div>
+                  <div style={{ fontSize:14, fontWeight:800, color:'#1E3A5F' }}>{v.bpSystolic}/{v.bpDiastolic} <span style={{ fontSize:10, fontWeight:500, color:C.textTertiary }}>mmHg</span></div>
+                </div>
+                {v.glucose && <div>
+                  <div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:2 }}>{t(lang,'visits.glucose')}</div>
+                  <div style={{ fontSize:14, fontWeight:800, color:'#14532D' }}>{v.glucose} <span style={{ fontSize:10, fontWeight:500, color:C.textTertiary }}>mmol/L</span></div>
+                </div>}
+                {v.nurseNotes && <div style={{ width:'100%', borderTop:'1px solid #E2E8F0', paddingTop:8, marginTop:2, fontSize:12, color:C.textSecondary, fontStyle:'italic' }}>"{v.nurseNotes}"</div>}
+              </div>
+            )}
+
+            {/* CTA buttons */}
+            {v.status === 'UNASSIGNED' && (
+              <button onClick={()=>onViewApplicants(v)} style={{ width:'100%', background:`linear-gradient(135deg,#EFF6FF,#F5F3FF)`, color:C.primary, border:`1.5px solid rgba(37,99,235,0.2)`, borderRadius:10, padding:'10px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, display:'flex', alignItems:'center', justifyContent:'center', gap:7 }}>
+                <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+                {tr('dashboard.viewApplicants')}
               </button>
-            )
-          )}
-          {(v.review || reviewed[v.id]) && v.status === 'COMPLETED' && (
-            <div style={{ marginTop:8, fontSize:12, color:C.secondary, fontWeight:600 }}>&#9733; {tr('dashboard.reviewed')}</div>
-          )}
+            )}
+            {v.status === 'COMPLETED' && (
+              <button onClick={()=>setViewingDetail(v)} style={{ width:'100%', background:'linear-gradient(135deg,#F0FDF4,#ECFDF5)', color:'#15803D', border:'1.5px solid rgba(34,197,94,0.2)', borderRadius:10, padding:'10px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, display:'flex', alignItems:'center', justifyContent:'center', gap:7, marginBottom:v.status==='COMPLETED'&&!v.review&&!reviewed[v.id]?8:0 }}>
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                {lang==='sq'?'Shiko Raportin e Plotë':'View Full Report'}
+              </button>
+            )}
+            {v.status === 'COMPLETED' && !v.review && !reviewed[v.id] && (
+              reviewing === v.id ? (
+                <div style={{ borderTop:`1px solid ${C.border}`, paddingTop:12, marginTop:4 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:8 }}>{tr('dashboard.rateNurse')}</div>
+                  <div style={{ display:'flex', gap:4, marginBottom:10 }}>
+                    {[1,2,3,4,5].map(s => (
+                      <button key={s} onClick={()=>setRating(s)} style={{ fontSize:26, background:'none', border:'none', cursor:'pointer', color:s<=rating?'#F59E0B':'#D1D5DB', padding:'0 2px', transition:'color 0.1s' }}>★</button>
+                    ))}
+                  </div>
+                  <input value={comment} onChange={e=>setComment(e.target.value)} placeholder={tr('dashboard.leaveComment')} style={{ width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:13, fontFamily:F, marginBottom:10, boxSizing:'border-box', outline:'none' }} />
+                  {reviewError && <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:8, padding:'8px 12px', fontSize:12, color:'#DC2626', marginBottom:10 }}>{reviewError}</div>}
+                  <div style={{ display:'flex', gap:8 }}>
+                    <button onClick={()=>{ setReviewing(null); setReviewError(''); }} style={{ flex:1, padding:'10px', borderRadius:9, border:`1px solid ${C.border}`, background:'transparent', fontSize:13, cursor:'pointer', color:C.textSecondary, fontFamily:F }}>{tr('dashboard.cancel')}</button>
+                    <button onClick={()=>submitReview(v.id)} disabled={!rating||submitting} style={{ flex:2, padding:'10px', borderRadius:9, border:'none', background:'linear-gradient(135deg,#2563EB,#4F46E5)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity:!rating||submitting?0.6:1, fontFamily:F }}>{submitting?tr('dashboard.submitting'):tr('dashboard.submitReview')}</button>
+                  </div>
+                </div>
+              ) : (
+                <button onClick={()=>{ setReviewing(v.id); setRating(0); setComment(''); }} style={{ width:'100%', marginTop:4, fontSize:12, fontWeight:700, color:'#D97706', background:'linear-gradient(135deg,#FFFBEB,#FEF3C7)', border:'1px solid #FDE68A', borderRadius:10, padding:'9px 14px', cursor:'pointer', fontFamily:F, display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+                  ★ {tr('dashboard.rateVisit')}
+                </button>
+              )
+            )}
+            {(v.review || reviewed[v.id]) && v.status === 'COMPLETED' && (
+              <div style={{ marginTop:6, fontSize:12, color:'#15803D', fontWeight:700, display:'flex', alignItems:'center', gap:5 }}>
+                <svg width="13" height="13" fill="none" stroke="#15803D" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                {tr('dashboard.reviewed')}
+              </div>
+            )}
+          </div>
         </div>
-      ))}
+        );
+      })}
     </div>
     {editing && <EditVisit visit={editing} onSave={()=>{ setEditing(null); onRefresh?.(); }} onCancel={()=>setEditing(null)} lang={lang} />}
     {deleting && <DeleteConfirm visit={deleting} onConfirm={()=>{ setDeleting(null); onRefresh?.(); }} onCancel={()=>setDeleting(null)} lang={lang} />}
@@ -1103,22 +1158,33 @@ function VisitDetailModal({ visit, lang, onClose }) {
   );
 
   return (
-    <div style={{ position:'fixed', inset:0, background:'rgba(15,23,42,0.5)', zIndex:9000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }} onClick={onClose}>
-      <div onClick={e=>e.stopPropagation()} style={{ background:C.bgWhite, borderRadius:20, maxWidth:540, width:'100%', boxShadow:'0 24px 64px rgba(0,0,0,0.18)', maxHeight:'90vh', display:'flex', flexDirection:'column', overflow:'hidden' }}>
+    <div style={{ position:'fixed', inset:0, background:'rgba(2,6,23,0.65)', backdropFilter:'blur(5px)', zIndex:9000, display:'flex', alignItems:'center', justifyContent:'center', padding:16 }} onClick={onClose}>
+      <div onClick={e=>e.stopPropagation()} style={{ background:C.bgWhite, borderRadius:24, maxWidth:540, width:'100%', boxShadow:'0 32px 80px rgba(0,0,0,0.25)', maxHeight:'90vh', display:'flex', flexDirection:'column', overflow:'hidden' }}>
 
-        {/* Sticky header */}
-        <div style={{ padding:'24px 28px 18px', borderBottom:`1px solid ${C.border}`, flexShrink:0 }}>
-          <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
+        {/* Gradient header */}
+        <div style={{ background:'linear-gradient(145deg,#1e3a5f 0%,#2563EB 60%,#4F46E5 100%)', padding:'26px 24px 22px', flexShrink:0, position:'relative', overflow:'hidden' }}>
+          {/* Dot texture */}
+          <div style={{ position:'absolute', inset:0, opacity:0.07, pointerEvents:'none' }}>
+            <svg width="100%" height="100%"><defs><pattern id="vd-dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#vd-dots)"/></svg>
+          </div>
+          <div style={{ position:'absolute', top:-30, right:-30, width:130, height:130, borderRadius:'50%', background:'rgba(255,255,255,0.07)', pointerEvents:'none' }}/>
+          <div style={{ position:'relative', zIndex:1, display:'flex', justifyContent:'space-between', alignItems:'flex-start' }}>
             <div>
-              <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:6 }}>{lang==='sq'?'Raport Vizite':'Visit Report'}</div>
-              <div style={{ fontSize:20, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.3px', marginBottom:4 }}>{serviceLabel(visit.serviceType)}</div>
-              <div style={{ fontSize:13, color:C.textSecondary }}>
-                {new Date(visit.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'})}
-                {' · '}
-                {new Date(visit.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+              <div style={{ fontSize:10, fontWeight:800, color:'rgba(255,255,255,0.55)', letterSpacing:'1.2px', textTransform:'uppercase', marginBottom:6 }}>{lang==='sq'?'Raport Vizite':'Visit Report'}</div>
+              <div style={{ fontSize:20, fontWeight:900, color:'#fff', letterSpacing:'-0.4px', marginBottom:5 }}>{serviceLabel(visit.serviceType)}</div>
+              <div style={{ display:'flex', alignItems:'center', gap:10, flexWrap:'wrap' }}>
+                <span style={{ fontSize:12, color:'rgba(255,255,255,0.75)', display:'flex', alignItems:'center', gap:4 }}>
+                  <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                  {new Date(visit.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'})}
+                </span>
+                <span style={{ fontSize:12, color:'rgba(255,255,255,0.75)', display:'flex', alignItems:'center', gap:4 }}>
+                  <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                  {new Date(visit.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'})}
+                </span>
+                {visit.workOrderNumber && <span style={{ fontSize:10, fontWeight:800, color:'rgba(255,255,255,0.9)', background:'rgba(255,255,255,0.15)', padding:'2px 9px', borderRadius:99, fontFamily:'monospace', border:'1px solid rgba(255,255,255,0.2)' }}>{visit.workOrderNumber}</span>}
               </div>
             </div>
-            <button onClick={onClose} style={{ background:C.bgSubtle, border:'none', borderRadius:9, width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary, fontSize:16, flexShrink:0 }}>✕</button>
+            <button onClick={onClose} style={{ background:'rgba(255,255,255,0.15)', border:'1px solid rgba(255,255,255,0.2)', borderRadius:10, width:34, height:34, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:'#fff', flexShrink:0, fontSize:15 }}>✕</button>
           </div>
         </div>
 
@@ -1213,10 +1279,9 @@ function VisitDetailModal({ visit, lang, onClose }) {
         </div>{/* end scrollable body */}
 
         {/* Sticky footer */}
-        <div style={{ padding:'14px 28px', borderTop:`1px solid ${C.border}`, flexShrink:0, display:'flex', justifyContent:'space-between', alignItems:'center', background:C.bgWhite }}>
+        <div style={{ padding:'14px 24px', borderTop:`1px solid ${C.border}`, flexShrink:0, display:'flex', justifyContent:'space-between', alignItems:'center', background:'#F8FAFC' }}>
           <Badge s="COMPLETED" lang={lang} />
-          {visit.workOrderNumber && <span style={{ fontSize:12, color:C.textTertiary, fontWeight:500 }}>#{visit.workOrderNumber}</span>}
-          <button onClick={onClose} style={{ fontSize:13, fontWeight:600, padding:'9px 20px', borderRadius:9, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.textSecondary }}>
+          <button onClick={onClose} style={{ fontSize:13, fontWeight:700, padding:'9px 22px', borderRadius:10, border:'1.5px solid #E2E8F0', background:'#fff', cursor:'pointer', color:C.textSecondary, fontFamily:F }}>
             {lang==='sq'?'Mbyll':'Close'}
           </button>
         </div>
