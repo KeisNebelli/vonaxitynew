@@ -206,18 +206,20 @@ router.post('/:id/apply', ...requireRole('NURSE'), async (req, res) => {
       data: { visitId: req.params.id, nurseId: nurse.id, message: req.body.message || '', status: 'PENDING' },
     });
 
-    // After application saved — notify client
+    // After application saved — notify client with nurse name + photo
     const visitForNotif = await prisma.visit.findUnique({
       where: { id: req.params.id },
-      include: { relative: { include: { client: true } }, nurse: { include: { user: true } } },
+      include: { relative: { include: { client: true } } },
     });
     if (visitForNotif) {
       await createNotification({
         userId: visitForNotif.relative.clientId,
         type: 'NURSE_APPLIED',
-        title: 'New applicant',
-        message: `A nurse has applied for your ${visitForNotif.serviceType} visit.`,
+        title: `${nurse.user.name} applied for your visit`,
+        message: `${nurse.user.name} applied for your ${visitForNotif.serviceType} visit in ${visitForNotif.relative?.city || ''}.`,
         relatedId: req.params.id,
+        actorName: nurse.user.name,
+        actorPhoto: nurse.profilePhotoUrl || null,
       });
     }
 
@@ -276,16 +278,26 @@ router.post('/:id/select/:nurseId', ...requireRole('CLIENT', 'ADMIN'), async (re
     await prisma.visitApplication.update({ where: { id: application.id }, data: { status: 'ACCEPTED' } });
     await prisma.visitApplication.updateMany({ where: { visitId, id: { not: application.id } }, data: { status: 'REJECTED' } });
 
-    // After nurse is selected — notify the nurse
-    const selectedNurse = await prisma.nurse.findUnique({ where: { id: nurseId }, select: { userId: true } });
+    // After nurse is selected — notify the nurse AND confirm to client
     const visitForNotif = await prisma.visit.findUnique({ where: { id: visitId }, include: { relative: true } });
-    if (selectedNurse && visitForNotif) {
+    if (nurse && visitForNotif) {
+      // Notify nurse
       await createNotification({
-        userId: selectedNurse.userId,
+        userId: nurse.userId,
         type: 'JOB_ASSIGNED',
         title: 'Job assigned to you',
         message: `You have been assigned a ${visitForNotif.serviceType} visit in ${visitForNotif.relative.city}.`,
         relatedId: visitId,
+      });
+      // Confirm to client that nurse is booked
+      await createNotification({
+        userId: visitForNotif.relative.clientId,
+        type: 'NURSE_ASSIGNED',
+        title: `${nurse.user.name} confirmed for your visit`,
+        message: `${nurse.user.name} has been assigned to your ${visitForNotif.serviceType} visit on ${new Date(visitForNotif.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short'})}.`,
+        relatedId: visitId,
+        actorName: nurse.user.name,
+        actorPhoto: nurse.profilePhotoUrl || null,
       });
     }
 

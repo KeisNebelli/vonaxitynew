@@ -47,6 +47,7 @@ const NAV_ITEMS = [
   { id:'dashboard', label:'dashboard', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
   { id:'jobs', label:'jobs', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
   { id:'visits', label:'visits', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+  { id:'calendar', label:'calendar', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14" strokeWidth="3"/><line x1="12" y1="14" x2="12" y2="14" strokeWidth="3"/><line x1="16" y1="14" x2="16" y2="14" strokeWidth="3"/><line x1="8" y1="18" x2="8" y2="18" strokeWidth="3"/><line x1="12" y1="18" x2="12" y2="18" strokeWidth="3"/></svg> },
   { id:'health', label:'health', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> },
   { id:'complete', label:'complete', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> },
   { id:'earnings', label:'earnings', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
@@ -74,8 +75,8 @@ function formatVisit(v) {
 const F = "'DM Sans','Inter',system-ui,sans-serif";
 
 const NURSE_LABELS = {
-  en:{ dashboard:'Dashboard', jobs:'Browse Jobs', visits:'My Visits', health:'Patient Health', map:'Navigation', complete:'Complete Visit', earnings:'Earnings', profile:'My Profile' },
-  sq:{ dashboard:'Paneli', jobs:'Shfleto Punët', visits:'Vizitat e Mia', health:'Shëndeti i Pacientit', map:'Navigimi', complete:'Përfundo Vizitën', earnings:'Fitimet', profile:'Profili Im' },
+  en:{ dashboard:'Dashboard', jobs:'Browse Jobs', visits:'My Visits', calendar:'Calendar', health:'Patient Health', map:'Navigation', complete:'Complete Visit', earnings:'Earnings', profile:'My Profile' },
+  sq:{ dashboard:'Paneli', jobs:'Shfleto Punët', visits:'Vizitat e Mia', calendar:'Kalendar', health:'Shëndeti i Pacientit', map:'Navigimi', complete:'Përfundo Vizitën', earnings:'Fitimet', profile:'Profili Im' },
 };
 const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
 
@@ -1565,6 +1566,174 @@ function OnboardingWizard({ nurse, user, onComplete, onSave, lang='en' }) {
   );
 }
 
+// ── Nurse Calendar ────────────────────────────────────────────────────────────
+function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }) {
+  const now = new Date();
+  const [year, setYear] = useState(now.getFullYear());
+  const [month, setMonth] = useState(now.getMonth()); // 0-indexed
+  const [selectedDay, setSelectedDay] = useState(null);
+
+  const MONTH_NAMES_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
+  const MONTH_NAMES_SQ = ['Janar','Shkurt','Mars','Prill','Maj','Qershor','Korrik','Gusht','Shtator','Tetor','Nëntor','Dhjetor'];
+  const DAY_NAMES_EN = ['Mon','Tue','Wed','Thu','Fri','Sat','Sun'];
+  const DAY_NAMES_SQ = ['Hën','Mar','Mër','Enj','Pre','Sht','Die'];
+  const monthName = lang === 'sq' ? MONTH_NAMES_SQ[month] : MONTH_NAMES_EN[month];
+  const dayNames = lang === 'sq' ? DAY_NAMES_SQ : DAY_NAMES_EN;
+
+  // Build visit index: { 'YYYY-MM-DD': [visit, ...] }
+  const visitsByDate = {};
+  visits.forEach(v => {
+    const d = new Date(v.scheduledAt).toISOString().split('T')[0];
+    if (!visitsByDate[d]) visitsByDate[d] = [];
+    visitsByDate[d].push(v);
+  });
+
+  // Build calendar grid
+  const firstDay = new Date(year, month, 1);
+  const lastDay = new Date(year, month + 1, 0);
+  // Monday-first: convert Sunday(0)→6, Monday(1)→0, ...
+  const startDow = (firstDay.getDay() + 6) % 7;
+  const totalCells = Math.ceil((startDow + lastDay.getDate()) / 7) * 7;
+  const cells = [];
+  for (let i = 0; i < totalCells; i++) {
+    const dayNum = i - startDow + 1;
+    if (dayNum < 1 || dayNum > lastDay.getDate()) { cells.push(null); continue; }
+    const pad = n => String(n).padStart(2,'0');
+    const dateStr = `${year}-${pad(month+1)}-${pad(dayNum)}`;
+    cells.push({ day: dayNum, dateStr, visits: visitsByDate[dateStr] || [] });
+  }
+
+  const prevMonth = () => { if (month === 0) { setMonth(11); setYear(y => y-1); } else setMonth(m => m-1); setSelectedDay(null); };
+  const nextMonth = () => { if (month === 11) { setMonth(0); setYear(y => y+1); } else setMonth(m => m+1); setSelectedDay(null); };
+
+  const todayStr = now.toISOString().split('T')[0];
+  const selectedCell = selectedDay ? cells.find(c => c?.dateStr === selectedDay) : null;
+
+  const statusColor = (s) => {
+    if (!s) return '#6B7280';
+    s = s.toUpperCase();
+    if (s === 'COMPLETED') return '#059669';
+    if (s === 'CANCELLED') return '#DC2626';
+    return '#2563EB';
+  };
+
+  return (
+    <div>
+      {/* Month navigation */}
+      <div style={{ background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, overflow: 'hidden', boxShadow: SSM }}>
+        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
+          <button onClick={prevMonth} style={{ width: 32, height: 32, borderRadius: 8, border: `1px solid ${C.border}`, background: C.bgWhite, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.textSecondary }}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
+          </button>
+          <div style={{ fontSize: 15, fontWeight: 800, color: C.textPrimary, letterSpacing: '-0.3px' }}>{monthName} {year}</div>
+          <button onClick={nextMonth} style={{ width: 32, height: 32, borderRadius: 8, border: `1px solid ${C.border}`, background: C.bgWhite, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.textSecondary }}>
+            <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
+          </button>
+        </div>
+
+        {/* Day headers */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '10px 12px 4px' }}>
+          {dayNames.map(d => (
+            <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 700, color: C.textTertiary, letterSpacing: '0.5px', textTransform: 'uppercase', padding: '4px 0' }}>{d}</div>
+          ))}
+        </div>
+
+        {/* Calendar grid */}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, padding: '0 12px 14px' }}>
+          {cells.map((cell, i) => {
+            if (!cell) return <div key={i} />;
+            const isToday = cell.dateStr === todayStr;
+            const isSelected = cell.dateStr === selectedDay;
+            const hasVisits = cell.visits.length > 0;
+            const isPast = cell.dateStr < todayStr;
+            return (
+              <button
+                key={cell.dateStr}
+                onClick={() => setSelectedDay(isSelected ? null : cell.dateStr)}
+                style={{
+                  aspectRatio: '1', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: F,
+                  background: isSelected ? C.primary : isToday ? '#EFF6FF' : 'transparent',
+                  color: isSelected ? '#fff' : isToday ? C.primary : isPast ? C.textTertiary : C.textPrimary,
+                  fontWeight: isToday || isSelected ? 800 : hasVisits ? 700 : 400,
+                  fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
+                  outline: isToday && !isSelected ? `2px solid ${C.primary}` : 'none', outlineOffset: '-2px',
+                  position: 'relative',
+                }}
+              >
+                <span>{cell.day}</span>
+                {hasVisits && (
+                  <div style={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
+                    {cell.visits.slice(0, 3).map((v, vi) => (
+                      <div key={vi} style={{ width: 4, height: 4, borderRadius: '50%', background: isSelected ? 'rgba(255,255,255,0.8)' : statusColor(v.status) }} />
+                    ))}
+                  </div>
+                )}
+              </button>
+            );
+          })}
+        </div>
+      </div>
+
+      {/* Legend */}
+      <div style={{ display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap' }}>
+        {[['#2563EB', lang==='sq'?'Planifikuar':'Scheduled'], ['#059669', lang==='sq'?'Kompletuar':'Completed'], ['#DC2626', lang==='sq'?'Anuluar':'Cancelled']].map(([col, label]) => (
+          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: C.textSecondary }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: col }} />
+            {label}
+          </div>
+        ))}
+      </div>
+
+      {/* Selected day panel */}
+      {selectedCell && (
+        <div style={{ marginTop: 16, background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, overflow: 'hidden', boxShadow: SSM }}>
+          <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}`, background: '#F8FAFC' }}>
+            <div style={{ fontSize: 14, fontWeight: 700, color: C.textPrimary }}>
+              {new Date(selectedCell.dateStr + 'T12:00:00').toLocaleDateString(lang === 'sq' ? 'sq-AL' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+            </div>
+            <div style={{ fontSize: 12, color: C.textTertiary, marginTop: 2 }}>
+              {selectedCell.visits.length === 0
+                ? (lang === 'sq' ? 'Asnjë vizitë e planifikuar' : 'No visits scheduled')
+                : `${selectedCell.visits.length} ${lang==='sq'?'vizitë':'visit'}${selectedCell.visits.length > 1 ? (lang==='sq'?'':'s') : ''}`}
+            </div>
+          </div>
+          {selectedCell.visits.length === 0 ? (
+            <div style={{ padding: '28px 18px', textAlign: 'center', color: C.textTertiary, fontSize: 13 }}>
+              {lang === 'sq' ? 'Shfleto punët për të marrë vizita të reja.' : 'Browse jobs to pick up new visits.'}
+            </div>
+          ) : (
+            <div style={{ display: 'flex', flexDirection: 'column' }}>
+              {selectedCell.visits.map((v, i) => {
+                const time = new Date(v.scheduledAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                const col = statusColor(v.status);
+                const svc = trService(v.serviceType, lang);
+                return (
+                  <div
+                    key={v.id}
+                    onClick={() => { setSelectedVisit(v); setActive('map'); }}
+                    style={{ padding: '14px 18px', borderBottom: i < selectedCell.visits.length-1 ? `1px solid ${C.border}` : 'none', display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer' }}
+                    onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
+                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                  >
+                    <div style={{ fontSize: 13, fontWeight: 800, color: col, minWidth: 42, textAlign: 'center', background: col + '18', borderRadius: 8, padding: '4px 0' }}>{time}</div>
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginBottom: 2 }}>{svc}</div>
+                      <div style={{ fontSize: 12, color: C.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.relative?.name || (lang==='sq'?'Pacient':'Patient')}{v.relative?.address ? ` · ${v.relative.address}` : ''}</div>
+                    </div>
+                    <div style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 99, background: col + '18', color: col, textTransform: 'uppercase', letterSpacing: '0.5px', flexShrink: 0 }}>
+                      {v.status?.replace(/_/g,' ')}
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          )}
+        </div>
+      )}
+    </div>
+  );
+}
+
 // ── Main nurse page ────────────────────────────────────────────────────────────
 export default function NursePage({ params }) {
   const router = useRouter();
@@ -1626,7 +1795,7 @@ export default function NursePage({ params }) {
   };
 
   const displayNurse = { name: nurse?.user?.name||nurse?.name||'Nurse', email: nurse?.user?.email||'', city: nurse?.city||'', rating: nurse?.rating||0, totalVisits: nurse?.totalVisits||0, totalEarnings: nurse?.totalEarnings||0, status: nurse?.status||'INCOMPLETE', ...nurse, initials:(nurse?.user?.name||nurse?.name||'N').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() };
-  const TITLES = { dashboard:tr('nurse.dashboard'), jobs:tr('nurse.browseJobs'), visits:tr('nurse.myVisits'), map:tr('nurse.navigation'), complete:tr('nurse.completeVisit'), earnings:tr('nurse.earnings'), profile:tr('nurse.profile'), onboarding:tr('nurse.completeProfile') };
+  const TITLES = { dashboard:tr('nurse.dashboard'), jobs:tr('nurse.browseJobs'), visits:tr('nurse.myVisits'), calendar: lang==='sq'?'Kalendar':'Calendar', map:tr('nurse.navigation'), complete:tr('nurse.completeVisit'), earnings:tr('nurse.earnings'), profile:tr('nurse.profile'), onboarding:tr('nurse.completeProfile') };
   const status = nurse?.status || 'INCOMPLETE';
   const statusColors = { APPROVED:['#ECFDF5','#059669'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
   const [sbg, scol] = statusColors[status] || statusColors.INCOMPLETE;
@@ -1700,6 +1869,7 @@ export default function NursePage({ params }) {
               {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} onTodayClick={()=>{ setVisitsInitialFilter('today'); setActive('visits'); }} />}
               {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
               {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} initialFilter={visitsInitialFilter} />}
+              {active==='calendar' && <NurseCalendar visits={visits} lang={lang} setActive={navigateTo} setSelectedVisit={setSelectedVisit} />}
               {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} onStatusChange={handleStatusChange} lang={lang} />}
               {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
               {active==='earnings' && <Earnings lang={lang} nurse={nurse} visits={visits} />}

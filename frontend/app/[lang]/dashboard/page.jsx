@@ -81,6 +81,7 @@ function NotificationBell({ lang, onNavigate }) {
   const iconFor = (type) => {
     const icons = {
       NURSE_APPLIED:   { bg:'#EFF6FF', color:'#2563EB', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
+      NURSE_ASSIGNED:  { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
       JOB_ASSIGNED:    { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
       JOB_UPDATED:     { bg:'#FEF3C7', color:'#D97706', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> },
       NURSE_ON_WAY:    { bg:'#EFF6FF', color:'#2563EB', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
@@ -102,6 +103,12 @@ function NotificationBell({ lang, onNavigate }) {
     return `${Math.floor(s/86400)}d`;
   };
 
+  // Parse notification message — may be JSON with { text, actorName, actorPhoto }
+  const parseNotif = (n) => {
+    let text = n.message, actorName = null, actorPhoto = null;
+    try { const p = JSON.parse(n.message); text = p.text || n.message; actorName = p.actorName; actorPhoto = p.actorPhoto; } catch {}
+    return { text, actorName, actorPhoto };
+  };
   const nt = (type, field) => {
     const map = t(lang, `notifications.types.${type}`);
     if (map && typeof map === 'object') return map[field] || '';
@@ -138,8 +145,10 @@ function NotificationBell({ lang, onNavigate }) {
                 {t(lang,'notifications.empty')}
               </div>
             ) : notifs.map(n => {
-              const title = nt(n.type,'title') || n.title;
-              const message = n.type === 'announcement' ? n.message : (nt(n.type,'message') || n.message);
+              const { text: parsedMsg, actorName, actorPhoto } = parseNotif(n);
+              // Prefer DB title (has actor name) over generic translation, fall back to translation
+              const title = n.title || nt(n.type,'title');
+              const message = n.type === 'announcement' ? parsedMsg : parsedMsg;
               return (
                 <div
                   key={n.id}
@@ -148,7 +157,13 @@ function NotificationBell({ lang, onNavigate }) {
                   onMouseEnter={e => e.currentTarget.style.background = C.bgSubtle}
                   onMouseLeave={e => e.currentTarget.style.background = n.read ? 'transparent' : C.primaryLight}
                 >
-                  {iconFor(n.type)}
+                  {actorPhoto ? (
+                    <img src={actorPhoto} alt={actorName||''} style={{ width:32, height:32, borderRadius:9, objectFit:'cover', flexShrink:0, border:'1.5px solid #E2E8F0' }} />
+                  ) : actorName ? (
+                    <div style={{ width:32, height:32, borderRadius:9, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:800, color:'#fff', flexShrink:0 }}>
+                      {actorName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
+                    </div>
+                  ) : iconFor(n.type)}
                   <div style={{ flex:1, minWidth:0 }}>
                     <div style={{ fontSize:13, fontWeight:n.read ? 500 : 700, color:C.textPrimary, marginBottom:2, lineHeight:1.3 }}>{title}</div>
                     <div style={{ fontSize:12, color:C.textSecondary, lineHeight:1.4, marginBottom:4 }}>{message}</div>
