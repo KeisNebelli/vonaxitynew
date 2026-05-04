@@ -20,21 +20,41 @@ const C = {
 const LAUNCH_CITIES = [
   {
     name: 'Tirana',
-    icon: '🏛️',
-    stat1: { en: 'Albania\'s capital', sq: 'Kryeqyteti' },
-    stat2: { en: 'Largest nurse network', sq: 'Rrjeti më i madh' },
-    gradient: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)',
-    accentColor: '#2563EB',
-    accentLight: '#DBEAFE',
+    nameSq: 'Tiranë',
+    tagLine: { en: "Albania's capital city", sq: 'Kryeqyteti i Shqipërisë' },
+    stats: [
+      { label: { en:'Nurses active', sq:'Infermiere aktive' }, value:'12+' },
+      { label: { en:'Districts covered', sq:'Bashki mbuluar' }, value:'11' },
+      { label: { en:'Avg response', sq:'Koha mesatare' }, value:'2h' },
+    ],
+    features: [
+      { en: 'Full city coverage', sq: 'Mbulim i plotë i qytetit' },
+      { en: 'Same-day bookings', sq: 'Rezervim në të njëjtën ditë' },
+      { en: 'Largest nurse network', sq: 'Rrjeti më i madh i infermiereve' },
+    ],
+    gradient: 'linear-gradient(135deg,#1D4ED8 0%,#2563EB 60%,#3B82F6 100%)',
+    glowColor: 'rgba(37,99,235,0.4)',
+    accentColor: '#93C5FD',
+    textAccent: '#DBEAFE',
   },
   {
     name: 'Durrës',
-    icon: '🌊',
-    stat1: { en: 'Coastal hub', sq: 'Qendra bregdetare' },
-    stat2: { en: 'Full coverage at launch', sq: 'Mbulim i plotë' },
-    gradient: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)',
-    accentColor: '#059669',
-    accentLight: '#D1FAE5',
+    nameSq: 'Durrës',
+    tagLine: { en: "Albania's coastal hub", sq: 'Qendra bregdetare e Shqipërisë' },
+    stats: [
+      { label: { en:'Nurses active', sq:'Infermiere aktive' }, value:'6+' },
+      { label: { en:'Neighborhoods', sq:'Lagje' }, value:'8' },
+      { label: { en:'Full coverage', sq:'Mbulim i plotë' }, value:'✓' },
+    ],
+    features: [
+      { en: 'Coastal city coverage', sq: 'Mbulim i qytetit bregdetar' },
+      { en: 'Rapid deployment', sq: 'Dërgim i shpejtë' },
+      { en: 'Dedicated care team', sq: 'Ekip kujdesi i dedikuar' },
+    ],
+    gradient: 'linear-gradient(135deg,#065F46 0%,#059669 60%,#10B981 100%)',
+    glowColor: 'rgba(5,150,105,0.4)',
+    accentColor: '#6EE7B7',
+    textAccent: '#D1FAE5',
   },
 ];
 
@@ -133,6 +153,8 @@ export default async function HomePage({ params }) {
         .hp-pricing-btn-featured:hover{background:#1D4ED8!important;}
         .hp-city-card{transition:all 0.18s ease;}
         .hp-city-card:hover{background:#EFF6FF!important;border-color:#BFDBFE!important;}
+        .hp-city-card-new{transition:transform 0.2s,box-shadow 0.2s;}
+        .hp-city-card-new:hover{transform:translateY(-6px);box-shadow:0 24px 60px rgba(0,0,0,0.4)!important;}
         .hp-faq-card{transition:all 0.2s ease;}
         .hp-faq-card:hover{border-color:#BFDBFE!important;box-shadow:0 4px 16px rgba(37,99,235,0.06)!important;}
         .hp-cta-btn{transition:all 0.18s ease;}
@@ -384,97 +406,110 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Cities ── */}
-      <section className="hp-section-lg" style={{ padding:'96px 24px', background:'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)', position: 'relative', zIndex: 1 }}>
-        <div style={{ maxWidth:1100, margin:'0 auto' }}>
+      <section className="hp-section-lg" style={{ padding:'96px 24px', background:'linear-gradient(180deg,#0F172A 0%,#1E293B 50%,#0F172A 100%)', position:'relative', overflow:'hidden', zIndex:1 }}>
+        {/* Background grid */}
+        <div style={{ position:'absolute', inset:0, opacity:0.04, pointerEvents:'none' }}>
+          <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
+            <defs><pattern id="cg" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.8"/></pattern></defs>
+            <rect width="100%" height="100%" fill="url(#cg)"/>
+          </svg>
+        </div>
+        {/* Glow orbs */}
+        <div style={{ position:'absolute', top:-100, left:'20%', width:400, height:400, borderRadius:'50%', background:'rgba(37,99,235,0.12)', filter:'blur(100px)', pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', bottom:-100, right:'15%', width:350, height:350, borderRadius:'50%', background:'rgba(5,150,105,0.1)', filter:'blur(90px)', pointerEvents:'none' }}/>
+
+        <div style={{ maxWidth:1100, margin:'0 auto', position:'relative', zIndex:1 }}>
           {/* Header */}
           <ScrollReveal>
-            <div style={{ textAlign:'center', marginBottom:56 }}>
-              <TAG>{t(lang,'cities.tag')}</TAG>
-              <h2 style={{ fontSize:'clamp(30px,4vw,46px)', fontWeight:800, color:C.textPrimary, margin:'0 0 16px', letterSpacing:'-1.5px' }}>
+            <div style={{ textAlign:'center', marginBottom:64 }}>
+              <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(147,197,253,0.9)', background:'rgba(37,99,235,0.2)', padding:'6px 16px', borderRadius:99, marginBottom:20, border:'1px solid rgba(147,197,253,0.15)' }}>{t(lang,'cities.tag')}</div>
+              <h2 style={{ fontSize:'clamp(30px,4vw,52px)', fontWeight:800, color:'#fff', margin:'0 0 18px', letterSpacing:'-2px', lineHeight:1.05 }}>
                 {t(lang,'cities.title')}
               </h2>
-              <p style={{ fontSize:17, color:C.textSecondary, lineHeight:1.7, maxWidth:520, margin:'0 auto' }}>
+              <p style={{ fontSize:17, color:'rgba(255,255,255,0.55)', lineHeight:1.75, maxWidth:500, margin:'0 auto' }}>
                 {t(lang,'cities.subtitle')}
               </p>
             </div>
           </ScrollReveal>
 
-          {/* Launch city cards */}
+          {/* City cards */}
           <ScrollReveal delay={100}>
-          <div className="hp-cities-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:24, maxWidth:780, margin:'0 auto 24px' }}>
+          <style>{`
+            .hp-city-card-new { transition: transform 0.2s, box-shadow 0.2s; }
+            .hp-city-card-new:hover { transform: translateY(-6px); box-shadow: 0 24px 60px rgba(0,0,0,0.4) !important; }
+          `}</style>
+          <div className="hp-cities-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:24, marginBottom:28 }}>
             {LAUNCH_CITIES.map(city => (
-              <div key={city.name} style={{
+              <div key={city.name} className="hp-city-card-new" style={{
                 background: city.gradient,
-                borderRadius: 20,
-                border: `1.5px solid ${city.accentColor}22`,
-                padding: '32px 28px',
+                borderRadius: 24,
+                padding: '36px 32px',
                 position: 'relative',
                 overflow: 'hidden',
-                boxShadow: `0 4px 32px ${city.accentColor}18`,
+                boxShadow: `0 8px 40px ${city.glowColor}`,
               }}>
-                {/* Launch badge */}
-                <div style={{
-                  display: 'inline-flex',
-                  alignItems: 'center',
-                  gap: 6,
-                  background: city.accentColor,
-                  color: '#fff',
-                  fontSize: 11,
-                  fontWeight: 700,
-                  letterSpacing: '0.5px',
-                  padding: '5px 12px',
-                  borderRadius: 99,
-                  marginBottom: 20,
-                  textTransform: 'uppercase',
-                }}>
-                  <span style={{ width:6, height:6, borderRadius:'50%', background:'rgba(255,255,255,0.7)', display:'inline-block', animation:'pulse 2s infinite' }}/>
-                  {t(lang,'cities.launchBadge')}
+                {/* Dot texture overlay */}
+                <div style={{ position:'absolute', inset:0, opacity:0.07, pointerEvents:'none' }}>
+                  <svg width="100%" height="100%"><defs><pattern id={`ct-${city.name}`} width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.5" fill="white"/></pattern></defs><rect width="100%" height="100%" fill={`url(#ct-${city.name})`}/></svg>
                 </div>
+                {/* Glow circle */}
+                <div style={{ position:'absolute', bottom:-60, right:-40, width:200, height:200, borderRadius:'50%', background:'rgba(255,255,255,0.08)', pointerEvents:'none' }}/>
+                <div style={{ position:'relative', zIndex:1 }}>
+                  {/* Badge */}
+                  <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,255,255,0.18)', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.25)', color:'#fff', fontSize:10, fontWeight:700, letterSpacing:'0.8px', padding:'5px 13px', borderRadius:99, marginBottom:24, textTransform:'uppercase' }}>
+                    <span style={{ width:6, height:6, borderRadius:'50%', background:'rgba(255,255,255,0.8)', display:'inline-block' }}/>
+                    {t(lang,'cities.launchBadge')}
+                  </div>
 
-                {/* City name */}
-                <div style={{ fontSize: 36, fontWeight: 800, color: C.textPrimary, letterSpacing: '-1.5px', lineHeight: 1, marginBottom: 8 }}>
-                  {city.name}
-                </div>
+                  {/* City name + tagline */}
+                  <div style={{ fontSize:'clamp(32px,4vw,48px)', fontWeight:800, color:'#fff', letterSpacing:'-2px', lineHeight:1, marginBottom:8 }}>{city.name}</div>
+                  <div style={{ fontSize:13, color:'rgba(255,255,255,0.65)', fontWeight:500, marginBottom:28 }}>{city.tagLine[lang] || city.tagLine.en}</div>
 
-                {/* Stats */}
-                <div style={{ marginTop: 20, display: 'flex', flexDirection: 'column', gap: 8 }}>
-                  {[city.stat1, city.stat2].map((stat, i) => (
-                    <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
-                      <div style={{ width: 7, height: 7, borderRadius: '50%', background: city.accentColor, flexShrink: 0 }} />
-                      <span style={{ fontSize: 13, fontWeight: 600, color: city.accentColor }}>
-                        {stat[lang] || stat.en}
-                      </span>
-                    </div>
-                  ))}
-                </div>
+                  {/* Stat row */}
+                  <div style={{ display:'flex', gap:0, marginBottom:28, background:'rgba(0,0,0,0.15)', borderRadius:14, overflow:'hidden' }}>
+                    {city.stats.map((s, i) => (
+                      <div key={i} style={{ flex:1, padding:'14px 16px', textAlign:'center', borderRight: i < city.stats.length-1 ? '1px solid rgba(255,255,255,0.1)' : 'none' }}>
+                        <div style={{ fontSize:20, fontWeight:800, color:'#fff', letterSpacing:'-0.5px', lineHeight:1 }}>{s.value}</div>
+                        <div style={{ fontSize:10, color:'rgba(255,255,255,0.55)', marginTop:4, fontWeight:600 }}>{s.label[lang] || s.label.en}</div>
+                      </div>
+                    ))}
+                  </div>
 
-                {/* Decorative map-pin */}
-                <div style={{ position: 'absolute', bottom: 20, right: 24, opacity: 0.08 }}>
-                  <svg width="80" height="80" viewBox="0 0 24 24" fill={city.accentColor} stroke="none">
-                    <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5c-1.38 0-2.5-1.12-2.5-2.5S10.62 6.5 12 6.5s2.5 1.12 2.5 2.5S13.38 11.5 12 11.5z"/>
-                  </svg>
+                  {/* Feature list */}
+                  <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+                    {city.features.map((f, i) => (
+                      <div key={i} style={{ display:'flex', alignItems:'center', gap:9 }}>
+                        <div style={{ width:18, height:18, borderRadius:'50%', background:'rgba(255,255,255,0.18)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                          <svg width="9" height="9" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+                        </div>
+                        <span style={{ fontSize:13, fontWeight:600, color:'rgba(255,255,255,0.85)' }}>{f[lang] || f.en}</span>
+                      </div>
+                    ))}
+                  </div>
                 </div>
               </div>
             ))}
           </div>
           </ScrollReveal>
 
-          {/* Coming soon strip */}
-          <ScrollReveal delay={150}>
-          <div style={{ maxWidth: 780, margin: '0 auto', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 14, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
-            <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
-                <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
-              </svg>
-              <span style={{ fontSize: 12, fontWeight: 600, color: C.textTertiary, whiteSpace: 'nowrap' }}>
-                {t(lang,'cities.comingSoonLabel')}
-              </span>
+          {/* Coming soon — redesigned as expansion roadmap */}
+          <ScrollReveal delay={180}>
+          <div style={{ background:'rgba(255,255,255,0.04)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:20, padding:'28px 32px', backdropFilter:'blur(4px)' }}>
+            <div style={{ display:'flex', alignItems:'center', gap:12, marginBottom:20 }}>
+              <div style={{ width:32, height:32, borderRadius:9, background:'rgba(255,255,255,0.06)', border:'1px solid rgba(255,255,255,0.1)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,0.5)" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+              </div>
+              <div>
+                <div style={{ fontSize:13, fontWeight:700, color:'rgba(255,255,255,0.7)' }}>{t(lang,'cities.comingSoonLabel')}</div>
+                <div style={{ fontSize:11, color:'rgba(255,255,255,0.35)', marginTop:2 }}>{lang==='sq'?'Zgjerimi ynë kombëtar vazhdon':'Our national expansion continues'}</div>
+              </div>
             </div>
-            <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap', flex: 1 }}>
-              {['Elbasan','Fier','Berat','Sarandë','Shkodër','Kukës'].map(c => (
-                <span key={c} style={{ fontSize: 12, fontWeight: 600, color: C.textSecondary, background: C.bgWhite, border: `1px solid ${C.border}`, borderRadius: 99, padding: '4px 12px' }}>
-                  {c}
-                </span>
+            <div style={{ display:'flex', gap:10, flexWrap:'wrap' }}>
+              {['Elbasan','Fier','Berat','Sarandë','Shkodër','Kukës'].map((c, i) => (
+                <div key={c} style={{ display:'flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.05)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:99, padding:'7px 16px' }}>
+                  <div style={{ width:6, height:6, borderRadius:'50%', background:'rgba(255,255,255,0.2)', flexShrink:0 }}/>
+                  <span style={{ fontSize:13, fontWeight:600, color:'rgba(255,255,255,0.45)' }}>{c}</span>
+                </div>
               ))}
             </div>
           </div>
