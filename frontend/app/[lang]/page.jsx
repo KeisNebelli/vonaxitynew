@@ -4,6 +4,7 @@ import HeroSection from '@/components/HeroSection';
 import OrganicBackground from '@/components/OrganicBackground';
 import ScrollReveal from '@/components/ScrollReveal';
 import HowItWorksSection from '@/components/HowItWorksSection';
+import ServiceCardsSection from '@/components/ServiceCardsSection';
 import Link from 'next/link';
 import { t } from '@/translations';
 
@@ -232,24 +233,7 @@ export default async function HomePage({ params }) {
               </svg>
             </div>
           </ScrollReveal>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 18 }}>
-            {SERVICE_ITEMS.map(({ Icon }, i) => (
-              <ScrollReveal key={i} delay={i * 70}>
-                <div className="hp-service-card" style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, padding: '26px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', height:'100%' }}>
-                  {/* Icon with green-tinted gradient */}
-                  <div style={{ width: 52, height: 52, borderRadius: 15, background: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, boxShadow: '0 2px 8px rgba(5,150,105,0.12)' }}>
-                    <Icon />
-                  </div>
-                  <div style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, marginBottom: 8, lineHeight:1.35 }}>
-                    {Array.isArray(services) && services[i]?.title}
-                  </div>
-                  <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.7 }}>
-                    {Array.isArray(services) && services[i]?.desc}
-                  </div>
-                </div>
-              </ScrollReveal>
-            ))}
-          </div>
+          <ServiceCardsSection lang={lang} services={services} />
           <ScrollReveal delay={200}>
             <div style={{ marginTop: 28, background: C.warningLight, border: `1px solid #FDE68A`, borderRadius: 14, padding: '16px 20px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
               <div style={{ flexShrink: 0, marginTop: 1 }}><WarningIcon /></div>

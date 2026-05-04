@@ -37,7 +37,7 @@ export default function Footer({ lang = 'en' }) {
 
           <div>
             <div style={{ fontSize: 11, fontWeight: 700, color: headingColor, letterSpacing: '1.2px', textTransform: 'uppercase', marginBottom: 16 }}>{t(lang, 'footer.services')}</div>
-            {services.map(s => <div key={s} style={{ fontSize: 13, marginBottom: 10, color: 'rgba(255,255,255,0.55)' }}>{s}</div>)}
+            {services.map((s, i) => <Link key={s} href={`/${lang}/services`} style={{ display: 'block', fontSize: 13, marginBottom: 10, color: 'rgba(255,255,255,0.55)', textDecoration: 'none', transition: 'color 0.15s' }} onMouseEnter={e => e.currentTarget.style.color='#fff'} onMouseLeave={e => e.currentTarget.style.color='rgba(255,255,255,0.55)'}>{s}</Link>)}
           </div>
 
           <div>
