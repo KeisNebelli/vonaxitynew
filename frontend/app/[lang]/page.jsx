@@ -2,6 +2,7 @@ import Nav from '@/components/layout/Nav';
 import Footer from '@/components/layout/Footer';
 import HeroSection from '@/components/HeroSection';
 import OrganicBackground from '@/components/OrganicBackground';
+import ScrollReveal from '@/components/ScrollReveal';
 import Link from 'next/link';
 import { t } from '@/translations';
 
@@ -188,186 +189,219 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── How it works ── */}
-      <section id="how-it-works" style={{ padding: '80px 24px', background: C.bgWhite, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="how-it-works" style={{ padding: '96px 24px', background: C.bgWhite, scrollMarginTop: '76px', position: 'relative', zIndex: 1, overflow:'hidden' }}>
+        {/* Subtle background cross watermark */}
+        <div style={{ position:'absolute', top:'50%', right:-60, transform:'translateY(-50%)', opacity:0.025, pointerEvents:'none' }}>
+          <svg width="340" height="340" viewBox="0 0 54 54" fill="none"><rect x="19" y="0" width="16" height="54" rx="6" fill="#7C3AED"/><rect x="0" y="19" width="54" height="16" rx="6" fill="#7C3AED"/></svg>
+        </div>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 56 }}>
-            <TAG>{t(lang, 'howItWorks.tag')}</TAG>
-            <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1px' }}>{t(lang, 'howItWorks.title')}</h2>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 16 }}>
+          <ScrollReveal>
+            <div style={{ textAlign: 'center', marginBottom: 64 }}>
+              <TAG>{t(lang, 'howItWorks.tag')}</TAG>
+              <h2 style={{ fontSize: 'clamp(30px,4vw,46px)', fontWeight: 800, color: C.textPrimary, margin: '0 0 14px', letterSpacing: '-1.5px' }}>{t(lang, 'howItWorks.title')}</h2>
+              <p style={{ fontSize: 16, color: C.textSecondary, maxWidth: 460, margin: '0 auto', lineHeight: 1.7 }}>{t(lang, 'howItWorks.subtitle') || 'From booking to bedside — fast, simple, and completely transparent.'}</p>
+            </div>
+          </ScrollReveal>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20, position:'relative' }}>
             {Array.isArray(steps) && steps.slice(0, 4).map((s, i) => (
-              <div key={i} className="hp-step-card" style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, borderTop: `3px solid ${C.primary}`, padding: '28px 22px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-                <div style={{ fontSize: 13, fontWeight: 800, color: C.primary, letterSpacing: '0.5px', marginBottom: 12, fontVariantNumeric: 'tabular-nums' }}>0{i + 1}</div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, marginBottom: 8, lineHeight: 1.4 }}>{s.title}</div>
-                <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>{s.desc}</div>
-              </div>
+              <ScrollReveal key={i} delay={i * 100}>
+                <div className="hp-step-card" style={{ background: C.bgWhite, borderRadius: 22, border: `1px solid ${C.border}`, padding: '32px 26px', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', position:'relative', overflow:'hidden', height:'100%' }}>
+                  {/* Giant watermark number */}
+                  <div style={{ position:'absolute', right:14, bottom:8, fontSize:88, fontWeight:900, color:'rgba(124,58,237,0.04)', letterSpacing:'-4px', lineHeight:1, userSelect:'none', pointerEvents:'none' }}>
+                    {i + 1}
+                  </div>
+                  {/* Gradient step circle */}
+                  <div style={{ width:52, height:52, borderRadius:'50%', background:'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:22, boxShadow:'0 6px 18px rgba(124,58,237,0.28)', flexShrink:0 }}>
+                    <span style={{ fontSize:16, fontWeight:800, color:'#fff' }}>0{i+1}</span>
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: C.textPrimary, marginBottom: 10, lineHeight: 1.35 }}>{s.title}</div>
+                  <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.7 }}>{s.desc}</div>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
       </section>
 
       {/* ── Services ── */}
-      <section id="services" style={{ padding: '80px 24px', background: C.bg, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="services" style={{ padding: '96px 24px', background: 'linear-gradient(180deg,#F8FAFF 0%,#F0F4FF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          <div style={{ marginBottom: 48 }}>
-            <TAG>{t(lang, 'services.tag')}</TAG>
-            <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1px' }}>{t(lang, 'services.title')}</h2>
-            <p style={{ fontSize: 16, color: C.textSecondary, maxWidth: 480 }}>{t(lang, 'services.subtitle')}</p>
-          </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(290px,1fr))', gap: 16 }}>
-            {SERVICE_ITEMS.map(({ Icon, titleKey }, i) => (
-              <div key={i} className="hp-service-card" style={{ background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, padding: 24, boxShadow: '0 2px 12px rgba(0,0,0,0.04)' }}>
-                <div style={{ width: 48, height: 48, borderRadius: 13, background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 16, boxShadow: '0 1px 4px rgba(37,99,235,0.12)' }}>
-                  <Icon />
-                </div>
-                <div style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, marginBottom: 6 }}>
-                  {Array.isArray(services) && services[i]?.title}
-                </div>
-                <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65 }}>
-                  {Array.isArray(services) && services[i]?.desc}
-                </div>
+          <ScrollReveal>
+            <div style={{ marginBottom: 56, display:'flex', justifyContent:'space-between', alignItems:'flex-end', flexWrap:'wrap', gap:20 }}>
+              <div>
+                <TAG>{t(lang, 'services.tag')}</TAG>
+                <h2 style={{ fontSize: 'clamp(30px,4vw,46px)', fontWeight: 800, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1.5px' }}>{t(lang, 'services.title')}</h2>
+                <p style={{ fontSize: 16, color: C.textSecondary, maxWidth: 440, lineHeight:1.7, margin:0 }}>{t(lang, 'services.subtitle')}</p>
               </div>
+              {/* Medicine cross accent */}
+              <svg width="56" height="56" viewBox="0 0 54 54" fill="none" style={{ opacity:0.12, flexShrink:0 }}>
+                <rect x="19" y="0" width="16" height="54" rx="7" fill="#059669"/>
+                <rect x="0" y="19" width="54" height="16" rx="7" fill="#059669"/>
+              </svg>
+            </div>
+          </ScrollReveal>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(280px,1fr))', gap: 18 }}>
+            {SERVICE_ITEMS.map(({ Icon }, i) => (
+              <ScrollReveal key={i} delay={i * 70}>
+                <div className="hp-service-card" style={{ background: C.bgWhite, borderRadius: 18, border: `1px solid ${C.border}`, padding: '26px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', height:'100%' }}>
+                  {/* Icon with green-tinted gradient */}
+                  <div style={{ width: 52, height: 52, borderRadius: 15, background: 'linear-gradient(135deg, #ECFDF5 0%, #D1FAE5 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', marginBottom: 18, boxShadow: '0 2px 8px rgba(5,150,105,0.12)' }}>
+                    <Icon />
+                  </div>
+                  <div style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, marginBottom: 8, lineHeight:1.35 }}>
+                    {Array.isArray(services) && services[i]?.title}
+                  </div>
+                  <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.7 }}>
+                    {Array.isArray(services) && services[i]?.desc}
+                  </div>
+                </div>
+              </ScrollReveal>
             ))}
           </div>
-          <div style={{ marginTop: 24, background: C.warningLight, border: `1px solid #FDE68A`, borderRadius: 12, padding: '14px 18px', display: 'flex', gap: 12, alignItems: 'flex-start' }}>
-            <div style={{ flexShrink: 0, marginTop: 1 }}><WarningIcon /></div>
-            <p style={{ fontSize: 13, color: '#92400E', margin: 0, lineHeight: 1.6 }}>
-              <strong>{t(lang, 'services.nonEmergencyStrong')}</strong> {t(lang, 'services.emergency')} <strong>127</strong> {t(lang, 'services.immediately')}
-            </p>
-          </div>
+          <ScrollReveal delay={200}>
+            <div style={{ marginTop: 28, background: C.warningLight, border: `1px solid #FDE68A`, borderRadius: 14, padding: '16px 20px', display: 'flex', gap: 14, alignItems: 'flex-start' }}>
+              <div style={{ flexShrink: 0, marginTop: 1 }}><WarningIcon /></div>
+              <p style={{ fontSize: 13, color: '#92400E', margin: 0, lineHeight: 1.65 }}>
+                <strong>{t(lang, 'services.nonEmergencyStrong')}</strong> {t(lang, 'services.emergency')} <strong>127</strong> {t(lang, 'services.immediately')}
+              </p>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* ── Our Nurses ── */}
-      <section id="our-nurses" style={{ padding: '88px 24px', background: C.bgWhite, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="our-nurses" style={{ padding: '96px 24px', background: C.bgWhite, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1100, margin: '0 auto' }}>
-          {/* Header */}
-          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 48, flexWrap: 'wrap', gap: 16 }}>
-            <div>
-              <TAG>{t(lang, 'nurses.tag') || 'OUR NURSES'}</TAG>
-              <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1px' }}>
-                {t(lang, 'nurses.title') || 'Meet our certified nurses'}
-              </h2>
-              <p style={{ fontSize: 16, color: C.textSecondary, maxWidth: 460, margin: 0, lineHeight: 1.65 }}>
-                {t(lang, 'nurses.subtitle') || 'Every nurse on Vonaxity is licensed, background-checked, and rated by real patients.'}
-              </p>
+          <ScrollReveal>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-end', marginBottom: 52, flexWrap: 'wrap', gap: 16 }}>
+              <div>
+                <TAG>{t(lang, 'nurses.tag') || 'OUR NURSES'}</TAG>
+                <h2 style={{ fontSize: 'clamp(30px,4vw,46px)', fontWeight: 800, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1.5px' }}>
+                  {t(lang, 'nurses.title') || 'Meet your care team'}
+                </h2>
+                <p style={{ fontSize: 16, color: C.textSecondary, maxWidth: 460, margin: 0, lineHeight: 1.7 }}>
+                  {t(lang, 'nurses.subtitle') || 'Every Vonaxity nurse is licensed by the Order of Nurses of Albania and personally verified by our team.'}
+                </p>
+              </div>
+              <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+                {[
+                  { icon: '✓', label: lang === 'sq' ? 'E licensuar' : 'Licensed & Certified' },
+                  { icon: '🛡', label: lang === 'sq' ? 'I verifikuar' : 'Background Checked' },
+                  { icon: '⭐', label: lang === 'sq' ? 'E vlerësuar' : 'Patient Rated' },
+                ].map(b => (
+                  <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: C.secondary, background: C.secondaryLight, border: '1px solid rgba(5,150,105,0.15)', padding: '6px 12px', borderRadius: 99 }}>
+                    <span style={{ fontSize: 11 }}>{b.icon}</span>{b.label}
+                  </div>
+                ))}
+              </div>
             </div>
-            {/* Trust badges row */}
-            <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
+          </ScrollReveal>
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 20, marginBottom: 40 }}>
+            {[
+              { initials:'EB', name:'Elona Berberi',    bg:'#DBEAFE', color:'#1D4ED8', specialty: lang==='sq'?'Kujdes i Përgjithshëm':'General Nursing',   rating:5.0, reviews:38, years:6,  langs:['AL','EN'] },
+              { initials:'MG', name:'Mirela Gjoka',     bg:'#D1FAE5', color:'#065F46', specialty: lang==='sq'?'Kujdes për të Moshuarit':'Elderly Care',      rating:4.9, reviews:61, years:11, langs:['AL'] },
+              { initials:'AH', name:'Artan Hoxha',      bg:'#EDE9FE', color:'#5B21B6', specialty: lang==='sq'?'Kujdes Post-Operativ':'Post-Op Recovery',    rating:5.0, reviews:24, years:8,  langs:['AL','EN','IT'] },
+              { initials:'BL', name:'Besmir Lika',      bg:'#FEF3C7', color:'#92400E', specialty: lang==='sq'?'Kujdesi i Plagëve':'Wound & IV Care',         rating:4.8, reviews:45, years:7,  langs:['AL','EN'] },
+            ].map((n, ni) => (
+              <ScrollReveal key={n.name} delay={ni * 90}>
+                <div className="hp-service-card" style={{ background: '#FAFAF9', borderRadius: 20, border: `1px solid ${C.border}`, padding: '26px 22px', boxShadow: '0 2px 16px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column' }}>
+                  <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
+                    <div style={{ width: 60, height: 60, borderRadius: '50%', background: n.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: n.color, flexShrink: 0, border: `2px solid ${n.color}22`, boxShadow:`0 4px 12px ${n.color}22` }}>
+                      {n.initials}
+                    </div>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: C.secondary, background: C.secondaryLight, border: '1px solid rgba(5,150,105,0.2)', padding: '4px 10px', borderRadius: 99 }}>
+                      <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M5 0L6.12 3.45H9.76L6.82 5.59L7.94 9.05L5 6.91L2.06 9.05L3.18 5.59L0.24 3.45H3.88L5 0Z" fill="#059669"/></svg>
+                      {lang === 'sq' ? 'E Verifikuar' : 'Verified'}
+                    </div>
+                  </div>
+                  <div style={{ fontSize: 16, fontWeight: 700, color: C.textPrimary, marginBottom: 3 }}>{n.name}</div>
+                  <div style={{ fontSize: 13, fontWeight: 500, color: C.primary, marginBottom: 14 }}>{n.specialty}</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 14 }}>
+                    <div style={{ display: 'flex', gap: 1 }}>
+                      {[1,2,3,4,5].map(s => (
+                        <svg key={s} width="13" height="13" viewBox="0 0 24 24" fill={s <= Math.round(n.rating) ? '#F59E0B' : '#E5E7EB'} stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      ))}
+                    </div>
+                    <span style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary }}>{n.rating.toFixed(1)}</span>
+                    <span style={{ fontSize: 12, color: C.textTertiary }}>({n.reviews})</span>
+                  </div>
+                  <div style={{ display: 'flex', gap: 10, marginBottom: 18 }}>
+                    <div style={{ flex: 1, background: C.bgWhite, borderRadius: 10, padding: '8px 10px', border: `1px solid ${C.border}`, textAlign: 'center' }}>
+                      <div style={{ fontSize: 18, fontWeight: 800, color: C.textPrimary, letterSpacing: '-0.5px' }}>{n.years}</div>
+                      <div style={{ fontSize: 10, color: C.textTertiary, fontWeight: 500 }}>{lang === 'sq' ? 'vjet' : 'yrs exp'}</div>
+                    </div>
+                    <div style={{ flex: 2, background: C.bgWhite, borderRadius: 10, padding: '8px 10px', border: `1px solid ${C.border}` }}>
+                      <div style={{ fontSize: 10, color: C.textTertiary, fontWeight: 500, marginBottom: 4 }}>{lang === 'sq' ? 'Gjuhë' : 'Languages'}</div>
+                      <div style={{ display: 'flex', gap: 4, flexWrap:'wrap' }}>
+                        {n.langs.map(l => (
+                          <span key={l} style={{ fontSize: 10, fontWeight: 700, color: C.primary, background: C.primaryLight, padding: '2px 7px', borderRadius: 6 }}>{l}</span>
+                        ))}
+                      </div>
+                    </div>
+                  </div>
+                  <Link href={`/${lang}/signup`} style={{ display: 'block', marginTop: 'auto' }}>
+                    <button className="hp-nurse-btn">{lang === 'sq' ? 'Rezervo një vizitë' : 'Book a visit'}</button>
+                  </Link>
+                </div>
+              </ScrollReveal>
+            ))}
+          </div>
+
+          <ScrollReveal delay={100}>
+            <div style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)', borderRadius: 18, padding: '28px 36px', display: 'flex', gap: 48, justifyContent: 'center', flexWrap: 'wrap', border: '1px solid rgba(124,58,237,0.1)', boxShadow:'0 4px 24px rgba(124,58,237,0.06)' }}>
               {[
-                { icon: '✓', label: lang === 'sq' ? 'E licensuar' : 'Licensed & Certified' },
-                { icon: '🛡', label: lang === 'sq' ? 'I verifikuar' : 'Background Checked' },
-                { icon: '⭐', label: lang === 'sq' ? 'E vlerësuar' : 'Patient Rated' },
-              ].map(b => (
-                <div key={b.label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, fontWeight: 600, color: C.secondary, background: C.secondaryLight, border: '1px solid rgba(5,150,105,0.15)', padding: '6px 12px', borderRadius: 99 }}>
-                  <span style={{ fontSize: 11 }}>{b.icon}</span>{b.label}
+                ['500+', lang === 'sq' ? 'Infermierë Aktivë' : 'Active Nurses'],
+                ['4.9', lang === 'sq' ? 'Vlerësim Mesatar' : 'Avg Rating'],
+                ['100%', lang === 'sq' ? 'Të Licencuar' : 'Licensed'],
+                ['48h', lang === 'sq' ? 'Kohë Reagimi' : 'Avg Response'],
+              ].map(([n, l]) => (
+                <div key={l} style={{ textAlign: 'center' }}>
+                  <div style={{ fontSize: 28, fontWeight: 800, background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', letterSpacing: '-1px' }}>{n}</div>
+                  <div style={{ fontSize: 12, color: C.textTertiary, marginTop: 3, fontWeight: 500 }}>{l}</div>
                 </div>
               ))}
             </div>
-          </div>
-
-          {/* Nurse cards */}
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(240px,1fr))', gap: 20, marginBottom: 40 }}>
-            {[
-              { initials:'EB', name:'Elona Berberi',    bg:'#DBEAFE', color:'#1D4ED8', specialty: lang==='sq'?'Kujdes i Përgjithshëm':'General Nursing',       rating:5.0, reviews:38, years:6,  langs:['AL','EN'] },
-              { initials:'MG', name:'Mirela Gjoka',     bg:'#D1FAE5', color:'#065F46', specialty: lang==='sq'?'Kujdes për të Moshuarit':'Elderly Care',          rating:4.9, reviews:61, years:11, langs:['AL'] },
-              { initials:'AH', name:'Artan Hoxha',      bg:'#EDE9FE', color:'#5B21B6', specialty: lang==='sq'?'Kujdes Post-Operativ':'Post-Op Recovery',        rating:5.0, reviews:24, years:8,  langs:['AL','EN','IT'] },
-              { initials:'BL', name:'Besmir Lika',      bg:'#FEF3C7', color:'#92400E', specialty: lang==='sq'?'Kujdesi i Plagëve':'Wound & IV Care',             rating:4.8, reviews:45, years:7,  langs:['AL','EN'] },
-            ].map((n) => (
-              <div key={n.name} className="hp-service-card" style={{ background: '#FAFAF9', borderRadius: 18, border: `1px solid ${C.border}`, padding: '24px 22px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', display: 'flex', flexDirection: 'column', gap: 0 }}>
-                {/* Avatar + verified */}
-                <div style={{ display: 'flex', alignItems: 'flex-start', justifyContent: 'space-between', marginBottom: 16 }}>
-                  <div style={{ width: 60, height: 60, borderRadius: '50%', background: n.bg, display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 18, fontWeight: 800, color: n.color, letterSpacing: '-0.5px', flexShrink: 0, border: `2px solid ${n.color}22` }}>
-                    {n.initials}
-                  </div>
-                  <div style={{ display: 'flex', alignItems: 'center', gap: 4, fontSize: 11, fontWeight: 700, color: C.secondary, background: C.secondaryLight, border: '1px solid rgba(5,150,105,0.2)', padding: '4px 10px', borderRadius: 99 }}>
-                    <svg width="9" height="9" viewBox="0 0 10 10" fill="none"><path d="M5 0L6.12 3.45H9.76L6.82 5.59L7.94 9.05L5 6.91L2.06 9.05L3.18 5.59L0.24 3.45H3.88L5 0Z" fill="#059669"/></svg>
-                    {lang === 'sq' ? 'E Verifikuar' : 'Verified'}
-                  </div>
-                </div>
-                {/* Name + specialty */}
-                <div style={{ fontSize: 16, fontWeight: 700, color: C.textPrimary, marginBottom: 3 }}>{n.name}</div>
-                <div style={{ fontSize: 13, fontWeight: 500, color: C.primary, marginBottom: 14 }}>{n.specialty}</div>
-                {/* Rating */}
-                <div style={{ display: 'flex', alignItems: 'center', gap: 6, marginBottom: 12 }}>
-                  <div style={{ display: 'flex', gap: 1 }}>
-                    {[1,2,3,4,5].map(s => (
-                      <svg key={s} width="13" height="13" viewBox="0 0 24 24" fill={s <= Math.round(n.rating) ? '#F59E0B' : '#E5E7EB'} stroke="none"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
-                    ))}
-                  </div>
-                  <span style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary }}>{n.rating.toFixed(1)}</span>
-                  <span style={{ fontSize: 12, color: C.textTertiary }}>({n.reviews})</span>
-                </div>
-                {/* Stats row */}
-                <div style={{ display: 'flex', gap: 12, marginBottom: 16 }}>
-                  <div style={{ flex: 1, background: C.bgWhite, borderRadius: 10, padding: '8px 10px', border: `1px solid ${C.borderSubtle || C.border}`, textAlign: 'center' }}>
-                    <div style={{ fontSize: 17, fontWeight: 800, color: C.textPrimary, letterSpacing: '-0.5px' }}>{n.years}</div>
-                    <div style={{ fontSize: 10, color: C.textTertiary, fontWeight: 500 }}>{lang === 'sq' ? 'vjet' : 'yrs exp'}</div>
-                  </div>
-                  <div style={{ flex: 2, background: C.bgWhite, borderRadius: 10, padding: '8px 10px', border: `1px solid ${C.borderSubtle || C.border}` }}>
-                    <div style={{ fontSize: 10, color: C.textTertiary, fontWeight: 500, marginBottom: 3 }}>{lang === 'sq' ? 'Gjuhë' : 'Languages'}</div>
-                    <div style={{ display: 'flex', gap: 4 }}>
-                      {n.langs.map(l => (
-                        <span key={l} style={{ fontSize: 10, fontWeight: 700, color: C.primary, background: C.primaryLight, padding: '2px 7px', borderRadius: 6 }}>{l}</span>
-                      ))}
-                    </div>
-                  </div>
-                </div>
-                {/* Book CTA */}
-                <Link href={`/${lang}/signup`} style={{ display: 'block', marginTop: 'auto' }}>
-                  <button className="hp-nurse-btn">
-                    {lang === 'sq' ? 'Rezervo një vizitë' : 'Book a visit'}
-                  </button>
-                </Link>
-              </div>
-            ))}
-          </div>
-
-          {/* Bottom stat strip */}
-          <div style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)', borderRadius: 16, padding: '24px 32px', display: 'flex', gap: 48, justifyContent: 'center', flexWrap: 'wrap', border: '1px solid rgba(37,99,235,0.1)' }}>
-            {[
-              ['500+', lang === 'sq' ? 'Infermierë Aktivë' : 'Active Nurses'],
-              ['4.9', lang === 'sq' ? 'Vlerësim Mesatar' : 'Avg Rating'],
-              ['100%', lang === 'sq' ? 'Të Licencuar' : 'Licensed'],
-              ['48h', lang === 'sq' ? 'Kohë Reagimi' : 'Avg Response'],
-            ].map(([n, l]) => (
-              <div key={l} style={{ textAlign: 'center' }}>
-                <div style={{ fontSize: 26, fontWeight: 800, background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', letterSpacing: '-1px' }}>{n}</div>
-                <div style={{ fontSize: 12, color: C.textTertiary, marginTop: 2, fontWeight: 500 }}>{l}</div>
-              </div>
-            ))}
-          </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" style={{ padding: '80px 24px', background: C.primaryLight, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="pricing" style={{ padding: '96px 24px', background: 'linear-gradient(180deg, #F5F3FF 0%, #EFF6FF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
-          <TAG>{t(lang, 'pricing.tag')}</TAG>
-          <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: '0 0 12px', letterSpacing: '-1px' }}>{t(lang, 'pricing.title')}</h2>
-          <p style={{ fontSize: 16, color: C.textSecondary, marginBottom: 48 }}>{t(lang, 'pricing.subtitle')}</p>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(250px,1fr))', gap: 16 }}>
-            {PLANS.map(p => (
-              <div key={p.name} className="hp-pricing-card" style={{ background: C.bgWhite, borderRadius: 18, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: '28px 24px', position: 'relative', boxShadow: p.featured ? '0 8px 32px rgba(37,99,235,0.18)' : '0 2px 8px rgba(0,0,0,0.04)' }}>
-                {p.featured && (
-                  <div style={{ position: 'absolute', top: -13, left: '50%', transform: 'translateX(-50%)', background: C.primary, color: '#fff', fontSize: 11, fontWeight: 700, padding: '4px 14px', borderRadius: 99, whiteSpace: 'nowrap', letterSpacing: '0.3px' }}>
-                    {t(lang, 'pricing.mostPopular')}
+          <ScrollReveal>
+            <TAG>{t(lang, 'pricing.tag')}</TAG>
+            <h2 style={{ fontSize: 'clamp(30px,4vw,46px)', fontWeight: 800, color: C.textPrimary, margin: '0 0 14px', letterSpacing: '-1.5px' }}>{t(lang, 'pricing.title')}</h2>
+            <p style={{ fontSize: 16, color: C.textSecondary, marginBottom: 56, lineHeight:1.7 }}>{t(lang, 'pricing.subtitle')}</p>
+          </ScrollReveal>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(250px,1fr))', gap: 18 }}>
+            {PLANS.map((p, pi) => (
+              <ScrollReveal key={p.name} delay={pi * 100}>
+                <div className="hp-pricing-card" style={{ background: C.bgWhite, borderRadius: 22, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: '32px 26px', position: 'relative', boxShadow: p.featured ? '0 12px 48px rgba(37,99,235,0.2)' : '0 2px 12px rgba(0,0,0,0.05)', height:'100%' }}>
+                  {p.featured && (
+                    <>
+                      {/* Featured gradient header strip */}
+                      <div style={{ position:'absolute', top:0, left:0, right:0, height:4, background:'linear-gradient(90deg,#7C3AED,#2563EB)', borderRadius:'22px 22px 0 0' }} />
+                      <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#7C3AED,#2563EB)', color: '#fff', fontSize: 11, fontWeight: 700, padding: '5px 16px', borderRadius: 99, whiteSpace: 'nowrap', boxShadow:'0 4px 12px rgba(124,58,237,0.35)' }}>
+                        {t(lang, 'pricing.mostPopular')}
+                      </div>
+                    </>
+                  )}
+                  <div style={{ fontSize: 12, fontWeight: 700, color: p.featured ? C.primary : C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom: 10 }}>{p.name}</div>
+                  <div style={{ fontSize: 48, fontWeight: 800, color: C.textPrimary, letterSpacing: '-2.5px', marginBottom: 2, lineHeight:1 }}>{p.price}</div>
+                  <div style={{ fontSize: 13, color: C.textTertiary, marginBottom: 20 }}>{t(lang, 'pricing.perMonth')}</div>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: p.featured ? '#7C3AED' : C.primary, background: p.featured ? 'rgba(124,58,237,0.08)' : C.primaryLight, display: 'inline-block', padding: '5px 14px', borderRadius: 99, marginBottom: 28 }}>
+                    {p.visits} {p.visits === 1 ? t(lang, 'pricing.visitMonth') : t(lang, 'pricing.visitsMonth')}
                   </div>
-                )}
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.textTertiary, marginBottom: 8 }}>{p.name}</div>
-                <div style={{ fontSize: 44, fontWeight: 700, color: C.textPrimary, letterSpacing: '-2px', marginBottom: 4 }}>{p.price}</div>
-                <div style={{ fontSize: 13, color: C.textTertiary, marginBottom: 16 }}>{t(lang, 'pricing.perMonth')}</div>
-                <div style={{ fontSize: 13, fontWeight: 600, color: C.primary, background: C.primaryLight, display: 'inline-block', padding: '4px 12px', borderRadius: 99, marginBottom: 24 }}>
-                  {p.visits} {p.visits === 1 ? t(lang, 'pricing.visitMonth') : t(lang, 'pricing.visitsMonth')}
+                  <br />
+                  <Link href={`/${lang}/signup?plan=${p.name.toLowerCase()}`}>
+                    <button className={p.featured ? 'hp-pricing-btn-featured' : 'hp-pricing-btn-outline'} style={{ width: '100%', padding: '13px', borderRadius: 12, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? 'linear-gradient(135deg,#7C3AED,#2563EB)' : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: p.featured ? '0 6px 20px rgba(124,58,237,0.3)' : 'none' }}>
+                      {t(lang, 'pricing.getStarted')}
+                    </button>
+                  </Link>
+                  <div style={{ fontSize: 11, color: C.textTertiary, marginTop: 12 }}>{t(lang, 'pricing.trialNote')}</div>
                 </div>
-                <br />
-                <Link href={`/${lang}/signup?plan=${p.name.toLowerCase()}`}>
-                  <button className={p.featured ? 'hp-pricing-btn-featured' : 'hp-pricing-btn-outline'} style={{ width: '100%', padding: '12px', borderRadius: 10, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? C.primary : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize: 14, fontWeight: 600, cursor: 'pointer' }}>
-                    {t(lang, 'pricing.getStarted')}
-                  </button>
-                </Link>
-                <div style={{ fontSize: 11, color: C.textTertiary, marginTop: 10 }}>{t(lang, 'pricing.trialNote')}</div>
-              </div>
+              </ScrollReveal>
             ))}
           </div>
         </div>
@@ -377,17 +411,20 @@ export default async function HomePage({ params }) {
       <section style={{ padding:'96px 24px', background:'linear-gradient(180deg, #F8FAFF 0%, #FFFFFF 100%)', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           {/* Header */}
-          <div style={{ textAlign:'center', marginBottom:56 }}>
-            <TAG>{t(lang,'cities.tag')}</TAG>
-            <h2 style={{ fontSize:'clamp(30px,4vw,46px)', fontWeight:800, color:C.textPrimary, margin:'0 0 16px', letterSpacing:'-1.5px' }}>
-              {t(lang,'cities.title')}
-            </h2>
-            <p style={{ fontSize:17, color:C.textSecondary, lineHeight:1.7, maxWidth:520, margin:'0 auto' }}>
-              {t(lang,'cities.subtitle')}
-            </p>
-          </div>
+          <ScrollReveal>
+            <div style={{ textAlign:'center', marginBottom:56 }}>
+              <TAG>{t(lang,'cities.tag')}</TAG>
+              <h2 style={{ fontSize:'clamp(30px,4vw,46px)', fontWeight:800, color:C.textPrimary, margin:'0 0 16px', letterSpacing:'-1.5px' }}>
+                {t(lang,'cities.title')}
+              </h2>
+              <p style={{ fontSize:17, color:C.textSecondary, lineHeight:1.7, maxWidth:520, margin:'0 auto' }}>
+                {t(lang,'cities.subtitle')}
+              </p>
+            </div>
+          </ScrollReveal>
 
           {/* Launch city cards */}
+          <ScrollReveal delay={100}>
           <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:20, marginBottom:24, maxWidth:780, margin:'0 auto 24px' }}>
             {LAUNCH_CITIES.map(city => (
               <div key={city.name} style={{
@@ -445,7 +482,11 @@ export default async function HomePage({ params }) {
             ))}
           </div>
 
+          </div>
+          </ScrollReveal>
+
           {/* Coming soon strip */}
+          <ScrollReveal delay={150}>
           <div style={{ maxWidth: 780, margin: '0 auto', background: C.bg, border: `1px solid ${C.border}`, borderRadius: 14, padding: '20px 24px', display: 'flex', alignItems: 'center', gap: 16, flexWrap: 'wrap' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: 8, flexShrink: 0 }}>
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
@@ -463,25 +504,42 @@ export default async function HomePage({ params }) {
               ))}
             </div>
           </div>
+          </ScrollReveal>
         </div>
       </section>
 
       {/* ── FAQ / About ── */}
-      <section id="about" style={{ padding: '80px 24px', background: C.bg, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="about" style={{ padding: '96px 24px', background: C.bg, scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 700, margin: '0 auto' }}>
-          <div style={{ textAlign: 'center', marginBottom: 48 }}>
-            <TAG>{t(lang, 'faq.tag')}</TAG>
-            <h2 style={{ fontSize: 'clamp(28px,4vw,42px)', fontWeight: 700, color: C.textPrimary, margin: 0, letterSpacing: '-1px' }}>{t(lang, 'faq.title')}</h2>
-          </div>
-          {Array.isArray(faqs) && faqs.slice(0, 4).map((f, i) => (
-            <div key={i} className="hp-faq-card" style={{ background: C.bgWhite, borderRadius: 12, border: `1px solid ${C.border}`, padding: '18px 22px', marginBottom: 8 }}>
-              <div style={{ fontSize: 15, fontWeight: 600, color: C.textPrimary, marginBottom: 8 }}>{f.q}</div>
-              <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.7 }}>{f.a}</div>
+          <ScrollReveal>
+            <div style={{ textAlign: 'center', marginBottom: 52 }}>
+              <TAG>{t(lang, 'faq.tag')}</TAG>
+              <h2 style={{ fontSize: 'clamp(30px,4vw,46px)', fontWeight: 800, color: C.textPrimary, margin: '0 0 14px', letterSpacing: '-1.5px' }}>{t(lang, 'faq.title')}</h2>
             </div>
+          </ScrollReveal>
+          {Array.isArray(faqs) && faqs.slice(0, 4).map((f, i) => (
+            <ScrollReveal key={i} delay={i * 80}>
+              <div className="hp-faq-card" style={{ background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, padding: '22px 26px', marginBottom: 10, boxShadow:'0 2px 8px rgba(0,0,0,0.03)' }}>
+                <div style={{ display:'flex', gap:14, alignItems:'flex-start' }}>
+                  <div style={{ width:28, height:28, borderRadius:8, background:'linear-gradient(135deg,#EFF6FF,#DBEAFE)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, marginTop:1 }}>
+                    <span style={{ fontSize:13, fontWeight:800, color:C.primary }}>Q</span>
+                  </div>
+                  <div>
+                    <div style={{ fontSize: 15, fontWeight: 700, color: C.textPrimary, marginBottom: 8, lineHeight:1.45 }}>{f.q}</div>
+                    <div style={{ fontSize: 14, color: C.textSecondary, lineHeight: 1.75 }}>{f.a}</div>
+                  </div>
+                </div>
+              </div>
+            </ScrollReveal>
           ))}
-          <div style={{ textAlign: 'center', marginTop: 24 }}>
-            <Link href={`/${lang}/faq`} style={{ fontSize: 14, fontWeight: 600, color: C.primary }}>{t(lang, 'faq.viewAll')}</Link>
-          </div>
+          <ScrollReveal delay={200}>
+            <div style={{ textAlign: 'center', marginTop: 28 }}>
+              <Link href={`/${lang}/faq`} style={{ fontSize: 14, fontWeight: 600, color: C.primary, display:'inline-flex', alignItems:'center', gap:6 }}>
+                {t(lang, 'faq.viewAll')}
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+              </Link>
+            </div>
+          </ScrollReveal>
         </div>
       </section>
 
