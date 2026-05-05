@@ -5,6 +5,7 @@ import OrganicBackground from '@/components/OrganicBackground';
 import ScrollReveal from '@/components/ScrollReveal';
 import HowItWorksSection from '@/components/HowItWorksSection';
 import ServiceCardsSection from '@/components/ServiceCardsSection';
+import LandingChat from '@/components/chat/LandingChat';
 import Link from 'next/link';
 import { t } from '@/translations';
 
@@ -610,6 +611,7 @@ export default async function HomePage({ params }) {
       </section>
 
       <Footer lang={lang} />
+      <LandingChat lang={lang} />
     </div>
   );
 }

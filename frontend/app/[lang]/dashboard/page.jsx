@@ -3,6 +3,7 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { api } from '@/lib/api';
 import { t } from '@/translations';
+import DashboardChat from '@/components/chat/DashboardChat';
 import Settings from './settings';
 import HealthProgress from './health';
 
@@ -2048,6 +2049,8 @@ export default function Dashboard({ params }) {
           ))}
         </div>
       </div>
+
+      <DashboardChat lang={lang} userName={userData.name || null} />
     </>
   );
 }

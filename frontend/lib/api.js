@@ -125,6 +125,10 @@ export const api = {
   getSettings: () => apiFetch('/settings'),
   updateSettings: (body) => apiFetch('/settings', { method: 'PUT', body: JSON.stringify(body) }),
 
+  // AI chat
+  chat: (messages, context = 'landing', userName = null) =>
+    apiFetch('/ai/chat', { method: 'POST', body: JSON.stringify({ messages, context, userName }) }),
+
   // Profile
   updateProfile: (body) => apiFetch('/profile', { method: 'PUT', body: JSON.stringify(body) }),
   updatePassword: (body) => apiFetch('/profile/password', { method: 'PUT', body: JSON.stringify(body) }),
