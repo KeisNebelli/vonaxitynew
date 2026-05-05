@@ -3,7 +3,7 @@ import { Suspense, useState, useEffect } from 'react';
 import { useSearchParams } from 'next/navigation';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { api } from '@/lib/api';
+import { api, apiFetch } from '@/lib/api';
 import { t } from '@/translations';
 
 const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', bg:'#FAFAF9', bgWhite:'#FFFFFF', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
@@ -124,7 +124,7 @@ function SignupContent({ params }) {
   const [pricing, setPricing] = useState({ basicPrice:50, standardPrice:75, premiumPrice:155, basicVisits:1, standardVisits:2, premiumVisits:4 });
 
   useEffect(() => {
-    api('/settings/public').then(d => { if (d && d.basicPrice) setPricing(d); }).catch(() => {});
+    apiFetch('/settings/public').then(d => { if (d && d.basicPrice) setPricing(d); }).catch(() => {});
   }, []);
 
   // Auto-set role from URL param
