@@ -2,45 +2,107 @@
 import { useState, useRef, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
 
-const C = {
-  primary: '#2563EB', primaryLight: '#EFF6FF',
-  bg: '#1E293B', bgPanel: '#0F172A',
-  text: '#F1F5F9', textMuted: '#94A3B8',
-  border: 'rgba(255,255,255,0.08)',
-  userBubble: 'linear-gradient(135deg,#1D4ED8,#3B82F6)',
-  aiBubble: '#1E293B',
-};
-
 const SUGGESTIONS = {
   en: ['How do I book a visit?', 'What do my health records show?', 'How do I upgrade my plan?', 'How do I add a family member?'],
   sq: ['Si rezervoj një vizitë?', 'Çfarë tregojnë shënimet e mia shëndetësore?', 'Si e rris planin tim?', 'Si shtoj një anëtar familje?'],
 };
-
 const PLACEHOLDER = { en: 'Ask me anything…', sq: 'Pyesni çdo gjë…' };
+const BUBBLE_TEXT = {
+  en: '👋 Need help with your dashboard?',
+  sq: '👋 Keni nevojë për ndihmë me panelin?',
+};
+
+function VonaIcon({ size = 40 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="dc-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="100%" stopColor="#7C3AED" />
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="50" fill="url(#dc-bg)" />
+      <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" />
+      <line x1="50" y1="14" x2="50" y2="23" stroke="rgba(255,255,255,0.75)" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="50" cy="11" r="4.5" fill="#BAE6FD" opacity="0.9" />
+      <circle cx="50" cy="11" r="2.5" fill="white" />
+      <rect x="18" y="33" width="7" height="12" rx="3.5" fill="rgba(255,255,255,0.82)" />
+      <rect x="75" y="33" width="7" height="12" rx="3.5" fill="rgba(255,255,255,0.82)" />
+      <rect x="25" y="22" width="50" height="40" rx="13" fill="white" opacity="0.97" />
+      <circle cx="38" cy="39" r="5" fill="#2563EB" />
+      <circle cx="38" cy="39" r="3" fill="#1D4ED8" />
+      <circle cx="36.5" cy="37.5" r="1.8" fill="white" opacity="0.55" />
+      <circle cx="62" cy="39" r="5" fill="#2563EB" />
+      <circle cx="62" cy="39" r="3" fill="#1D4ED8" />
+      <circle cx="60.5" cy="37.5" r="1.8" fill="white" opacity="0.55" />
+      <path d="M 42 50 Q 50 56 58 50" stroke="#3B82F6" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+      <circle cx="31" cy="46" r="3.5" fill="#FCA5A5" opacity="0.35" />
+      <circle cx="69" cy="46" r="3.5" fill="#FCA5A5" opacity="0.35" />
+      <rect x="44" y="62" width="12" height="6" rx="3" fill="rgba(255,255,255,0.8)" />
+      <rect x="27" y="68" width="46" height="22" rx="11" fill="white" opacity="0.93" />
+      <rect x="47.5" y="72" width="5" height="14" rx="2" fill="#EF4444" opacity="0.75" />
+      <rect x="43" y="76.5" width="14" height="5" rx="2" fill="#EF4444" opacity="0.75" />
+    </svg>
+  );
+}
+
+const CSS = `
+  @keyframes vonaGlowDark {
+    0%,100% { box-shadow:0 4px 20px rgba(99,102,241,0.45),0 0 0 0 rgba(99,102,241,0); }
+    50%      { box-shadow:0 6px 28px rgba(99,102,241,0.65),0 0 0 9px rgba(99,102,241,0.1); }
+  }
+  @keyframes dcSlideUp {
+    from { opacity:0;transform:translateY(18px) scale(0.96); }
+    to   { opacity:1;transform:translateY(0) scale(1); }
+  }
+  @keyframes dcBubblePop {
+    from { opacity:0;transform:translateY(8px) scale(0.92); }
+    to   { opacity:1;transform:translateY(0) scale(1); }
+  }
+  @keyframes dotBounce2 {
+    0%,80%,100% { transform:translateY(0); }
+    40%         { transform:translateY(-5px); }
+  }
+  .vona-idle-dark { animation:vonaGlowDark 3s ease-in-out infinite; }
+  .vona-idle-dark:hover {
+    animation:none !important;
+    transform:scale(1.1) !important;
+    box-shadow:0 8px 32px rgba(99,102,241,0.7) !important;
+    transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.18s ease !important;
+  }
+`;
 
 export default function DashboardChat({ lang = 'en', userName = null }) {
   const greeting = userName
     ? (lang === 'sq'
-        ? `Përshëndetje ${userName}! Unë jam Vona, asistentja juaj. Si mund t'ju ndihmoj sot?`
-        : `Hi ${userName}! I'm Vona, your Vonaxity support assistant. How can I help you today?`)
+        ? `Përshëndetje ${userName}! Unë jam Vona, asistentja juaj e kujdesit. Si mund t'ju ndihmoj sot?`
+        : `Hi ${userName}! I'm Vona, your care assistant. How can I help you today?`)
     : (lang === 'sq'
         ? "Përshëndetje! Unë jam Vona, asistentja juaj e Vonaxity. Si mund t'ju ndihmoj?"
-        : "Hi! I'm Vona, your Vonaxity support assistant. How can I help you today?");
+        : "Hi! I'm Vona, your Vonaxity care assistant. How can I help you today?");
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: greeting }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
+  const [showBubble, setShowBubble] = useState(false);
+  const [bubbleDismissed, setBubbleDismissed] = useState(false);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
 
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 120);
-  }, [open]);
+    if (bubbleDismissed) return;
+    const t = setTimeout(() => setShowBubble(true), 5000);
+    return () => clearTimeout(t);
+  }, [bubbleDismissed]);
 
   useEffect(() => {
-    bottomRef.current?.scrollIntoView({ behavior: 'smooth' });
-  }, [messages, loading]);
+    if (open) { setShowBubble(false); setTimeout(() => inputRef.current?.focus(), 120); }
+  }, [open]);
+
+  useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
+
+  const dismiss = () => { setShowBubble(false); setBubbleDismissed(true); };
 
   const send = async (text) => {
     const trimmed = (text || input).trim();
@@ -50,74 +112,107 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
     setMessages(next);
     setLoading(true);
     try {
-      const apiMessages = next.map(m => ({ role: m.role, content: m.content }));
       const data = await apiFetch('/ai/chat', {
         method: 'POST',
-        body: JSON.stringify({ messages: apiMessages, context: 'dashboard', userName }),
+        body: JSON.stringify({ messages: next.map(m => ({ role: m.role, content: m.content })), context: 'dashboard', userName }),
       });
       setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
     } catch {
-      setMessages(prev => [...prev, { role: 'assistant', content: lang === 'sq' ? 'Na vjen keq, ndodhi një gabim. Ju lutem provoni sërish.' : 'Sorry, something went wrong. Please try again.' }]);
-    } finally {
-      setLoading(false);
-    }
+      setMessages(prev => [...prev, { role: 'assistant', content: lang === 'sq' ? 'Na vjen keq, ndodhi një gabim. Provoni sërish.' : 'Sorry, something went wrong. Please try again.' }]);
+    } finally { setLoading(false); }
   };
 
   const onKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
 
   return (
     <>
-      {/* Floating bubble — sits above mobile nav tabs (bottom: 80px) */}
+      <style suppressHydrationWarning>{CSS}</style>
+
+      {/* Prompt bubble */}
+      {showBubble && !open && (
+        <div
+          onClick={() => { dismiss(); setOpen(true); }}
+          style={{
+            position: 'fixed', bottom: 144, right: 20, zIndex: 9001,
+            background: '#1E293B', borderRadius: 16, padding: '10px 12px 10px 14px',
+            boxShadow: '0 8px 30px rgba(0,0,0,0.4)', border: '1px solid rgba(255,255,255,0.1)',
+            display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
+            fontFamily: "'DM Sans','Inter',system-ui,sans-serif",
+            fontSize: 13.5, fontWeight: 500, color: '#F1F5F9', maxWidth: 240,
+            animation: 'dcBubblePop 0.28s cubic-bezier(0.34,1.56,0.64,1)',
+          }}
+        >
+          <span style={{ flex: 1, lineHeight: 1.4 }}>{BUBBLE_TEXT[lang] || BUBBLE_TEXT.en}</span>
+          <button
+            onClick={e => { e.stopPropagation(); dismiss(); }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569',
+              padding: 2, display: 'flex', flexShrink: 0 }}
+          >
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+            </svg>
+          </button>
+          <div style={{
+            position: 'absolute', bottom: -7, right: 24,
+            borderLeft: '7px solid transparent', borderRight: '7px solid transparent',
+            borderTop: '8px solid #1E293B',
+          }} />
+        </div>
+      )}
+
+      {/* Floating button — sits above mobile nav (bottom: 80px) */}
       <button
         onClick={() => setOpen(o => !o)}
-        aria-label={open ? 'Close support chat' : 'Open support chat'}
+        aria-label={open ? 'Close support chat' : 'Chat with Vona'}
+        className={!open ? 'vona-idle-dark' : ''}
         style={{
           position: 'fixed', bottom: 80, right: 20, zIndex: 9000,
-          width: 50, height: 50, borderRadius: '50%',
-          background: open ? '#334155' : 'linear-gradient(135deg,#1D4ED8,#3B82F6)',
-          border: '2px solid rgba(255,255,255,0.12)', cursor: 'pointer',
-          boxShadow: '0 4px 18px rgba(0,0,0,0.35)',
+          width: 54, height: 54, borderRadius: '50%',
+          background: open ? '#334155' : 'linear-gradient(135deg,#3B82F6,#7C3AED)',
+          border: '2px solid rgba(255,255,255,0.12)', cursor: 'pointer', padding: 0, overflow: 'hidden',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'transform 0.2s, background 0.2s',
+          transition: 'transform 0.18s, box-shadow 0.18s, background 0.2s',
         }}
-        onMouseEnter={e => { e.currentTarget.style.transform = 'scale(1.08)'; }}
-        onMouseLeave={e => { e.currentTarget.style.transform = 'scale(1)'; }}
       >
-        {open ? (
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
-        ) : (
-          <img src="/vona-icon.svg" alt="Vona" width="34" height="34" style={{ borderRadius: '50%' }} />
-        )}
+        {open
+          ? <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          : <VonaIcon size={54} />}
       </button>
 
       {/* Chat panel */}
       {open && (
-        <div
-          style={{
-            position: 'fixed', bottom: 142, right: 20, zIndex: 8999,
-            width: 'min(360px, calc(100vw - 32px))',
-            height: 'min(480px, calc(100vh - 180px))',
-            background: '#0F172A', borderRadius: 18,
-            boxShadow: '0 12px 50px rgba(0,0,0,0.5)',
-            border: '1px solid rgba(255,255,255,0.08)',
-            display: 'flex', flexDirection: 'column',
-            fontFamily: "'DM Sans','Inter',system-ui,sans-serif",
-            overflow: 'hidden',
-            animation: 'dashChatUp 0.22s cubic-bezier(0.34,1.56,0.64,1)',
-          }}
-        >
-          <style suppressHydrationWarning>{`@keyframes dashChatUp{from{opacity:0;transform:translateY(14px) scale(0.97)}to{opacity:1;transform:translateY(0) scale(1)}}`}</style>
+        <div style={{
+          position: 'fixed', bottom: 146, right: 20, zIndex: 8999,
+          width: 'min(360px, calc(100vw - 32px))',
+          height: 'min(490px, calc(100vh - 180px))',
+          background: '#0F172A', borderRadius: 20,
+          boxShadow: '0 16px 60px rgba(0,0,0,0.55)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          display: 'flex', flexDirection: 'column',
+          fontFamily: "'DM Sans','Inter',system-ui,sans-serif",
+          overflow: 'hidden',
+          animation: 'dcSlideUp 0.26s cubic-bezier(0.34,1.56,0.64,1)',
+        }}>
 
           {/* Header */}
-          <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', gap: 10, background: '#0F172A' }}>
-            <img src="/vona-icon.svg" alt="Vona" width="34" height="34" style={{ borderRadius: '50%', flexShrink: 0 }} />
+          <div style={{
+            padding: '12px 16px',
+            background: 'linear-gradient(135deg,#1D4ED8,#6D28D9)',
+            display: 'flex', alignItems: 'center', gap: 10,
+          }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden',
+              flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+              <VonaIcon size={36} />
+            </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>Vona</div>
-              <div style={{ fontSize: 11, color: '#64748B' }}>Support Assistant</div>
+              <div style={{ fontSize: 14, fontWeight: 800, color: '#fff', letterSpacing: '-0.2px' }}>Vona</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', fontWeight: 400 }}>
+                {lang === 'sq' ? 'Asistentja juaj e Kujdesit' : 'Your Care Assistant'}
+              </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
               <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ADE80' }} />
-              <span style={{ fontSize: 11, color: '#64748B' }}>{lang === 'sq' ? 'Online' : 'Online'}</span>
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.55)' }}>Online</span>
             </div>
           </div>
 
@@ -128,7 +223,7 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
                 <div style={{
                   maxWidth: '84%', padding: '9px 13px',
                   borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                  background: m.role === 'user' ? C.userBubble : '#1E293B',
+                  background: m.role === 'user' ? 'linear-gradient(135deg,#1D4ED8,#6D28D9)' : '#1E293B',
                   color: '#F1F5F9', fontSize: 13, lineHeight: 1.55, whiteSpace: 'pre-wrap',
                 }}>
                   {m.content}
@@ -137,9 +232,11 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
             ))}
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{ padding: '9px 14px', borderRadius: '16px 16px 16px 4px', background: '#1E293B', display: 'flex', gap: 5, alignItems: 'center' }}>
+                <div style={{ padding: '9px 14px', borderRadius: '16px 16px 16px 4px',
+                  background: '#1E293B', display: 'flex', gap: 5, alignItems: 'center' }}>
                   {[0, 1, 2].map(i => (
-                    <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#475569', display: 'inline-block', animation: `dotBounce2 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                    <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#475569',
+                      display: 'inline-block', animation: `dotBounce2 1.2s ease-in-out ${i * 0.2}s infinite` }} />
                   ))}
                 </div>
               </div>
@@ -147,21 +244,15 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
             <div ref={bottomRef} />
           </div>
 
-          {/* Suggestions — shown only when just the greeting exists */}
+          {/* Suggestions */}
           {messages.length === 1 && (
             <div style={{ padding: '0 12px 8px', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {(SUGGESTIONS[lang] || SUGGESTIONS.en).map(s => (
-                <button
-                  key={s}
-                  onClick={() => send(s)}
-                  style={{
-                    fontSize: 11.5, fontWeight: 500, padding: '5px 10px', borderRadius: 20,
-                    border: '1px solid rgba(59,130,246,0.35)', background: 'rgba(37,99,235,0.15)',
-                    color: '#93C5FD', cursor: 'pointer', fontFamily: 'inherit',
-                  }}
-                >
-                  {s}
-                </button>
+                <button key={s} onClick={() => send(s)} style={{
+                  fontSize: 11.5, fontWeight: 500, padding: '5px 10px', borderRadius: 20,
+                  border: '1px solid rgba(109,40,217,0.4)', background: 'rgba(109,40,217,0.15)',
+                  color: '#A78BFA', cursor: 'pointer', fontFamily: 'inherit',
+                }}>{s}</button>
               ))}
             </div>
           )}
@@ -178,11 +269,11 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
               disabled={loading}
               style={{
                 flex: 1, resize: 'none', border: '1.5px solid rgba(255,255,255,0.1)', borderRadius: 11,
-                padding: '8px 11px', fontSize: 13, fontFamily: 'inherit', outline: 'none', lineHeight: 1.45,
-                color: '#F1F5F9', background: '#1E293B', maxHeight: 90, overflowY: 'auto',
-                transition: 'border-color 0.15s',
+                padding: '8px 11px', fontSize: 13, fontFamily: 'inherit', outline: 'none',
+                lineHeight: 1.45, color: '#F1F5F9', background: '#1E293B',
+                maxHeight: 90, overflowY: 'auto', transition: 'border-color 0.15s',
               }}
-              onFocus={e => { e.target.style.borderColor = '#3B82F6'; }}
+              onFocus={e => { e.target.style.borderColor = '#7C3AED'; }}
               onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.1)'; }}
             />
             <button
@@ -191,15 +282,18 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
               style={{
                 width: 36, height: 36, borderRadius: 10, border: 'none',
                 cursor: loading || !input.trim() ? 'default' : 'pointer',
-                background: loading || !input.trim() ? '#1E293B' : 'linear-gradient(135deg,#1D4ED8,#3B82F6)',
+                background: loading || !input.trim() ? '#1E293B' : 'linear-gradient(135deg,#1D4ED8,#6D28D9)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 transition: 'background 0.15s',
               }}
             >
-              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke={loading || !input.trim() ? '#475569' : '#fff'} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none"
+                stroke={loading || !input.trim() ? '#475569' : '#fff'}
+                strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
+              </svg>
             </button>
           </div>
-          <style suppressHydrationWarning>{`@keyframes dotBounce2{0%,80%,100%{transform:translateY(0)}40%{transform:translateY(-5px)}}`}</style>
         </div>
       )}
     </>
