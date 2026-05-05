@@ -265,6 +265,12 @@ function SignupContent({ params }) {
           <div style={{ textAlign:'center', marginTop:8 }}>
             <button onClick={()=>setRole(null)} style={{ fontSize:12, color:C.textTertiary, background:'transparent', border:'none', cursor:'pointer' }}>{t(lang,'signup.changeAccountType')}</button>
           </div>
+
+          <p style={{ marginTop:20, fontSize:11, color:'#9CA3AF', lineHeight:1.6, textAlign:'center' }}>
+            {lang === 'sq'
+              ? 'Vonaxity verifikon çdo infermiere para aprovimit, por nuk është përgjegjëse për veprimet e pavarura të përdoruesve jashtë platformës. Gjithmonë kontrolloni identitetin e infermiereve tuaj. Vonaxity ofron vetëm kujdes jo-urgjent.'
+              : 'Vonaxity verifies every nurse before approval, but is not responsible for the independent actions of users outside the platform. Always verify your caregiver\'s identity. Vonaxity provides non-emergency care only.'}
+          </p>
         </div>
       </div>
     </div>
