@@ -213,3 +213,12 @@ model PasswordReset {
   createdAt DateTime @default(now())
 }
 
+model ChatLog {
+  id        String   @id @default(cuid())
+  context   String   // landing | client | nurse | admin
+  question  String
+  answer    String
+  helpful   Boolean? // null = unrated, true = thumbs-up, false = thumbs-down
+  createdAt DateTime @default(now())
+}
+

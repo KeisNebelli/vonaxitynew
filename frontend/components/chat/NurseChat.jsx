@@ -140,9 +140,18 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
   const [showBubble, setShowBubble] = useState(false);
   const [bubbleDismissed, setBubbleDismissed] = useState(false);
   const [pendingNav, setPendingNav] = useState(null);
+  const [rated, setRated] = useState({});
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const redirectTimer = useRef(null);
+
+  const sendFeedback = async (logId, helpful) => {
+    if (!logId || rated[logId]) return;
+    setRated(prev => ({ ...prev, [logId]: helpful ? 'up' : 'down' }));
+    try {
+      await apiFetch('/ai/feedback', { method: 'POST', body: JSON.stringify({ logId, helpful }) });
+    } catch {}
+  };
 
   useEffect(() => {
     if (bubbleDismissed) return;
@@ -211,7 +220,7 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
         method: 'POST',
         body: JSON.stringify({ messages: next.map(m => ({ role: m.role, content: m.content })), context: 'nurse' }),
       });
-      setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
+      setMessages(prev => [...prev, { role: 'assistant', content: data.content, logId: data.logId || null }]);
 
       if (intent && onNavigate) {
         const navText = (NAV_MSGS[lang] || NAV_MSGS.en)[intent.id];
@@ -331,20 +340,32 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
                     {m.content}
                   </div>
                 ) : (
-                  <div style={{
-                    maxWidth: '84%', padding: '9px 13px',
-                    borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                    background: m.emergency
-                      ? 'rgba(220,38,38,0.15)'
-                      : m.role === 'user'
-                        ? 'linear-gradient(135deg,#1D4ED8,#6D28D9)'
-                        : '#1E293B',
-                    border: m.emergency ? '1px solid rgba(220,38,38,0.35)' : 'none',
-                    color: m.emergency ? '#FCA5A5' : '#F1F5F9',
-                    fontSize: 13, lineHeight: 1.55, whiteSpace: 'pre-wrap',
-                    fontWeight: m.emergency ? 600 : 400,
-                  }}>
-                    {m.content}
+                  <div style={{ maxWidth: '84%' }}>
+                    <div style={{
+                      padding: '9px 13px',
+                      borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      background: m.emergency
+                        ? 'rgba(220,38,38,0.15)'
+                        : m.role === 'user'
+                          ? 'linear-gradient(135deg,#1D4ED8,#6D28D9)'
+                          : '#1E293B',
+                      border: m.emergency ? '1px solid rgba(220,38,38,0.35)' : 'none',
+                      color: m.emergency ? '#FCA5A5' : '#F1F5F9',
+                      fontSize: 13, lineHeight: 1.55, whiteSpace: 'pre-wrap',
+                      fontWeight: m.emergency ? 600 : 400,
+                    }}>
+                      {m.content}
+                    </div>
+                    {m.role === 'assistant' && m.logId && !m.emergency && (
+                      <div style={{ display: 'flex', gap: 4, marginTop: 4, paddingLeft: 2 }}>
+                        <button onClick={() => sendFeedback(m.logId, true)} title="Helpful" style={{ background: 'none', border: 'none', cursor: rated[m.logId] ? 'default' : 'pointer', padding: 2, opacity: rated[m.logId] === 'up' ? 1 : rated[m.logId] === 'down' ? 0.25 : 0.45, transition: 'opacity 0.15s' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={rated[m.logId] === 'up' ? '#4ADE80' : 'none'} stroke={rated[m.logId] === 'up' ? '#4ADE80' : '#64748B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                        </button>
+                        <button onClick={() => sendFeedback(m.logId, false)} title="Not helpful" style={{ background: 'none', border: 'none', cursor: rated[m.logId] ? 'default' : 'pointer', padding: 2, opacity: rated[m.logId] === 'down' ? 1 : rated[m.logId] === 'up' ? 0.25 : 0.45, transition: 'opacity 0.15s' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={rated[m.logId] === 'down' ? '#F87171' : 'none'} stroke={rated[m.logId] === 'down' ? '#F87171' : '#64748B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>

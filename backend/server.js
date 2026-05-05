@@ -374,6 +374,45 @@ Vona can summarize CRM data, flag issues, and suggest actions. However, Vona doe
 // dashboard is an alias for client (backwards compatibility)
 SYSTEM_BASE.dashboard = SYSTEM_BASE.client;
 
+// ── RAG helpers ───────────────────────────────────────────────────────────────
+const STOP_WORDS = new Set(['a','an','the','is','it','in','on','of','to','for','and','or','but','what','how','can','do','i','my','me','we','you','your','are','was','be','with','that','this','at','by','from','as','have','has','will','not','if','its','their','our','which','when','where','who','they','he','she','us']);
+
+function tokenize(text) {
+  return text.toLowerCase().replace(/[^a-z0-9\s]/g, '').split(/\s+/).filter(w => w.length > 2 && !STOP_WORDS.has(w));
+}
+
+function jaccardSimilarity(a, b) {
+  const setA = new Set(tokenize(a));
+  const setB = new Set(tokenize(b));
+  if (setA.size === 0 || setB.size === 0) return 0;
+  let intersection = 0;
+  for (const w of setA) if (setB.has(w)) intersection++;
+  const union = setA.size + setB.size - intersection;
+  return intersection / union;
+}
+
+async function findRelevantPastAnswers(question, context) {
+  try {
+    // Only pull logs that were rated helpful (or unrated — never thumbs-down)
+    const logs = await prismaAI.chatLog.findMany({
+      where: { context, helpful: { not: false } },
+      orderBy: { createdAt: 'desc' },
+      take: 200,
+      select: { id: true, question: true, answer: true },
+    });
+
+    const scored = logs
+      .map(log => ({ ...log, score: jaccardSimilarity(question, log.question) }))
+      .filter(log => log.score > 0.15)
+      .sort((a, b) => b.score - a.score)
+      .slice(0, 3);
+
+    return scored;
+  } catch {
+    return [];
+  }
+}
+
 app.post('/ai/chat', aiLimiter, async (req, res) => {
   try {
     const { messages, context, userName, crmContext } = req.body;
@@ -387,7 +426,6 @@ app.post('/ai/chat', aiLimiter, async (req, res) => {
       : buildPricingBlock(pricing);
 
     const basePrompt = SYSTEM_BASE[context] || SYSTEM_BASE.landing;
-    // nurse and admin prompts don't use pricingBlock
     let system = (context === 'nurse' || context === 'admin')
       ? basePrompt()
       : basePrompt(pricingBlock);
@@ -398,6 +436,16 @@ app.post('/ai/chat', aiLimiter, async (req, res) => {
 
     if (context === 'admin' && crmContext && typeof crmContext === 'string' && crmContext.trim()) {
       system = `${system}\n\n== LIVE CRM DATA ==\n${crmContext}\n\nBase your answers only on this data. Do not invent numbers. If a question cannot be answered from this data, say: "I don't have enough data loaded to answer that."`;
+    }
+
+    // Inject relevant past Q&A (RAG)
+    const lastUserMsg = [...messages].reverse().find(m => m.role === 'user');
+    if (lastUserMsg && context !== 'admin') {
+      const relevant = await findRelevantPastAnswers(lastUserMsg.content, context === 'dashboard' ? 'client' : (context || 'landing'));
+      if (relevant.length > 0) {
+        const ragBlock = relevant.map(r => `Q: ${r.question}\nA: ${r.answer}`).join('\n\n');
+        system = `${system}\n\n== PAST INTERACTIONS (use these to inform your answer if relevant) ==\n${ragBlock}`;
+      }
     }
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
@@ -416,10 +464,40 @@ app.post('/ai/chat', aiLimiter, async (req, res) => {
     });
     const data = await response.json();
     if (!response.ok) throw new Error(data.error?.message || 'AI error');
-    res.json({ content: data.content?.[0]?.text || '' });
+
+    const answer = data.content?.[0]?.text || '';
+
+    // Save Q&A to ChatLog for future RAG, return logId for feedback
+    let logId = null;
+    if (lastUserMsg && answer && context !== 'admin') {
+      const logContext = context === 'dashboard' ? 'client' : (context || 'landing');
+      try {
+        const log = await prismaAI.chatLog.create({
+          data: { context: logContext, question: lastUserMsg.content.slice(0, 1000), answer: answer.slice(0, 2000) },
+        });
+        logId = log.id;
+      } catch {}
+    }
+
+    res.json({ content: answer, logId });
   } catch (err) {
     console.error('AI proxy error:', err);
     res.status(500).json({ error: 'AI assistant is temporarily unavailable.' });
+  }
+});
+
+// ── AI feedback (thumbs up/down) ──────────────────────────────────────────────
+app.post('/ai/feedback', aiLimiter, async (req, res) => {
+  try {
+    const { logId, helpful } = req.body;
+    if (!logId || typeof helpful !== 'boolean') {
+      return res.status(400).json({ error: 'logId and helpful (boolean) are required' });
+    }
+    await prismaAI.chatLog.update({ where: { id: logId }, data: { helpful } });
+    res.json({ ok: true });
+  } catch (err) {
+    console.error('Feedback error:', err);
+    res.status(500).json({ error: 'Could not save feedback.' });
   }
 });
 

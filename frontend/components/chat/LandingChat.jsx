@@ -150,9 +150,18 @@ export default function LandingChat({ lang = 'en' }) {
   const [showBubble, setShowBubble] = useState(false);
   const [bubbleDismissed, setBubbleDismissed] = useState(false);
   const [pendingNav, setPendingNav] = useState(null); // { id, anchor?, path? }
+  const [rated, setRated] = useState({}); // logId -> 'up'|'down'
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const redirectTimer = useRef(null);
+
+  const sendFeedback = async (logId, helpful) => {
+    if (!logId || rated[logId]) return;
+    setRated(prev => ({ ...prev, [logId]: helpful ? 'up' : 'down' }));
+    try {
+      await apiFetch('/ai/feedback', { method: 'POST', body: JSON.stringify({ logId, helpful }) });
+    } catch {}
+  };
 
   useEffect(() => {
     if (bubbleDismissed) return;
@@ -231,7 +240,7 @@ export default function LandingChat({ lang = 'en' }) {
         method: 'POST',
         body: JSON.stringify({ messages: next.map(m => ({ role: m.role, content: m.content })), context: 'landing' }),
       });
-      const aiMsg = { role: 'assistant', content: data.content };
+      const aiMsg = { role: 'assistant', content: data.content, logId: data.logId || null };
       setMessages(prev => [...prev, aiMsg]);
 
       // After AI responds, schedule navigation if intent found
@@ -359,19 +368,31 @@ export default function LandingChat({ lang = 'en' }) {
                     {m.content}
                   </div>
                 ) : (
-                  <div style={{
-                    maxWidth: '82%', padding: '10px 14px',
-                    borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                    background: m.emergency
-                      ? 'linear-gradient(135deg,#FEF2F2,#FFF1F2)'
-                      : m.role === 'user'
-                        ? 'linear-gradient(135deg,#2563EB,#7C3AED)'
-                        : '#F1F5F9',
-                    border: m.emergency ? '1.5px solid #FECACA' : 'none',
-                    color: m.role === 'user' ? '#fff' : m.emergency ? '#DC2626' : '#0F172A',
-                    fontSize: 13.5, lineHeight: 1.55, whiteSpace: 'pre-wrap', fontWeight: m.emergency ? 600 : 400,
-                  }}>
-                    {m.content}
+                  <div style={{ maxWidth: '82%' }}>
+                    <div style={{
+                      padding: '10px 14px',
+                      borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                      background: m.emergency
+                        ? 'linear-gradient(135deg,#FEF2F2,#FFF1F2)'
+                        : m.role === 'user'
+                          ? 'linear-gradient(135deg,#2563EB,#7C3AED)'
+                          : '#F1F5F9',
+                      border: m.emergency ? '1.5px solid #FECACA' : 'none',
+                      color: m.role === 'user' ? '#fff' : m.emergency ? '#DC2626' : '#0F172A',
+                      fontSize: 13.5, lineHeight: 1.55, whiteSpace: 'pre-wrap', fontWeight: m.emergency ? 600 : 400,
+                    }}>
+                      {m.content}
+                    </div>
+                    {m.role === 'assistant' && m.logId && !m.emergency && (
+                      <div style={{ display: 'flex', gap: 4, marginTop: 4, paddingLeft: 2 }}>
+                        <button onClick={() => sendFeedback(m.logId, true)} title="Helpful" style={{ background: 'none', border: 'none', cursor: rated[m.logId] ? 'default' : 'pointer', padding: 2, opacity: rated[m.logId] === 'up' ? 1 : rated[m.logId] === 'down' ? 0.25 : 0.45, transition: 'opacity 0.15s' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={rated[m.logId] === 'up' ? '#16A34A' : 'none'} stroke={rated[m.logId] === 'up' ? '#16A34A' : '#64748B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                        </button>
+                        <button onClick={() => sendFeedback(m.logId, false)} title="Not helpful" style={{ background: 'none', border: 'none', cursor: rated[m.logId] ? 'default' : 'pointer', padding: 2, opacity: rated[m.logId] === 'down' ? 1 : rated[m.logId] === 'up' ? 0.25 : 0.45, transition: 'opacity 0.15s' }}>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={rated[m.logId] === 'down' ? '#DC2626' : 'none'} stroke={rated[m.logId] === 'down' ? '#DC2626' : '#64748B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                        </button>
+                      </div>
+                    )}
                   </div>
                 )}
               </div>
