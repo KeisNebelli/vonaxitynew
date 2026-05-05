@@ -164,6 +164,7 @@ Rules:
 - For billing issues, direct the user to the Subscription section or the support contact on the website`,
 };
 
+console.log('[AI] Key loaded:', process.env.ANTHROPIC_API_KEY ? `${process.env.ANTHROPIC_API_KEY.substring(0, 14)}...` : 'MISSING');
 app.post('/ai/chat', aiLimiter, async (req, res) => {
   try {
     const { messages, context, userName } = req.body;
