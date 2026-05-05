@@ -2084,7 +2084,7 @@ export default function Dashboard({ params }) {
         </div>
       </div>
 
-      <DashboardChat lang={lang} userName={userData.name || null} />
+      <DashboardChat lang={lang} userName={userData.name || null} onNavigate={(section) => { setActive(section); setSidebarOpen(false); setViewingApplicants(null); }} />
     </>
   );
 }

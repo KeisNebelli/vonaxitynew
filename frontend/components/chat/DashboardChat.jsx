@@ -12,6 +12,54 @@ const BUBBLE_TEXT = {
   sq: '👋 Keni nevojë për ndihmë me panelin?',
 };
 
+// ── Intent detection ──────────────────────────────────────────────────────────
+const INTENTS = [
+  {
+    id: 'emergency',
+    keys: ['chest pain','heart attack','stroke','trouble breathing','bleeding','unconscious','emergency'],
+    emergency: true,
+  },
+  { id: 'book',         keys: ['book','appointment','reserve','schedule a visit','new visit','add visit'], section: 'book' },
+  { id: 'health',       keys: ['health','vitals','blood pressure','glucose','heart rate','oxygen','records','history'], section: 'health' },
+  { id: 'nurses',       keys: ['find nurse','browse nurse','nurse profile','see nurses','who is available'], section: 'nurses' },
+  { id: 'visits',       keys: ['my visit','visit history','past visit','upcoming','all visit','visit list'], section: 'visits' },
+  { id: 'subscription', keys: ['plan','subscription','upgrade','downgrade','billing','payment','premium','standard','basic','cost','price'], section: 'subscription' },
+  { id: 'settings',     keys: ['setting','account','profile','password','family member','loved one','add person','change email','edit info'], section: 'settings' },
+];
+
+const NAV_MSGS = {
+  en: {
+    book:         "I'll take you to Book a Visit 👇",
+    health:       "Let me show you your Health records 👇",
+    nurses:       "Taking you to Find Nurses 👇",
+    visits:       "I'll show you your visit history 👇",
+    subscription: "Taking you to Subscription & Plans 👇",
+    settings:     "I'll take you to Account Settings 👇",
+  },
+  sq: {
+    book:         "Po ju çoj tek Rezervo Vizitë 👇",
+    health:       "Ju tregoj shënimet tuaja shëndetësore 👇",
+    nurses:       "Po ju çoj tek Gjej Infermiere 👇",
+    visits:       "Ju tregoj historinë e vizitave 👇",
+    subscription: "Po ju çoj tek Abonimi & Planet 👇",
+    settings:     "Po ju çoj tek Cilësimet e llogarisë 👇",
+  },
+};
+
+const EMERGENCY_MSG = {
+  en: "⚠️ Vonaxity is not an emergency service. Please call your local emergency number immediately. In Albania, call 127.",
+  sq: "⚠️ Vonaxity nuk është shërbim urgjence. Ju lutemi telefononi menjëherë numrin e urgjencës. Në Shqipëri telefononi 127.",
+};
+
+function detectIntent(text) {
+  const lower = text.toLowerCase();
+  for (const intent of INTENTS) {
+    if (intent.keys.some(k => lower.includes(k))) return intent;
+  }
+  return null;
+}
+
+// ── Icon ──────────────────────────────────────────────────────────────────────
 function VonaIcon({ size = 40 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -46,6 +94,7 @@ function VonaIcon({ size = 40 }) {
   );
 }
 
+// ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
   @keyframes vonaGlowDark {
     0%,100% { box-shadow:0 4px 20px rgba(99,102,241,0.45),0 0 0 0 rgba(99,102,241,0); }
@@ -63,6 +112,10 @@ const CSS = `
     0%,80%,100% { transform:translateY(0); }
     40%         { transform:translateY(-5px); }
   }
+  @keyframes navPulseDark {
+    0%,100% { opacity:1; }
+    50%     { opacity:0.65; }
+  }
   .vona-idle-dark { animation:vonaGlowDark 3s ease-in-out infinite; }
   .vona-idle-dark:hover {
     animation:none !important;
@@ -70,9 +123,11 @@ const CSS = `
     box-shadow:0 8px 32px rgba(99,102,241,0.7) !important;
     transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.18s ease !important;
   }
+  .nav-hint-dark { animation:navPulseDark 1.4s ease-in-out infinite; }
 `;
 
-export default function DashboardChat({ lang = 'en', userName = null }) {
+// ── Component ─────────────────────────────────────────────────────────────────
+export default function DashboardChat({ lang = 'en', userName = null, onNavigate }) {
   const greeting = userName
     ? (lang === 'sq'
         ? `Përshëndetje ${userName}! Unë jam Vona, asistentja juaj e kujdesit. Si mund t'ju ndihmoj sot?`
@@ -87,8 +142,10 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
   const [loading, setLoading] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [bubbleDismissed, setBubbleDismissed] = useState(false);
+  const [pendingNav, setPendingNav] = useState(null);
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+  const redirectTimer = useRef(null);
 
   useEffect(() => {
     if (bubbleDismissed) return;
@@ -102,21 +159,72 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
 
+  useEffect(() => () => { if (redirectTimer.current) clearTimeout(redirectTimer.current); }, []);
+
+  const handleInput = (e) => {
+    setInput(e.target.value);
+    if (redirectTimer.current) {
+      clearTimeout(redirectTimer.current);
+      redirectTimer.current = null;
+      setPendingNav(null);
+    }
+  };
+
+  const executeNav = (intent) => {
+    if (intent.section && onNavigate) onNavigate(intent.section);
+    setPendingNav(null);
+    redirectTimer.current = null;
+  };
+
+  const scheduleNav = (intent) => {
+    setPendingNav(intent);
+    redirectTimer.current = setTimeout(() => executeNav(intent), 1800);
+  };
+
   const dismiss = () => { setShowBubble(false); setBubbleDismissed(true); };
 
   const send = async (text) => {
     const trimmed = (text || input).trim();
     if (!trimmed || loading) return;
+
+    if (redirectTimer.current) {
+      clearTimeout(redirectTimer.current);
+      redirectTimer.current = null;
+      setPendingNav(null);
+    }
+
     setInput('');
+    const intent = detectIntent(trimmed);
+
+    if (intent?.emergency) {
+      setMessages(prev => [
+        ...prev,
+        { role: 'user', content: trimmed },
+        { role: 'assistant', content: EMERGENCY_MSG[lang] || EMERGENCY_MSG.en, emergency: true },
+      ]);
+      return;
+    }
+
     const next = [...messages, { role: 'user', content: trimmed }];
     setMessages(next);
     setLoading(true);
+
     try {
       const data = await apiFetch('/ai/chat', {
         method: 'POST',
         body: JSON.stringify({ messages: next.map(m => ({ role: m.role, content: m.content })), context: 'dashboard', userName }),
       });
       setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
+
+      if (intent && onNavigate) {
+        const navText = (NAV_MSGS[lang] || NAV_MSGS.en)[intent.id];
+        if (navText) {
+          setTimeout(() => {
+            setMessages(prev => [...prev, { role: 'assistant', content: navText, isNav: true }]);
+            scheduleNav(intent);
+          }, 400);
+        }
+      }
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: lang === 'sq' ? 'Na vjen keq, ndodhi një gabim. Provoni sërish.' : 'Sorry, something went wrong. Please try again.' }]);
     } finally { setLoading(false); }
@@ -145,22 +253,17 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
           <span style={{ flex: 1, lineHeight: 1.4 }}>{BUBBLE_TEXT[lang] || BUBBLE_TEXT.en}</span>
           <button
             onClick={e => { e.stopPropagation(); dismiss(); }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569',
-              padding: 2, display: 'flex', flexShrink: 0 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#475569', padding: 2, display: 'flex', flexShrink: 0 }}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
-          <div style={{
-            position: 'absolute', bottom: -7, right: 24,
-            borderLeft: '7px solid transparent', borderRight: '7px solid transparent',
-            borderTop: '8px solid #1E293B',
-          }} />
+          <div style={{ position: 'absolute', bottom: -7, right: 24, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '8px solid #1E293B' }} />
         </div>
       )}
 
-      {/* Floating button — sits above mobile nav (bottom: 80px) */}
+      {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Close support chat' : 'Chat with Vona'}
@@ -195,13 +298,8 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
         }}>
 
           {/* Header */}
-          <div style={{
-            padding: '12px 16px',
-            background: 'linear-gradient(135deg,#1D4ED8,#6D28D9)',
-            display: 'flex', alignItems: 'center', gap: 10,
-          }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden',
-              flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
+          <div style={{ padding: '12px 16px', background: 'linear-gradient(135deg,#1D4ED8,#6D28D9)', display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
               <VonaIcon size={36} />
             </div>
             <div style={{ flex: 1 }}>
@@ -220,23 +318,45 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
           <div style={{ flex: 1, overflowY: 'auto', padding: '14px 12px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {messages.map((m, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                <div style={{
-                  maxWidth: '84%', padding: '9px 13px',
-                  borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
-                  background: m.role === 'user' ? 'linear-gradient(135deg,#1D4ED8,#6D28D9)' : '#1E293B',
-                  color: '#F1F5F9', fontSize: 13, lineHeight: 1.55, whiteSpace: 'pre-wrap',
-                }}>
-                  {m.content}
-                </div>
+                {m.isNav ? (
+                  <div
+                    className="nav-hint-dark"
+                    onClick={() => { if (redirectTimer.current) { clearTimeout(redirectTimer.current); executeNav(pendingNav); } }}
+                    style={{
+                      maxWidth: '84%', padding: '9px 13px',
+                      borderRadius: '16px 16px 16px 4px',
+                      background: 'rgba(109,40,217,0.25)',
+                      border: '1.5px solid rgba(167,139,250,0.4)',
+                      color: '#C4B5FD', fontSize: 13, lineHeight: 1.55,
+                      cursor: 'pointer', fontWeight: 600,
+                    }}
+                  >
+                    {m.content}
+                  </div>
+                ) : (
+                  <div style={{
+                    maxWidth: '84%', padding: '9px 13px',
+                    borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                    background: m.emergency
+                      ? 'rgba(220,38,38,0.15)'
+                      : m.role === 'user'
+                        ? 'linear-gradient(135deg,#1D4ED8,#6D28D9)'
+                        : '#1E293B',
+                    border: m.emergency ? '1px solid rgba(220,38,38,0.35)' : 'none',
+                    color: m.emergency ? '#FCA5A5' : '#F1F5F9',
+                    fontSize: 13, lineHeight: 1.55, whiteSpace: 'pre-wrap',
+                    fontWeight: m.emergency ? 600 : 400,
+                  }}>
+                    {m.content}
+                  </div>
+                )}
               </div>
             ))}
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{ padding: '9px 14px', borderRadius: '16px 16px 16px 4px',
-                  background: '#1E293B', display: 'flex', gap: 5, alignItems: 'center' }}>
+                <div style={{ padding: '9px 14px', borderRadius: '16px 16px 16px 4px', background: '#1E293B', display: 'flex', gap: 5, alignItems: 'center' }}>
                   {[0, 1, 2].map(i => (
-                    <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#475569',
-                      display: 'inline-block', animation: `dotBounce2 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                    <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#475569', display: 'inline-block', animation: `dotBounce2 1.2s ease-in-out ${i * 0.2}s infinite` }} />
                   ))}
                 </div>
               </div>
@@ -262,7 +382,7 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
             <textarea
               ref={inputRef}
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={handleInput}
               onKeyDown={onKey}
               placeholder={PLACEHOLDER[lang] || PLACEHOLDER.en}
               rows={1}

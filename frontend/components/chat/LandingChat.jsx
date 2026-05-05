@@ -1,5 +1,6 @@
 'use client';
 import { useState, useRef, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
 import { apiFetch } from '@/lib/api';
 
 const SUGGESTIONS = {
@@ -16,6 +17,63 @@ const BUBBLE_TEXT = {
   sq: '👋 Doni ndihmë për rezervim?',
 };
 
+// ── Intent detection ──────────────────────────────────────────────────────────
+const INTENTS = [
+  {
+    id: 'emergency',
+    keys: ['chest pain','heart attack','stroke','trouble breathing','can\'t breathe','bleeding heavily','unconscious','collapsed','faint','emergency'],
+    emergency: true,
+  },
+  { id: 'pricing',   keys: ['pric','plan','cost','how much','monthly','subscription','€','fee','cheap','expensive'], anchor: 'pricing' },
+  { id: 'services',  keys: ['service','offer','blood pressure','glucose','vital','welfare','post-surg','medication','nursing care','what do you do'], anchor: 'services' },
+  { id: 'nurses',    keys: ['find nurse','nurse profile','nurse availab','see nurses','browse nurse','who are the nurse'], anchor: 'nurses' },
+  { id: 'cities',    keys: ['city','cities','where','location','tirana','durrës','durres','coverage','operate','available in'], anchor: 'cities' },
+  { id: 'about',     keys: ['about','founder','who built','story','keis','mission','who made'], anchor: 'about' },
+  { id: 'nurse_signup', keys: ['join as nurse','become a nurse','nurse signup','nurse register','work for vonaxity','i am a nurse','i\'m a nurse'], path: '/signup?role=nurse' },
+  { id: 'signup',    keys: ['sign up','signup','register','get started','create account','start now','book','appointment','reserve'], path: '/signup?role=client' },
+  { id: 'signin',    keys: ['login','log in','sign in','signin'], path: '/signin' },
+  { id: 'dashboard', keys: ['dashboard','my account','my visits'], path: '/dashboard' },
+];
+
+const NAV_MSGS = {
+  en: {
+    pricing:      "I'll take you to our pricing plans 👇",
+    services:     "Let me show you our services 👇",
+    nurses:       "I'll take you to our nurses section 👇",
+    cities:       "I'll show you the cities we cover 👇",
+    about:        "Let me take you to our about section 👇",
+    nurse_signup: "I'll take you to the nurse registration page →",
+    signup:       "I'll take you to the sign up page →",
+    signin:       "Taking you to the login page →",
+    dashboard:    "Taking you to the dashboard →",
+  },
+  sq: {
+    pricing:      "Po ju çoj tek planet e çmimeve 👇",
+    services:     "Ju tregoj shërbimet tona 👇",
+    nurses:       "Po ju çoj tek seksioni i infermiereve 👇",
+    cities:       "Ju tregoj qytetet që mbulojmë 👇",
+    about:        "Ju tregoj rreth nesh 👇",
+    nurse_signup: "Po ju çoj tek regjistrimi për infermiere →",
+    signup:       "Po ju çoj tek regjistrimi →",
+    signin:       "Po ju çoj tek faqja e hyrjes →",
+    dashboard:    "Po ju çoj tek paneli →",
+  },
+};
+
+const EMERGENCY_MSG = {
+  en: "⚠️ Vonaxity is not an emergency service. Please call your local emergency number immediately. In Albania, call 127.",
+  sq: "⚠️ Vonaxity nuk është shërbim urgjence. Ju lutemi telefononi menjëherë numrin e urgjencës. Në Shqipëri telefononi 127.",
+};
+
+function detectIntent(text) {
+  const lower = text.toLowerCase();
+  for (const intent of INTENTS) {
+    if (intent.keys.some(k => lower.includes(k))) return intent;
+  }
+  return null;
+}
+
+// ── Icon ──────────────────────────────────────────────────────────────────────
 function VonaIcon({ size = 40 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
@@ -50,6 +108,7 @@ function VonaIcon({ size = 40 }) {
   );
 }
 
+// ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
   @keyframes vonaGlow {
     0%,100% { box-shadow:0 4px 20px rgba(99,102,241,0.38),0 0 0 0 rgba(99,102,241,0); }
@@ -67,6 +126,10 @@ const CSS = `
     0%,80%,100% { transform:translateY(0); }
     40%         { transform:translateY(-6px); }
   }
+  @keyframes navPulse {
+    0%,100% { opacity:1; }
+    50%     { opacity:0.6; }
+  }
   .vona-idle { animation:vonaGlow 3s ease-in-out infinite; }
   .vona-idle:hover {
     animation:none !important;
@@ -74,17 +137,22 @@ const CSS = `
     box-shadow:0 8px 32px rgba(99,102,241,0.65) !important;
     transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.18s ease !important;
   }
+  .nav-hint { animation:navPulse 1.4s ease-in-out infinite; }
 `;
 
+// ── Component ─────────────────────────────────────────────────────────────────
 export default function LandingChat({ lang = 'en' }) {
+  const router = useRouter();
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: GREETING[lang] || GREETING.en }]);
   const [input, setInput] = useState('');
   const [loading, setLoading] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [bubbleDismissed, setBubbleDismissed] = useState(false);
+  const [pendingNav, setPendingNav] = useState(null); // { id, anchor?, path? }
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
+  const redirectTimer = useRef(null);
 
   useEffect(() => {
     if (bubbleDismissed) return;
@@ -98,27 +166,95 @@ export default function LandingChat({ lang = 'en' }) {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
 
+  // Cancel pending redirect when user starts typing
+  const handleInput = (e) => {
+    setInput(e.target.value);
+    if (redirectTimer.current) {
+      clearTimeout(redirectTimer.current);
+      redirectTimer.current = null;
+      setPendingNav(null);
+    }
+  };
+
+  const executeNav = (intent) => {
+    if (intent.anchor) {
+      const el = document.getElementById(intent.anchor);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        router.push(`/${lang}#${intent.anchor}`);
+      }
+    } else if (intent.path) {
+      router.push(`/${lang}${intent.path}`);
+    }
+    setPendingNav(null);
+    redirectTimer.current = null;
+  };
+
+  const scheduleNav = (intent) => {
+    setPendingNav(intent);
+    redirectTimer.current = setTimeout(() => executeNav(intent), 1800);
+  };
+
   const dismiss = () => { setShowBubble(false); setBubbleDismissed(true); };
 
   const send = async (text) => {
     const trimmed = (text || input).trim();
     if (!trimmed || loading) return;
+
+    // Cancel any pending redirect when user sends a new message
+    if (redirectTimer.current) {
+      clearTimeout(redirectTimer.current);
+      redirectTimer.current = null;
+      setPendingNav(null);
+    }
+
     setInput('');
+    const intent = detectIntent(trimmed);
+
+    // Emergency: respond immediately, no redirect
+    if (intent?.emergency) {
+      setMessages(prev => [
+        ...prev,
+        { role: 'user', content: trimmed },
+        { role: 'assistant', content: EMERGENCY_MSG[lang] || EMERGENCY_MSG.en, emergency: true },
+      ]);
+      return;
+    }
+
     const next = [...messages, { role: 'user', content: trimmed }];
     setMessages(next);
     setLoading(true);
+
     try {
       const data = await apiFetch('/ai/chat', {
         method: 'POST',
         body: JSON.stringify({ messages: next.map(m => ({ role: m.role, content: m.content })), context: 'landing' }),
       });
-      setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
+      const aiMsg = { role: 'assistant', content: data.content };
+      setMessages(prev => [...prev, aiMsg]);
+
+      // After AI responds, schedule navigation if intent found
+      if (intent) {
+        const navText = (NAV_MSGS[lang] || NAV_MSGS.en)[intent.id];
+        if (navText) {
+          setTimeout(() => {
+            setMessages(prev => [...prev, { role: 'assistant', content: navText, isNav: true }]);
+            scheduleNav(intent);
+          }, 400);
+        }
+      }
     } catch {
       setMessages(prev => [...prev, { role: 'assistant', content: lang === 'sq' ? 'Na vjen keq, ndodhi një gabim. Provoni sërish.' : 'Sorry, something went wrong. Please try again.' }]);
-    } finally { setLoading(false); }
+    } finally {
+      setLoading(false);
+    }
   };
 
   const onKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
+
+  // Cleanup on unmount
+  useEffect(() => () => { if (redirectTimer.current) clearTimeout(redirectTimer.current); }, []);
 
   return (
     <>
@@ -129,7 +265,7 @@ export default function LandingChat({ lang = 'en' }) {
         <div
           onClick={() => { dismiss(); setOpen(true); }}
           style={{
-            position: 'fixed', bottom: 94, right: 20, zIndex: 9001,
+            position: 'fixed', bottom: 94, right: 24, zIndex: 9001,
             background: '#fff', borderRadius: 16, padding: '10px 12px 10px 14px',
             boxShadow: '0 8px 30px rgba(15,23,42,0.13)', border: '1px solid #E2E8F0',
             display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
@@ -141,19 +277,13 @@ export default function LandingChat({ lang = 'en' }) {
           <span style={{ flex: 1, lineHeight: 1.4 }}>{BUBBLE_TEXT[lang] || BUBBLE_TEXT.en}</span>
           <button
             onClick={e => { e.stopPropagation(); dismiss(); }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#CBD5E1',
-              padding: 2, display: 'flex', flexShrink: 0 }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#CBD5E1', padding: 2, display: 'flex', flexShrink: 0 }}
           >
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
-          <div style={{
-            position: 'absolute', bottom: -7, right: 24,
-            borderLeft: '7px solid transparent', borderRight: '7px solid transparent',
-            borderTop: '8px solid #fff',
-            filter: 'drop-shadow(0 2px 1px rgba(15,23,42,0.06))',
-          }} />
+          <div style={{ position: 'absolute', bottom: -7, right: 24, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '8px solid #fff', filter: 'drop-shadow(0 2px 1px rgba(15,23,42,0.06))' }} />
         </div>
       )}
 
@@ -192,13 +322,8 @@ export default function LandingChat({ lang = 'en' }) {
         }}>
 
           {/* Header */}
-          <div style={{
-            padding: '13px 18px',
-            background: 'linear-gradient(135deg,#2563EB,#7C3AED)',
-            display: 'flex', alignItems: 'center', gap: 11,
-          }}>
-            <div style={{ width: 38, height: 38, borderRadius: '50%', overflow: 'hidden',
-              flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.22)' }}>
+          <div style={{ padding: '13px 18px', background: 'linear-gradient(135deg,#2563EB,#7C3AED)', display: 'flex', alignItems: 'center', gap: 11 }}>
+            <div style={{ width: 38, height: 38, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.22)' }}>
               <VonaIcon size={38} />
             </div>
             <div style={{ flex: 1 }}>
@@ -217,24 +342,45 @@ export default function LandingChat({ lang = 'en' }) {
           <div style={{ flex: 1, overflowY: 'auto', padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {messages.map((m, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
-                <div style={{
-                  maxWidth: '82%', padding: '10px 14px',
-                  borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
-                  background: m.role === 'user' ? 'linear-gradient(135deg,#2563EB,#7C3AED)' : '#F1F5F9',
-                  color: m.role === 'user' ? '#fff' : '#0F172A',
-                  fontSize: 13.5, lineHeight: 1.55, whiteSpace: 'pre-wrap',
-                }}>
-                  {m.content}
-                </div>
+                {m.isNav ? (
+                  // Navigation hint bubble
+                  <div
+                    className="nav-hint"
+                    onClick={() => { if (redirectTimer.current) { clearTimeout(redirectTimer.current); executeNav(pendingNav); } }}
+                    style={{
+                      maxWidth: '82%', padding: '9px 14px',
+                      borderRadius: '18px 18px 18px 4px',
+                      background: 'linear-gradient(135deg,#EFF6FF,#F5F3FF)',
+                      border: '1.5px solid #C4B5FD',
+                      color: '#5B21B6', fontSize: 13, lineHeight: 1.55,
+                      cursor: 'pointer', fontWeight: 600,
+                    }}
+                  >
+                    {m.content}
+                  </div>
+                ) : (
+                  <div style={{
+                    maxWidth: '82%', padding: '10px 14px',
+                    borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
+                    background: m.emergency
+                      ? 'linear-gradient(135deg,#FEF2F2,#FFF1F2)'
+                      : m.role === 'user'
+                        ? 'linear-gradient(135deg,#2563EB,#7C3AED)'
+                        : '#F1F5F9',
+                    border: m.emergency ? '1.5px solid #FECACA' : 'none',
+                    color: m.role === 'user' ? '#fff' : m.emergency ? '#DC2626' : '#0F172A',
+                    fontSize: 13.5, lineHeight: 1.55, whiteSpace: 'pre-wrap', fontWeight: m.emergency ? 600 : 400,
+                  }}>
+                    {m.content}
+                  </div>
+                )}
               </div>
             ))}
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{ padding: '10px 16px', borderRadius: '18px 18px 18px 4px',
-                  background: '#F1F5F9', display: 'flex', gap: 5, alignItems: 'center' }}>
+                <div style={{ padding: '10px 16px', borderRadius: '18px 18px 18px 4px', background: '#F1F5F9', display: 'flex', gap: 5, alignItems: 'center' }}>
                   {[0, 1, 2].map(i => (
-                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#94A3B8',
-                      display: 'inline-block', animation: `dotBounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#94A3B8', display: 'inline-block', animation: `dotBounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />
                   ))}
                 </div>
               </div>
@@ -260,7 +406,7 @@ export default function LandingChat({ lang = 'en' }) {
             <textarea
               ref={inputRef}
               value={input}
-              onChange={e => setInput(e.target.value)}
+              onChange={handleInput}
               onKeyDown={onKey}
               placeholder={PLACEHOLDER[lang] || PLACEHOLDER.en}
               rows={1}
