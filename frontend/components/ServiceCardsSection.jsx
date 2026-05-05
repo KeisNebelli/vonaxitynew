@@ -105,20 +105,32 @@ const SERVICE_META = [
 export default function ServiceCardsSection({ lang, services }) {
   const [active, setActive] = useState(null);
   const [visible, setVisible] = useState(false);
+  const [leaving, setLeaving] = useState(false);
   const touchStartX = useRef(null);
 
   const open = useCallback((i) => {
+    setLeaving(false);
     setActive(i);
     requestAnimationFrame(() => requestAnimationFrame(() => setVisible(true)));
   }, []);
 
   const close = useCallback(() => {
+    setLeaving(true);
     setVisible(false);
-    setTimeout(() => setActive(null), 280);
+    setTimeout(() => { setActive(null); setLeaving(false); }, 280);
   }, []);
 
-  const goPrev = useCallback(() => { if (active > 0) { setVisible(false); setTimeout(() => { setActive(a => a - 1); setVisible(true); }, 140); } }, [active]);
-  const goNext = useCallback(() => { if (active < SERVICE_META.length - 1) { setVisible(false); setTimeout(() => { setActive(a => a + 1); setVisible(true); }, 140); } }, [active]);
+  const goPrev = useCallback(() => {
+    if (active <= 0) return;
+    setLeaving(true); setVisible(false);
+    setTimeout(() => { setActive(a => a - 1); setLeaving(false); setVisible(true); }, 180);
+  }, [active]);
+
+  const goNext = useCallback(() => {
+    if (active >= SERVICE_META.length - 1) return;
+    setLeaving(true); setVisible(false);
+    setTimeout(() => { setActive(a => a + 1); setLeaving(false); setVisible(true); }, 180);
+  }, [active]);
 
   useEffect(() => {
     if (active === null) return;
@@ -151,10 +163,15 @@ export default function ServiceCardsSection({ lang, services }) {
     <>
       <style>{`
         @keyframes svc-fade-up {
-          from { opacity:0; transform:translateY(16px) scale(0.97); }
+          from { opacity:0; transform:translateY(24px) scale(0.96); }
           to   { opacity:1; transform:translateY(0)    scale(1);    }
         }
-        @keyframes svc-overlay-in { from{opacity:0} to{opacity:1} }
+        @keyframes svc-fade-down {
+          from { opacity:1; transform:translateY(0)    scale(1);    }
+          to   { opacity:0; transform:translateY(16px) scale(0.97); }
+        }
+        @keyframes svc-overlay-in  { from{opacity:0} to{opacity:1} }
+        @keyframes svc-overlay-out { from{opacity:1} to{opacity:0} }
 
         .svc-card {
           background:#fff;
@@ -205,8 +222,10 @@ export default function ServiceCardsSection({ lang, services }) {
           align-items:center;
           justify-content:center;
           padding:24px;
-          animation:svc-overlay-in 0.25s ease both;
+          transition:opacity 0.28s ease;
         }
+        .svc-overlay.is-visible  { animation:svc-overlay-in  0.25s ease both; }
+        .svc-overlay.is-leaving  { animation:svc-overlay-out 0.25s ease both; }
         .svc-modal {
           background:#fff;
           border-radius:24px;
@@ -215,10 +234,12 @@ export default function ServiceCardsSection({ lang, services }) {
           max-width:640px;
           max-height:90vh;
           overflow-y:auto;
-          animation:svc-fade-up 0.32s cubic-bezier(0.34,1.26,0.64,1) both;
           position:relative;
           scrollbar-width:thin;
+          transition:opacity 0.28s ease, transform 0.28s cubic-bezier(0.34,1.1,0.64,1);
         }
+        .svc-modal.is-visible { animation:svc-fade-up   0.32s cubic-bezier(0.34,1.26,0.64,1) both; }
+        .svc-modal.is-leaving { animation:svc-fade-down 0.25s ease both; }
         .svc-modal::-webkit-scrollbar { width:4px; }
         .svc-modal::-webkit-scrollbar-track { background:transparent; }
         .svc-modal::-webkit-scrollbar-thumb { background:#E5E7EB; border-radius:99px; }
@@ -330,12 +351,12 @@ export default function ServiceCardsSection({ lang, services }) {
       {/* ── Modal ── */}
       {active !== null && meta && svc && (
         <div
-          className="svc-overlay"
+          className={`svc-overlay ${leaving ? 'is-leaving' : visible ? 'is-visible' : ''}`}
           onClick={close}
           onTouchStart={onTouchStart}
           onTouchEnd={onTouchEnd}
         >
-          <div className="svc-modal" onClick={(e) => e.stopPropagation()}>
+          <div className={`svc-modal ${leaving ? 'is-leaving' : visible ? 'is-visible' : ''}`} onClick={(e) => e.stopPropagation()}>
 
             {/* ── Gradient header ── */}
             <div className="svc-modal-header" style={{ background: meta.gradient }}>
@@ -411,7 +432,7 @@ export default function ServiceCardsSection({ lang, services }) {
                   {SERVICE_META.map((m, si) => (
                     <button
                       key={si}
-                      onClick={() => { setVisible(false); setTimeout(() => { setActive(si); setVisible(true); }, 140); }}
+                      onClick={() => { if (si === active) return; setLeaving(true); setVisible(false); setTimeout(() => { setActive(si); setLeaving(false); setVisible(true); }, 180); }}
                       style={{ width: si === active ? 20 : 6, height:6, borderRadius:99, border:'none', background: si === active ? meta.color : '#E5E7EB', cursor:'pointer', transition:'width 0.3s ease, background 0.2s ease', padding:0, flexShrink:0 }}
                       aria-label={`Go to service ${si + 1}`}
                     />
