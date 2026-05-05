@@ -1,6 +1,16 @@
 'use client';
 import { useState, useEffect, useCallback, useRef } from 'react';
 import ScrollReveal from '@/components/ScrollReveal';
+import {
+  AnimBooking,
+  AnimMatching,
+  AnimChooseNurse,
+  AnimConfirmed,
+  AnimTracking,
+  AnimReport,
+} from '@/components/visuals/StepAnimations';
+
+const STEP_ANIMATIONS = [AnimBooking, AnimMatching, AnimChooseNurse, AnimConfirmed, AnimTracking, AnimReport];
 
 /* ─────────────────────────────────────────────────────────
    MOCKUP COMPONENTS — one per step
@@ -638,6 +648,8 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
                   <div style={{ position:'absolute', right:12, bottom:6, fontSize:72, fontWeight:900, color:'rgba(0,0,0,0.03)', letterSpacing:'-4px', lineHeight:1, userSelect:'none', pointerEvents:'none' }}>
                     {i + 1}
                   </div>
+                  {/* Step animation illustration */}
+                  {(() => { const Anim = STEP_ANIMATIONS[i]; return <Anim />; })()}
                   {/* Step circle — uses each step's own color */}
                   <div style={{ width:46, height:46, borderRadius:'50%', background:cardColor(i), display:'flex', alignItems:'center', justifyContent:'center', marginBottom:18, boxShadow:`0 6px 16px ${cardColor(i)}44` }}>
                     <span style={{ fontSize:14, fontWeight:800, color:'#fff' }}>0{i+1}</span>
