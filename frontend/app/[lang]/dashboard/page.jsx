@@ -1592,7 +1592,9 @@ function FindNurses({ lang, onBook }) {
       {/* Empty state */}
       {filtered.length === 0 && (
         <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, padding:'56px 24px', textAlign:'center' }}>
-          <div style={{ fontSize:44, marginBottom:12 }}>🔍</div>
+          <div style={{ width:64, height:64, borderRadius:18, background:'#F3F4F6', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px' }}>
+            <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#9CA3AF" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          </div>
           <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary, marginBottom:6 }}>{tr('dashboard.noNursesFound')}</div>
           <div style={{ fontSize:13, color:C.textSecondary }}>{tr('dashboard.noNursesFoundSub')}</div>
         </div>

@@ -283,7 +283,9 @@ export default function NursesPage({ params }) {
             </div>
           ) : nurses.length === 0 ? (
             <div style={{ textAlign:'center', padding:'80px 24px', color:C.textTertiary }}>
-              <div style={{ fontSize:48, marginBottom:16 }}>👩‍⚕️</div>
+              <div style={{ width:72, height:72, borderRadius:20, background:'#EFF6FF', display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 16px', border:'1px solid rgba(37,99,235,0.12)' }}>
+                <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#2563EB" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
+              </div>
               <div style={{ fontSize:16, fontWeight:600, color:C.textSecondary, marginBottom:8 }}>{tr('nurses.noNurses')}</div>
               <div style={{ fontSize:14 }}>{lang==='sq' ? 'Infermiere do të shfaqen së shpejti.' : 'Nurses will appear here soon.'}</div>
             </div>

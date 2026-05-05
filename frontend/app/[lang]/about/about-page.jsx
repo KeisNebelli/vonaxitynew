@@ -161,13 +161,15 @@ export default function AboutPage({ params }) {
                 </div>
 
                 {[
-                  { emoji:'🌍', text: lang==='sq' ? '2.5M+ shqiptarë jetojnë jashtë vendit' : '2.5M+ Albanians live abroad' },
-                  { emoji:'👴', text: lang==='sq' ? 'Prindërit plaken pa mbikëqyrje mjekësore' : 'Parents age without medical oversight' },
-                  { emoji:'📵', text: lang==='sq' ? 'Asnjë platformë e besuar nuk ekzistonte' : 'No trusted platform existed' },
-                  { emoji:'💡', text: lang==='sq' ? 'Vonaxity mbyll këtë boshllëk' : 'Vonaxity closes that gap' },
+                  { icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg>, iconBg:'rgba(147,197,253,0.15)', iconCol:'#93C5FD', text: lang==='sq' ? '2.5M+ shqiptarë jetojnë jashtë vendit' : '2.5M+ Albanians live abroad' },
+                  { icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>, iconBg:'rgba(252,165,165,0.15)', iconCol:'#FCA5A5', text: lang==='sq' ? 'Prindërit plaken pa mbikëqyrje mjekësore' : 'Parents age without medical oversight' },
+                  { icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg>, iconBg:'rgba(251,191,36,0.15)', iconCol:'#FCD34D', text: lang==='sq' ? 'Asnjë platformë e besuar nuk ekzistonte' : 'No trusted platform existed' },
+                  { icon:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>, iconBg:'rgba(110,231,183,0.2)', iconCol:'#6EE7B7', text: lang==='sq' ? 'Vonaxity mbyll këtë boshllëk' : 'Vonaxity closes that gap' },
                 ].map((item, i) => (
-                  <div key={i} style={{ display:'flex', gap:14, alignItems:'flex-start', marginBottom: i < 3 ? 18 : 0, paddingBottom: i < 3 ? 18 : 0, borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.08)' : 'none' }}>
-                    <div style={{ fontSize:22, flexShrink:0, marginTop:2 }}>{item.emoji}</div>
+                  <div key={i} style={{ display:'flex', gap:14, alignItems:'center', marginBottom: i < 3 ? 16 : 0, paddingBottom: i < 3 ? 16 : 0, borderBottom: i < 3 ? '1px solid rgba(255,255,255,0.07)' : 'none' }}>
+                    <div style={{ width:30, height:30, borderRadius:8, background:item.iconBg, border:`1px solid ${item.iconCol}30`, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:item.iconCol }}>
+                      {item.icon}
+                    </div>
                     <div style={{ fontSize:14, color:'rgba(255,255,255,0.8)', lineHeight:1.55, fontWeight:500 }}>{item.text}</div>
                   </div>
                 ))}
@@ -296,12 +298,15 @@ export default function AboutPage({ params }) {
                   <p style={{ fontSize:15, color:C.textSecondary, lineHeight:1.8, margin:0 }}>{person.bio}</p>
                   <div style={{ marginTop:20, display:'flex', gap:10, flexWrap:'wrap' }}>
                     {[
-                      { label:lang==='sq'?'New Jersey, SHBA':'New Jersey, USA', icon:'📍' },
-                      { label:lang==='sq'?'Siguria Kibernetike':'Cybersecurity B.Sc.', icon:'🎓' },
-                      { label:lang==='sq'?'Ndërtues':'Builder', icon:'🚀' },
+                      { label:lang==='sq'?'New Jersey, SHBA':'New Jersey, USA', col:'#2563EB', bg:'rgba(37,99,235,0.08)',
+                        icon:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+                      { label:lang==='sq'?'Siguria Kibernetike B.Sc.':'Cybersecurity B.Sc.', col:'#7C3AED', bg:'rgba(124,58,237,0.08)',
+                        icon:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> },
+                      { label:lang==='sq'?'Ndërtues':'Builder', col:'#059669', bg:'rgba(5,150,105,0.08)',
+                        icon:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> },
                     ].map(tag => (
-                      <span key={tag.label} style={{ fontSize:12, fontWeight:600, color:C.textSecondary, background:C.bg, border:`1px solid ${C.border}`, borderRadius:99, padding:'5px 13px', display:'flex', alignItems:'center', gap:5 }}>
-                        <span>{tag.icon}</span>{tag.label}
+                      <span key={tag.label} style={{ fontSize:12, fontWeight:600, color:tag.col, background:tag.bg, border:`1px solid ${tag.col}25`, borderRadius:99, padding:'5px 13px', display:'flex', alignItems:'center', gap:6 }}>
+                        <span style={{ color:tag.col, display:'flex', alignItems:'center' }}>{tag.icon}</span>{tag.label}
                       </span>
                     ))}
                   </div>
