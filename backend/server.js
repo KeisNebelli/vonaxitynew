@@ -117,8 +117,46 @@ app.use('/contact', contactRouter);
 app.use('/profile', profileRouter);
 
 // ── AI Assistant proxy ────────────────────────────────────────────────────────
-const SYSTEM_PROMPTS = {
-  landing: `You are Vona, Vonaxity's friendly virtual assistant. Vonaxity is a healthcare platform founded in 2026 by Albanians living abroad. It connects families living outside Albania with certified nurses who visit their loved ones at home in Albania. Book from anywhere in the world — UK, Italy, Germany, USA, and more.
+const prismaAI = require('./lib/db');
+
+const DEFAULT_PRICING = { basicPrice:30, standardPrice:50, premiumPrice:120, basicVisits:1, standardVisits:2, premiumVisits:4 };
+
+async function getLivePricing() {
+  try {
+    const record = await prismaAI.systemSettings.findFirst();
+    const s = record ? JSON.parse(record.value) : DEFAULT_PRICING;
+    return {
+      basicPrice:     s.basicPrice     || DEFAULT_PRICING.basicPrice,
+      standardPrice:  s.standardPrice  || DEFAULT_PRICING.standardPrice,
+      premiumPrice:   s.premiumPrice   || DEFAULT_PRICING.premiumPrice,
+      basicVisits:    s.basicVisits    || DEFAULT_PRICING.basicVisits,
+      standardVisits: s.standardVisits || DEFAULT_PRICING.standardVisits,
+      premiumVisits:  s.premiumVisits  || DEFAULT_PRICING.premiumVisits,
+    };
+  } catch {
+    return DEFAULT_PRICING;
+  }
+}
+
+function buildPricingBlock(p) {
+  return `== PRICING ==
+All plans include a 7-day free trial. No hidden fees. Cancel anytime. Secure payments by Stripe.
+- Basic: €${p.basicPrice}/month — ${p.basicVisits} nurse visit${p.basicVisits > 1 ? 's' : ''} per month
+- Standard: €${p.standardPrice}/month — ${p.standardVisits} nurse visits per month (most popular)
+- Premium: €${p.premiumPrice}/month — ${p.premiumVisits} nurse visits per month
+Plans can be upgraded or downgraded at any time. Changes take effect from the next billing cycle.`;
+}
+
+function buildDashPricingBlock(p) {
+  return `== PLANS ==
+- Basic: €${p.basicPrice}/month — ${p.basicVisits} visit${p.basicVisits > 1 ? 's' : ''}/month
+- Standard: €${p.standardPrice}/month — ${p.standardVisits} visits/month (most popular)
+- Premium: €${p.premiumPrice}/month — ${p.premiumVisits} visits/month
+Plans can be changed anytime; changes apply next billing cycle. Manage billing in the Subscription section.`;
+}
+
+const SYSTEM_BASE = {
+  landing: (pricingBlock) => `You are Vona, Vonaxity's friendly virtual assistant. Vonaxity is a healthcare platform founded in 2026 by Albanians living abroad. It connects families living outside Albania with certified nurses who visit their loved ones at home in Albania. Book from anywhere in the world — UK, Italy, Germany, USA, and more.
 
 == SERVICES ==
 Every plan includes access to all services:
@@ -132,12 +170,7 @@ Every plan includes access to all services:
 - General Nursing: Broad nursing support tailored to the patient's needs.
 IMPORTANT: Vonaxity is non-emergency care only.
 
-== PRICING ==
-All plans include a 7-day free trial. No hidden fees. Cancel anytime. Secure payments by Stripe.
-- Basic: €30/month — 1 nurse visit per month
-- Standard: €50/month — 2 nurse visits per month (most popular)
-- Premium: €120/month — 4 nurse visits per month
-Plans can be upgraded or downgraded at any time. Changes take effect from the next billing cycle.
+${pricingBlock}
 
 == CITIES ==
 Currently live: Tirana (capital, 12+ nurses, 11 districts, ~2hr avg response), Durrës (second city, major coastal hub).
@@ -194,7 +227,7 @@ Vonaxity was founded by Keis Nebelli, CEO & Founder, an Albanian living abroad w
 - For emergencies in Albania: call 127 immediately
 - For anything you're unsure about: direct to hello@vonaxity.com`,
 
-  dashboard: `You are Vona, Vonaxity's in-platform support assistant for logged-in users. Vonaxity connects families abroad with certified nurses for at-home visits in Albania.
+  dashboard: (pricingBlock) => `You are Vona, Vonaxity's in-platform support assistant for logged-in users. Vonaxity connects families abroad with certified nurses for at-home visits in Albania.
 
 == DASHBOARD SECTIONS ==
 - Overview: Activity summary, upcoming visits, quick stats, and a shortcut to book a visit.
@@ -205,11 +238,7 @@ Vonaxity was founded by Keis Nebelli, CEO & Founder, an Albanian living abroad w
 - Subscription: View and manage your plan. Upgrade or downgrade anytime via Stripe. 7-day free trial on all plans.
 - Settings: Update your personal info, manage loved ones (add/edit family members receiving care), change password, contact preferences, and emergency contact.
 
-== PLANS ==
-- Basic: €30/month — 1 visit/month
-- Standard: €50/month — 2 visits/month (most popular)
-- Premium: €120/month — 4 visits/month
-Plans can be changed anytime; changes apply next billing cycle. Manage billing in the Subscription section.
+${pricingBlock}
 
 == SERVICES (all included in every plan) ==
 Blood Pressure Check, Glucose Monitoring, Vitals Monitoring, Blood Work Collection, Welfare Check, Post-surgical Care, Medication Administration, General Nursing.
@@ -257,7 +286,14 @@ app.post('/ai/chat', aiLimiter, async (req, res) => {
       return res.status(400).json({ error: 'messages array is required' });
     }
 
-    let system = SYSTEM_PROMPTS[context] || SYSTEM_PROMPTS.landing;
+    const pricing = await getLivePricing();
+    const pricingBlock = context === 'dashboard'
+      ? buildDashPricingBlock(pricing)
+      : buildPricingBlock(pricing);
+
+    const basePrompt = SYSTEM_BASE[context] || SYSTEM_BASE.landing;
+    let system = basePrompt(pricingBlock);
+
     if (userName && context === 'dashboard') {
       system = `The user's name is ${userName}.\n\n${system}`;
     }
