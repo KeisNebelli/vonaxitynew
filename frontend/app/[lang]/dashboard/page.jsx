@@ -951,7 +951,7 @@ function Applicants({ visitId, visitInfo, onBack, onSelect, lang='en' }) {
 
       <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'16px 20px', marginBottom:20, boxShadow:SSM }}>
         <div style={{ fontSize:15, fontWeight:700, color:C.textPrimary }}>{(() => { const s = SERVICES_MAP.find(x=>x.en===visitInfo?.serviceType); return lang==='sq'&&s?s.sq:visitInfo?.serviceType; })()}</div>
-        <div style={{ fontSize:12, color:C.textTertiary, marginTop:3 }}>{visitInfo?.scheduledAt ? new Date(visitInfo.scheduledAt).toLocaleDateString('en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : ''}</div>
+        <div style={{ fontSize:12, color:C.textTertiary, marginTop:3 }}>{visitInfo?.scheduledAt ? new Date(visitInfo.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'}) : ''}</div>
       </div>
 
       {loading && <div style={{ textAlign:'center', padding:40, color:C.textTertiary, fontSize:14 }}>{tr('dashboard.applicantsLoading')}</div>}
@@ -1975,7 +1975,9 @@ export default function Dashboard({ params }) {
                   <button key={l} onClick={()=>switchLang(l)} style={{ padding:'4px 10px',borderRadius:6,border:'none',fontSize:11,fontWeight:700,cursor:'pointer',background:uiLang===l?C.primary:'transparent',color:uiLang===l?'#fff':C.textSecondary,fontFamily:F }}>{l.toUpperCase()}</button>
                 ))}
               </div>
-              <span style={{ fontSize:11,fontWeight:700,padding:'4px 11px',borderRadius:99,background:isTrial?C.purpleLight:C.secondaryLight,color:isTrial?C.purple:C.secondary }}>{userData.subscription?.status||'Trial'}</span>
+              <span style={{ fontSize:11,fontWeight:700,padding:'4px 11px',borderRadius:99,background:isTrial?C.purpleLight:C.secondaryLight,color:isTrial?C.purple:C.secondary }}>
+                {(()=>{const s=userData.subscription?.status;return s==='ACTIVE'?(lang==='sq'?'Aktiv':'Active'):s==='TRIAL'?(lang==='sq'?'Provë':'Trial'):s==='EXPIRED'?(lang==='sq'?'Skaduar':'Expired'):(s||'Trial')})()}
+              </span>
             </div>
           </div>
 
