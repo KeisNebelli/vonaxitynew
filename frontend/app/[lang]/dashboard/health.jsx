@@ -136,7 +136,7 @@ function buildAreaPath(pts, toX, toY, key, bottomY) {
 }
 
 /* ─── SVG line chart ─────────────────────────────────────── */
-function VitalsChart({ points, metric, lang }) {
+function VitalsChart({ points, metric, lang = 'en' }) {
   const [hovered, setHovered] = useState(null);
   const containerRef = useRef(null);
   const [W, setW] = useState(560);
@@ -305,7 +305,7 @@ function VitalsChart({ points, metric, lang }) {
               {isBP ? `${p.value}/${p.value2 ?? '—'} ${metric.unit}` : `${p.value} ${metric.unit}`}
             </div>
             <div style={{ color: '#94A3B8', fontSize: 11 }}>{fmtDate(p.date, 'long')}</div>
-            {p.nurse && <div style={{ color: '#64748B', fontSize: 11, marginTop: 2 }}>Nurse: {p.nurse}</div>}
+            {p.nurse && <div style={{ color: '#64748B', fontSize: 11, marginTop: 2 }}>{lang==='sq' ? 'Infermierja' : 'Nurse'}: {p.nurse}</div>}
           </div>
         );
       })()}
@@ -753,8 +753,8 @@ function HealthAnalytics({ visits, relative, lang, nurseMode, onBack }) {
                            : trend > 0 ? (activeMetric === 'oxygen' ? C.green : C.red)
                                        : (activeMetric === 'oxygen' ? C.red   : C.green),
                     }}>
-                      {Math.abs(trend) < 1 ? '→ Stable' : `${trend > 0 ? '↑' : '↓'} ${Math.abs(trend).toFixed(1)}`}
-                      <span style={{ fontSize: 10, fontWeight: 400, color: C.textMuted }}>vs prev</span>
+                      {Math.abs(trend) < 1 ? (lang==='sq' ? '→ Stabil' : '→ Stable') : `${trend > 0 ? '↑' : '↓'} ${Math.abs(trend).toFixed(1)}`}
+                      <span style={{ fontSize: 10, fontWeight: 400, color: C.textMuted }}>{lang==='sq' ? 'vs para' : 'vs prev'}</span>
                     </div>
                   )}
                 </div>
@@ -808,11 +808,11 @@ function HealthAnalytics({ visits, relative, lang, nurseMode, onBack }) {
                   <>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                       <span style={{ display: 'inline-block', width: 16, height: 2.5,
-                        background: metric.color, borderRadius: 1 }}/> Systolic
+                        background: metric.color, borderRadius: 1 }}/> {lang==='sq' ? 'Sistolik' : 'Systolic'}
                     </span>
                     <span style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
                       <span style={{ display: 'inline-block', width: 16, height: 2,
-                        background: '#93C5FD', borderRadius: 1 }}/> Diastolic
+                        background: '#93C5FD', borderRadius: 1 }}/> {lang==='sq' ? 'Diastolik' : 'Diastolic'}
                     </span>
                   </>
                 )}
@@ -824,12 +824,12 @@ function HealthAnalytics({ visits, relative, lang, nurseMode, onBack }) {
           {/* Summary stats */}
           {allVals.length >= 2 && (
             <div style={{ display: 'flex', gap: 10, flexWrap: 'wrap' }}>
-              <MiniStat label="Min" value={minVal} unit={metric.unit} color={C.blue}/>
+              <MiniStat label={lang==='sq'?'Min':'Min'} value={minVal} unit={metric.unit} color={C.blue}/>
               <MiniStat
                 label={lang==='sq'?'Mesatare':'Average'}
                 value={avgVal != null ? (metric.id==='temp' ? avgVal.toFixed(1) : Math.round(avgVal)) : null}
                 unit={metric.unit} color={C.textSub}/>
-              <MiniStat label="Max" value={maxVal} unit={metric.unit} color={C.red}/>
+              <MiniStat label={lang==='sq'?'Maks':'Max'} value={maxVal} unit={metric.unit} color={C.red}/>
               <MiniStat label={lang==='sq'?'Matje':'Readings'} value={allVals.length} color={C.text}/>
             </div>
           )}
