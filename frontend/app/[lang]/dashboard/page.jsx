@@ -413,7 +413,9 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits, onViewNe
           </div>
           <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.7px', textTransform:'uppercase', marginBottom:5 }}>{tr('dashboard.plan')}</div>
           <div style={{ fontSize:20, fontWeight:800, color:C.primary, letterSpacing:'-0.5px', lineHeight:1 }}>{planLabel}</div>
-          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5, fontWeight:500 }}>{sub?.status||'Active'}</div>
+          <div style={{ fontSize:11, color:C.textTertiary, marginTop:5, fontWeight:500 }}>
+            {sub?.status==='ACTIVE' ? (lang==='sq'?'Aktiv':'Active') : sub?.status==='TRIAL' ? (lang==='sq'?'Provë':'Trial') : sub?.status==='EXPIRED' ? (lang==='sq'?'Skaduar':'Expired') : (sub?.status||'Active')}
+          </div>
         </div>
 
         {/* Visits used */}
@@ -433,7 +435,7 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits, onViewNe
               <div style={{ fontSize:10, color:C.textTertiary, marginTop:4 }}>{visitsLeft} {lang==='sq'?'mbetur':'remaining'}</div>
             </div>
           ) : (
-            <div style={{ fontSize:11, color:C.secondary, marginTop:5, fontWeight:600 }}>Unlimited</div>
+            <div style={{ fontSize:11, color:C.secondary, marginTop:5, fontWeight:600 }}>{lang==='sq'?'E pakufizuar':'Unlimited'}</div>
           )}
         </div>
 
@@ -688,7 +690,7 @@ function BookVisit({ relatives=[], subscription, onSuccess, onCancel, lang='en' 
             )}
             {subscription && (
               subscription.visitsPerMonth >= 999
-                ? <span style={{ fontSize:11, fontWeight:700, color:'#6EE7B7', background:'rgba(110,231,183,0.15)', padding:'3px 10px', borderRadius:99, border:'1px solid rgba(110,231,183,0.3)' }}>⚡ Unlimited visits</span>
+                ? <span style={{ fontSize:11, fontWeight:700, color:'#6EE7B7', background:'rgba(110,231,183,0.15)', padding:'3px 10px', borderRadius:99, border:'1px solid rgba(110,231,183,0.3)' }}>⚡ {lang==='sq'?'Vizita të pakufizuara':'Unlimited visits'}</span>
                 : <span style={{ fontSize:11, fontWeight:700, color: subscription.visitsUsed >= subscription.visitsPerMonth ? '#FCA5A5':'#6EE7B7', background:'rgba(255,255,255,0.12)', padding:'3px 10px', borderRadius:99 }}>
                     {subscription.visitsPerMonth - subscription.visitsUsed} {lang==='sq'?'vizita mbetur':'visits remaining'}
                   </span>
@@ -1725,11 +1727,13 @@ function SubscriptionSection({ userData, lang }) {
             <div style={{ fontSize:13, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:6 }}>{tr('dashboard.currentPlan')}</div>
             <div style={{ fontSize:22, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px' }}>{currentPlan ? currentPlan.charAt(0).toUpperCase()+currentPlan.slice(1) : tr('dashboard.trialLabel')}</div>
             <div style={{ fontSize:13, color:C.textSecondary, marginTop:4 }}>
-              {visitsTotal >= 999 ? '⚡ Unlimited visits (test account)' : visitsTotal > 0 ? `${visitsUsed}/${visitsTotal} ${tr('dashboard.visitsUsedMonth')}` : tr('dashboard.freeTrial')}
+              {visitsTotal >= 999 ? (lang==='sq'?'⚡ Vizita të pakufizuara (llogari test)':'⚡ Unlimited visits (test account)') : visitsTotal > 0 ? `${visitsUsed}/${visitsTotal} ${tr('dashboard.visitsUsedMonth')}` : tr('dashboard.freeTrial')}
             </div>
           </div>
           <div style={{ display:'flex', gap:8, alignItems:'center' }}>
-            <span style={{ fontSize:12, fontWeight:700, padding:'4px 12px', borderRadius:99, background:status==='ACTIVE'?C.secondaryLight:status==='TRIAL'?C.purpleLight:C.warningLight, color:status==='ACTIVE'?C.secondary:status==='TRIAL'?C.purple:C.warning }}>{status}</span>
+            <span style={{ fontSize:12, fontWeight:700, padding:'4px 12px', borderRadius:99, background:status==='ACTIVE'?C.secondaryLight:status==='TRIAL'?C.purpleLight:C.warningLight, color:status==='ACTIVE'?C.secondary:status==='TRIAL'?C.purple:C.warning }}>
+              {status==='ACTIVE'?(lang==='sq'?'Aktiv':'Active'):status==='TRIAL'?(lang==='sq'?'Provë':'Trial'):status==='EXPIRED'?(lang==='sq'?'Skaduar':'Expired'):status}
+            </span>
             {sub?.stripeSubId && (
               <button onClick={handlePortal} disabled={portalLoading} style={{ fontSize:13, fontWeight:600, padding:'8px 16px', borderRadius:9, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.textSecondary }}>
                 {portalLoading ? tr('dashboard.opening') : tr('dashboard.manageBilling')}
