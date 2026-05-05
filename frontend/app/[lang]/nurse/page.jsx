@@ -6,6 +6,7 @@ import { t } from '@/translations';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
 import { toastSuccess, toastError } from '@/components/ui/Toast';
 import HealthProgress from '../dashboard/health';
+import NurseChat from '@/components/chat/NurseChat';
 // Module-level translation helper - uses 'en' as default
 let _currentLang = 'en';
 const tr = (key) => t(_currentLang, key);
@@ -2210,6 +2211,7 @@ export default function NursePage({ params }) {
           ))}
         </div>
       </div>
+      <NurseChat lang={lang} nurseStatus={nurse?.status || 'INCOMPLETE'} onNavigate={(section) => { navigateTo(section); }} />
     </>
   );
 }

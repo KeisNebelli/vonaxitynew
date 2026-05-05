@@ -1,7 +1,7 @@
 'use client';
 import { useState, useMemo, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
-import { api } from '@/lib/api';
+import { api, apiFetch } from '@/lib/api';
 import { t } from '@/translations';
 import { toastSuccess, toastError } from '@/components/ui/Toast';
 
@@ -1108,86 +1108,47 @@ function Analytics({ clients, nurses, visits, payments=[], lang='en' }) {
   );
 }
 
+function buildCrmSummary(clients, nurses, visits, payments) {
+  const unassigned = visits.filter(v => v.status === 'UNASSIGNED');
+  const approved = nurses.filter(n => n.status === 'APPROVED');
+  const pending = nurses.filter(n => n.status === 'PENDING');
+  const incomplete = nurses.filter(n => n.status === 'INCOMPLETE');
+  const completed = visits.filter(v => v.status === 'COMPLETED');
+  const revenue = payments.filter(p => p.status === 'paid').reduce((s, p) => s + (p.amount || 0), 0);
+  const byCity = {};
+  visits.forEach(v => { byCity[v.city] = (byCity[v.city] || 0) + 1; });
+  const nursesByCity = {};
+  approved.forEach(n => { nursesByCity[n.city] = (nursesByCity[n.city] || 0) + 1; });
+  const premiumClients = clients.filter(c => c.plan === 'premium');
+  const trialClients = clients.filter(c => c.status === 'TRIAL');
+  const activeClients = clients.filter(c => c.status === 'ACTIVE');
+  const failedPayments = payments.filter(p => p.status === 'failed');
+
+  return `Clients total: ${clients.length} (active: ${activeClients.length}, trial: ${trialClients.length})
+Nurses total: ${nurses.length} (approved: ${approved.length}, pending: ${pending.length}, incomplete: ${incomplete.length})
+Visits total: ${visits.length} (completed: ${completed.length}, unassigned: ${unassigned.length})
+Revenue collected: €${revenue}
+Premium clients: ${premiumClients.length}
+Failed payments: ${failedPayments.length}
+Unassigned visits:
+${unassigned.length === 0 ? 'None' : unassigned.map(v => `- ${v.clientName || 'Client'} — ${v.serviceType || v.service || 'Service'} in ${v.city || '?'} on ${new Date(v.scheduledAt).toLocaleDateString()}`).join('\n')}
+Pending nurse applications:
+${pending.length === 0 ? 'None' : pending.map(n => `- ${n.name} — ${n.city} — License: ${n.licenseNumber || 'N/A'}`).join('\n')}
+Approved nurses by city:
+${Object.entries(nursesByCity).map(([city, count]) => `- ${city}: ${count}`).join('\n') || 'None'}
+Visits by city:
+${Object.entries(byCity).map(([city, count]) => `- ${city}: ${count}`).join('\n') || 'None'}
+Top rated nurses (approved):
+${[...approved].sort((a,b) => (b.rating||0)-(a.rating||0)).slice(0,5).map(n => `- ${n.name} (${n.city}) rating: ${n.rating||'N/A'}, visits: ${n.totalVisits||0}`).join('\n') || 'None'}`;
+}
+
 function AIAssistant({ clients, nurses, visits, payments=[], lang='en' }) {
   const tr = (key) => t(lang, key);
   const [messages, setMessages] = useState([
     { role:'assistant', content:t(lang,'admin.aiSubtitle') }
   ]);
   const [input, setInput] = useState('');
-
-  // Free rule-based engine — no API costs
-  const analyze = (q) => {
-    const query = q.toLowerCase();
-    const unassigned = visits.filter(v=>v.status==='UNASSIGNED');
-    const pending = nurses.filter(n=>n.status==='PENDING');
-    const approved = nurses.filter(n=>n.status==='APPROVED');
-    const completed = visits.filter(v=>v.status==='COMPLETED');
-    const noShow = visits.filter(v=>v.status==='NO_SHOW');
-    const revenue = payments.filter(p=>p.status==='paid').reduce((s,p)=>s+p.amount,0);
-
-    if (query.includes('unassigned')) {
-      if (unassigned.length===0) return 'All visits are currently assigned. No action needed.';
-      return `There are ${unassigned.length} unassigned visit${unassigned.length>1?'s':''}:\n\n${unassigned.map(v=>`• ${v.clientName} — ${v.service} in ${v.city} on ${new Date(v.scheduledAt).toLocaleDateString()}`).join('\n')}\n\nGo to the Alerts tab to assign nurses quickly.`;
-    }
-    if (query.includes('tirana') && (query.includes('nurse') || query.includes('available'))) {
-      const tiranaApproved = approved.filter(n=>n.city==='Tirana');
-      return `${tiranaApproved.length} approved nurse${tiranaApproved.length!==1?'s':''} available in Tirana:\n\n${tiranaApproved.map(n=>`• ${n.name} — Rating ${n.rating} · ${n.totalVisits} visits\n  Available: ${n.availability.slice(0,3).join(', ')}${n.availability.length>3?'...':''}`).join('\n\n')}`;
-    }
-    if (query.includes('nurse') && (query.includes('available') || query.includes('approved'))) {
-      const byCity = {};
-      approved.forEach(n=>{ if(!byCity[n.city]) byCity[n.city]=[]; byCity[n.city].push(n.name); });
-      return `${approved.length} approved nurses across ${Object.keys(byCity).length} cities:\n\n${Object.entries(byCity).map(([city,ns])=>`• ${city}: ${ns.join(', ')}`).join('\n')}`;
-    }
-    if (query.includes('premium')) {
-      const premiumClients = clients.filter(c=>c.plan==='premium');
-      return `${premiumClients.length} clients on the Premium plan:\n\n${premiumClients.map(c=>`• ${c.name} (${c.country}) — ${c.status} · ${c.visitsUsed}/${c.visitsTotal} visits used`).join('\n')}`;
-    }
-    if (query.includes('pending') && query.includes('nurse')) {
-      if (pending.length===0) return 'No nurse applications pending. All applications have been reviewed.';
-      return `${pending.length} nurse application${pending.length!==1?'s':''} awaiting review:\n\n${pending.map(n=>`• ${n.name} — ${n.city} · Applied ${n.joinedAt}\n  License: ${n.licenseNumber}`).join('\n\n')}\n\nGo to the Nurses tab or Alerts to approve or reject.`;
-    }
-    if (query.includes('today') || query.includes('scheduled')) {
-      const today = visits.filter(v=>['PENDING','IN_PROGRESS','ON_THE_WAY'].includes(v.status));
-      if (today.length===0) return 'No visits scheduled or in progress right now.';
-      return `${today.length} visit${today.length!==1?'s':''} currently scheduled or in progress:\n\n${today.map(v=>`• ${v.clientName} — ${v.service} in ${v.city}\n  Nurse: ${v.nurseName||'Unassigned'} · ${new Date(v.scheduledAt).toLocaleDateString()}`).join('\n\n')}`;
-    }
-    if (query.includes('city') && query.includes('most')) {
-      const cityCounts = {};
-      visits.forEach(v=>{ cityCounts[v.city]=(cityCounts[v.city]||0)+1; });
-      const sorted = Object.entries(cityCounts).sort((a,b)=>b[1]-a[1]);
-      return `Visit breakdown by city:\n\n${sorted.map(([city,count])=>`• ${city}: ${count} visit${count!==1?'s':''}`).join('\n')}\n\nTirana leads with ${sorted[0][1]} visits.`;
-    }
-    if (query.includes('revenue') || query.includes('payment') || query.includes('money')) {
-      const failed = payments.filter(p=>p.status==='failed');
-      return `Revenue summary:\n\n• Total collected: €${revenue}\n• Successful payments: ${payments.filter(p=>p.status==='paid').length}\n• Failed payments: ${failed.length}${failed.length>0?'\n\nFailed payments:\n'+failed.map(p=>`• ${p.clientName} — €${p.amount} (${p.date})`).join('\n'):''}`;
-    }
-    if (query.includes('no show') || query.includes('no-show') || query.includes('missed')) {
-      if (noShow.length===0) return 'No no-shows recorded. All completed visits went ahead as planned.';
-      return `${noShow.length} no-show${noShow.length!==1?'s':''} recorded:\n\n${noShow.map(v=>`• ${v.clientName} — ${v.service} in ${v.city} on ${new Date(v.scheduledAt).toLocaleDateString()}\n  Nurse: ${v.nurseName}${v.nurseNotes?'\n  Note: '+v.nurseNotes:''}`).join('\n\n')}`;
-    }
-    if (query.includes('client') && (query.includes('total') || query.includes('how many'))) {
-      const byCountry = {};
-      clients.forEach(c=>{ byCountry[c.country]=(byCountry[c.country]||0)+1; });
-      return `${clients.length} total clients:\n\n• Active: ${clients.filter(c=>c.status==='ACTIVE').length}\n• Trial: ${clients.filter(c=>c.status==='TRIAL').length}\n\nBy country:\n${Object.entries(byCountry).map(([country,count])=>`• ${country}: ${count}`).join('\n')}`;
-    }
-    if (query.includes('summary') || query.includes('overview') || query.includes('status')) {
-      return `Platform summary:\n\n• Clients: ${clients.length} (${clients.filter(c=>c.status==='ACTIVE').length} active, ${clients.filter(c=>c.status==='TRIAL').length} trial)\n• Nurses: ${nurses.length} (${approved.length} approved, ${pending.length} pending)\n• Visits: ${visits.length} total (${completed.length} completed, ${unassigned.length} unassigned)\n• Revenue: €${revenue}\n• Alerts: ${unassigned.length} unassigned visit${unassigned.length!==1?'s':''}, ${pending.length} pending nurse${pending.length!==1?'s':''}`;
-    }
-    if (query.includes('rating') || query.includes('best nurse') || query.includes('top nurse')) {
-      const sorted = [...approved].sort((a,b)=>b.rating-a.rating);
-      return `Nurses ranked by rating:\n\n${sorted.map((n,i)=>`${i+1}. ${n.name} (${n.city}) — ${n.rating} rating · ${n.totalVisits} visits`).join('\n')}`;
-    }
-
-    return `I can answer questions about:\n\n• Unassigned visits — "How many unassigned visits?"\n• Nurse availability — "Which nurses are in Tirana?"\n• Client plans — "Show premium clients"\n• Alerts — "Any pending nurse applications?"\n• Revenue — "What's our total revenue?"\n• City breakdown — "Which city has the most visits?"\n• Platform summary — "Give me an overview"\n\nTry one of the quick questions above or rephrase your question!`;
-  };
-
-  const sendMessage = () => {
-    if (!input.trim()) return;
-    const userMsg = input.trim();
-    setInput('');
-    const reply = analyze(userMsg);
-    setMessages(prev=>[...prev, { role:'user', content:userMsg }, { role:'assistant', content:reply }]);
-  };
+  const [loading, setLoading] = useState(false);
 
   const QUICK = [
     'How many unassigned visits do we have?',
@@ -1198,14 +1159,47 @@ function AIAssistant({ clients, nurses, visits, payments=[], lang='en' }) {
     'Give me a platform summary',
   ];
 
+  const send = async () => {
+    if (!input.trim() || loading) return;
+    const userMsg = input.trim();
+    setInput('');
+    setLoading(true);
+    const crmContext = buildCrmSummary(clients, nurses, visits, payments);
+    setMessages(prev => [...prev, { role: 'user', content: userMsg }]);
+    try {
+      const data = await apiFetch('/ai/chat', {
+        method: 'POST',
+        body: JSON.stringify({
+          messages: [...messages, { role: 'user', content: userMsg }].map(m => ({ role: m.role, content: m.content })),
+          context: 'admin',
+          crmContext,
+        }),
+      });
+      setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
+    } catch {
+      setMessages(prev => [...prev, { role: 'assistant', content: 'Sorry, I could not connect to the assistant. Please try again.' }]);
+    } finally {
+      setLoading(false);
+    }
+  };
+
   return (
     <div style={{ display:'flex', flexDirection:'column', height:'calc(100vh - 120px)', maxWidth:760 }}>
       <div style={{ background:C.primaryLight, borderRadius:14, border:`1px solid rgba(37,99,235,0.15)`, padding:'16px 20px', marginBottom:20, display:'flex', gap:12, alignItems:'center' }}>
-        <div style={{ width:40, height:40, borderRadius:'50%', background:C.primary, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 015.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+        <div style={{ width:40, height:40, borderRadius:'50%', overflow:'hidden', flexShrink:0 }}>
+          <svg width="40" height="40" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+            <defs>
+              <linearGradient id="adm-vona-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+                <stop offset="0%" stopColor="#2563EB" />
+                <stop offset="100%" stopColor="#7C3AED" />
+              </linearGradient>
+            </defs>
+            <circle cx="50" cy="50" r="50" fill="url(#adm-vona-bg)" />
+            <text x="50" y="65" textAnchor="middle" fontSize="42" fontWeight="800" fill="white" fontFamily="system-ui,sans-serif">V</text>
+          </svg>
         </div>
         <div>
-          <div style={{ fontSize:15, fontWeight:700, color:C.primary }}>{tr('admin.aiTitle')}</div>
+          <div style={{ fontSize:15, fontWeight:700, color:C.primary }}>Vona — Admin CRM Assistant</div>
           <div style={{ fontSize:12, color:'#3B82F6', marginTop:2 }}>{tr('admin.aiSubtitle')}</div>
         </div>
       </div>
@@ -1221,19 +1215,47 @@ function AIAssistant({ clients, nurses, visits, payments=[], lang='en' }) {
       <div style={{ flex:1, overflowY:'auto', background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20, marginBottom:16, display:'flex', flexDirection:'column', gap:14 }}>
         {messages.map((m,i) => (
           <div key={i} style={{ display:'flex', gap:10, alignItems:'flex-start', flexDirection:m.role==='user'?'row-reverse':'row' }}>
-            <div style={{ width:32, height:32, borderRadius:'50%', background:m.role==='user'?'#1E3A5F':C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:700, color:m.role==='user'?'#93C5FD':C.primary, flexShrink:0 }}>
-              {m.role==='user'?'A':'AI'}
+            <div style={{ width:32, height:32, borderRadius:'50%', background:m.role==='user'?'#1E3A5F':C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', fontSize:11, fontWeight:700, color:m.role==='user'?'#93C5FD':C.primary, flexShrink:0, overflow:'hidden' }}>
+              {m.role==='user' ? 'A' : (
+                <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                  <defs>
+                    <linearGradient id="adm-vona-avatar" x1="0%" y1="0%" x2="100%" y2="100%">
+                      <stop offset="0%" stopColor="#2563EB" />
+                      <stop offset="100%" stopColor="#7C3AED" />
+                    </linearGradient>
+                  </defs>
+                  <circle cx="50" cy="50" r="50" fill="url(#adm-vona-avatar)" />
+                  <text x="50" y="65" textAnchor="middle" fontSize="42" fontWeight="800" fill="white" fontFamily="system-ui,sans-serif">V</text>
+                </svg>
+              )}
             </div>
             <div style={{ maxWidth:'78%', background:m.role==='user'?C.primary:C.bg, borderRadius:m.role==='user'?'14px 14px 4px 14px':'14px 14px 14px 4px', padding:'12px 16px', fontSize:14, color:m.role==='user'?'#fff':C.textPrimary, lineHeight:1.7, whiteSpace:'pre-wrap' }}>
               {m.content}
             </div>
           </div>
         ))}
+        {loading && (
+          <div style={{ display:'flex', gap:10, alignItems:'flex-start' }}>
+            <div style={{ width:32, height:32, borderRadius:'50%', background:C.primaryLight, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, overflow:'hidden' }}>
+              <svg width="32" height="32" viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+                <defs>
+                  <linearGradient id="adm-vona-loading" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#2563EB" />
+                    <stop offset="100%" stopColor="#7C3AED" />
+                  </linearGradient>
+                </defs>
+                <circle cx="50" cy="50" r="50" fill="url(#adm-vona-loading)" />
+                <text x="50" y="65" textAnchor="middle" fontSize="42" fontWeight="800" fill="white" fontFamily="system-ui,sans-serif">V</text>
+              </svg>
+            </div>
+            <div style={{ background:C.bg, borderRadius:'14px 14px 14px 4px', padding:'12px 16px', fontSize:14, color:C.textSecondary }}>...</div>
+          </div>
+        )}
       </div>
 
       <div style={{ display:'flex', gap:10 }}>
-        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&sendMessage()} placeholder={tr('admin.aiPlaceholder')} style={{ flex:1, padding:'12px 16px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' }} />
-        <button onClick={sendMessage} disabled={!input.trim()} className="adm-btn-primary" style={{ padding:'12px 20px', opacity:!input.trim()?0.5:1 }}>{tr('admin.aiSend')}</button>
+        <input value={input} onChange={e=>setInput(e.target.value)} onKeyDown={e=>e.key==='Enter'&&send()} placeholder={tr('admin.aiPlaceholder')} style={{ flex:1, padding:'12px 16px', borderRadius:10, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit' }} />
+        <button onClick={send} disabled={loading || !input.trim()} className="adm-btn-primary" style={{ padding:'12px 20px', opacity:(loading || !input.trim())?0.5:1 }}>{tr('admin.aiSend')}</button>
       </div>
     </div>
   );

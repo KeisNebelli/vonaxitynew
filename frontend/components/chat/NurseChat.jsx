@@ -3,13 +3,13 @@ import { useState, useRef, useEffect } from 'react';
 import { apiFetch } from '@/lib/api';
 
 const SUGGESTIONS = {
-  en: ['How do I book a visit?', 'What do my health records show?', 'How do I upgrade my plan?', 'How do I add a family member?'],
-  sq: ['Si rezervoj një vizitë?', 'Çfarë tregojnë shënimet e mia shëndetësore?', 'Si e rris planin tim?', 'Si shtoj një anëtar familje?'],
+  en: ['How do I get approved?', 'How do bookings work?', 'Where do I upload my certificate?', 'How do I get paid?'],
+  sq: ['Si miratohem?', 'Si funksionojnë rezervimet?', 'Ku ngarkoja certifikatën?', 'Si paguhem?'],
 };
 const PLACEHOLDER = { en: 'Ask me anything…', sq: 'Pyesni çdo gjë…' };
 const BUBBLE_TEXT = {
-  en: '👋 Need help with your dashboard?',
-  sq: '👋 Keni nevojë për ndihmë me panelin?',
+  en: '👋 Need help with your nurse account?',
+  sq: '👋 Keni nevojë për ndihmë me llogarinë tuaj?',
 };
 
 // ── Intent detection ──────────────────────────────────────────────────────────
@@ -19,30 +19,27 @@ const INTENTS = [
     keys: ['chest pain','heart attack','stroke','trouble breathing','bleeding','unconscious','emergency'],
     emergency: true,
   },
-  { id: 'book',         keys: ['book','appointment','reserve','schedule a visit','new visit','add visit'], section: 'book' },
-  { id: 'health',       keys: ['health','vitals','blood pressure','glucose','heart rate','oxygen','records','history'], section: 'health' },
-  { id: 'nurses',       keys: ['find nurse','browse nurse','nurse profile','see nurses','who is available'], section: 'nurses' },
-  { id: 'visits',       keys: ['my visit','visit history','past visit','upcoming','all visit','visit list'], section: 'visits' },
-  { id: 'subscription', keys: ['plan','subscription','upgrade','downgrade','billing','payment','premium','standard','basic','cost','price'], section: 'subscription' },
-  { id: 'settings',     keys: ['setting','account','profile','password','family member','loved one','add person','change email','edit info'], section: 'settings' },
+  { id: 'profile',   keys: ['profile','certif','upload','license','complet','approv','status','incomplet'], section: 'profile' },
+  { id: 'jobs',      keys: ['job','booking','work order','find job','apply','available visit'], section: 'jobs' },
+  { id: 'visits',    keys: ['visit','my visit','schedule','upcoming','assigned'], section: 'visits' },
+  { id: 'earnings',  keys: ['earn','pay','payment','money','salary','rate'], section: 'earnings' },
+  { id: 'calendar',  keys: ['calendar','schedule','week','day'], section: 'calendar' },
 ];
 
 const NAV_MSGS = {
   en: {
-    book:         "I'll take you to Book a Visit 👇",
-    health:       "Let me show you your Health records 👇",
-    nurses:       "Taking you to Find Nurses 👇",
-    visits:       "I'll show you your visit history 👇",
-    subscription: "Taking you to Subscription & Plans 👇",
-    settings:     "I'll take you to Account Settings 👇",
+    profile:  "I'll take you to your Profile 👇",
+    jobs:     "Taking you to Find Jobs 👇",
+    visits:   "I'll show you your visits 👇",
+    earnings: "Taking you to your Earnings 👇",
+    calendar: "I'll open your Calendar 👇",
   },
   sq: {
-    book:         "Po ju çoj tek Rezervo Vizitë 👇",
-    health:       "Ju tregoj shënimet tuaja shëndetësore 👇",
-    nurses:       "Po ju çoj tek Gjej Infermiere 👇",
-    visits:       "Ju tregoj historinë e vizitave 👇",
-    subscription: "Po ju çoj tek Abonimi & Planet 👇",
-    settings:     "Po ju çoj tek Cilësimet e llogarisë 👇",
+    profile:  "Po ju çoj tek Profili juaj 👇",
+    jobs:     "Po ju çoj tek Gjej Punë 👇",
+    visits:   "Ju tregoj vizitat tuaja 👇",
+    earnings: "Po ju çoj tek Fitimet 👇",
+    calendar: "Po ju çoj tek Kalendari 👇",
   },
 };
 
@@ -64,12 +61,12 @@ function VonaIcon({ size = 40 }) {
   return (
     <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <linearGradient id="dc-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+        <linearGradient id="nc-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#3B82F6" />
           <stop offset="100%" stopColor="#7C3AED" />
         </linearGradient>
       </defs>
-      <circle cx="50" cy="50" r="50" fill="url(#dc-bg)" />
+      <circle cx="50" cy="50" r="50" fill="url(#nc-bg)" />
       <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" />
       <line x1="50" y1="14" x2="50" y2="23" stroke="rgba(255,255,255,0.75)" strokeWidth="2.5" strokeLinecap="round" />
       <circle cx="50" cy="11" r="4.5" fill="#BAE6FD" opacity="0.9" />
@@ -96,45 +93,45 @@ function VonaIcon({ size = 40 }) {
 
 // ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
-  @keyframes vonaGlowDark {
+  @keyframes ncVonaGlowDark {
     0%,100% { box-shadow:0 4px 20px rgba(99,102,241,0.45),0 0 0 0 rgba(99,102,241,0); }
     50%      { box-shadow:0 6px 28px rgba(99,102,241,0.65),0 0 0 9px rgba(99,102,241,0.1); }
   }
-  @keyframes dcSlideUp {
+  @keyframes ncSlideUp {
     from { opacity:0;transform:translateY(18px) scale(0.96); }
     to   { opacity:1;transform:translateY(0) scale(1); }
   }
-  @keyframes dcBubblePop {
+  @keyframes ncBubblePop {
     from { opacity:0;transform:translateY(8px) scale(0.92); }
     to   { opacity:1;transform:translateY(0) scale(1); }
   }
-  @keyframes dotBounce2 {
+  @keyframes ncDotBounce {
     0%,80%,100% { transform:translateY(0); }
     40%         { transform:translateY(-5px); }
   }
-  @keyframes navPulseDark {
+  @keyframes ncNavPulseDark {
     0%,100% { opacity:1; }
     50%     { opacity:0.65; }
   }
-  .vona-idle-dark { animation:vonaGlowDark 3s ease-in-out infinite; }
-  .vona-idle-dark:hover {
+  .nc-vona-idle-dark { animation:ncVonaGlowDark 3s ease-in-out infinite; }
+  .nc-vona-idle-dark:hover {
     animation:none !important;
     transform:scale(1.1) !important;
     box-shadow:0 8px 32px rgba(99,102,241,0.7) !important;
     transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.18s ease !important;
   }
-  .nav-hint-dark { animation:navPulseDark 1.4s ease-in-out infinite; }
+  .nc-nav-hint-dark { animation:ncNavPulseDark 1.4s ease-in-out infinite; }
 `;
 
 // ── Component ─────────────────────────────────────────────────────────────────
-export default function DashboardChat({ lang = 'en', userName = null, onNavigate }) {
-  const greeting = userName
+export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onNavigate }) {
+  const greeting = (nurseStatus === 'INCOMPLETE' || nurseStatus === 'PENDING')
     ? (lang === 'sq'
-        ? `Përshëndetje ${userName}! Unë jam Vona, asistentja juaj e kujdesit. Si mund t'ju ndihmoj sot?`
-        : `Hi ${userName}! I'm Vona, your care assistant. How can I help you today?`)
+        ? `Përshëndetje! Unë jam Vona. Profili juaj është ${nurseStatus.toLowerCase()} — ju ndihmoj ta plotësoni për të filluar të merrni rezervime.`
+        : `Hi! I'm Vona, your nurse support assistant. Your profile is ${nurseStatus.toLowerCase()} — I can help you complete it to start receiving bookings.`)
     : (lang === 'sq'
-        ? "Përshëndetje! Unë jam Vona, asistentja juaj e Vonaxity. Si mund t'ju ndihmoj?"
-        : "Hi! I'm Vona, your Vonaxity care assistant. How can I help you today?");
+        ? "Përshëndetje! Unë jam Vona, asistentja juaj e mbështetjes infermierore. Si mund t'ju ndihmoj me panelin tuaj sot?"
+        : "Hi! I'm Vona, your nurse support assistant. How can I help you with your nurse dashboard today?");
 
   const [open, setOpen] = useState(false);
   const [messages, setMessages] = useState([{ role: 'assistant', content: greeting }]);
@@ -212,7 +209,7 @@ export default function DashboardChat({ lang = 'en', userName = null, onNavigate
     try {
       const data = await apiFetch('/ai/chat', {
         method: 'POST',
-        body: JSON.stringify({ messages: next.map(m => ({ role: m.role, content: m.content })), context: 'client', userName }),
+        body: JSON.stringify({ messages: next.map(m => ({ role: m.role, content: m.content })), context: 'nurse' }),
       });
       setMessages(prev => [...prev, { role: 'assistant', content: data.content }]);
 
@@ -247,7 +244,7 @@ export default function DashboardChat({ lang = 'en', userName = null, onNavigate
             display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
             fontFamily: "'DM Sans','Inter',system-ui,sans-serif",
             fontSize: 13.5, fontWeight: 500, color: '#F1F5F9', maxWidth: 240,
-            animation: 'dcBubblePop 0.28s cubic-bezier(0.34,1.56,0.64,1)',
+            animation: 'ncBubblePop 0.28s cubic-bezier(0.34,1.56,0.64,1)',
           }}
         >
           <span style={{ flex: 1, lineHeight: 1.4 }}>{BUBBLE_TEXT[lang] || BUBBLE_TEXT.en}</span>
@@ -267,7 +264,7 @@ export default function DashboardChat({ lang = 'en', userName = null, onNavigate
       <button
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Close support chat' : 'Chat with Vona'}
-        className={!open ? 'vona-idle-dark' : ''}
+        className={!open ? 'nc-vona-idle-dark' : ''}
         style={{
           position: 'fixed', bottom: 80, right: 20, zIndex: 9000,
           width: 54, height: 54, borderRadius: '50%',
@@ -294,7 +291,7 @@ export default function DashboardChat({ lang = 'en', userName = null, onNavigate
           display: 'flex', flexDirection: 'column',
           fontFamily: "'DM Sans','Inter',system-ui,sans-serif",
           overflow: 'hidden',
-          animation: 'dcSlideUp 0.26s cubic-bezier(0.34,1.56,0.64,1)',
+          animation: 'ncSlideUp 0.26s cubic-bezier(0.34,1.56,0.64,1)',
         }}>
 
           {/* Header */}
@@ -305,7 +302,7 @@ export default function DashboardChat({ lang = 'en', userName = null, onNavigate
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 800, color: '#fff', letterSpacing: '-0.2px' }}>Vona</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.65)', fontWeight: 400 }}>
-                {lang === 'sq' ? 'Asistentja juaj e Kujdesit' : 'Client Care Assistant'}
+                {lang === 'sq' ? 'Asistentja juaj Infermierore' : 'Nurse Support Assistant'}
               </div>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
@@ -320,7 +317,7 @@ export default function DashboardChat({ lang = 'en', userName = null, onNavigate
               <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                 {m.isNav ? (
                   <div
-                    className="nav-hint-dark"
+                    className="nc-nav-hint-dark"
                     onClick={() => { if (redirectTimer.current) { clearTimeout(redirectTimer.current); executeNav(pendingNav); } }}
                     style={{
                       maxWidth: '84%', padding: '9px 13px',
@@ -356,7 +353,7 @@ export default function DashboardChat({ lang = 'en', userName = null, onNavigate
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
                 <div style={{ padding: '9px 14px', borderRadius: '16px 16px 16px 4px', background: '#1E293B', display: 'flex', gap: 5, alignItems: 'center' }}>
                   {[0, 1, 2].map(i => (
-                    <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#475569', display: 'inline-block', animation: `dotBounce2 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                    <span key={i} style={{ width: 6, height: 6, borderRadius: '50%', background: '#475569', display: 'inline-block', animation: `ncDotBounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />
                   ))}
                 </div>
               </div>
