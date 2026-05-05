@@ -213,16 +213,17 @@ export default function ServiceCardsSection({ lang, services }) {
 
         .svc-overlay {
           position:fixed;
-          inset:0;
-          background:rgba(15,23,42,0.6);
+          top:0; left:0; right:0; bottom:0;
+          width:100vw; height:100vh;
+          background:rgba(15,23,42,0.65);
           backdrop-filter:blur(10px);
           -webkit-backdrop-filter:blur(10px);
-          z-index:1000;
+          z-index:9500;
           display:flex;
           align-items:center;
           justify-content:center;
           padding:24px;
-          transition:opacity 0.28s ease;
+          box-sizing:border-box;
         }
         .svc-overlay.is-visible  { animation:svc-overlay-in  0.25s ease both; }
         .svc-overlay.is-leaving  { animation:svc-overlay-out 0.25s ease both; }
