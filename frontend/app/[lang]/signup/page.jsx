@@ -121,7 +121,7 @@ function SignupContent({ params }) {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [pricing, setPricing] = useState({ basicPrice:30, standardPrice:50, premiumPrice:120, basicVisits:1, standardVisits:2, premiumVisits:4 });
+  const [pricing, setPricing] = useState({ basicPrice:50, standardPrice:75, premiumPrice:155, basicVisits:1, standardVisits:2, premiumVisits:4 });
 
   useEffect(() => {
     api('/settings/public').then(d => { if (d && d.basicPrice) setPricing(d); }).catch(() => {});
