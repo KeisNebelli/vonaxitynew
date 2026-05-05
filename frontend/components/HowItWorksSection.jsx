@@ -633,7 +633,7 @@ export default function HowItWorksSection({ lang, tag, title, subtitle, steps, p
           </ScrollReveal>
 
           {/* 6-card grid: 3 columns on desktop, 2 on tablet, 1 on mobile */}
-          <div style={{ display:'grid', gridTemplateColumns:'repeat(auto-fill,minmax(200px,1fr))', gap:18 }}>
+          <div style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:18 }}>
             {STEPS.map((s, i) => (
               <ScrollReveal key={i} delay={i * 70}>
                 <div
