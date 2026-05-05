@@ -52,8 +52,12 @@ export default function ServicesPage({ params }) {
       </section>
 
       {/* Service cards */}
-      <section style={{ padding:'60px 24px 80px', background:C.bg }}>
-        <div style={{ maxWidth:1000, margin:'0 auto' }}>
+      <section style={{ padding:'60px 24px 80px', background:'linear-gradient(160deg,#FAF7FF 0%,#F5FAFF 45%,#F2FBF6 100%)', position:'relative', overflow:'hidden' }}>
+        {/* Aurora blobs */}
+        <div style={{ position:'absolute', top:-120, left:-100, width:560, height:560, borderRadius:'50%', background:'radial-gradient(circle,rgba(124,58,237,0.13) 0%,transparent 70%)', filter:'blur(48px)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', bottom:-100, right:-80, width:480, height:480, borderRadius:'50%', background:'radial-gradient(circle,rgba(5,150,105,0.11) 0%,transparent 70%)', filter:'blur(48px)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', top:'35%', right:'12%', width:320, height:320, borderRadius:'50%', background:'radial-gradient(circle,rgba(14,165,233,0.09) 0%,transparent 70%)', filter:'blur(56px)', pointerEvents:'none' }} />
+        <div style={{ maxWidth:1000, margin:'0 auto', position:'relative' }}>
           <div style={{ textAlign:'center', marginBottom:40 }}>
             <h2 style={{ fontSize:'clamp(24px,3vw,36px)', fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:12 }}>{t(lang,'services.allServicesTitle')}</h2>
             <p style={{ fontSize:15, color:C.textSecondary }}>{t(lang,'services.allServicesDesc')}</p>

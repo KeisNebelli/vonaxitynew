@@ -240,8 +240,12 @@ export default async function HomePage({ params }) {
       />
 
       {/* ── Services ── */}
-      <section id="services" className="hp-section-lg" style={{ padding: '96px 24px', background: 'linear-gradient(180deg,#F8FAFF 0%,#F0F4FF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
-        <div style={{ maxWidth: 1100, margin: '0 auto' }}>
+      <section id="services" className="hp-section-lg" style={{ padding: '96px 24px', background: 'linear-gradient(160deg,#FAF7FF 0%,#F5FAFF 45%,#F2FBF6 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1, overflow: 'hidden' }}>
+        {/* Aurora blobs */}
+        <div style={{ position:'absolute', top:-120, left:-100, width:560, height:560, borderRadius:'50%', background:'radial-gradient(circle,rgba(124,58,237,0.13) 0%,transparent 70%)', filter:'blur(48px)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', bottom:-100, right:-80, width:480, height:480, borderRadius:'50%', background:'radial-gradient(circle,rgba(5,150,105,0.11) 0%,transparent 70%)', filter:'blur(48px)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', top:'35%', right:'12%', width:320, height:320, borderRadius:'50%', background:'radial-gradient(circle,rgba(14,165,233,0.09) 0%,transparent 70%)', filter:'blur(56px)', pointerEvents:'none' }} />
+        <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
           <ScrollReveal>
             <div style={{ marginBottom: 56, display:'flex', justifyContent:'space-between', alignItems:'flex-end', flexWrap:'wrap', gap:20 }}>
               <div>
