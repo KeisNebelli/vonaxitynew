@@ -74,7 +74,7 @@ export default function LandingChat({ lang = 'en' }) {
         {open ? (
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         ) : (
-          <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <img src="/vona-icon.svg" alt="Vona" width="38" height="38" style={{ borderRadius: '50%' }} />
         )}
       </button>
 
@@ -98,9 +98,7 @@ export default function LandingChat({ lang = 'en' }) {
 
           {/* Header */}
           <div style={{ padding: '14px 18px', background: 'linear-gradient(135deg,#1D4ED8,#2563EB)', display: 'flex', alignItems: 'center', gap: 10 }}>
-            <div style={{ width: 36, height: 36, borderRadius: '50%', background: 'rgba(255,255,255,0.2)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
+            <img src="/vona-icon.svg" alt="Vona" width="36" height="36" style={{ borderRadius: '50%', flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 14, fontWeight: 700, color: '#fff' }}>Vona</div>
               <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.75)' }}>Vonaxity Assistant</div>

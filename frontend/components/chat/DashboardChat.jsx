@@ -86,7 +86,7 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
         {open ? (
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
         ) : (
-          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 01-2 2H7l-4 4V5a2 2 0 012-2h14a2 2 0 012 2z"/></svg>
+          <img src="/vona-icon.svg" alt="Vona" width="34" height="34" style={{ borderRadius: '50%' }} />
         )}
       </button>
 
@@ -110,9 +110,7 @@ export default function DashboardChat({ lang = 'en', userName = null }) {
 
           {/* Header */}
           <div style={{ padding: '12px 16px', borderBottom: '1px solid rgba(255,255,255,0.07)', display: 'flex', alignItems: 'center', gap: 10, background: '#0F172A' }}>
-            <div style={{ width: 34, height: 34, borderRadius: '50%', background: 'linear-gradient(135deg,#1D4ED8,#3B82F6)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0 }}>
-              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            </div>
+            <img src="/vona-icon.svg" alt="Vona" width="34" height="34" style={{ borderRadius: '50%', flexShrink: 0 }} />
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 13, fontWeight: 700, color: '#F1F5F9' }}>Vona</div>
               <div style={{ fontSize: 11, color: '#64748B' }}>Support Assistant</div>
