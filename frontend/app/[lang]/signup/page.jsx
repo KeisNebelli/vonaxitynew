@@ -121,6 +121,11 @@ function SignupContent({ params }) {
   });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
+  const [pricing, setPricing] = useState({ basicPrice:30, standardPrice:50, premiumPrice:120, basicVisits:1, standardVisits:2, premiumVisits:4 });
+
+  useEffect(() => {
+    api('/settings/public').then(d => { if (d && d.basicPrice) setPricing(d); }).catch(() => {});
+  }, []);
 
   // Auto-set role from URL param
   useEffect(() => {
@@ -187,7 +192,7 @@ function SignupContent({ params }) {
             <div>
               <h2 style={{ fontSize:24, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px', marginBottom:6 }}>{t(lang,'signup.step1Title')}</h2>
               <p style={{ fontSize:14, color:C.textSecondary, marginBottom:24, lineHeight:1.6 }}>{t(lang,'signup.step1Subtitle')}</p>
-              {[{name:'basic',price:'€30',v:1},{name:'standard',price:'€50',v:2},{name:'premium',price:'€120',v:4}].map(p => (
+              {[{name:'basic',price:`€${pricing.basicPrice}`,v:pricing.basicVisits},{name:'standard',price:`€${pricing.standardPrice}`,v:pricing.standardVisits},{name:'premium',price:`€${pricing.premiumPrice}`,v:pricing.premiumVisits}].map(p => (
                 <div key={p.name} onClick={()=>setForm({...form,plan:p.name})}
                   style={{ borderRadius:12, padding:'16px 18px', marginBottom:10, cursor:'pointer', border:`2px solid ${form.plan===p.name?accent:C.border}`, background:form.plan===p.name?C.primaryLight:'#fff', display:'flex', justifyContent:'space-between', alignItems:'center', transition:'all 0.15s' }}>
                   <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, textTransform:'capitalize' }}>{p.name} · {p.v} {p.v===1?t(lang,'pricing.visitMonth'):t(lang,'pricing.visitsMonth')}</div>
