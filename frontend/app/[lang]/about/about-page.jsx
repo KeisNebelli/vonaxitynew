@@ -280,24 +280,27 @@ export default function AboutPage({ params }) {
           <div style={{ display:'flex', justifyContent:'center' }}>
             {TEAM.map((person, i) => (
               <div key={i} className="ab-team-card" style={{ background:C.bgWhite, borderRadius:24, border:`1px solid ${C.border}`, maxWidth:560, width:'100%', boxShadow:'0 4px 24px rgba(0,0,0,0.07)', overflow:'hidden' }}>
-                {/* Gradient header */}
-                <div style={{ background:person.grad, padding:'32px 32px 0', position:'relative', overflow:'hidden' }}>
-                  <div style={{ position:'absolute', top:-30, right:-30, width:150, height:150, borderRadius:'50%', background:'rgba(255,255,255,0.08)', pointerEvents:'none' }}/>
-                  <div style={{ display:'flex', alignItems:'flex-end', gap:20 }}>
-                    <div style={{ width:80, height:80, borderRadius:20, border:'2.5px solid rgba(255,255,255,0.35)', flexShrink:0, marginBottom:-20, position:'relative', zIndex:1, overflow:'hidden', background:'rgba(255,255,255,0.2)' }}>
-                      {person.photo
-                        ? <img src={person.photo} alt={person.name} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'top center', display:'block' }} />
-                        : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:26, fontWeight:800, color:'#fff', backdropFilter:'blur(4px)' }}>{person.initials}</div>
-                      }
-                    </div>
-                    <div style={{ paddingBottom:24, flex:1 }}>
-                      <div style={{ fontSize:22, fontWeight:800, color:'#fff', letterSpacing:'-0.5px', marginBottom:4 }}>{person.name}</div>
-                      <div style={{ fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.75)', letterSpacing:'0.5px', textTransform:'uppercase' }}>{person.role}</div>
-                    </div>
+                {/* Gradient header with centered photo */}
+                <div style={{ background:person.grad, padding:'36px 32px 0', position:'relative', overflow:'visible', textAlign:'center' }}>
+                  <div style={{ position:'absolute', top:-30, right:-30, width:180, height:180, borderRadius:'50%', background:'rgba(255,255,255,0.07)', pointerEvents:'none' }}/>
+                  <div style={{ position:'absolute', top:-20, left:-40, width:140, height:140, borderRadius:'50%', background:'rgba(255,255,255,0.05)', pointerEvents:'none' }}/>
+                  {/* Large centered photo */}
+                  <div style={{ width:160, height:160, borderRadius:24, border:'4px solid rgba(255,255,255,0.5)', margin:'0 auto', marginBottom:-40, position:'relative', zIndex:2, overflow:'hidden', background:'rgba(255,255,255,0.2)', boxShadow:'0 8px 32px rgba(0,0,0,0.25)' }}>
+                    {person.photo
+                      ? <img src={person.photo} alt={person.name} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'top center', display:'block' }} />
+                      : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:48, fontWeight:800, color:'#fff' }}>{person.initials}</div>
+                    }
                   </div>
+                  {/* Spacer so gradient area has height */}
+                  <div style={{ height:36 }} />
+                </div>
+                {/* Name + role below photo overlap */}
+                <div style={{ paddingTop:56, textAlign:'center', paddingBottom:8 }}>
+                  <div style={{ fontSize:24, fontWeight:800, color:'#111827', letterSpacing:'-0.5px', marginBottom:4 }}>{person.name}</div>
+                  <div style={{ fontSize:12, fontWeight:700, color:C.textTertiary, letterSpacing:'0.8px', textTransform:'uppercase' }}>{person.role}</div>
                 </div>
                 {/* Bio */}
-                <div style={{ padding:'28px 32px 32px', paddingTop:32 }}>
+                <div style={{ padding:'16px 32px 32px' }}>
                   <p style={{ fontSize:15, color:C.textSecondary, lineHeight:1.8, margin:0 }}>{person.bio}</p>
                   <div style={{ marginTop:20, display:'flex', gap:10, flexWrap:'wrap' }}>
                     {[
