@@ -60,6 +60,7 @@ export default function Footer({ lang = 'en' }) {
           <div style={{ display: 'flex', gap: 20, fontSize: 12 }}>
             <Link href={`/${lang}/privacy`} style={{ color:'rgba(255,255,255,0.45)', textDecoration:'none' }}>{t(lang, 'footer.privacy')}</Link>
             <Link href={`/${lang}/terms`} style={{ color:'rgba(255,255,255,0.45)', textDecoration:'none' }}>{t(lang, 'footer.terms')}</Link>
+            <Link href={`/${lang}/disclaimer`} style={{ color:'rgba(255,255,255,0.45)', textDecoration:'none' }}>{lang === 'sq' ? 'Mohim Përgjegjësie' : 'Disclaimer'}</Link>
           </div>
         </div>
       </div>
