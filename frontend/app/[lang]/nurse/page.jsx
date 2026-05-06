@@ -320,60 +320,80 @@ function DashboardCalendar({ visits=[], lang='en', onOpenCalendar, onVisitSelect
         </button>
       </div>
 
-      {/* Day-of-week headers */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2, marginBottom:4 }}>
-        {DOW.map(d => (
-          <div key={d} style={{ textAlign:'center', fontSize:10, fontWeight:700, color:C.textTertiary, padding:'2px 0' }}>{d}</div>
+      {/* Calendar grid — day headers */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', borderBottom:`1px solid ${C.border}`, marginBottom:0 }}>
+        {DOW.map((d,i) => (
+          <div key={d} style={{ textAlign:'center', fontSize:9, fontWeight:700, color: i>=5?'#94A3B8':C.textTertiary, padding:'4px 0', borderRight: i<6?`1px solid ${C.border}`:'none', background:'#FAFAFA', letterSpacing:'0.4px' }}>{d}</div>
         ))}
       </div>
 
-      {/* Calendar grid */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gap:2 }}>
+      {/* Calendar grid — day cells with visit chips */}
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)' }}>
         {cells.map((d, i) => {
-          if (!d) return <div key={`e${i}`}/>;
+          if (!d) return (
+            <div key={`e${i}`} style={{ minHeight:64, background:'#FAFAFA', borderRight: i%7<6?`1px solid ${C.border}`:'none', borderBottom: i<cells.length-7?`1px solid ${C.border}`:'none' }}/>
+          );
           const key = dayKey(d);
           const dayVisits = visitsByDate[key]||[];
           const isToday = key === todayStr;
           const isSelected = d === selectedDay;
-          const hasPending = dayVisits.some(v=>v.status==='SCHEDULED'||v.status==='IN_PROGRESS');
-          const hasDone = dayVisits.some(v=>v.status==='COMPLETED');
-          const hasCancelled = dayVisits.some(v=>v.status==='CANCELLED') && !hasPending && !hasDone;
+          const isSat = i%7===5, isSun = i%7===6;
 
           return (
-            <button key={key} onClick={()=>setSelectedDay(d===selectedDay?null:d)}
+            <div key={key} onClick={()=>setSelectedDay(d===selectedDay?null:d)}
               style={{
-                position:'relative', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
-                padding:'5px 2px', borderRadius:8, border:'none', cursor:dayVisits.length?'pointer':'default',
-                background: isSelected ? '#2563EB' : isToday ? '#EFF6FF' : 'transparent',
-                fontFamily:F,
+                minHeight:64, padding:'4px 3px', cursor:'pointer',
+                background: isSelected?'#EFF6FF' : isToday?'#FFFBEB' : (isSat||isSun)?'#FAFAFA' : C.bgWhite,
+                borderRight: i%7<6?`1px solid ${C.border}`:'none',
+                borderBottom: i<cells.length-7?`1px solid ${C.border}`:'none',
+                transition:'background 0.1s',
               }}>
-              <span style={{ fontSize:12, fontWeight: isToday||isSelected?700:400, color: isSelected?'#fff':isToday?'#2563EB':C.textPrimary, lineHeight:1 }}>{d}</span>
-              {/* Dots */}
-              {dayVisits.length > 0 && (
-                <div style={{ display:'flex', gap:2, marginTop:3 }}>
-                  {hasPending && <div style={{ width:4, height:4, borderRadius:'50%', background: isSelected?'#93C5FD':'#2563EB' }}/>}
-                  {hasDone && <div style={{ width:4, height:4, borderRadius:'50%', background: isSelected?'#6EE7B7':'#059669' }}/>}
-                  {hasCancelled && <div style={{ width:4, height:4, borderRadius:'50%', background: isSelected?'#FCA5A5':'#DC2626' }}/>}
-                </div>
-              )}
-            </button>
+              {/* Day number */}
+              <div style={{ width:18, height:18, borderRadius:5, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:3,
+                background: isToday?C.primary:'transparent',
+                color: isToday?'#fff' : (isSat||isSun)?'#94A3B8' : C.textPrimary,
+                fontSize:10, fontWeight: isToday||dayVisits.length?700:400,
+              }}>{d}</div>
+
+              {/* Visit chips */}
+              <div style={{ display:'flex', flexDirection:'column', gap:1 }}>
+                {dayVisits.slice(0,2).map((v,vi) => {
+                  const col = statusColor(v.status);
+                  const time = new Date(v.scheduledAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
+                  const wo = v.workOrderNumber ? `WO-${v.workOrderNumber}` : `#${v.id?.slice(-4)?.toUpperCase()}`;
+                  return (
+                    <div key={v.id||vi} onClick={e=>{e.stopPropagation();onVisitSelect(v);}}
+                      style={{ background:col+'18', borderLeft:`2px solid ${col}`, borderRadius:'0 3px 3px 0', padding:'1px 3px', overflow:'hidden' }}>
+                      <div style={{ fontSize:8, fontWeight:800, color:col, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{time} · {wo}</div>
+                      <div style={{ fontSize:8, color:C.textSecondary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{trService(v.serviceType,lang)}</div>
+                    </div>
+                  );
+                })}
+                {dayVisits.length > 2 && (
+                  <div style={{ fontSize:8, fontWeight:700, color:C.primary, paddingLeft:3 }}>+{dayVisits.length-2}</div>
+                )}
+              </div>
+            </div>
           );
         })}
       </div>
 
-      {/* Selected day visits */}
+      {/* Selected day visits panel */}
       {selectedDay && (
-        <div style={{ marginTop:12, borderTop:`1px solid ${C.border}`, paddingTop:12 }}>
+        <div style={{ marginTop:0, borderTop:`1px solid ${C.border}`, paddingTop:12, paddingLeft:4, paddingRight:4, paddingBottom:4 }}>
+          <div style={{ fontSize:11, fontWeight:700, color:C.textSecondary, marginBottom:8 }}>
+            {new Date(`${year}-${String(month+1).padStart(2,'0')}-${String(selectedDay).padStart(2,'0')}T12:00:00`).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'long',day:'numeric',month:'short'})}
+          </div>
           {selectedVisits.length === 0 ? (
-            <div style={{ fontSize:12, color:C.textTertiary, textAlign:'center', padding:'8px 0' }}>
+            <div style={{ fontSize:11, color:C.textTertiary, textAlign:'center', padding:'8px 0' }}>
               {lang==='sq'?'Asnjë vizitë këtë ditë':'No visits this day'}
             </div>
           ) : (
             <div style={{ display:'flex', flexDirection:'column', gap:6 }}>
               {selectedVisits.map(v => {
-                const t = new Date(v.scheduledAt);
-                const time = t.toLocaleTimeString([], {hour:'2-digit',minute:'2-digit'});
+                const time = new Date(v.scheduledAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
                 const sc = statusColor(v.status);
+                const wo = v.workOrderNumber ? `WO-${v.workOrderNumber}` : `#${v.id?.slice(-6)?.toUpperCase()}`;
                 return (
                   <button key={v.id} onClick={()=>onVisitSelect(v)}
                     style={{ display:'flex', alignItems:'center', gap:10, background:'#F8FAFC', border:`1px solid ${C.border}`, borderRadius:10, padding:'9px 12px', cursor:'pointer', textAlign:'left', fontFamily:F, width:'100%' }}>
@@ -383,9 +403,9 @@ function DashboardCalendar({ visits=[], lang='en', onOpenCalendar, onVisitSelect
                         <span style={{ fontSize:12, fontWeight:700, color:C.textPrimary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>
                           {v.relative?.name || (lang==='sq'?'Pacient':'Patient')}
                         </span>
-                        <span style={{ fontSize:10, fontWeight:700, color:C.textTertiary, background:'#F1F5F9', borderRadius:5, padding:'1px 5px', flexShrink:0 }}>#{v.id?.slice(-6)?.toUpperCase()}</span>
+                        <span style={{ fontSize:10, fontWeight:700, color:C.textTertiary, background:'#F1F5F9', borderRadius:5, padding:'1px 5px', flexShrink:0 }}>{wo}</span>
                       </div>
-                      <div style={{ fontSize:11, color:C.textTertiary }}>{v.serviceType} · {time}</div>
+                      <div style={{ fontSize:11, color:C.textTertiary }}>{trService(v.serviceType,lang)} · {time}</div>
                     </div>
                     <svg width="12" height="12" fill="none" stroke={C.textTertiary} strokeWidth="2" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
                   </button>
@@ -397,10 +417,10 @@ function DashboardCalendar({ visits=[], lang='en', onOpenCalendar, onVisitSelect
       )}
 
       {/* Legend */}
-      <div style={{ display:'flex', gap:12, marginTop:12, paddingTop:10, borderTop:`1px solid ${C.border}` }}>
+      <div style={{ display:'flex', gap:12, marginTop:10, paddingTop:10, borderTop:`1px solid ${C.border}` }}>
         {[['#2563EB', lang==='sq'?'Planifikuar':'Scheduled'], ['#059669', lang==='sq'?'Kryer':'Completed'], ['#DC2626', lang==='sq'?'Anuluar':'Cancelled']].map(([col,lbl])=>(
           <div key={lbl} style={{ display:'flex', alignItems:'center', gap:4 }}>
-            <div style={{ width:7, height:7, borderRadius:'50%', background:col }}/>
+            <div style={{ width:10, height:8, borderRadius:2, background:col+'22', borderLeft:`2.5px solid ${col}` }}/>
             <span style={{ fontSize:10, color:C.textTertiary, fontWeight:500 }}>{lbl}</span>
           </div>
         ))}
