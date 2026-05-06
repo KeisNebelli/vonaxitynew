@@ -709,8 +709,119 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
   );
 }
 
+function NurseVisitCard({ v, lang, onStatusChange, onComplete, isHighlighted, highlightRef }) {
+  const [showDetails, setShowDetails] = useState(false);
+  const st = (v.status || 'SCHEDULED').toUpperCase();
+  const statusCfg = {
+    COMPLETED:   { label: lang==='sq'?'E Përfunduar':'Completed',   color:'#059669', bg:'#ECFDF5', border:'#BBF7D0', accent:'#059669' },
+    SCHEDULED:   { label: lang==='sq'?'E Planifikuar':'Scheduled',  color:'#2563EB', bg:'#EFF6FF', border:'#BFDBFE', accent:'#2563EB' },
+    IN_PROGRESS: { label: lang==='sq'?'Në Progres':'In Progress',   color:'#D97706', bg:'#FFFBEB', border:'#FDE68A', accent:'#D97706' },
+    CANCELLED:   { label: lang==='sq'?'Anuluar':'Cancelled',        color:'#DC2626', bg:'#FEF2F2', border:'#FECACA', accent:'#DC2626' },
+    PENDING:     { label: lang==='sq'?'Në Pritje':'Pending',        color:'#7C3AED', bg:'#F5F3FF', border:'#DDD6FE', accent:'#7C3AED' },
+  };
+  const s = statusCfg[st] || statusCfg.SCHEDULED;
+  const wo = v.workOrderNumber ? `VON-${v.workOrderNumber}` : `#${v.id?.slice(-6)?.toUpperCase()}`;
+  const date = new Date(v.scheduledAt);
+  const dateStr = date.toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'short',day:'numeric',month:'long',year:'numeric'});
+  const timeStr = date.toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+  const svc = trService(v.serviceType, lang);
+
+  return (
+    <div ref={isHighlighted ? highlightRef : null} style={{ background:'#fff', borderRadius:16, border:`1.5px solid ${isHighlighted ? C.primary : C.border}`, overflow:'hidden', boxShadow: isHighlighted ? `0 0 0 3px ${C.primary}22, 0 4px 20px rgba(0,0,0,0.08)` : SSM, transition:'box-shadow 0.3s' }}>
+      {/* Colored top accent */}
+      <div style={{ height:4, background: s.accent }} />
+
+      <div style={{ padding:'16px 20px' }}>
+        {/* Header */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-start', gap:12, marginBottom:12 }}>
+          <div style={{ flex:1, minWidth:0 }}>
+            <div style={{ display:'flex', alignItems:'center', gap:8, flexWrap:'wrap', marginBottom:5 }}>
+              <span style={{ fontSize:15, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.2px' }}>{svc}</span>
+              <span style={{ fontSize:10, fontWeight:700, color:C.primary, background:C.primaryLight, padding:'2px 8px', borderRadius:6, border:`1px solid rgba(37,99,235,0.18)`, letterSpacing:'0.4px' }}>{wo}</span>
+            </div>
+            <div style={{ display:'flex', gap:14, flexWrap:'wrap' }}>
+              <span style={{ fontSize:12, color:C.textSecondary, display:'flex', alignItems:'center', gap:4 }}>
+                <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                {dateStr}
+              </span>
+              <span style={{ fontSize:12, color:C.textSecondary, display:'flex', alignItems:'center', gap:4 }}>
+                <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+                {timeStr}
+              </span>
+              {v.relative?.name && (
+                <span style={{ fontSize:12, color:C.textSecondary, display:'flex', alignItems:'center', gap:4 }}>
+                  <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                  {v.relative.name}
+                </span>
+              )}
+            </div>
+          </div>
+          <span style={{ fontSize:11, fontWeight:700, color:s.color, background:s.bg, border:`1px solid ${s.border}`, padding:'4px 10px', borderRadius:99, whiteSpace:'nowrap', flexShrink:0 }}>
+            {s.label}
+          </span>
+        </div>
+
+        {/* Vitals row — completed only */}
+        {st === 'COMPLETED' && (v.bp || v.hr || v.glucose || v.temperature || v.oxygenSat) && (
+          <div style={{ display:'flex', gap:20, padding:'10px 0', borderTop:`1px solid ${C.border}`, borderBottom:`1px solid ${C.border}`, marginBottom:12, flexWrap:'wrap' }}>
+            {v.bp && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:2 }}>{lang==='sq'?'Presioni i Gjakut':'Blood Pressure'}</div><div style={{ fontSize:15, fontWeight:800, color:C.textPrimary }}>{v.bp} <span style={{ fontSize:10, fontWeight:500, color:C.textTertiary }}>mmHg</span></div></div>}
+            {v.hr && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:2 }}>{lang==='sq'?'Pulsi':'Heart Rate'}</div><div style={{ fontSize:15, fontWeight:800, color:C.textPrimary }}>{v.hr} <span style={{ fontSize:10, fontWeight:500, color:C.textTertiary }}>bpm</span></div></div>}
+            {v.glucose && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:2 }}>{lang==='sq'?'Glukoza':'Glucose'}</div><div style={{ fontSize:15, fontWeight:800, color:C.textPrimary }}>{v.glucose} <span style={{ fontSize:10, fontWeight:500, color:C.textTertiary }}>mmol/L</span></div></div>}
+            {v.temperature && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:2 }}>{lang==='sq'?'Temperatura':'Temp'}</div><div style={{ fontSize:15, fontWeight:800, color:C.textPrimary }}>{v.temperature} <span style={{ fontSize:10, fontWeight:500, color:C.textTertiary }}>°C</span></div></div>}
+            {v.oxygenSat && <div><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:2 }}>O₂ Sat</div><div style={{ fontSize:15, fontWeight:800, color:C.textPrimary }}>{v.oxygenSat} <span style={{ fontSize:10, fontWeight:500, color:C.textTertiary }}>%</span></div></div>}
+          </div>
+        )}
+
+        {/* Nurse notes */}
+        {(v.nurseNotes || v.notes) && (
+          <div style={{ fontSize:13, color:C.textSecondary, fontStyle:'italic', lineHeight:1.6, marginBottom:12, paddingLeft:10, borderLeft:`3px solid ${C.border}` }}>
+            "{v.nurseNotes || v.notes}"
+          </div>
+        )}
+
+        {/* Address for active visits */}
+        {st !== 'COMPLETED' && v.relative?.address && (
+          <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:C.textSecondary, marginBottom:12 }}>
+            <svg width="12" height="12" fill="none" stroke={C.textTertiary} strokeWidth="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+            {v.relative.address}
+          </div>
+        )}
+
+        {/* Action buttons */}
+        <div style={{ display:'flex', gap:8, marginTop:4 }}>
+          <button
+            onClick={() => setShowDetails(d => !d)}
+            style={{ flex:1, padding:'11px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:F, fontSize:13, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+              background: st==='COMPLETED' ? 'linear-gradient(135deg,#059669,#34D399)' : 'linear-gradient(135deg,#2563EB,#3B82F6)',
+              color:'#fff' }}>
+            <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+            {showDetails ? (lang==='sq'?'Mbyll':'Close') : (lang==='sq'?'Shiko Raportin e Plotë':'View Full Details')}
+          </button>
+          {(st === 'SCHEDULED' || st === 'IN_PROGRESS') && (
+            <button onClick={onComplete} style={{ padding:'11px 16px', borderRadius:10, border:`1.5px solid ${C.primary}`, background:'transparent', color:C.primary, fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, whiteSpace:'nowrap' }}>
+              {lang==='sq'?'Përfundo':'Complete'}
+            </button>
+          )}
+        </div>
+      </div>
+
+      {/* Expanded full detail with map card */}
+      {showDetails && (
+        <div style={{ borderTop:`1px solid ${C.border}`, padding:'0 0 4px' }}>
+          <VisitLocationCard
+            lang={lang}
+            visit={formatVisit(v)}
+            compact={st === 'COMPLETED'}
+            onStatusChange={onStatusChange || (() => {})}
+            onComplete={onComplete}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
+
 function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusChange, initialFilter='all', highlightVisitId=null }) {
-  const tr = (key) => t(lang, key);
   const [filter, setFilter] = useState(initialFilter);
   const todayStr = new Date().toISOString().split('T')[0];
   const highlightRef = useRef(null);
@@ -720,7 +831,6 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusCha
     }
   }, [highlightVisitId]);
 
-  // Counts per tab
   const counts = {
     all:       visits.length,
     today:     visits.filter(v => !['COMPLETED','CANCELLED'].includes(v.status) && new Date(v.scheduledAt).toISOString().split('T')[0] === todayStr).length,
@@ -728,22 +838,19 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusCha
     completed: visits.filter(v => v.status === 'COMPLETED').length,
   };
 
-  const filtered = visits.filter(v => {
+  const filtered = [...visits].sort((a,b) => new Date(b.scheduledAt)-new Date(a.scheduledAt)).filter(v => {
     if (filter === 'all') return true;
-    if (filter === 'today') {
-      if (['COMPLETED','CANCELLED'].includes(v.status)) return false;
-      return new Date(v.scheduledAt).toISOString().split('T')[0] === todayStr;
-    }
+    if (filter === 'today') return !['COMPLETED','CANCELLED'].includes(v.status) && new Date(v.scheduledAt).toISOString().split('T')[0] === todayStr;
     if (filter === 'upcoming') return !['COMPLETED','CANCELLED'].includes(v.status);
     if (filter === 'completed') return v.status === 'COMPLETED';
     return true;
   });
 
   const filterLabels = {
-    all:       t(lang,'nurse.visitsFilterAll'),
-    today:     lang==='sq' ? 'Sot' : 'Today',
-    upcoming:  t(lang,'nurse.visitsFilterUpcoming'),
-    completed: t(lang,'nurse.visitsFilterCompleted'),
+    all:      t(lang,'nurse.visitsFilterAll'),
+    today:    lang==='sq'?'Sot':'Today',
+    upcoming: t(lang,'nurse.visitsFilterUpcoming'),
+    completed:t(lang,'nurse.visitsFilterCompleted'),
   };
 
   if (!visits.length) return (
@@ -754,33 +861,45 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusCha
 
   return (
     <div>
-      {/* Status tab bar with counts */}
+      <style>{`.nvc-btn:hover{opacity:0.88!important}`}</style>
+      {/* Filter tabs */}
       <div style={{ display:'flex', gap:8, marginBottom:20, flexWrap:'wrap' }}>
         {['all','today','upcoming','completed'].map(f => {
-          const active = filter === f;
-          const count = counts[f];
+          const isActive = filter === f;
           return (
-            <button key={f} onClick={()=>setFilter(f)} style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:600, padding:'7px 14px', borderRadius:99, cursor:'pointer', background:active ? C.primary : C.bgWhite, color:active ? '#fff' : C.textSecondary, border:active ? 'none' : `1px solid ${C.border}`, transition:'all 0.15s' }}>
+            <button key={f} onClick={()=>setFilter(f)} style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, fontWeight:600, padding:'7px 14px', borderRadius:99, cursor:'pointer', fontFamily:F,
+              background: isActive ? C.primary : C.bgWhite,
+              color: isActive ? '#fff' : C.textSecondary,
+              border: isActive ? 'none' : `1px solid ${C.border}`,
+              transition:'all 0.15s' }}>
               {filterLabels[f]}
-              <span style={{ fontSize:11, fontWeight:700, padding:'1px 6px', borderRadius:99, background: active ? 'rgba(255,255,255,0.25)' : C.bgSubtle, color: active ? '#fff' : C.textTertiary, minWidth:18, textAlign:'center' }}>
-                {count}
+              <span style={{ fontSize:11, fontWeight:700, padding:'1px 6px', borderRadius:99,
+                background: isActive ? 'rgba(255,255,255,0.25)' : C.bgSubtle,
+                color: isActive ? '#fff' : C.textTertiary, minWidth:18, textAlign:'center' }}>
+                {counts[f]}
               </span>
             </button>
           );
         })}
       </div>
+
+      {/* Visit cards */}
       <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-        {filtered.map(v => {
-          const isHighlighted = highlightVisitId && v.id === highlightVisitId;
-          return (
-            <div key={v.id} ref={isHighlighted ? highlightRef : null}
-              style={{ borderRadius:14, outline: isHighlighted ? `2px solid ${C.primary}` : 'none', outlineOffset:2, boxShadow: isHighlighted ? `0 0 0 4px ${C.primary}18` : 'none', transition:'box-shadow 0.3s' }}>
-              <VisitLocationCard lang={lang} visit={formatVisit(v)} compact={v.status==='COMPLETED'}
-                onStatusChange={onStatusChange || ((id,status)=>{})}
-                onComplete={(id)=>{ setSelectedVisit(v); setActive('complete'); }} />
-            </div>
-          );
-        })}
+        {filtered.length === 0 ? (
+          <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:'36px 24px', textAlign:'center', color:C.textTertiary, fontSize:13 }}>
+            {lang==='sq'?'Asnjë vizitë e gjetur.':'No visits found.'}
+          </div>
+        ) : filtered.map(v => (
+          <NurseVisitCard
+            key={v.id}
+            v={v}
+            lang={lang}
+            onStatusChange={onStatusChange}
+            onComplete={() => { setSelectedVisit(v); setActive('complete'); }}
+            isHighlighted={highlightVisitId === v.id}
+            highlightRef={highlightRef}
+          />
+        ))}
       </div>
     </div>
   );
