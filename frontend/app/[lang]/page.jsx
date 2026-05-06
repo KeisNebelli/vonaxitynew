@@ -413,17 +413,18 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Cities ── */}
-      <section className="hp-section-lg" style={{ padding:'96px 24px', background:'linear-gradient(180deg,#0F172A 0%,#1E293B 50%,#0F172A 100%)', position:'relative', overflow:'hidden', zIndex:1 }}>
+      <section className="hp-section-lg" style={{ padding:'96px 24px', background:'linear-gradient(135deg,#0F172A 0%,#1E3A5F 45%,#1D4ED8 75%,#0F172A 100%)', position:'relative', overflow:'hidden', zIndex:1 }}>
         {/* Background grid */}
-        <div style={{ position:'absolute', inset:0, opacity:0.04, pointerEvents:'none' }}>
+        <div style={{ position:'absolute', inset:0, opacity:0.06, pointerEvents:'none' }}>
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
-            <defs><pattern id="cg" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.8"/></pattern></defs>
+            <defs><pattern id="cg" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs>
             <rect width="100%" height="100%" fill="url(#cg)"/>
           </svg>
         </div>
         {/* Glow orbs */}
-        <div style={{ position:'absolute', top:-100, left:'20%', width:400, height:400, borderRadius:'50%', background:'rgba(37,99,235,0.12)', filter:'blur(100px)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', bottom:-100, right:'15%', width:350, height:350, borderRadius:'50%', background:'rgba(5,150,105,0.1)', filter:'blur(90px)', pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', top:-80, left:'10%', width:500, height:500, borderRadius:'50%', background:'rgba(37,99,235,0.18)', filter:'blur(120px)', pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', bottom:-80, right:'10%', width:420, height:420, borderRadius:'50%', background:'rgba(5,150,105,0.14)', filter:'blur(110px)', pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', top:'40%', left:'50%', transform:'translateX(-50%)', width:300, height:300, borderRadius:'50%', background:'rgba(124,58,237,0.08)', filter:'blur(90px)', pointerEvents:'none' }}/>
 
         <div style={{ maxWidth:1100, margin:'0 auto', position:'relative', zIndex:1 }}>
           {/* Header */}
