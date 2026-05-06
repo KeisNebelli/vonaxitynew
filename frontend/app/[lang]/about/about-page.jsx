@@ -40,7 +40,25 @@ const MILESTONES = {
 };
 
 const TEAM = [
-  { initials:'KN', photo:'/founder-keis.jpg', name:'Keis Nebelli', role:'CEO & Founder', bio:'Albanian student based in New Jersey, USA, pursuing a Bachelor\'s degree in Cybersecurity. Built Vonaxity to solve a deeply personal problem — ensuring families abroad can keep their loved ones in Albania safe and cared for.', grad:'linear-gradient(135deg,#2563EB,#4F46E5)' },
+  {
+    initials:'KN', photo:'/founder-keis.jpg', name:'Keis Nebelli',
+    role:{ en:'CEO & Founder', sq:'CEO & Themelues' },
+    grad:'linear-gradient(135deg,#2563EB,#4F46E5)',
+    bio:{
+      en:[
+        "I was born in Durrës, Albania, and now live in New Jersey, USA, where I'm pursuing a Bachelor's degree in Cybersecurity. Living abroad, I always felt a constant concern — wanting to know that my family back home was safe, supported, and properly cared for.",
+        "Over time, I realized that something was missing. There was no simple way to check in on their wellbeing, no system to organize care, and no easy access to medical information when it mattered most. Everything depended on phone calls, paperwork, and uncertainty.",
+        "That's where the idea for Vonaxity started. I built it to create peace of mind — not just for myself, but for every family living abroad who wants to stay connected and involved in their loved ones' care.",
+        "With my background in technology and hands-on experience in IT systems and field operations, my goal is to build Vonaxity into a modern healthcare platform that connects patients, nurses, laboratories, and medical providers into one seamless system — and to help bring Albania closer to the healthcare standards seen in more advanced countries.",
+      ],
+      sq:[
+        "Jam lindur në Durrës, Shqipëri, dhe tani jetoj në New Jersey, SHBA, ku ndjek studimet bachelor në Siguri Kibernetike. Duke jetuar jashtë vendit, kisha gjithmonë një shqetësim të vazhdueshëm — të dija që familja ime në shtëpi ishte e sigurt, e mbështetur dhe e kujdesur siç duhet.",
+        "Me kalimin e kohës, kuptova se diçka mungonte. Nuk kishte asnjë mënyrë të thjeshtë për të kontrolluar gjendjen e tyre shëndetësore, asnjë sistem për të organizuar kujdesin, dhe asnjë qasje të lehtë në informacionin mjekësor kur kishte më shumë rëndësi. Gjithçka varej nga telefonatat, dokumentet dhe pasiguria.",
+        "Aty filloi ideja për Vonaxity. E ndërtova për të krijuar qetësi shpirtërore — jo vetëm për veten time, por për çdo familje që jeton jashtë dhe dëshiron të mbetet e lidhur dhe e përfshirë në kujdesin e të dashurve të tyre.",
+        "Me sfondin tim në teknologji dhe përvojën praktike në sisteme IT dhe operacione në terren, qëllimi im është ta ndërtoj Vonaxity-n në një platformë moderne shëndetësore që lidh pacientët, infermierët, laboratorët dhe ofruesit mjekësorë në një sistem të vetëm — dhe të ndihmoj Shqipërinë të afrohet me standardet shëndetësore të vendeve më të zhvilluara.",
+      ],
+    },
+  },
 ];
 
 export default function AboutPage({ params }) {
@@ -297,11 +315,13 @@ export default function AboutPage({ params }) {
                 {/* Name + role below photo overlap */}
                 <div style={{ paddingTop:56, textAlign:'center', paddingBottom:8 }}>
                   <div style={{ fontSize:24, fontWeight:800, color:'#111827', letterSpacing:'-0.5px', marginBottom:4 }}>{person.name}</div>
-                  <div style={{ fontSize:12, fontWeight:700, color:C.textTertiary, letterSpacing:'0.8px', textTransform:'uppercase' }}>{person.role}</div>
+                  <div style={{ fontSize:12, fontWeight:700, color:C.textTertiary, letterSpacing:'0.8px', textTransform:'uppercase' }}>{typeof person.role === 'object' ? (person.role[lang] || person.role.en) : person.role}</div>
                 </div>
                 {/* Bio */}
                 <div style={{ padding:'16px 32px 32px' }}>
-                  <p style={{ fontSize:15, color:C.textSecondary, lineHeight:1.8, margin:0 }}>{person.bio}</p>
+                  {(Array.isArray(person.bio) ? person.bio : (person.bio[lang] || person.bio.en)).map((para, idx) => (
+                    <p key={idx} style={{ fontSize:15, color:C.textSecondary, lineHeight:1.85, margin:0, marginBottom: idx < (person.bio[lang] || person.bio.en).length - 1 ? 14 : 0 }}>{para}</p>
+                  ))}
                   <div style={{ marginTop:20, display:'flex', gap:10, flexWrap:'wrap' }}>
                     {[
                       { label:lang==='sq'?'New Jersey, SHBA':'New Jersey, USA', col:'#2563EB', bg:'rgba(37,99,235,0.08)',
