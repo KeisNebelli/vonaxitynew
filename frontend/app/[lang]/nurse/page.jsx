@@ -50,6 +50,7 @@ const NAV_ITEMS = [
   { id:'visits',    label:'visits',    icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
   { id:'calendar',  label:'calendar',  icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/></svg> },
   { id:'health',    label:'health',    icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> },
+  { id:'history',   label:'history',   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/><path d="M3.05 11a9 9 0 0 1 .49-2.59"/></svg> },
   { id:'complete',  label:'complete',  icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> },
   { id:'profile',   label:'profile',   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
 ];
@@ -75,8 +76,8 @@ function formatVisit(v) {
 const F = "'DM Sans','Inter',system-ui,sans-serif";
 
 const NURSE_LABELS = {
-  en:{ dashboard:'Dashboard', jobs:'Browse Jobs', visits:'My Visits', calendar:'Calendar', health:'Patient Health', complete:'Complete Visit', profile:'My Profile' },
-  sq:{ dashboard:'Paneli', jobs:'Shfleto Punët', visits:'Vizitat e Mia', calendar:'Kalendar', health:'Shëndeti i Pacientit', complete:'Përfundo Vizitën', profile:'Profili Im' },
+  en:{ dashboard:'Dashboard', jobs:'Browse Jobs', visits:'My Visits', calendar:'Calendar', health:'Patient Health', history:'Job History', complete:'Complete Visit', profile:'My Profile' },
+  sq:{ dashboard:'Paneli', jobs:'Shfleto Punët', visits:'Vizitat e Mia', calendar:'Kalendar', health:'Shëndeti i Pacientit', history:'Historia e Punëve', complete:'Përfundo Vizitën', profile:'Profili Im' },
 };
 const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
 
@@ -1878,6 +1879,252 @@ function OnboardingWizard({ nurse, user, onComplete, onSave, lang='en' }) {
 }
 
 // ── Nurse Calendar ────────────────────────────────────────────────────────────
+// ── Job History ───────────────────────────────────────────────────────────────
+function JobHistory({ visits = [], lang = 'en', setActive, setSelectedVisit }) {
+  const [expanded, setExpanded] = useState({});
+  const [search, setSearch] = useState('');
+  const [filterStatus, setFilterStatus] = useState('all');
+
+  const toggle = (id) => setExpanded(prev => ({ ...prev, [id]: !prev[id] }));
+
+  const statusColor = (s) => {
+    if (!s) return '#6B7280';
+    const u = s.toUpperCase();
+    if (u === 'COMPLETED') return '#059669';
+    if (u === 'CANCELLED') return '#DC2626';
+    if (u === 'IN_PROGRESS') return '#D97706';
+    return '#2563EB';
+  };
+  const statusBg = (s) => statusColor(s) + '15';
+  const statusLabel = (s, l) => {
+    if (!s) return '—';
+    const u = s.toUpperCase();
+    if (l === 'sq') {
+      if (u === 'COMPLETED') return 'Kompletuar';
+      if (u === 'CANCELLED') return 'Anuluar';
+      if (u === 'IN_PROGRESS') return 'Në Progres';
+      if (u === 'SCHEDULED') return 'Planifikuar';
+    }
+    return u.replace(/_/g, ' ');
+  };
+
+  // Sort newest first, filter
+  const sorted = [...visits].sort((a, b) => new Date(b.scheduledAt) - new Date(a.scheduledAt));
+  const filtered = sorted.filter(v => {
+    const matchStatus = filterStatus === 'all' || v.status?.toUpperCase() === filterStatus;
+    const q = search.toLowerCase();
+    const matchSearch = !q ||
+      (v.workOrderNumber || '').toLowerCase().includes(q) ||
+      (v.relative?.name || '').toLowerCase().includes(q) ||
+      (v.serviceType || '').toLowerCase().includes(q) ||
+      (v.notes || '').toLowerCase().includes(q);
+    return matchStatus && matchSearch;
+  });
+
+  const VitalChip = ({ label, value, unit, normal }) => {
+    if (!value) return null;
+    const num = parseFloat(value);
+    const ok = normal ? (num >= normal[0] && num <= normal[1]) : true;
+    return (
+      <div style={{ background: ok ? '#F0FDF4' : '#FEF2F2', border: `1px solid ${ok ? '#BBF7D0' : '#FECACA'}`, borderRadius: 10, padding: '8px 12px', minWidth: 80, textAlign: 'center' }}>
+        <div style={{ fontSize: 11, fontWeight: 600, color: ok ? '#059669' : '#DC2626', marginBottom: 2 }}>{label}</div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: ok ? '#065F46' : '#991B1B', lineHeight: 1 }}>{value}<span style={{ fontSize: 10, fontWeight: 500, marginLeft: 2 }}>{unit}</span></div>
+        <div style={{ fontSize: 9, color: ok ? '#059669' : '#DC2626', marginTop: 2, fontWeight: 600 }}>{ok ? (lang === 'sq' ? 'Normal' : 'Normal') : (lang === 'sq' ? 'Jashtë normës' : 'Out of range')}</div>
+      </div>
+    );
+  };
+
+  return (
+    <div>
+      <style>{`
+        .jh-card { transition: box-shadow 0.15s; }
+        .jh-card:hover { box-shadow: 0 4px 20px rgba(0,0,0,0.08) !important; }
+        .jh-expand-btn { transition: transform 0.2s; }
+      `}</style>
+
+      {/* Header */}
+      <div style={{ marginBottom: 20 }}>
+        <div style={{ fontSize: 20, fontWeight: 800, color: C.textPrimary, letterSpacing: '-0.5px', marginBottom: 4 }}>
+          {lang === 'sq' ? 'Historia e Punëve' : 'Job History'}
+        </div>
+        <div style={{ fontSize: 12, color: C.textTertiary }}>
+          {visits.length} {lang === 'sq' ? 'punë gjithsej' : 'total work orders'}
+        </div>
+      </div>
+
+      {/* Search + filter bar */}
+      <div style={{ display: 'flex', gap: 10, marginBottom: 16, flexWrap: 'wrap' }}>
+        <div style={{ flex: 1, minWidth: 200, position: 'relative' }}>
+          <svg width="14" height="14" fill="none" stroke={C.textTertiary} strokeWidth="2" viewBox="0 0 24 24" style={{ position: 'absolute', left: 12, top: '50%', transform: 'translateY(-50%)' }}><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg>
+          <input
+            value={search} onChange={e => setSearch(e.target.value)}
+            placeholder={lang === 'sq' ? 'Kërko WO, pacient, shërbim...' : 'Search WO, patient, service...'}
+            style={{ width: '100%', padding: '9px 12px 9px 34px', borderRadius: 10, border: `1.5px solid ${C.border}`, fontSize: 13, color: C.textPrimary, background: C.bgWhite, outline: 'none', fontFamily: F, boxSizing: 'border-box' }}
+          />
+        </div>
+        <div style={{ display: 'flex', gap: 6 }}>
+          {[['all', lang==='sq'?'Të gjitha':'All'], ['COMPLETED', lang==='sq'?'Kryera':'Completed'], ['SCHEDULED', lang==='sq'?'Planifik.':'Scheduled'], ['CANCELLED', lang==='sq'?'Anuluar':'Cancelled']].map(([val, lbl]) => (
+            <button key={val} onClick={() => setFilterStatus(val)}
+              style={{ fontSize: 12, fontWeight: 600, padding: '7px 13px', borderRadius: 99, cursor: 'pointer', border: 'none', fontFamily: F,
+                background: filterStatus === val ? C.primary : C.bgWhite,
+                color: filterStatus === val ? '#fff' : C.textSecondary,
+                boxShadow: filterStatus === val ? 'none' : `inset 0 0 0 1px ${C.border}`,
+              }}>{lbl}</button>
+          ))}
+        </div>
+      </div>
+
+      {/* Empty state */}
+      {filtered.length === 0 && (
+        <div style={{ background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, padding: '48px 24px', textAlign: 'center' }}>
+          <svg width="40" height="40" fill="none" stroke="#CBD5E1" strokeWidth="1.5" viewBox="0 0 24 24" style={{ marginBottom: 12 }}><path d="M12 8v4l3 3"/><circle cx="12" cy="12" r="9"/></svg>
+          <div style={{ fontSize: 14, color: C.textTertiary }}>{lang === 'sq' ? 'Asnjë punë e gjetur.' : 'No jobs found.'}</div>
+        </div>
+      )}
+
+      {/* Job cards */}
+      <div style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+        {filtered.map((v) => {
+          const isOpen = !!expanded[v.id];
+          const col = statusColor(v.status);
+          const date = new Date(v.scheduledAt);
+          const dateStr = date.toLocaleDateString(lang === 'sq' ? 'sq-AL' : 'en-GB', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+          const timeStr = date.toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+          const wo = v.workOrderNumber ? `WO-${v.workOrderNumber}` : `#${v.id?.slice(-6)?.toUpperCase()}`;
+          const svc = trService(v.serviceType, lang);
+
+          return (
+            <div key={v.id} className="jh-card" style={{ background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, overflow: 'hidden', boxShadow: SSM }}>
+              {/* Card header — always visible */}
+              <div
+                onClick={() => toggle(v.id)}
+                style={{ padding: '14px 18px', cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14 }}
+              >
+                {/* Status stripe */}
+                <div style={{ width: 4, alignSelf: 'stretch', borderRadius: 4, background: col, flexShrink: 0 }} />
+
+                {/* Main info */}
+                <div style={{ flex: 1, minWidth: 0 }}>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 4, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 13, fontWeight: 800, color: C.textPrimary, letterSpacing: '-0.2px' }}>
+                      {v.relative?.name || (lang === 'sq' ? 'Pacient' : 'Patient')}
+                    </span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: C.textTertiary, background: C.bgSubtle, borderRadius: 6, padding: '2px 7px', letterSpacing: '0.2px' }}>{wo}</span>
+                    <span style={{ fontSize: 10, fontWeight: 700, color: col, background: statusBg(v.status), borderRadius: 99, padding: '2px 8px', textTransform: 'uppercase', letterSpacing: '0.4px' }}>{statusLabel(v.status, lang)}</span>
+                  </div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12, flexWrap: 'wrap' }}>
+                    <span style={{ fontSize: 12, color: C.textSecondary, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                      {dateStr} · {timeStr}
+                    </span>
+                    <span style={{ fontSize: 12, color: C.textSecondary, display: 'flex', alignItems: 'center', gap: 4 }}>
+                      <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                      {svc}
+                    </span>
+                    {v.relative?.address && (
+                      <span style={{ fontSize: 12, color: C.textSecondary, display: 'flex', alignItems: 'center', gap: 4, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', maxWidth: 180 }}>
+                        <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                        {v.relative.address}
+                      </span>
+                    )}
+                  </div>
+                </div>
+
+                {/* Expand arrow */}
+                <svg className="jh-expand-btn" width="16" height="16" fill="none" stroke={C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"
+                  style={{ flexShrink: 0, transform: isOpen ? 'rotate(180deg)' : 'rotate(0deg)' }}>
+                  <polyline points="6 9 12 15 18 9"/>
+                </svg>
+              </div>
+
+              {/* Expanded detail panel */}
+              {isOpen && (
+                <div style={{ borderTop: `1px solid ${C.border}`, background: '#FAFAFA' }}>
+                  {/* Vitals grid */}
+                  {(v.bp || v.hr || v.glucose || v.temperature || v.oxygenSat) && (
+                    <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}` }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: C.textTertiary, letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: 12 }}>
+                        {lang === 'sq' ? 'Shenjat Vitale të Regjistruara' : 'Recorded Vitals'}
+                      </div>
+                      <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                        <VitalChip label={lang==='sq'?'Presioni':'Blood Pressure'} value={v.bp} unit="mmHg" normal={null} />
+                        <VitalChip label={lang==='sq'?'Pulsi':'Heart Rate'} value={v.hr} unit="bpm" normal={[60,100]} />
+                        <VitalChip label={lang==='sq'?'Glukoza':'Glucose'} value={v.glucose} unit="mg/dL" normal={[70,140]} />
+                        <VitalChip label={lang==='sq'?'Temperatura':'Temp'} value={v.temperature} unit="°C" normal={[36.1,37.2]} />
+                        <VitalChip label={lang==='sq'?'Oksigjeni':'O₂ Sat'} value={v.oxygenSat} unit="%" normal={[95,100]} />
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Nurse notes */}
+                  {(v.nurseNotes || v.notes) && (
+                    <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}` }}>
+                      <div style={{ fontSize: 11, fontWeight: 700, color: C.textTertiary, letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: 8 }}>
+                        {lang === 'sq' ? 'Shënimet e Infermierës' : 'Nurse Notes'}
+                      </div>
+                      <div style={{ fontSize: 13, color: C.textSecondary, lineHeight: 1.65, background: C.bgWhite, border: `1px solid ${C.border}`, borderRadius: 10, padding: '10px 14px', whiteSpace: 'pre-wrap' }}>
+                        {v.nurseNotes || v.notes}
+                      </div>
+                    </div>
+                  )}
+
+                  {/* Patient info */}
+                  <div style={{ padding: '14px 18px' }}>
+                    <div style={{ fontSize: 11, fontWeight: 700, color: C.textTertiary, letterSpacing: '0.5px', textTransform: 'uppercase', marginBottom: 10 }}>
+                      {lang === 'sq' ? 'Informacioni i Pacientit' : 'Patient Info'}
+                    </div>
+                    <div style={{ display: 'flex', gap: 16, flexWrap: 'wrap', marginBottom: 14 }}>
+                      {v.relative?.name && (
+                        <div style={{ fontSize: 13, color: C.textSecondary, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <svg width="13" height="13" fill="none" stroke={C.textTertiary} strokeWidth="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+                          <strong>{v.relative.name}</strong>
+                        </div>
+                      )}
+                      {v.relative?.age && (
+                        <div style={{ fontSize: 13, color: C.textSecondary }}>{lang==='sq'?'Mosha:':'Age:'} <strong>{v.relative.age}</strong></div>
+                      )}
+                      {v.relative?.phone && (
+                        <div style={{ fontSize: 13, color: C.textSecondary, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <svg width="13" height="13" fill="none" stroke={C.textTertiary} strokeWidth="2" viewBox="0 0 24 24"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07 19.5 19.5 0 01-6-6 19.79 19.79 0 01-3.07-8.67A2 2 0 014.11 2h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L8.09 9.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 16.92z"/></svg>
+                          {v.relative.phone}
+                        </div>
+                      )}
+                      {v.relative?.address && (
+                        <div style={{ fontSize: 13, color: C.textSecondary, display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <svg width="13" height="13" fill="none" stroke={C.textTertiary} strokeWidth="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>
+                          {v.relative.address}
+                        </div>
+                      )}
+                    </div>
+
+                    {/* Action buttons */}
+                    <div style={{ display: 'flex', gap: 8, flexWrap: 'wrap' }}>
+                      <button
+                        onClick={() => { setSelectedVisit(v); setActive('health'); }}
+                        style={{ fontSize: 12, fontWeight: 600, padding: '7px 14px', borderRadius: 9, cursor: 'pointer', border: 'none', fontFamily: F, background: '#EFF6FF', color: C.primary, display: 'flex', alignItems: 'center', gap: 6 }}>
+                        <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg>
+                        {lang === 'sq' ? 'Shëndeti i Pacientit' : 'Patient Health'}
+                      </button>
+                      {v.status?.toUpperCase() === 'SCHEDULED' && (
+                        <button
+                          onClick={() => { setSelectedVisit(v); setActive('complete'); }}
+                          style={{ fontSize: 12, fontWeight: 600, padding: '7px 14px', borderRadius: 9, cursor: 'pointer', border: 'none', fontFamily: F, background: C.primary, color: '#fff', display: 'flex', alignItems: 'center', gap: 6 }}>
+                          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+                          {lang === 'sq' ? 'Përfundo Vizitën' : 'Complete Visit'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
 function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }) {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
@@ -2207,7 +2454,7 @@ export default function NursePage({ params }) {
   };
 
   const displayNurse = { name: nurse?.user?.name||nurse?.name||'Nurse', email: nurse?.user?.email||'', city: nurse?.city||'', rating: nurse?.rating||0, totalVisits: nurse?.totalVisits||0, totalEarnings: nurse?.totalEarnings||0, status: nurse?.status||'INCOMPLETE', ...nurse, initials:(nurse?.user?.name||nurse?.name||'N').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() };
-  const TITLES = { dashboard:tr('nurse.dashboard'), jobs:tr('nurse.browseJobs'), visits:tr('nurse.myVisits'), calendar: lang==='sq'?'Kalendar':'Calendar', map:tr('nurse.navigation'), complete:tr('nurse.completeVisit'), earnings:tr('nurse.earnings'), profile:tr('nurse.profile'), onboarding:tr('nurse.completeProfile') };
+  const TITLES = { dashboard:tr('nurse.dashboard'), jobs:tr('nurse.browseJobs'), visits:tr('nurse.myVisits'), calendar: lang==='sq'?'Kalendar':'Calendar', history: lang==='sq'?'Historia e Punëve':'Job History', map:tr('nurse.navigation'), complete:tr('nurse.completeVisit'), earnings:tr('nurse.earnings'), profile:tr('nurse.profile'), onboarding:tr('nurse.completeProfile') };
   const status = nurse?.status || 'INCOMPLETE';
   const statusColors = { APPROVED:['#ECFDF5','#059669'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
   const [sbg, scol] = statusColors[status] || statusColors.INCOMPLETE;
@@ -2282,6 +2529,7 @@ export default function NursePage({ params }) {
               {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
               {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} initialFilter={visitsInitialFilter} highlightVisitId={selectedVisit?.id} />}
               {active==='calendar' && <NurseCalendar visits={visits} lang={lang} setActive={navigateTo} setSelectedVisit={setSelectedVisit} />}
+              {active==='history' && <JobHistory visits={visits} lang={lang} setActive={navigateTo} setSelectedVisit={setSelectedVisit} />}
               {active==='health' && <HealthProgress visits={visits} lang={lang} nurseMode={true} />}
               {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
               {active==='profile' && <NurseProfile lang={lang} nurse={nurse} />}
