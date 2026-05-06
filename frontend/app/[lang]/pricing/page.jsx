@@ -115,26 +115,22 @@ export default function PricingPage({ params }) {
                 background: C.bgWhite,
                 borderRadius: 20,
                 border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`,
-                padding: p.featured ? '0 0 32px' : '32px 28px',
+                padding: '32px 0',
                 position: 'relative',
                 boxShadow: p.featured ? '0 12px 48px rgba(37,99,235,0.16)' : '0 2px 12px rgba(0,0,0,0.06)',
                 overflow: 'hidden',
               }}>
-                {p.featured && (
-                  <>
-                    {/* Gradient top accent bar */}
-                    <div style={{ height:6, background:'linear-gradient(90deg,#7C3AED 0%,#2563EB 100%)', marginBottom:28 }} />
-                    {/* Badge inline inside card */}
-                    <div style={{ paddingLeft:28, paddingRight:28, marginBottom:16 }}>
-                      <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'linear-gradient(135deg,#7C3AED,#2563EB)', color:'#fff', fontSize:11, fontWeight:700, padding:'4px 14px', borderRadius:99, letterSpacing:'0.4px' }}>
-                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                <div style={{ paddingLeft:28, paddingRight:28 }}>
+                  {/* Plan name row — badge sits inline here for featured */}
+                  <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12, flexWrap:'wrap' }}>
+                    <div style={{ fontSize:13, fontWeight:700, color: p.featured ? C.primary : C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px' }}>{p.name}</div>
+                    {p.featured && (
+                      <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#7C3AED,#2563EB)', color:'#fff', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, letterSpacing:'0.4px', whiteSpace:'nowrap' }}>
+                        <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                         {t(lang,'pricing.mostPopular')}
                       </div>
-                    </div>
-                  </>
-                )}
-                <div style={{ paddingLeft:28, paddingRight:28 }}>
-                  <div style={{ fontSize:13, fontWeight:700, color: p.featured ? C.primary : C.textTertiary, marginBottom:12, textTransform:'uppercase', letterSpacing:'0.5px' }}>{p.name}</div>
+                    )}
+                  </div>
                   <div style={{ display:'flex', alignItems:'flex-end', gap:4, marginBottom:4 }}>
                     <span style={{ fontSize:52, fontWeight:800, color:C.textPrimary, letterSpacing:'-3px', lineHeight:1 }}>€{p.price}</span>
                   </div>
