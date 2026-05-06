@@ -382,15 +382,16 @@ export default async function HomePage({ params }) {
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(250px,1fr))', gap: 18 }}>
             {PLANS.map((p, pi) => (
               <ScrollReveal key={p.name} delay={pi * 100}>
-                <div className="hp-pricing-card" style={{ background: C.bgWhite, borderRadius: 22, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: '32px 26px', position: 'relative', boxShadow: p.featured ? '0 12px 48px rgba(37,99,235,0.2)' : '0 2px 12px rgba(0,0,0,0.05)', height:'100%' }}>
+                <div className="hp-pricing-card" style={{ background: C.bgWhite, borderRadius: 22, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: p.featured ? '0 0 32px' : '32px 26px', position: 'relative', boxShadow: p.featured ? '0 12px 48px rgba(37,99,235,0.2)' : '0 2px 12px rgba(0,0,0,0.05)', height:'100%', overflow:'hidden' }}>
                   {p.featured && (
-                    <>
-                      {/* Featured gradient header strip */}
-                      <div style={{ position:'absolute', top:0, left:0, right:0, height:4, background:'linear-gradient(90deg,#7C3AED,#2563EB)', borderRadius:'22px 22px 0 0' }} />
-                      <div style={{ position: 'absolute', top: -14, left: '50%', transform: 'translateX(-50%)', background: 'linear-gradient(135deg,#7C3AED,#2563EB)', color: '#fff', fontSize: 11, fontWeight: 700, padding: '5px 16px', borderRadius: 99, whiteSpace: 'nowrap', boxShadow:'0 4px 12px rgba(124,58,237,0.35)' }}>
-                        {t(lang, 'pricing.mostPopular')}
-                      </div>
-                    </>
+                    <div style={{ height:5, background:'linear-gradient(90deg,#7C3AED,#2563EB)', marginBottom:24 }} />
+                  )}
+                  <div style={{ paddingLeft: p.featured ? 26 : 0, paddingRight: p.featured ? 26 : 0 }}>
+                  {p.featured && (
+                    <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#7C3AED,#2563EB)', color:'#fff', fontSize:10, fontWeight:700, padding:'3px 12px', borderRadius:99, marginBottom:14, whiteSpace:'nowrap' }}>
+                      <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                      {t(lang, 'pricing.mostPopular')}
+                    </div>
                   )}
                   <div style={{ fontSize: 12, fontWeight: 700, color: p.featured ? C.primary : C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom: 10 }}>{p.name}</div>
                   <div style={{ fontSize: 48, fontWeight: 800, color: C.textPrimary, letterSpacing: '-2.5px', marginBottom: 2, lineHeight:1 }}>{p.price}</div>
@@ -405,6 +406,7 @@ export default async function HomePage({ params }) {
                     </button>
                   </Link>
                   <div style={{ fontSize: 11, color: C.textTertiary, marginTop: 12 }}>{t(lang, 'pricing.trialNote')}</div>
+                  </div>
                 </div>
               </ScrollReveal>
             ))}
