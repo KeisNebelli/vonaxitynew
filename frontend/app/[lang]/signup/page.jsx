@@ -10,8 +10,8 @@ const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', seco
 const CITIES = ['Tirana','Durrës','Elbasan','Fier','Berat','Sarandë','Kukës','Shkodër'];
 
 const ILLUSTRATIONS = {
-  client: '/cliendlandingpage.png',
-  nurse:  '/nurselandingpage.png',
+  client: '/family-care.png',
+  nurse:  '/nurse-hero.png',
 };
 
 function CheckIcon() {
@@ -31,9 +31,11 @@ function IllustrationPanel({ role }) {
 
   return (
     <div style={{ position:'relative', width:'42%', flexShrink:0, overflow:'hidden', background: isNurse?'#1e3a5f':'#064e3b' }}>
-      <img src={src} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center' }} />
-      <div style={{ position:'absolute', inset:0, background: overlay }} />
-      <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse at center, ${radial} 0%, ${radialOuter} 100%)` }} />
+      <img src={src} alt="" style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
+      {/* Dark overlay for text contrast */}
+      <div style={{ position:'absolute', inset:0, background: isNurse ? 'linear-gradient(160deg,rgba(17,50,130,0.72) 0%,rgba(37,99,235,0.55) 100%)' : 'linear-gradient(160deg,rgba(4,68,48,0.72) 0%,rgba(5,150,105,0.50) 100%)' }} />
+      {/* Bottom vignette for tagline readability */}
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:160, background:'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)' }} />
       <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'36px 40px' }}>
         {/* logo */}
         <Link href="/" style={{ fontSize:22, fontWeight:900, color:'#fff', letterSpacing:'-0.5px', textDecoration:'none', textShadow:'0 2px 10px rgba(0,0,0,0.2)' }}>Vonaxity</Link>
