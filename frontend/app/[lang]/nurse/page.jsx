@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { t } from '@/translations';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
 import { toastSuccess, toastError } from '@/components/ui/Toast';
-import HealthProgress from '../dashboard/health';
+// HealthProgress removed — not needed at this stage
 import NurseChat from '@/components/chat/NurseChat';
 // Module-level translation helper - uses 'en' as default
 let _currentLang = 'en';
@@ -46,13 +46,10 @@ const EXPERIENCE_LIST = ['Less than 1 year','1-2 years','3-5 years','6-10 years'
 
 const NAV_ITEMS = [
   { id:'dashboard', label:'dashboard', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
-  { id:'jobs', label:'jobs', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
-  { id:'visits', label:'visits', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
-  { id:'calendar', label:'calendar', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14" strokeWidth="3"/><line x1="12" y1="14" x2="12" y2="14" strokeWidth="3"/><line x1="16" y1="14" x2="16" y2="14" strokeWidth="3"/><line x1="8" y1="18" x2="8" y2="18" strokeWidth="3"/><line x1="12" y1="18" x2="12" y2="18" strokeWidth="3"/></svg> },
-  { id:'health', label:'health', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> },
-  { id:'complete', label:'complete', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> },
-  { id:'earnings', label:'earnings', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
-  { id:'profile', label:'profile', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
+  { id:'jobs',      label:'jobs',      icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
+  { id:'visits',    label:'visits',    icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+  { id:'complete',  label:'complete',  icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> },
+  { id:'profile',   label:'profile',   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
 ];
 
 function formatVisit(v) {
@@ -76,8 +73,8 @@ function formatVisit(v) {
 const F = "'DM Sans','Inter',system-ui,sans-serif";
 
 const NURSE_LABELS = {
-  en:{ dashboard:'Dashboard', jobs:'Browse Jobs', visits:'My Visits', calendar:'Calendar', health:'Patient Health', map:'Navigation', complete:'Complete Visit', earnings:'Earnings', profile:'My Profile' },
-  sq:{ dashboard:'Paneli', jobs:'Shfleto Punët', visits:'Vizitat e Mia', calendar:'Kalendar', health:'Shëndeti i Pacientit', map:'Navigimi', complete:'Përfundo Vizitën', earnings:'Fitimet', profile:'Profili Im' },
+  en:{ dashboard:'Dashboard', jobs:'Browse Jobs', visits:'My Visits', complete:'Complete Visit', profile:'My Profile' },
+  sq:{ dashboard:'Paneli', jobs:'Shfleto Punët', visits:'Vizitat e Mia', complete:'Përfundo Vizitën', profile:'Profili Im' },
 };
 const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
 
@@ -2188,12 +2185,8 @@ export default function NursePage({ params }) {
               {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} onTodayClick={()=>{ setVisitsInitialFilter('today'); setActive('visits'); }} />}
               {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
               {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} initialFilter={visitsInitialFilter} />}
-              {active==='calendar' && <NurseCalendar visits={visits} lang={lang} setActive={navigateTo} setSelectedVisit={setSelectedVisit} />}
-              {active==='map' && <MapView selectedVisit={selectedVisit} setActive={setActive} setSelectedVisit={setSelectedVisit} visits={visits} onStatusChange={handleStatusChange} lang={lang} />}
               {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
-              {active==='earnings' && <Earnings lang={lang} nurse={nurse} visits={visits} />}
               {active==='profile' && <NurseProfile lang={lang} nurse={nurse} />}
-              {active==='health' && <HealthProgress visits={visits} lang={lang} nurseMode={true} />}
             </div>
           </main>
         </div>
