@@ -744,10 +744,16 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
   );
 }
 
-function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusChange, initialFilter='all' }) {
+function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusChange, initialFilter='all', highlightVisitId=null }) {
   const tr = (key) => t(lang, key);
   const [filter, setFilter] = useState(initialFilter);
   const todayStr = new Date().toISOString().split('T')[0];
+  const highlightRef = useRef(null);
+  useEffect(() => {
+    if (highlightVisitId && highlightRef.current) {
+      highlightRef.current.scrollIntoView({ behavior:'smooth', block:'center' });
+    }
+  }, [highlightVisitId]);
 
   // Counts per tab
   const counts = {
@@ -799,11 +805,17 @@ function Visits({ setActive, setSelectedVisit, lang='en', visits=[], onStatusCha
         })}
       </div>
       <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
-        {filtered.map(v => (
-          <VisitLocationCard key={v.id} lang={lang} visit={formatVisit(v)} compact={v.status==='COMPLETED'}
-            onStatusChange={onStatusChange || ((id,status)=>{})}
-            onComplete={(id)=>{ setSelectedVisit(v); setActive('complete'); }} />
-        ))}
+        {filtered.map(v => {
+          const isHighlighted = highlightVisitId && v.id === highlightVisitId;
+          return (
+            <div key={v.id} ref={isHighlighted ? highlightRef : null}
+              style={{ borderRadius:14, outline: isHighlighted ? `2px solid ${C.primary}` : 'none', outlineOffset:2, boxShadow: isHighlighted ? `0 0 0 4px ${C.primary}18` : 'none', transition:'box-shadow 0.3s' }}>
+              <VisitLocationCard lang={lang} visit={formatVisit(v)} compact={v.status==='COMPLETED'}
+                onStatusChange={onStatusChange || ((id,status)=>{})}
+                onComplete={(id)=>{ setSelectedVisit(v); setActive('complete'); }} />
+            </div>
+          );
+        })}
       </div>
     </div>
   );
@@ -2003,11 +2015,11 @@ function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }
         </div>
 
         {/* Calendar grid — each cell is a real box with visit chips */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)' }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gridAutoRows:'minmax(88px,auto)' }}>
           {cells.map((cell, i) => {
             if (!cell) {
               return (
-                <div key={`empty-${i}`} style={{ minHeight:88, background:'#FAFAFA', borderRight: i%7 < 6 ? `1px solid ${C.border}` : 'none', borderBottom: i < totalCells-7 ? `1px solid ${C.border}` : 'none' }} />
+                <div key={`empty-${i}`} style={{ background:'#FAFAFA', overflow:'hidden', minWidth:0, borderRight: i%7 < 6 ? `1px solid ${C.border}` : 'none', borderBottom: i < totalCells-7 ? `1px solid ${C.border}` : 'none' }} />
               );
             }
             const isToday = cell.dateStr === todayStr;
@@ -2024,22 +2036,22 @@ function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }
                 className="cal-cell"
                 onClick={() => setSelectedDay(isSelected ? null : cell.dateStr)}
                 style={{
-                  minHeight:88,
-                  padding:'6px 5px',
+                  padding:'6px 4px',
                   cursor:'pointer',
+                  overflow:'hidden',
+                  minWidth:0,
                   background: isSelected ? '#EFF6FF' : isToday ? '#FFFBEB' : isWeekend ? '#FAFAFA' : C.bgWhite,
                   borderRight: i%7 < 6 ? `1px solid ${C.border}` : 'none',
                   borderBottom: i < totalCells-7 ? `1px solid ${C.border}` : 'none',
-                  position:'relative',
-                  verticalAlign:'top',
                 }}
               >
                 {/* Day number */}
                 <div style={{
-                  width:22, height:22, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:4,
+                  width:20, height:20, borderRadius:5, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:3,
                   background: isToday ? C.primary : 'transparent',
                   color: isToday ? '#fff' : isPast ? C.textTertiary : isWeekend ? '#94A3B8' : C.textPrimary,
                   fontSize:11, fontWeight: isToday || hasVisits ? 800 : 500,
+                  flexShrink:0,
                 }}>
                   {cell.day}
                 </div>
@@ -2049,29 +2061,32 @@ function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }
                   {cell.visits.slice(0,3).map((v, vi) => {
                     const col = statusColor(v.status);
                     const time = new Date(v.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
-                    const wo = v.workOrderNumber ? `WO-${v.workOrderNumber}` : `#${v.id?.slice(-4)?.toUpperCase()}`;
+                    const woShort = v.workOrderNumber ? v.workOrderNumber.slice(-5) : v.id?.slice(-4)?.toUpperCase();
                     const svc = trService(v.serviceType, lang);
                     return (
                       <div
                         key={v.id || vi}
                         className="cal-chip"
-                        onClick={e => { e.stopPropagation(); setSelectedVisit(v); setActive('complete'); }}
+                        onClick={e => { e.stopPropagation(); setSelectedVisit(v); setActive('visits'); }}
                         style={{
                           background: statusBg(v.status),
                           borderLeft:`2.5px solid ${col}`,
-                          borderRadius:'0 5px 5px 0',
-                          padding:'2px 5px',
+                          borderRadius:'0 4px 4px 0',
+                          padding:'2px 4px',
                           cursor:'pointer',
                           overflow:'hidden',
+                          width:'100%',
+                          minWidth:0,
+                          boxSizing:'border-box',
                         }}
                       >
-                        <div style={{ fontSize:9, fontWeight:800, color:col, letterSpacing:'0.2px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{time} · {wo}</div>
+                        <div style={{ fontSize:9, fontWeight:800, color:col, letterSpacing:'0.1px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{time} · #{woShort}</div>
                         <div style={{ fontSize:9, fontWeight:500, color:C.textSecondary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{svc}</div>
                       </div>
                     );
                   })}
                   {cell.visits.length > 3 && (
-                    <div style={{ fontSize:9, fontWeight:700, color:C.primary, paddingLeft:4 }}>+{cell.visits.length - 3} {lang==='sq'?'më shumë':'more'}</div>
+                    <div style={{ fontSize:9, fontWeight:700, color:C.primary, paddingLeft:3 }}>+{cell.visits.length - 3}</div>
                   )}
                 </div>
               </div>
@@ -2130,7 +2145,7 @@ function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }
                 return (
                   <div
                     key={v.id}
-                    onClick={()=>{ setSelectedVisit(v); setActive('complete'); }}
+                    onClick={()=>{ setSelectedVisit(v); setActive('visits'); }}
                     style={{ padding:'14px 18px', borderBottom: i < selectedCell.visits.length-1 ? `1px solid ${C.border}` : 'none', display:'flex', alignItems:'center', gap:14, cursor:'pointer', transition:'background 0.1s' }}
                     onMouseEnter={e=>e.currentTarget.style.background='#F8FAFC'}
                     onMouseLeave={e=>e.currentTarget.style.background='transparent'}
@@ -2301,7 +2316,7 @@ export default function NursePage({ params }) {
               {active==='onboarding' && <OnboardingWizard nurse={nurse} onComplete={handleComplete} onSave={handleSave} lang={lang} />}
               {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} onTodayClick={()=>{ setVisitsInitialFilter('today'); setActive('visits'); }} />}
               {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
-              {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} initialFilter={visitsInitialFilter} />}
+              {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} initialFilter={visitsInitialFilter} highlightVisitId={selectedVisit?.id} />}
               {active==='calendar' && <NurseCalendar visits={visits} lang={lang} setActive={navigateTo} setSelectedVisit={setSelectedVisit} />}
               {active==='health' && <HealthProgress visits={visits} lang={lang} nurseMode={true} />}
               {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
