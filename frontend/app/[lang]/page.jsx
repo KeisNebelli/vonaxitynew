@@ -33,7 +33,8 @@ const LAUNCH_CITIES = [
       { en: 'Same-day bookings', sq: 'Rezervim në të njëjtën ditë' },
       { en: 'Largest nurse network', sq: 'Rrjeti më i madh i infermiereve' },
     ],
-    gradient: 'linear-gradient(135deg,#1D4ED8 0%,#2563EB 60%,#3B82F6 100%)',
+    photo: '/city-tirana.jpg',
+    overlay: 'linear-gradient(160deg,rgba(17,50,130,0.82) 0%,rgba(29,78,216,0.72) 50%,rgba(37,99,235,0.55) 100%)',
     glowColor: 'rgba(37,99,235,0.4)',
     accentColor: '#93C5FD',
     textAccent: '#DBEAFE',
@@ -52,7 +53,8 @@ const LAUNCH_CITIES = [
       { en: 'Rapid deployment', sq: 'Dërgim i shpejtë' },
       { en: 'Dedicated care team', sq: 'Ekip kujdesi i dedikuar' },
     ],
-    gradient: 'linear-gradient(135deg,#065F46 0%,#059669 60%,#10B981 100%)',
+    photo: '/city-durres.jpg',
+    overlay: 'linear-gradient(160deg,rgba(4,68,48,0.82) 0%,rgba(5,101,71,0.72) 50%,rgba(5,150,105,0.55) 100%)',
     glowColor: 'rgba(5,150,105,0.4)',
     accentColor: '#6EE7B7',
     textAccent: '#D1FAE5',
@@ -446,19 +448,21 @@ export default async function HomePage({ params }) {
           <div className="hp-cities-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:24, marginBottom:28 }}>
             {LAUNCH_CITIES.map(city => (
               <div key={city.name} className="hp-city-card-new" style={{
-                background: city.gradient,
                 borderRadius: 24,
                 padding: '36px 32px',
                 position: 'relative',
                 overflow: 'hidden',
                 boxShadow: `0 8px 40px ${city.glowColor}`,
+                minHeight: 340,
               }}>
-                {/* Dot texture overlay */}
-                <div style={{ position:'absolute', inset:0, opacity:0.07, pointerEvents:'none' }}>
-                  <svg width="100%" height="100%"><defs><pattern id={`ct-${city.name}`} width="20" height="20" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.5" fill="white"/></pattern></defs><rect width="100%" height="100%" fill={`url(#ct-${city.name})`}/></svg>
-                </div>
+                {/* Real city photo background */}
+                <div style={{ position:'absolute', inset:0, backgroundImage:`url(${city.photo})`, backgroundSize:'cover', backgroundPosition:'center', pointerEvents:'none' }} />
+                {/* Colour overlay — keeps brand feel + ensures readability */}
+                <div style={{ position:'absolute', inset:0, background: city.overlay, pointerEvents:'none' }} />
+                {/* Subtle vignette at bottom for text contrast */}
+                <div style={{ position:'absolute', inset:0, background:'linear-gradient(to top,rgba(0,0,0,0.35) 0%,transparent 55%)', pointerEvents:'none' }} />
                 {/* Glow circle */}
-                <div style={{ position:'absolute', bottom:-60, right:-40, width:200, height:200, borderRadius:'50%', background:'rgba(255,255,255,0.08)', pointerEvents:'none' }}/>
+                <div style={{ position:'absolute', bottom:-60, right:-40, width:200, height:200, borderRadius:'50%', background:'rgba(255,255,255,0.06)', pointerEvents:'none' }}/>
                 <div style={{ position:'relative', zIndex:1 }}>
                   {/* Badge */}
                   <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'rgba(255,255,255,0.18)', backdropFilter:'blur(8px)', border:'1px solid rgba(255,255,255,0.25)', color:'#fff', fontSize:10, fontWeight:700, letterSpacing:'0.8px', padding:'5px 13px', borderRadius:99, marginBottom:24, textTransform:'uppercase' }}>
