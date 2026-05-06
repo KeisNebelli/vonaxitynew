@@ -91,6 +91,22 @@ export default function DisclaimerPage({ params }) {
         .disc-card:hover { transform: translateY(-2px); box-shadow: 0 12px 40px rgba(0,0,0,0.08) !important; }
         .disc-nav-pill { transition: all 0.15s; cursor: pointer; }
         .disc-nav-pill:hover { opacity: 0.8; transform: translateY(-1px); }
+
+        @keyframes orbitCW  { from { transform: rotate(0deg)   translateX(88px) rotate(0deg);   } to { transform: rotate(360deg)  translateX(88px) rotate(-360deg);  } }
+        @keyframes orbitCCW { from { transform: rotate(0deg)   translateX(64px) rotate(0deg);   } to { transform: rotate(-360deg) translateX(64px) rotate(360deg);   } }
+        @keyframes pulse    { 0%,100%{transform:scale(1);opacity:1} 50%{transform:scale(1.07);opacity:0.85} }
+        @keyframes hbeat    { 0%,100%{stroke-dashoffset:200} 40%{stroke-dashoffset:0} }
+        @keyframes floatUp  { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+        @keyframes shimmer  { 0%{opacity:0.4} 50%{opacity:1} 100%{opacity:0.4} }
+        @keyframes ringPulse{ 0%,100%{r:42;opacity:0.18} 50%{r:50;opacity:0.08} }
+
+        .disc-orbit-1 { animation: orbitCW  14s linear infinite; }
+        .disc-orbit-2 { animation: orbitCCW 10s linear infinite; }
+        .disc-orbit-3 { animation: orbitCW  18s linear infinite; animation-delay:-5s; }
+        .disc-orbit-4 { animation: orbitCCW 12s linear infinite; animation-delay:-3s; }
+        .disc-shield   { animation: pulse   3.2s ease-in-out infinite; transform-origin: center; }
+        .disc-float    { animation: floatUp 4s ease-in-out infinite; }
+        .disc-shimmer  { animation: shimmer 2.5s ease-in-out infinite; }
       `}</style>
       <Nav lang={lang} />
 
@@ -108,10 +124,117 @@ export default function DisclaimerPage({ params }) {
         <div style={{ position:'absolute', bottom:-40, right:'15%', width:250, height:250, borderRadius:'50%', background:'rgba(124,58,237,0.14)', filter:'blur(80px)', pointerEvents:'none' }}/>
 
         <div style={{ position:'relative', zIndex:1 }}>
-          <div style={{ display:'inline-flex', alignItems:'center', gap:8, fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(147,197,253,0.95)', background:'rgba(37,99,235,0.3)', padding:'6px 18px', borderRadius:99, marginBottom:20, border:'1px solid rgba(147,197,253,0.2)' }}>
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(147,197,253,0.95)', background:'rgba(37,99,235,0.3)', padding:'6px 18px', borderRadius:99, marginBottom:28, border:'1px solid rgba(147,197,253,0.2)' }}>
             <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             {c.tag}
           </div>
+
+          {/* ── Animated illustration ── */}
+          <div className="disc-float" style={{ display:'flex', justifyContent:'center', marginBottom:32 }}>
+            <svg width="220" height="220" viewBox="0 0 220 220" fill="none" xmlns="http://www.w3.org/2000/svg" style={{ overflow:'visible' }}>
+
+              {/* Outer glow rings */}
+              <circle cx="110" cy="110" r="95" stroke="rgba(255,255,255,0.06)" strokeWidth="1"/>
+              <circle cx="110" cy="110" r="72" stroke="rgba(255,255,255,0.08)" strokeWidth="1"/>
+
+              {/* Animated pulse ring */}
+              <circle cx="110" cy="110" r="52" stroke="rgba(99,179,255,0.25)" strokeWidth="1.5" style={{ animation:'ringPulse 2.8s ease-in-out infinite' }}/>
+
+              {/* Orbit paths (dashed) */}
+              <circle cx="110" cy="110" r="88" stroke="rgba(255,255,255,0.07)" strokeWidth="1" strokeDasharray="4 8"/>
+              <circle cx="110" cy="110" r="64" stroke="rgba(255,255,255,0.07)" strokeWidth="1" strokeDasharray="3 6"/>
+
+              {/* ── Orbiting icons ── */}
+              {/* 1 — Lock (outer orbit) */}
+              <g style={{ transformOrigin:'110px 110px' }} className="disc-orbit-1">
+                <g transform="translate(110,110)">
+                  <rect x="-14" y="-14" width="28" height="28" rx="8" fill="rgba(37,99,235,0.85)" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+                  <rect x="-5" y="-3" width="10" height="8" rx="1.5" fill="none" stroke="white" strokeWidth="1.5"/>
+                  <path d="M-2.5 -3 Q-2.5 -7 0 -7 Q2.5 -7 2.5 -3" stroke="white" strokeWidth="1.5" fill="none"/>
+                  <circle cx="0" cy="2" r="1" fill="white"/>
+                </g>
+              </g>
+
+              {/* 2 — Document (outer orbit) */}
+              <g style={{ transformOrigin:'110px 110px' }} className="disc-orbit-3">
+                <g transform="translate(110,110)">
+                  <rect x="-14" y="-14" width="28" height="28" rx="8" fill="rgba(124,58,237,0.85)" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+                  <rect x="-6" y="-8" width="12" height="16" rx="1.5" fill="none" stroke="white" strokeWidth="1.5"/>
+                  <line x1="-3" y1="-3" x2="3" y2="-3" stroke="white" strokeWidth="1.2"/>
+                  <line x1="-3" y1="0" x2="3" y2="0" stroke="white" strokeWidth="1.2"/>
+                  <line x1="-3" y1="3" x2="1" y2="3" stroke="white" strokeWidth="1.2"/>
+                </g>
+              </g>
+
+              {/* 3 — People (inner orbit) */}
+              <g style={{ transformOrigin:'110px 110px' }} className="disc-orbit-2">
+                <g transform="translate(110,110)">
+                  <rect x="-14" y="-14" width="28" height="28" rx="8" fill="rgba(5,150,105,0.85)" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+                  <circle cx="-2" cy="-4" r="3.5" fill="none" stroke="white" strokeWidth="1.5"/>
+                  <path d="M-8 7 Q-8 1 -2 1 Q4 1 4 7" fill="none" stroke="white" strokeWidth="1.5"/>
+                </g>
+              </g>
+
+              {/* 4 — Checkmark (inner orbit) */}
+              <g style={{ transformOrigin:'110px 110px' }} className="disc-orbit-4">
+                <g transform="translate(110,110)">
+                  <rect x="-14" y="-14" width="28" height="28" rx="8" fill="rgba(217,119,6,0.85)" stroke="rgba(255,255,255,0.25)" strokeWidth="1"/>
+                  <polyline points="-5,0 -1,5 6,-5" fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                </g>
+              </g>
+
+              {/* ── Central shield ── */}
+              <g className="disc-shield" style={{ transformOrigin:'110px 110px' }}>
+                {/* Shield shadow/glow */}
+                <ellipse cx="110" cy="148" rx="28" ry="6" fill="rgba(0,0,0,0.25)" filter="url(#blur)"/>
+                {/* Shield body */}
+                <path d="M110 68 L138 80 L138 108 Q138 130 110 148 Q82 130 82 108 L82 80 Z"
+                  fill="url(#shieldGrad)" stroke="rgba(255,255,255,0.3)" strokeWidth="1.5"/>
+                {/* Shield inner highlight */}
+                <path d="M110 76 L132 86 L132 108 Q132 126 110 141 Q88 126 88 108 L88 86 Z"
+                  fill="url(#shieldInner)" opacity="0.4"/>
+                {/* Heartbeat line */}
+                <polyline points="94,109 99,109 102,100 106,118 110,104 114,114 117,109 126,109"
+                  fill="none" stroke="white" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+                  strokeDasharray="60" strokeDashoffset="60"
+                  style={{ animation:'hbeat 2.4s ease-in-out infinite' }}/>
+              </g>
+
+              {/* ── Floating mini badges ── */}
+              {/* Top-left verified badge */}
+              <g className="disc-shimmer" style={{ animationDelay:'0s' }}>
+                <rect x="28" y="56" width="52" height="22" rx="11" fill="rgba(5,150,105,0.9)" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+                <polyline points="39,67 42,71 49,63" fill="none" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"/>
+                <text x="53" y="71" fontSize="9" fontWeight="700" fill="white" fontFamily="system-ui">Verified</text>
+              </g>
+              {/* Top-right secure badge */}
+              <g className="disc-shimmer" style={{ animationDelay:'0.8s' }}>
+                <rect x="140" y="48" width="52" height="22" rx="11" fill="rgba(37,99,235,0.9)" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+                <rect x="150" y="60" width="8" height="6" rx="1" fill="none" stroke="white" strokeWidth="1.5"/>
+                <path d="M151 60 Q151 56 154 56 Q157 56 157 60" fill="none" stroke="white" strokeWidth="1.5"/>
+                <text x="162" y="63" fontSize="9" fontWeight="700" fill="white" fontFamily="system-ui">Secure</text>
+              </g>
+              {/* Bottom legal badge */}
+              <g className="disc-shimmer" style={{ animationDelay:'1.6s' }}>
+                <rect x="68" y="162" width="64" height="22" rx="11" fill="rgba(124,58,237,0.9)" stroke="rgba(255,255,255,0.2)" strokeWidth="1"/>
+                <text x="100" y="177" fontSize="9" fontWeight="700" fill="white" fontFamily="system-ui" textAnchor="middle">⚖ Albanian Law</text>
+              </g>
+
+              {/* Gradient defs */}
+              <defs>
+                <radialGradient id="shieldGrad" cx="40%" cy="30%" r="70%">
+                  <stop offset="0%" stopColor="#60A5FA"/>
+                  <stop offset="100%" stopColor="#1D4ED8"/>
+                </radialGradient>
+                <linearGradient id="shieldInner" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stopColor="white" stopOpacity="0.6"/>
+                  <stop offset="100%" stopColor="white" stopOpacity="0"/>
+                </linearGradient>
+                <filter id="blur"><feGaussianBlur stdDeviation="4"/></filter>
+              </defs>
+            </svg>
+          </div>
+
           <h1 style={{ fontSize:'clamp(36px,5vw,60px)', fontWeight:900, color:'#fff', letterSpacing:'-2.5px', lineHeight:1.05, marginBottom:14 }}>
             {c.title}
           </h1>
