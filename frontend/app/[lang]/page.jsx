@@ -215,16 +215,16 @@ export default async function HomePage({ params }) {
       />
 
       {/* ── Trust bar ── */}
-      <section style={{ background: 'rgba(255,255,255,0.88)', backdropFilter:'blur(8px)', borderTop: `1px solid ${C.border}`, borderBottom: `1px solid ${C.border}`, padding: '28px 24px', boxShadow: '0 2px 12px rgba(0,0,0,0.04)', position:'relative', zIndex:1 }}>
-        <div className="hp-trust-bar" style={{ maxWidth: 1100, margin: '0 auto', display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(220px,1fr))', gap: 20 }}>
+      <section style={{ background: '#fff', borderTop:`1px solid ${C.border}`, borderBottom:`1px solid ${C.border}`, padding:'32px 24px', position:'relative', zIndex:1 }}>
+        <div className="hp-trust-bar" style={{ maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))', gap:0 }}>
           {TRUST_ITEMS.map((item, i) => (
-            <div key={i} style={{ display: 'flex', alignItems: 'center', gap: 14 }}>
-              <div style={{ width: 42, height: 42, borderRadius: 12, background: 'linear-gradient(135deg, #EFF6FF 0%, #DBEAFE 100%)', display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0, boxShadow: '0 1px 4px rgba(37,99,235,0.12)' }}>
+            <div key={i} style={{ display:'flex', alignItems:'center', gap:16, padding:'0 28px', borderRight: i < TRUST_ITEMS.length - 1 ? `1px solid ${C.border}` : 'none' }}>
+              <div style={{ width:48, height:48, borderRadius:14, background:'linear-gradient(135deg,#EFF6FF 0%,#EDE9FE 100%)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 2px 8px rgba(37,99,235,0.10)' }}>
                 {item.icon}
               </div>
               <div>
-                <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary }}>{item.title}</div>
-                <div style={{ fontSize: 11, color: C.textTertiary, marginTop: 2 }}>{item.sub}</div>
+                <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary, letterSpacing:'-0.2px' }}>{item.title}</div>
+                <div style={{ fontSize:12, color:C.textSecondary, marginTop:3, lineHeight:1.4 }}>{item.sub}</div>
               </div>
             </div>
           ))}
