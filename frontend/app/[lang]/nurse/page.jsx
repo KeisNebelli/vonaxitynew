@@ -5,7 +5,7 @@ import { api } from '@/lib/api';
 import { t } from '@/translations';
 import VisitLocationCard, { DailyRouteCard } from '@/components/map/VisitLocationCard';
 import { toastSuccess, toastError } from '@/components/ui/Toast';
-// HealthProgress removed — not needed at this stage
+import HealthProgress from '../dashboard/health';
 import NurseChat from '@/components/chat/NurseChat';
 // Module-level translation helper - uses 'en' as default
 let _currentLang = 'en';
@@ -48,6 +48,8 @@ const NAV_ITEMS = [
   { id:'dashboard', label:'dashboard', icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg> },
   { id:'jobs',      label:'jobs',      icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></svg> },
   { id:'visits',    label:'visits',    icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+  { id:'calendar',  label:'calendar',  icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/><line x1="8" y1="14" x2="8" y2="14"/><line x1="12" y1="14" x2="12" y2="14"/><line x1="16" y1="14" x2="16" y2="14"/></svg> },
+  { id:'health',    label:'health',    icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> },
   { id:'complete',  label:'complete',  icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg> },
   { id:'profile',   label:'profile',   icon:<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
 ];
@@ -73,8 +75,8 @@ function formatVisit(v) {
 const F = "'DM Sans','Inter',system-ui,sans-serif";
 
 const NURSE_LABELS = {
-  en:{ dashboard:'Dashboard', jobs:'Browse Jobs', visits:'My Visits', complete:'Complete Visit', profile:'My Profile' },
-  sq:{ dashboard:'Paneli', jobs:'Shfleto Punët', visits:'Vizitat e Mia', complete:'Përfundo Vizitën', profile:'Profili Im' },
+  en:{ dashboard:'Dashboard', jobs:'Browse Jobs', visits:'My Visits', calendar:'Calendar', health:'Patient Health', complete:'Complete Visit', profile:'My Profile' },
+  sq:{ dashboard:'Paneli', jobs:'Shfleto Punët', visits:'Vizitat e Mia', calendar:'Kalendar', health:'Shëndeti i Pacientit', complete:'Përfundo Vizitën', profile:'Profili Im' },
 };
 const SSM = '0 1px 3px rgba(15,23,42,0.06),0 1px 2px rgba(15,23,42,0.04)';
 
@@ -1883,7 +1885,7 @@ function OnboardingWizard({ nurse, user, onComplete, onSave, lang='en' }) {
 function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }) {
   const now = new Date();
   const [year, setYear] = useState(now.getFullYear());
-  const [month, setMonth] = useState(now.getMonth()); // 0-indexed
+  const [month, setMonth] = useState(now.getMonth());
   const [selectedDay, setSelectedDay] = useState(null);
 
   const MONTH_NAMES_EN = ['January','February','March','April','May','June','July','August','September','October','November','December'];
@@ -1901,10 +1903,9 @@ function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }
     visitsByDate[d].push(v);
   });
 
-  // Build calendar grid
+  // Build calendar grid (Monday-first)
   const firstDay = new Date(year, month, 1);
   const lastDay = new Date(year, month + 1, 0);
-  // Monday-first: convert Sunday(0)→6, Monday(1)→0, ...
   const startDow = (firstDay.getDay() + 6) % 7;
   const totalCells = Math.ceil((startDow + lastDay.getDate()) / 7) * 7;
   const cells = [];
@@ -1923,122 +1924,218 @@ function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }
   const selectedCell = selectedDay ? cells.find(c => c?.dateStr === selectedDay) : null;
 
   const statusColor = (s) => {
-    if (!s) return '#6B7280';
-    s = s.toUpperCase();
-    if (s === 'COMPLETED') return '#059669';
-    if (s === 'CANCELLED') return '#DC2626';
+    if (!s) return '#2563EB';
+    const u = s.toUpperCase();
+    if (u === 'COMPLETED') return '#059669';
+    if (u === 'CANCELLED') return '#DC2626';
     return '#2563EB';
   };
 
+  const statusBg = (s) => statusColor(s) + '18';
+
+  // Count visits this month for the header summary
+  const monthVisitsCount = cells.reduce((acc, c) => acc + (c ? c.visits.length : 0), 0);
+
   return (
     <div>
-      {/* Month navigation */}
-      <div style={{ background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, overflow: 'hidden', boxShadow: SSM }}>
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', padding: '16px 20px', borderBottom: `1px solid ${C.border}` }}>
-          <button onClick={prevMonth} style={{ width: 32, height: 32, borderRadius: 8, border: `1px solid ${C.border}`, background: C.bgWhite, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.textSecondary }}>
+      <style>{`
+        .cal-chip { transition: opacity 0.12s, transform 0.12s; }
+        .cal-chip:hover { opacity: 0.85; transform: translateX(1px); }
+        .cal-cell { transition: background 0.1s; }
+        .cal-cell:hover { background: #F1F5F9 !important; }
+      `}</style>
+
+      {/* Header */}
+      <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', marginBottom:16 }}>
+        <div>
+          <div style={{ fontSize:20, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.5px' }}>
+            {lang==='sq'?'Kalendari':'Work Calendar'}
+          </div>
+          <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>
+            {monthVisitsCount} {lang==='sq'?'vizitë këtë muaj':'visits this month'}
+          </div>
+        </div>
+        <div style={{ display:'flex', gap:8 }}>
+          <button onClick={()=>{ setYear(now.getFullYear()); setMonth(now.getMonth()); setSelectedDay(todayStr); }} style={{ fontSize:12, fontWeight:600, color:C.primary, background:C.primaryLight, border:`1px solid ${C.primary}30`, borderRadius:8, padding:'6px 12px', cursor:'pointer', fontFamily:F }}>
+            {lang==='sq'?'Sot':'Today'}
+          </button>
+        </div>
+      </div>
+
+      {/* Calendar card */}
+      <div style={{ background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
+        {/* Month nav */}
+        <div style={{ display:'flex', alignItems:'center', justifyContent:'space-between', padding:'14px 18px', borderBottom:`1px solid ${C.border}`, background:'#F8FAFC' }}>
+          <button onClick={prevMonth} style={{ width:32, height:32, borderRadius:8, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary }}>
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="15 18 9 12 15 6"/></svg>
           </button>
-          <div style={{ fontSize: 15, fontWeight: 800, color: C.textPrimary, letterSpacing: '-0.3px' }}>{monthName} {year}</div>
-          <button onClick={nextMonth} style={{ width: 32, height: 32, borderRadius: 8, border: `1px solid ${C.border}`, background: C.bgWhite, cursor: 'pointer', display: 'flex', alignItems: 'center', justifyContent: 'center', color: C.textSecondary }}>
+          <div style={{ fontSize:15, fontWeight:800, color:C.textPrimary, letterSpacing:'-0.3px' }}>{monthName} {year}</div>
+          <button onClick={nextMonth} style={{ width:32, height:32, borderRadius:8, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', display:'flex', alignItems:'center', justifyContent:'center', color:C.textSecondary }}>
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
           </button>
         </div>
 
-        {/* Day headers */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', padding: '10px 12px 4px' }}>
-          {dayNames.map(d => (
-            <div key={d} style={{ textAlign: 'center', fontSize: 11, fontWeight: 700, color: C.textTertiary, letterSpacing: '0.5px', textTransform: 'uppercase', padding: '4px 0' }}>{d}</div>
+        {/* Day-name headers */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', borderBottom:`1px solid ${C.border}` }}>
+          {dayNames.map((d,i) => (
+            <div key={d} style={{ textAlign:'center', fontSize:10, fontWeight:700, color: i >= 5 ? '#94A3B8' : C.textTertiary, letterSpacing:'0.6px', textTransform:'uppercase', padding:'8px 0', background:'#FAFAFA', borderRight: i < 6 ? `1px solid ${C.border}` : 'none' }}>{d}</div>
           ))}
         </div>
 
-        {/* Calendar grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(7, 1fr)', gap: 2, padding: '0 12px 14px' }}>
+        {/* Calendar grid — each cell is a real box with visit chips */}
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)' }}>
           {cells.map((cell, i) => {
-            if (!cell) return <div key={i} />;
+            if (!cell) {
+              return (
+                <div key={`empty-${i}`} style={{ minHeight:88, background:'#FAFAFA', borderRight: i%7 < 6 ? `1px solid ${C.border}` : 'none', borderBottom: i < totalCells-7 ? `1px solid ${C.border}` : 'none' }} />
+              );
+            }
             const isToday = cell.dateStr === todayStr;
             const isSelected = cell.dateStr === selectedDay;
-            const hasVisits = cell.visits.length > 0;
             const isPast = cell.dateStr < todayStr;
+            const isSat = (i % 7) === 5;
+            const isSun = (i % 7) === 6;
+            const isWeekend = isSat || isSun;
+            const hasVisits = cell.visits.length > 0;
+
             return (
-              <button
+              <div
                 key={cell.dateStr}
+                className="cal-cell"
                 onClick={() => setSelectedDay(isSelected ? null : cell.dateStr)}
                 style={{
-                  aspectRatio: '1', borderRadius: 10, border: 'none', cursor: 'pointer', fontFamily: F,
-                  background: isSelected ? C.primary : isToday ? '#EFF6FF' : 'transparent',
-                  color: isSelected ? '#fff' : isToday ? C.primary : isPast ? C.textTertiary : C.textPrimary,
-                  fontWeight: isToday || isSelected ? 800 : hasVisits ? 700 : 400,
-                  fontSize: 13, display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', gap: 2,
-                  outline: isToday && !isSelected ? `2px solid ${C.primary}` : 'none', outlineOffset: '-2px',
-                  position: 'relative',
+                  minHeight:88,
+                  padding:'6px 5px',
+                  cursor:'pointer',
+                  background: isSelected ? '#EFF6FF' : isToday ? '#FFFBEB' : isWeekend ? '#FAFAFA' : C.bgWhite,
+                  borderRight: i%7 < 6 ? `1px solid ${C.border}` : 'none',
+                  borderBottom: i < totalCells-7 ? `1px solid ${C.border}` : 'none',
+                  position:'relative',
+                  verticalAlign:'top',
                 }}
               >
-                <span>{cell.day}</span>
-                {hasVisits && (
-                  <div style={{ display: 'flex', gap: 2, justifyContent: 'center' }}>
-                    {cell.visits.slice(0, 3).map((v, vi) => (
-                      <div key={vi} style={{ width: 4, height: 4, borderRadius: '50%', background: isSelected ? 'rgba(255,255,255,0.8)' : statusColor(v.status) }} />
-                    ))}
-                  </div>
-                )}
-              </button>
+                {/* Day number */}
+                <div style={{
+                  width:22, height:22, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:4,
+                  background: isToday ? C.primary : 'transparent',
+                  color: isToday ? '#fff' : isPast ? C.textTertiary : isWeekend ? '#94A3B8' : C.textPrimary,
+                  fontSize:11, fontWeight: isToday || hasVisits ? 800 : 500,
+                }}>
+                  {cell.day}
+                </div>
+
+                {/* Visit chips */}
+                <div style={{ display:'flex', flexDirection:'column', gap:2 }}>
+                  {cell.visits.slice(0,3).map((v, vi) => {
+                    const col = statusColor(v.status);
+                    const time = new Date(v.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+                    const wo = v.workOrderNumber ? `WO-${v.workOrderNumber}` : `#${v.id?.slice(-4)?.toUpperCase()}`;
+                    const svc = trService(v.serviceType, lang);
+                    return (
+                      <div
+                        key={v.id || vi}
+                        className="cal-chip"
+                        onClick={e => { e.stopPropagation(); setSelectedVisit(v); setActive('complete'); }}
+                        style={{
+                          background: statusBg(v.status),
+                          borderLeft:`2.5px solid ${col}`,
+                          borderRadius:'0 5px 5px 0',
+                          padding:'2px 5px',
+                          cursor:'pointer',
+                          overflow:'hidden',
+                        }}
+                      >
+                        <div style={{ fontSize:9, fontWeight:800, color:col, letterSpacing:'0.2px', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{time} · {wo}</div>
+                        <div style={{ fontSize:9, fontWeight:500, color:C.textSecondary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{svc}</div>
+                      </div>
+                    );
+                  })}
+                  {cell.visits.length > 3 && (
+                    <div style={{ fontSize:9, fontWeight:700, color:C.primary, paddingLeft:4 }}>+{cell.visits.length - 3} {lang==='sq'?'më shumë':'more'}</div>
+                  )}
+                </div>
+              </div>
             );
           })}
         </div>
       </div>
 
       {/* Legend */}
-      <div style={{ display: 'flex', gap: 16, marginTop: 12, flexWrap: 'wrap' }}>
+      <div style={{ display:'flex', gap:16, marginTop:12, flexWrap:'wrap' }}>
         {[['#2563EB', lang==='sq'?'Planifikuar':'Scheduled'], ['#059669', lang==='sq'?'Kompletuar':'Completed'], ['#DC2626', lang==='sq'?'Anuluar':'Cancelled']].map(([col, label]) => (
-          <div key={label} style={{ display: 'flex', alignItems: 'center', gap: 6, fontSize: 12, color: C.textSecondary }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: col }} />
+          <div key={label} style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:C.textSecondary }}>
+            <div style={{ width:10, height:10, borderRadius:3, background:col+'22', borderLeft:`3px solid ${col}` }} />
             {label}
           </div>
         ))}
+        <div style={{ marginLeft:'auto', fontSize:12, color:C.textTertiary }}>
+          {lang==='sq'?'Klikoni vizitën për detaje':'Click a visit chip to open details'}
+        </div>
       </div>
 
-      {/* Selected day panel */}
+      {/* Selected day detail panel */}
       {selectedCell && (
-        <div style={{ marginTop: 16, background: C.bgWhite, borderRadius: 16, border: `1px solid ${C.border}`, overflow: 'hidden', boxShadow: SSM }}>
-          <div style={{ padding: '14px 18px', borderBottom: `1px solid ${C.border}`, background: '#F8FAFC' }}>
-            <div style={{ fontSize: 14, fontWeight: 700, color: C.textPrimary }}>
-              {new Date(selectedCell.dateStr + 'T12:00:00').toLocaleDateString(lang === 'sq' ? 'sq-AL' : 'en-GB', { weekday: 'long', day: 'numeric', month: 'long' })}
+        <div style={{ marginTop:16, background:C.bgWhite, borderRadius:16, border:`1px solid ${C.border}`, overflow:'hidden', boxShadow:SSM }}>
+          <div style={{ padding:'14px 18px', borderBottom:`1px solid ${C.border}`, background:'#F8FAFC', display:'flex', alignItems:'center', justifyContent:'space-between' }}>
+            <div>
+              <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary }}>
+                {new Date(selectedCell.dateStr+'T12:00:00').toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'long',day:'numeric',month:'long'})}
+              </div>
+              <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>
+                {selectedCell.visits.length === 0
+                  ? (lang==='sq'?'Asnjë vizitë e planifikuar':'No visits scheduled')
+                  : `${selectedCell.visits.length} ${lang==='sq'?'vizitë':'visit'}${selectedCell.visits.length > 1 && lang!=='sq' ? 's':''} ${lang==='sq'?'të planifikuara':''}`}
+              </div>
             </div>
-            <div style={{ fontSize: 12, color: C.textTertiary, marginTop: 2 }}>
-              {selectedCell.visits.length === 0
-                ? (lang === 'sq' ? 'Asnjë vizitë e planifikuar' : 'No visits scheduled')
-                : `${selectedCell.visits.length} ${lang==='sq'?'vizitë':'visit'}${selectedCell.visits.length > 1 ? (lang==='sq'?'':'s') : ''}`}
-            </div>
+            <button onClick={()=>setSelectedDay(null)} style={{ width:28,height:28,borderRadius:8,border:`1px solid ${C.border}`,background:C.bgWhite,cursor:'pointer',display:'flex',alignItems:'center',justifyContent:'center',color:C.textTertiary }}>
+              <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+            </button>
           </div>
+
           {selectedCell.visits.length === 0 ? (
-            <div style={{ padding: '28px 18px', textAlign: 'center', color: C.textTertiary, fontSize: 13 }}>
-              {lang === 'sq' ? 'Shfleto punët për të marrë vizita të reja.' : 'Browse jobs to pick up new visits.'}
+            <div style={{ padding:'28px 18px', textAlign:'center' }}>
+              <svg width="32" height="32" fill="none" stroke="#CBD5E1" strokeWidth="1.5" viewBox="0 0 24 24" style={{ marginBottom:8 }}><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+              <div style={{ color:C.textTertiary, fontSize:13 }}>{lang==='sq'?'Shfleto punët për të marrë vizita të reja.':'Browse jobs to pick up new visits.'}</div>
+              <button onClick={()=>setActive('jobs')} style={{ marginTop:12, fontSize:12, fontWeight:600, color:C.primary, background:C.primaryLight, border:`1px solid ${C.primary}30`, borderRadius:8, padding:'6px 14px', cursor:'pointer', fontFamily:F }}>
+                {lang==='sq'?'Shfleto Punët':'Browse Jobs'}
+              </button>
             </div>
           ) : (
-            <div style={{ display: 'flex', flexDirection: 'column' }}>
+            <div style={{ display:'flex', flexDirection:'column' }}>
               {selectedCell.visits.map((v, i) => {
-                const time = new Date(v.scheduledAt).toLocaleTimeString('en-GB', { hour: '2-digit', minute: '2-digit' });
+                const time = new Date(v.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
                 const col = statusColor(v.status);
                 const svc = trService(v.serviceType, lang);
+                const wo = v.workOrderNumber ? `WO-${v.workOrderNumber}` : `#${v.id?.slice(-6)?.toUpperCase()}`;
                 return (
                   <div
                     key={v.id}
-                    onClick={() => { setSelectedVisit(v); setActive('map'); }}
-                    style={{ padding: '14px 18px', borderBottom: i < selectedCell.visits.length-1 ? `1px solid ${C.border}` : 'none', display: 'flex', alignItems: 'center', gap: 14, cursor: 'pointer' }}
-                    onMouseEnter={e => e.currentTarget.style.background = '#F8FAFC'}
-                    onMouseLeave={e => e.currentTarget.style.background = 'transparent'}
+                    onClick={()=>{ setSelectedVisit(v); setActive('complete'); }}
+                    style={{ padding:'14px 18px', borderBottom: i < selectedCell.visits.length-1 ? `1px solid ${C.border}` : 'none', display:'flex', alignItems:'center', gap:14, cursor:'pointer', transition:'background 0.1s' }}
+                    onMouseEnter={e=>e.currentTarget.style.background='#F8FAFC'}
+                    onMouseLeave={e=>e.currentTarget.style.background='transparent'}
                   >
-                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:3, minWidth:48 }}>
-                      <div style={{ fontSize: 13, fontWeight: 800, color: col, textAlign: 'center', background: col + '18', borderRadius: 8, padding: '4px 6px', width:'100%' }}>{time}</div>
-                      <div style={{ fontSize: 9, fontWeight: 700, color: C.textTertiary, letterSpacing:'0.3px' }}>#{v.id?.slice(-6)?.toUpperCase()}</div>
+                    {/* Time + WO block */}
+                    <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:3, flexShrink:0 }}>
+                      <div style={{ fontSize:14, fontWeight:800, color:col, background:col+'18', borderRadius:8, padding:'5px 8px', textAlign:'center', minWidth:50 }}>{time}</div>
+                      <div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, letterSpacing:'0.3px' }}>{wo}</div>
                     </div>
-                    <div style={{ flex: 1, minWidth: 0 }}>
-                      <div style={{ fontSize: 13, fontWeight: 700, color: C.textPrimary, marginBottom: 2 }}>{svc}</div>
-                      <div style={{ fontSize: 12, color: C.textSecondary, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>{v.relative?.name || (lang==='sq'?'Pacient':'Patient')}{v.relative?.address ? ` · ${v.relative.address}` : ''}</div>
+
+                    {/* Service + patient */}
+                    <div style={{ flex:1, minWidth:0 }}>
+                      <div style={{ fontSize:13, fontWeight:700, color:C.textPrimary, marginBottom:2 }}>{svc}</div>
+                      <div style={{ fontSize:12, color:C.textSecondary, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                        {v.relative?.name || (lang==='sq'?'Pacient':'Patient')}{v.relative?.address ? ` · ${v.relative.address}` : ''}
+                      </div>
                     </div>
-                    <div style={{ fontSize: 10, fontWeight: 700, padding: '3px 8px', borderRadius: 99, background: col + '18', color: col, textTransform: 'uppercase', letterSpacing: '0.5px', flexShrink: 0 }}>
+
+                    {/* Status badge */}
+                    <div style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:99, background:col+'18', color:col, textTransform:'uppercase', letterSpacing:'0.5px', flexShrink:0 }}>
                       {v.status?.replace(/_/g,' ')}
                     </div>
+
+                    {/* Arrow */}
+                    <svg width="14" height="14" fill="none" stroke={C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
                   </div>
                 );
               })}
@@ -2185,6 +2282,8 @@ export default function NursePage({ params }) {
               {active==='dashboard' && <Dashboard setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} nurse={nurse} onTodayClick={()=>{ setVisitsInitialFilter('today'); setActive('visits'); }} />}
               {active==='jobs' && <BrowseJobs nurse={nurse} lang={lang} />}
               {active==='visits' && <Visits setActive={setActive} setSelectedVisit={setSelectedVisit} lang={lang} visits={visits} onStatusChange={handleStatusChange} initialFilter={visitsInitialFilter} />}
+              {active==='calendar' && <NurseCalendar visits={visits} lang={lang} setActive={navigateTo} setSelectedVisit={setSelectedVisit} />}
+              {active==='health' && <HealthProgress visits={visits} lang={lang} nurseMode={true} />}
               {active==='complete' && <CompleteVisit visit={selectedVisit} setActive={setActive} onComplete={loadData} lang={lang} />}
               {active==='profile' && <NurseProfile lang={lang} nurse={nurse} />}
             </div>
