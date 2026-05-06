@@ -82,12 +82,12 @@ export default function NurseSignup({ params }) {
 
       {/* ── Left illustration panel ── */}
       <div style={{ position:'relative', width:'42%', flexShrink:0, overflow:'hidden', background:'#1e3a5f' }}>
-        <img src="/nurselandingpage.png" alt=""
+        <img src="/nurse-hero.png" alt=""
           style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', objectPosition:'center top' }} />
-        {/* blue wash */}
-        <div style={{ position:'absolute', inset:0, background:'rgba(30,58,95,0.55)' }} />
-        {/* radial vignette */}
-        <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse at center, rgba(30,58,95,0.1) 0%, rgba(30,58,95,0.52) 100%)' }} />
+        {/* directional overlay */}
+        <div style={{ position:'absolute', inset:0, background:'linear-gradient(160deg,rgba(17,50,130,0.72) 0%,rgba(37,99,235,0.50) 100%)' }} />
+        {/* bottom vignette */}
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:160, background:'linear-gradient(to top, rgba(0,0,0,0.55) 0%, transparent 100%)' }} />
 
         <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between', padding:'36px 40px', animation:'fadeUp 0.6s ease both' }}>
           {/* logo */}
