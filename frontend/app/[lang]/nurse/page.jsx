@@ -321,17 +321,17 @@ function DashboardCalendar({ visits=[], lang='en', onOpenCalendar, onVisitSelect
       </div>
 
       {/* Calendar grid — day headers */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', borderBottom:`1px solid ${C.border}`, marginBottom:0 }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', borderBottom:`1px solid ${C.border}` }}>
         {DOW.map((d,i) => (
-          <div key={d} style={{ textAlign:'center', fontSize:9, fontWeight:700, color: i>=5?'#94A3B8':C.textTertiary, padding:'4px 0', borderRight: i<6?`1px solid ${C.border}`:'none', background:'#FAFAFA', letterSpacing:'0.4px' }}>{d}</div>
+          <div key={d} style={{ textAlign:'center', fontSize:9, fontWeight:700, color: i>=5?'#94A3B8':C.textTertiary, padding:'4px 0', borderRight: i<6?`1px solid ${C.border}`:'none', background:'#FAFAFA', overflow:'hidden', minWidth:0 }}>{d}</div>
         ))}
       </div>
 
       {/* Calendar grid — day cells with visit chips */}
-      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)' }}>
+      <div style={{ display:'grid', gridTemplateColumns:'repeat(7,1fr)', gridAutoRows:'minmax(64px,auto)' }}>
         {cells.map((d, i) => {
           if (!d) return (
-            <div key={`e${i}`} style={{ minHeight:64, background:'#FAFAFA', borderRight: i%7<6?`1px solid ${C.border}`:'none', borderBottom: i<cells.length-7?`1px solid ${C.border}`:'none' }}/>
+            <div key={`e${i}`} style={{ minWidth:0, overflow:'hidden', background:'#FAFAFA', borderRight: i%7<6?`1px solid ${C.border}`:'none', borderBottom: i<cells.length-7?`1px solid ${C.border}`:'none' }}/>
           );
           const key = dayKey(d);
           const dayVisits = visitsByDate[key]||[];
@@ -342,14 +342,15 @@ function DashboardCalendar({ visits=[], lang='en', onOpenCalendar, onVisitSelect
           return (
             <div key={key} onClick={()=>setSelectedDay(d===selectedDay?null:d)}
               style={{
-                minHeight:64, padding:'4px 3px', cursor:'pointer',
+                padding:'4px 3px', cursor:'pointer',
+                minWidth:0, overflow:'hidden',
                 background: isSelected?'#EFF6FF' : isToday?'#FFFBEB' : (isSat||isSun)?'#FAFAFA' : C.bgWhite,
                 borderRight: i%7<6?`1px solid ${C.border}`:'none',
                 borderBottom: i<cells.length-7?`1px solid ${C.border}`:'none',
                 transition:'background 0.1s',
               }}>
               {/* Day number */}
-              <div style={{ width:18, height:18, borderRadius:5, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:3,
+              <div style={{ width:18, height:18, borderRadius:5, display:'flex', alignItems:'center', justifyContent:'center', marginBottom:3, flexShrink:0,
                 background: isToday?C.primary:'transparent',
                 color: isToday?'#fff' : (isSat||isSun)?'#94A3B8' : C.textPrimary,
                 fontSize:10, fontWeight: isToday||dayVisits.length?700:400,
@@ -360,11 +361,11 @@ function DashboardCalendar({ visits=[], lang='en', onOpenCalendar, onVisitSelect
                 {dayVisits.slice(0,2).map((v,vi) => {
                   const col = statusColor(v.status);
                   const time = new Date(v.scheduledAt).toLocaleTimeString([],{hour:'2-digit',minute:'2-digit'});
-                  const wo = v.workOrderNumber ? `WO-${v.workOrderNumber}` : `#${v.id?.slice(-4)?.toUpperCase()}`;
+                  const woShort = v.workOrderNumber ? v.workOrderNumber.slice(-5) : v.id?.slice(-4)?.toUpperCase();
                   return (
                     <div key={v.id||vi} onClick={e=>{e.stopPropagation();onVisitSelect(v);}}
-                      style={{ background:col+'18', borderLeft:`2px solid ${col}`, borderRadius:'0 3px 3px 0', padding:'1px 3px', overflow:'hidden' }}>
-                      <div style={{ fontSize:8, fontWeight:800, color:col, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{time} · {wo}</div>
+                      style={{ background:col+'18', borderLeft:`2px solid ${col}`, borderRadius:'0 3px 3px 0', padding:'1px 3px', overflow:'hidden', width:'100%', boxSizing:'border-box', minWidth:0 }}>
+                      <div style={{ fontSize:8, fontWeight:800, color:col, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{time} #{woShort}</div>
                       <div style={{ fontSize:8, color:C.textSecondary, whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis' }}>{trService(v.serviceType,lang)}</div>
                     </div>
                   );
