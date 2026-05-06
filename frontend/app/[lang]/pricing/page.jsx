@@ -115,38 +115,49 @@ export default function PricingPage({ params }) {
                 background: C.bgWhite,
                 borderRadius: 20,
                 border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`,
-                padding: '32px 28px',
+                padding: p.featured ? '0 0 32px' : '32px 28px',
                 position: 'relative',
-                boxShadow: p.featured ? '0 8px 40px rgba(37,99,235,0.14)' : '0 2px 12px rgba(0,0,0,0.06)',
+                boxShadow: p.featured ? '0 12px 48px rgba(37,99,235,0.16)' : '0 2px 12px rgba(0,0,0,0.06)',
+                overflow: 'hidden',
               }}>
                 {p.featured && (
-                  <div style={{ position:'absolute', top:-14, left:'50%', transform:'translateX(-50%)', background:C.primary, color:'#fff', fontSize:11, fontWeight:700, padding:'5px 16px', borderRadius:99, whiteSpace:'nowrap', letterSpacing:'0.3px' }}>
-                    {t(lang,'pricing.mostPopular')}
-                  </div>
+                  <>
+                    {/* Gradient top accent bar */}
+                    <div style={{ height:6, background:'linear-gradient(90deg,#7C3AED 0%,#2563EB 100%)', marginBottom:28 }} />
+                    {/* Badge inline inside card */}
+                    <div style={{ paddingLeft:28, paddingRight:28, marginBottom:16 }}>
+                      <div style={{ display:'inline-flex', alignItems:'center', gap:6, background:'linear-gradient(135deg,#7C3AED,#2563EB)', color:'#fff', fontSize:11, fontWeight:700, padding:'4px 14px', borderRadius:99, letterSpacing:'0.4px' }}>
+                        <svg width="9" height="9" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+                        {t(lang,'pricing.mostPopular')}
+                      </div>
+                    </div>
+                  </>
                 )}
-                <div style={{ fontSize:13, fontWeight:700, color: p.featured ? C.primary : C.textTertiary, marginBottom:12, textTransform:'uppercase', letterSpacing:'0.5px' }}>{p.name}</div>
-                <div style={{ display:'flex', alignItems:'flex-end', gap:4, marginBottom:4 }}>
-                  <span style={{ fontSize:52, fontWeight:800, color:C.textPrimary, letterSpacing:'-3px', lineHeight:1 }}>€{p.price}</span>
+                <div style={{ paddingLeft:28, paddingRight:28 }}>
+                  <div style={{ fontSize:13, fontWeight:700, color: p.featured ? C.primary : C.textTertiary, marginBottom:12, textTransform:'uppercase', letterSpacing:'0.5px' }}>{p.name}</div>
+                  <div style={{ display:'flex', alignItems:'flex-end', gap:4, marginBottom:4 }}>
+                    <span style={{ fontSize:52, fontWeight:800, color:C.textPrimary, letterSpacing:'-3px', lineHeight:1 }}>€{p.price}</span>
+                  </div>
+                  <div style={{ fontSize:13, color:C.textTertiary, marginBottom:20 }}>{t(lang,'pricing.perMonth')}</div>
+                  <div style={{ fontSize:13, fontWeight:700, color: p.featured ? '#fff' : C.primary, background: p.featured ? C.primary : C.primaryLight, display:'inline-flex', alignItems:'center', gap:6, padding:'6px 14px', borderRadius:99, marginBottom:28 }}>
+                    <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
+                    {p.visits} {p.visits===1 ? t(lang,'pricing.visitMonth') : t(lang,'pricing.visitsMonth')}
+                  </div>
+                  <ul style={{ listStyle:'none', padding:0, margin:'0 0 28px' }}>
+                    {p.features.map(f => (
+                      <li key={f} style={{ display:'flex', alignItems:'center', gap:10, fontSize:13, color:C.textSecondary, padding:'7px 0', borderBottom:`1px solid ${C.borderSubtle || '#F9FAFB'}` }}>
+                        <div style={{ flexShrink:0 }}><CheckIcon color={p.featured ? C.primary : C.secondary} /></div>
+                        {f}
+                      </li>
+                    ))}
+                  </ul>
+                  <Link href={`/${lang}/signup?plan=${p.name.toLowerCase()}`}>
+                    <button style={{ width:'100%', padding:'13px', borderRadius:11, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? C.primary : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'0.1px' }}>
+                      {t(lang,'pricing.getStarted')}
+                    </button>
+                  </Link>
+                  <div style={{ fontSize:11, color:C.textTertiary, textAlign:'center', marginTop:12 }}>{t(lang,'pricing.trialNote')}</div>
                 </div>
-                <div style={{ fontSize:13, color:C.textTertiary, marginBottom:20 }}>{t(lang,'pricing.perMonth')}</div>
-                <div style={{ fontSize:13, fontWeight:700, color: p.featured ? '#fff' : C.primary, background: p.featured ? C.primary : C.primaryLight, display:'inline-flex', alignItems:'center', gap:6, padding:'6px 14px', borderRadius:99, marginBottom:28 }}>
-                  <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
-                  {p.visits} {p.visits===1 ? t(lang,'pricing.visitMonth') : t(lang,'pricing.visitsMonth')}
-                </div>
-                <ul style={{ listStyle:'none', padding:0, margin:'0 0 28px' }}>
-                  {p.features.map(f => (
-                    <li key={f} style={{ display:'flex', alignItems:'center', gap:10, fontSize:13, color:C.textSecondary, padding:'7px 0', borderBottom:`1px solid ${C.borderSubtle || '#F9FAFB'}` }}>
-                      <div style={{ flexShrink:0 }}><CheckIcon color={p.featured ? C.primary : C.secondary} /></div>
-                      {f}
-                    </li>
-                  ))}
-                </ul>
-                <Link href={`/${lang}/signup?plan=${p.name.toLowerCase()}`}>
-                  <button style={{ width:'100%', padding:'13px', borderRadius:11, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? C.primary : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize:14, fontWeight:700, cursor:'pointer', letterSpacing:'0.1px' }}>
-                    {t(lang,'pricing.getStarted')}
-                  </button>
-                </Link>
-                <div style={{ fontSize:11, color:C.textTertiary, textAlign:'center', marginTop:12 }}>{t(lang,'pricing.trialNote')}</div>
               </div>
             ))}
           </div>

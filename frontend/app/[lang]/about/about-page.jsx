@@ -40,7 +40,7 @@ const MILESTONES = {
 };
 
 const TEAM = [
-  { initials:'KN', name:'Keis Nebelli', role:'CEO & Founder', bio:'Albanian student based in New Jersey, USA, pursuing a Bachelor\'s degree in Cybersecurity. Built Vonaxity to solve a deeply personal problem — ensuring families abroad can keep their loved ones in Albania safe and cared for.', grad:'linear-gradient(135deg,#2563EB,#4F46E5)' },
+  { initials:'KN', photo:'/founder-keis.jpg', name:'Keis Nebelli', role:'CEO & Founder', bio:'Albanian student based in New Jersey, USA, pursuing a Bachelor\'s degree in Cybersecurity. Built Vonaxity to solve a deeply personal problem — ensuring families abroad can keep their loved ones in Albania safe and cared for.', grad:'linear-gradient(135deg,#2563EB,#4F46E5)' },
 ];
 
 export default function AboutPage({ params }) {
@@ -284,8 +284,11 @@ export default function AboutPage({ params }) {
                 <div style={{ background:person.grad, padding:'32px 32px 0', position:'relative', overflow:'hidden' }}>
                   <div style={{ position:'absolute', top:-30, right:-30, width:150, height:150, borderRadius:'50%', background:'rgba(255,255,255,0.08)', pointerEvents:'none' }}/>
                   <div style={{ display:'flex', alignItems:'flex-end', gap:20 }}>
-                    <div style={{ width:80, height:80, borderRadius:20, background:'rgba(255,255,255,0.2)', border:'2.5px solid rgba(255,255,255,0.35)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:26, fontWeight:800, color:'#fff', flexShrink:0, backdropFilter:'blur(4px)', marginBottom:-20, position:'relative', zIndex:1 }}>
-                      {person.initials}
+                    <div style={{ width:80, height:80, borderRadius:20, border:'2.5px solid rgba(255,255,255,0.35)', flexShrink:0, marginBottom:-20, position:'relative', zIndex:1, overflow:'hidden', background:'rgba(255,255,255,0.2)' }}>
+                      {person.photo
+                        ? <img src={person.photo} alt={person.name} style={{ width:'100%', height:'100%', objectFit:'cover', objectPosition:'top center', display:'block' }} />
+                        : <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', fontSize:26, fontWeight:800, color:'#fff', backdropFilter:'blur(4px)' }}>{person.initials}</div>
+                      }
                     </div>
                     <div style={{ paddingBottom:24, flex:1 }}>
                       <div style={{ fontSize:22, fontWeight:800, color:'#fff', letterSpacing:'-0.5px', marginBottom:4 }}>{person.name}</div>
