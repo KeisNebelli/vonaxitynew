@@ -46,13 +46,13 @@ const TEAM = [
     grad:'linear-gradient(135deg,#2563EB,#4F46E5)',
     bio:{
       en:[
-        "I was born in Durrës, Albania, and now live in New Jersey, USA, where I'm pursuing a Bachelor's degree in Cybersecurity. Living abroad, I always felt a constant concern — wanting to know that my family back home was safe, supported, and properly cared for.",
+        "Born in Durrës, Albania, and now living in New Jersey, USA, where I'm pursuing a Bachelor's degree in Cybersecurity. Living abroad, I always felt a constant concern — wanting to know that my family back home was safe, supported, and properly cared for.",
         "Over time, I realized that something was missing. There was no simple way to check in on their wellbeing, no system to organize care, and no easy access to medical information when it mattered most. Everything depended on phone calls, paperwork, and uncertainty.",
         "That's where the idea for Vonaxity started. I built it to create peace of mind — not just for myself, but for every family living abroad who wants to stay connected and involved in their loved ones' care.",
         "With my background in technology and hands-on experience in IT systems and field operations, my goal is to build Vonaxity into a modern healthcare platform that connects patients, nurses, laboratories, and medical providers into one seamless system — and to help bring Albania closer to the healthcare standards seen in more advanced countries.",
       ],
       sq:[
-        "Jam lindur në Durrës, Shqipëri, dhe tani jetoj në New Jersey, SHBA, ku ndjek studimet bachelor në Siguri Kibernetike. Duke jetuar jashtë vendit, kisha gjithmonë një shqetësim të vazhdueshëm — të dija që familja ime në shtëpi ishte e sigurt, e mbështetur dhe e kujdesur siç duhet.",
+        "Lindur në Durrës, Shqipëri, dhe tani jetoj në New Jersey, SHBA, ku ndjek studimet bachelor në Siguri Kibernetike. Duke jetuar jashtë vendit, kisha gjithmonë një shqetësim të vazhdueshëm — të dija që familja ime në shtëpi ishte e sigurt, e mbështetur dhe e kujdesur siç duhet.",
         "Me kalimin e kohës, kuptova se diçka mungonte. Nuk kishte asnjë mënyrë të thjeshtë për të kontrolluar gjendjen e tyre shëndetësore, asnjë sistem për të organizuar kujdesin, dhe asnjë qasje të lehtë në informacionin mjekësor kur kishte më shumë rëndësi. Gjithçka varej nga telefonatat, dokumentet dhe pasiguria.",
         "Aty filloi ideja për Vonaxity. E ndërtova për të krijuar qetësi shpirtërore — jo vetëm për veten time, por për çdo familje që jeton jashtë dhe dëshiron të mbetet e lidhur dhe e përfshirë në kujdesin e të dashurve të tyre.",
         "Me sfondin tim në teknologji dhe përvojën praktike në sisteme IT dhe operacione në terren, qëllimi im është ta ndërtoj Vonaxity-n në një platformë moderne shëndetësore që lidh pacientët, infermierët, laboratorët dhe ofruesit mjekësorë në një sistem të vetëm — dhe të ndihmoj Shqipërinë të afrohet me standardet shëndetësore të vendeve më të zhvilluara.",
