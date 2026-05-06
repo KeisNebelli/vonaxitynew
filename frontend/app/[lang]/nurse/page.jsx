@@ -932,11 +932,24 @@ function MapView({ selectedVisit, setActive, setSelectedVisit, visits=[], onStat
 
 function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
   const tr = (key) => t(lang, key);
-  const [form, setForm] = useState({ bp:'', hr:'', glucose:'', temp:'', oxygen:'', notes:'' });
+  const [step, setStep] = useState(1); // 1=vitals, 2=notes, 3=review
+  const [form, setForm] = useState({
+    bp:'', hr:'', glucose:'', temp:'', oxygen:'', weight:'',
+    assessment:'', intervention:'', patientResponse:'', followUp:'',
+    medications:'', conditionFlag:'stable',
+  });
   const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [error, setError] = useState('');
-  const inp = { width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:14, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:'inherit', boxSizing:'border-box' };
+
+  const inp = { width:'100%', padding:'10px 13px', borderRadius:9, border:`1.5px solid ${C.border}`, fontSize:13, color:C.textPrimary, background:C.bgWhite, outline:'none', fontFamily:F, boxSizing:'border-box', transition:'border-color 0.15s' };
+  const ta = { ...inp, minHeight:80, resize:'vertical', lineHeight:1.6 };
+
+  const FLAGS = [
+    { id:'stable',   color:'#059669', bg:'#ECFDF5', border:'#BBF7D0', icon:'🟢', label: lang==='sq'?'Stabil':'Stable',   sub: lang==='sq'?'Gjendje e mirë, pa shqetësime':'Good condition, no concerns' },
+    { id:'monitor',  color:'#D97706', bg:'#FFFBEB', border:'#FDE68A', icon:'🟡', label: lang==='sq'?'Monitoro':'Monitor', sub: lang==='sq'?'Shqetësim i lehtë, ndiq nga afër':'Mild concern, watch closely' },
+    { id:'escalate', color:'#DC2626', bg:'#FEF2F2', border:'#FECACA', icon:'🔴', label: lang==='sq'?'Eskalim':'Escalate', sub: lang==='sq'?'Kërkon vëmendje urgjente / mjek':'Needs urgent attention / GP referral' },
+  ];
 
   if (!visit) return (
     <div style={{ padding:40, textAlign:'center', color:C.textTertiary, fontSize:14 }}>
@@ -946,58 +959,232 @@ function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
 
   const handleSubmit = async () => {
     setSubmitting(true); setError('');
+    const nurseNotes = [
+      form.assessment    && `[${lang==='sq'?'Vlerësimi':'Assessment'}]\n${form.assessment}`,
+      form.intervention  && `[${lang==='sq'?'Ndërhyrja':'Intervention'}]\n${form.intervention}`,
+      form.patientResponse && `[${lang==='sq'?'Reagimi i Pacientit':'Patient Response'}]\n${form.patientResponse}`,
+      form.followUp      && `[${lang==='sq'?'Rekomandim':'Follow-up'}]\n${form.followUp}`,
+      form.medications   && `[${lang==='sq'?'Medikamentet':'Medications'}]\n${form.medications}`,
+      form.conditionFlag && `[${lang==='sq'?'Gjendja':'Condition'}] ${form.conditionFlag.toUpperCase()}`,
+    ].filter(Boolean).join('\n\n');
     try {
       await api.completeVisit(visit.id, {
         bp: form.bp, hr: form.hr, glucose: form.glucose,
-        temperature: form.temp, oxygenSat: form.oxygen, nurseNotes: form.notes,
+        temperature: form.temp, oxygenSat: form.oxygen,
+        weight: form.weight, conditionFlag: form.conditionFlag,
+        nurseNotes,
       });
       setSubmitted(true);
       onComplete && onComplete();
     } catch (err) {
-      setError(err.message || tr('nurse.passwordUpdateFailed'));
+      setError(err.message || 'Submission failed. Please try again.');
+      setStep(3);
     } finally { setSubmitting(false); }
   };
 
-  if (submitted) return (
-    <div style={{ textAlign:'center', padding:'80px 20px' }}>
-      <div style={{ width:64, height:64, borderRadius:'50%', background:C.secondaryLight, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 20px' }}>
-        <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+  if (submitted) {
+    const flag = FLAGS.find(f => f.id === form.conditionFlag) || FLAGS[0];
+    return (
+      <div style={{ textAlign:'center', padding:'60px 20px', maxWidth:480, margin:'0 auto' }}>
+        <div style={{ width:72, height:72, borderRadius:'50%', background:flag.bg, border:`2px solid ${flag.border}`, display:'flex', alignItems:'center', justifyContent:'center', margin:'0 auto 20px', fontSize:28 }}>{flag.icon}</div>
+        <h3 style={{ fontSize:22, fontWeight:800, color:C.textPrimary, marginBottom:8, letterSpacing:'-0.5px' }}>{lang==='sq'?'Raporti u dorëzua!':'Visit Report Submitted!'}</h3>
+        <p style={{ fontSize:13, color:C.textSecondary, marginBottom:6, lineHeight:1.6 }}>
+          {lang==='sq'?'Vizita u regjistrua me sukses.':'Visit recorded successfully.'}
+        </p>
+        <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:flag.bg, border:`1px solid ${flag.border}`, borderRadius:99, padding:'7px 18px', fontSize:13, fontWeight:700, color:flag.color, marginBottom:28 }}>
+          {flag.icon} {lang==='sq'?'Gjendja:':'Condition:'} {flag.label}
+        </div>
+        <div style={{ display:'flex', gap:10, justifyContent:'center' }}>
+          <button onClick={()=>{ setSubmitted(false); setActive('visits'); }} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:F }}>
+            {lang==='sq'?'Kthehu te Vizitat':'Back to Visits'}
+          </button>
+          <button onClick={()=>{ setSubmitted(false); setActive('history'); }} style={{ background:C.bgWhite, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:10, padding:'12px 24px', fontSize:14, fontWeight:600, cursor:'pointer', fontFamily:F }}>
+            {lang==='sq'?'Historia':'Job History'}
+          </button>
+        </div>
       </div>
-      <h3 style={{ fontSize:22, fontWeight:700, color:C.textPrimary, marginBottom:10 }}>{tr('nurse.reportSubmitted')}</h3>
-      <p style={{ fontSize:14, color:C.textSecondary, marginBottom:24 }}>{tr('nurse.reportSaved')}</p>
-      <button onClick={()=>{ setSubmitted(false); setActive('visits'); }} style={{ background:C.primary, color:'#fff', border:'none', borderRadius:10, padding:'12px 28px', fontSize:14, fontWeight:600, cursor:'pointer' }}>{tr('nurse.backToVisits')}</button>
-    </div>
-  );
+    );
+  }
+
+  const wo = visit.workOrderNumber ? `VON-${visit.workOrderNumber}` : `#${visit.id?.slice(-6)?.toUpperCase()}`;
+  const patientName = visit.relative?.name || visit.clientName || 'Patient';
+  const STEPS = [
+    { n:1, label: lang==='sq'?'Shenjat Vitale':'Vitals' },
+    { n:2, label: lang==='sq'?'Shënimet Klinike':'Clinical Notes' },
+    { n:3, label: lang==='sq'?'Rishikimi':'Review & Submit' },
+  ];
 
   return (
-    <div style={{ maxWidth:560 }}>
-      <div style={{ background:C.primaryLight, borderRadius:12, padding:'14px 18px', marginBottom:24, border:`1px solid rgba(37,99,235,0.15)` }}>
-        <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-          <div style={{ fontSize:15, fontWeight:600, color:C.primary }}>{visit.relative?.name || visit.clientName || 'Patient'}</div>
-          {visit.workOrderNumber && <span style={{ fontSize:10, fontWeight:700, color:'#fff', background:'rgba(37,99,235,0.5)', padding:'2px 8px', borderRadius:99, letterSpacing:'0.5px' }}>{visit.workOrderNumber}</span>}
+    <div style={{ maxWidth:580, fontFamily:F }}>
+      <style>{`.cv-inp:focus{border-color:#2563EB!important;box-shadow:0 0 0 3px rgba(37,99,235,0.08)}.cv-flag:hover{opacity:0.88}`}</style>
+
+      {/* Visit info header */}
+      <div style={{ background:'linear-gradient(135deg,#1E3A5F,#2563EB)', borderRadius:14, padding:'16px 20px', marginBottom:24, position:'relative', overflow:'hidden' }}>
+        <div style={{ position:'absolute', top:-20, right:-20, width:80, height:80, borderRadius:'50%', background:'rgba(255,255,255,0.06)' }}/>
+        <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:6 }}>
+          <div style={{ fontSize:16, fontWeight:800, color:'#fff', letterSpacing:'-0.3px' }}>{patientName}</div>
+          <span style={{ fontSize:10, fontWeight:700, color:'rgba(255,255,255,0.7)', background:'rgba(255,255,255,0.15)', padding:'2px 9px', borderRadius:99, letterSpacing:'0.5px' }}>{wo}</span>
         </div>
-        <div style={{ fontSize:13, color:'#3B82F6', marginTop:2 }}>{trService(visit.serviceType, lang)} · {new Date(visit.scheduledAt).toLocaleDateString('en-GB',{day:'numeric',month:'short',year:'numeric'})}</div>
-        {visit.relative?.address && <div style={{ fontSize:12, color:'#3B82F6', marginTop:2, opacity:0.8, display:'flex', alignItems:'center', gap:4 }}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{visit.relative.address}</div>}
+        <div style={{ fontSize:13, color:'rgba(255,255,255,0.75)' }}>{trService(visit.serviceType, lang)} · {new Date(visit.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'short',day:'numeric',month:'long'})}</div>
+        {visit.relative?.address && <div style={{ fontSize:12, color:'rgba(255,255,255,0.55)', marginTop:4, display:'flex', alignItems:'center', gap:4 }}><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>{visit.relative.address}</div>}
       </div>
-      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:16 }}>
-        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:16 }}>{tr('nurse.vitals')}</div>
-        <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
-          {[['bp',tr('nurse.bloodPressure'),'128/82'],['hr',tr('nurse.heartRate'),'72'],['glucose',tr('nurse.glucose'),'5.4'],['temp',tr('nurse.temperature'),'36.8'],['oxygen',tr('nurse.oxygen'),'97']].map(([key,label,ph]) => (
-            <div key={key}>
-              <label style={{ fontSize:12, fontWeight:600, color:C.textPrimary, display:'block', marginBottom:5 }}>{label}</label>
-              <input value={form[key]} onChange={e=>setForm({...form,[key]:e.target.value})} placeholder={`e.g. ${ph}`} style={inp} />
+
+      {/* Step indicator */}
+      <div style={{ display:'flex', gap:0, marginBottom:24, background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, overflow:'hidden' }}>
+        {STEPS.map((s,i) => (
+          <button key={s.n} onClick={()=>setStep(s.n)} style={{ flex:1, padding:'11px 8px', border:'none', borderRight:i<2?`1px solid ${C.border}`:'none', cursor:'pointer', fontFamily:F, fontWeight:step===s.n?700:500, fontSize:12, color:step===s.n?C.primary:C.textTertiary, background:step===s.n?C.primaryLight:'#fff', transition:'all 0.15s', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
+            <span style={{ width:18, height:18, borderRadius:'50%', background:step===s.n?C.primary:step>s.n?'#059669':C.border, color:'#fff', fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+              {step > s.n ? '✓' : s.n}
+            </span>
+            {s.label}
+          </button>
+        ))}
+      </div>
+
+      {/* ── Step 1: Vitals ── */}
+      {step === 1 && (
+        <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:22, marginBottom:16 }}>
+          <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>{lang==='sq'?'Shenjat Vitale':'Vitals Recording'}</div>
+          <div style={{ fontSize:12, color:C.textTertiary, marginBottom:20 }}>{lang==='sq'?'Regjistro matjet e marra gjatë vizitës.':'Record measurements taken during the visit.'}</div>
+          <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:14 }}>
+            {[
+              ['bp',    lang==='sq'?'Presioni i Gjakut':'Blood Pressure', '128/82', 'mmHg'],
+              ['hr',    lang==='sq'?'Frekuenca Kardiake':'Heart Rate',    '72',     'bpm'],
+              ['glucose',lang==='sq'?'Glukoza':'Glucose',                 '5.4',    'mmol/L'],
+              ['temp',  lang==='sq'?'Temperatura':'Temperature',           '36.8',   '°C'],
+              ['oxygen',lang==='sq'?'Saturimi O₂':'O₂ Saturation',       '97',     '%'],
+              ['weight',lang==='sq'?'Pesha (opsionale)':'Weight (opt.)',  '70',     'kg'],
+            ].map(([k,label,ph,unit]) => (
+              <div key={k}>
+                <label style={{ fontSize:11, fontWeight:700, color:C.textSecondary, display:'block', marginBottom:5, textTransform:'uppercase', letterSpacing:'0.4px' }}>
+                  {label} <span style={{ fontWeight:400, textTransform:'none', color:C.textTertiary }}>({unit})</span>
+                </label>
+                <input className="cv-inp" value={form[k]} onChange={e=>setForm(f=>({...f,[k]:e.target.value}))} placeholder={`e.g. ${ph}`} style={inp} />
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+
+      {/* ── Step 2: Clinical Notes ── */}
+      {step === 2 && (
+        <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+          {/* Condition Flag */}
+          <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
+            <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>{lang==='sq'?'Gjendja e Pacientit':'Patient Condition'}</div>
+            <div style={{ fontSize:12, color:C.textTertiary, marginBottom:14 }}>{lang==='sq'?'Cakto nivelin e gjendjes sipas vlerësimit tuaj.':'Set the condition level based on your assessment.'}</div>
+            <div style={{ display:'flex', flexDirection:'column', gap:8 }}>
+              {FLAGS.map(f => (
+                <div key={f.id} className="cv-flag" onClick={()=>setForm(prev=>({...prev,conditionFlag:f.id}))}
+                  style={{ display:'flex', alignItems:'center', gap:14, padding:'12px 16px', borderRadius:10, border:`2px solid ${form.conditionFlag===f.id?f.color:C.border}`, background:form.conditionFlag===f.id?f.bg:'#fff', cursor:'pointer', transition:'all 0.15s' }}>
+                  <span style={{ fontSize:22, flexShrink:0 }}>{f.icon}</span>
+                  <div style={{ flex:1 }}>
+                    <div style={{ fontSize:14, fontWeight:700, color:form.conditionFlag===f.id?f.color:C.textPrimary }}>{f.label}</div>
+                    <div style={{ fontSize:12, color:C.textTertiary, marginTop:2 }}>{f.sub}</div>
+                  </div>
+                  <div style={{ width:18, height:18, borderRadius:'50%', border:`2px solid ${form.conditionFlag===f.id?f.color:C.border}`, background:form.conditionFlag===f.id?f.color:'transparent', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    {form.conditionFlag===f.id && <svg width="10" height="10" fill="none" stroke="#fff" strokeWidth="3" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          {/* Structured notes */}
+          <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
+            <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary, marginBottom:16 }}>{lang==='sq'?'Shënimet Klinike':'Clinical Notes'}</div>
+            {[
+              ['assessment',    lang==='sq'?'Vlerësimi':'Assessment',           lang==='sq'?'Çfarë vërejtët — simptoma, shenja, gjendje...':'What you observed — symptoms, signs, condition...'],
+              ['intervention',  lang==='sq'?'Ndërhyrja':'Intervention',         lang==='sq'?'Çfarë bëtë — procedura, matje, kujdes...':'What you did — procedures, measurements, care...'],
+              ['patientResponse',lang==='sq'?'Reagimi i Pacientit':'Patient Response', lang==='sq'?'Si reagoi pacienti — mirë, pak jo mirë, ankesa...':'How patient responded — well, poorly, complaints...'],
+              ['followUp',      lang==='sq'?'Rekomandim':'Follow-up Recommendation', lang==='sq'?'Vizitë kontrolli, mjek, urgjencë...':'Check-up visit, GP referral, emergency...'],
+            ].map(([k,label,ph]) => (
+              <div key={k} style={{ marginBottom:14 }}>
+                <label style={{ fontSize:11, fontWeight:700, color:C.textSecondary, display:'block', marginBottom:6, textTransform:'uppercase', letterSpacing:'0.4px' }}>{label}</label>
+                <textarea className="cv-inp" value={form[k]} onChange={e=>setForm(f=>({...f,[k]:e.target.value}))} placeholder={ph} style={ta} />
+              </div>
+            ))}
+          </div>
+
+          {/* Medications */}
+          <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:20 }}>
+            <div style={{ fontSize:14, fontWeight:700, color:C.textPrimary, marginBottom:4 }}>{lang==='sq'?'Medikamentet':'Medications'}</div>
+            <div style={{ fontSize:12, color:C.textTertiary, marginBottom:12 }}>{lang==='sq'?'Medikamentet aktuale të pacientit ose të administruara.':'Current patient medications or any administered during visit.'}</div>
+            <textarea className="cv-inp" value={form.medications} onChange={e=>setForm(f=>({...f,medications:e.target.value}))} placeholder={lang==='sq'?'p.sh. Metformin 500mg 2x ditë, Aspirin 75mg...':'e.g. Metformin 500mg twice daily, Aspirin 75mg...'} style={{...ta, minHeight:64}} />
+          </div>
         </div>
+      )}
+
+      {/* ── Step 3: Review ── */}
+      {step === 3 && (() => {
+        const flag = FLAGS.find(f=>f.id===form.conditionFlag)||FLAGS[0];
+        const hasVitals = form.bp||form.hr||form.glucose||form.temp||form.oxygen||form.weight;
+        const hasNotes = form.assessment||form.intervention||form.patientResponse||form.followUp;
+        return (
+          <div style={{ display:'flex', flexDirection:'column', gap:14 }}>
+            {/* Condition summary */}
+            <div style={{ background:flag.bg, border:`1.5px solid ${flag.border}`, borderRadius:14, padding:'14px 18px', display:'flex', alignItems:'center', gap:12 }}>
+              <span style={{ fontSize:28 }}>{flag.icon}</span>
+              <div>
+                <div style={{ fontSize:15, fontWeight:800, color:flag.color }}>{flag.label}</div>
+                <div style={{ fontSize:12, color:flag.color, opacity:0.75 }}>{flag.sub}</div>
+              </div>
+            </div>
+
+            {/* Vitals review */}
+            {hasVitals && (
+              <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:18 }}>
+                <div style={{ fontSize:12, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:12 }}>{lang==='sq'?'Shenjat Vitale':'Vitals'}</div>
+                <div style={{ display:'flex', gap:14, flexWrap:'wrap' }}>
+                  {[['bp','BP','mmHg'],['hr','HR','bpm'],['glucose',lang==='sq'?'Glukoza':'Glucose','mmol/L'],['temp',lang==='sq'?'Temp':'Temp','°C'],['oxygen','O₂','%'],['weight',lang==='sq'?'Pesha':'Weight','kg']].map(([k,lbl,unit])=>
+                    form[k] ? <div key={k}><div style={{ fontSize:9, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.4px', marginBottom:2 }}>{lbl}</div><div style={{ fontSize:16, fontWeight:800, color:C.textPrimary }}>{form[k]}<span style={{ fontSize:10, fontWeight:400, color:C.textTertiary, marginLeft:2 }}>{unit}</span></div></div> : null
+                  )}
+                </div>
+              </div>
+            )}
+
+            {/* Notes review */}
+            {hasNotes && (
+              <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:18 }}>
+                <div style={{ fontSize:12, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:12 }}>{lang==='sq'?'Shënimet Klinike':'Clinical Notes'}</div>
+                {[['assessment',lang==='sq'?'Vlerësimi':'Assessment'],['intervention',lang==='sq'?'Ndërhyrja':'Intervention'],['patientResponse',lang==='sq'?'Reagimi i Pacientit':'Patient Response'],['followUp',lang==='sq'?'Rekomandim':'Follow-up']].map(([k,lbl])=>
+                  form[k] ? <div key={k} style={{ marginBottom:12 }}><div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.4px', marginBottom:4 }}>{lbl}</div><div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6, background:'#F8FAFC', borderRadius:8, padding:'8px 12px', borderLeft:`3px solid ${C.primary}` }}>{form[k]}</div></div> : null
+                )}
+                {form.medications && <div><div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.4px', marginBottom:4 }}>{lang==='sq'?'Medikamentet':'Medications'}</div><div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6, background:'#F8FAFC', borderRadius:8, padding:'8px 12px', borderLeft:'3px solid #7C3AED' }}>{form.medications}</div></div>}
+              </div>
+            )}
+
+            {!hasVitals && !hasNotes && (
+              <div style={{ background:'#FFFBEB', border:'1px solid #FDE68A', borderRadius:12, padding:'12px 16px', fontSize:13, color:'#92400E' }}>
+                ⚠️ {lang==='sq'?'Nuk u shtuan shënjat vitale ose shënimet. Rekomandohet plotësimi i të dyja.':'No vitals or notes added. It is recommended to fill in both.'}
+              </div>
+            )}
+
+            {error && <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:9, padding:'11px 14px', fontSize:13, color:'#DC2626' }}>{error}</div>}
+
+            <button onClick={handleSubmit} disabled={submitting}
+              style={{ width:'100%', background: submitting?'#94A3B8':'linear-gradient(135deg,#059669,#10B981)', color:'#fff', border:'none', borderRadius:12, padding:'15px', fontSize:15, fontWeight:700, cursor:submitting?'not-allowed':'pointer', letterSpacing:'-0.2px', display:'flex', alignItems:'center', justifyContent:'center', gap:8, fontFamily:F }}>
+              {submitting
+                ? <><svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ animation:'spin 0.8s linear infinite' }}><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0"/></svg>{lang==='sq'?'Duke dërguar...':'Submitting...'}</>
+                : <><svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>{lang==='sq'?'Dërgo Raportin':'Submit Visit Report'}</>}
+            </button>
+          </div>
+        );
+      })()}
+
+      {/* Navigation buttons */}
+      <div style={{ display:'flex', gap:10, marginTop:16 }}>
+        {step > 1 && (
+          <button onClick={()=>setStep(s=>s-1)} style={{ flex:1, padding:'11px', borderRadius:10, border:`1.5px solid ${C.border}`, background:'#fff', color:C.textSecondary, fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:F }}>
+            ← {lang==='sq'?'Prapa':'Back'}
+          </button>
+        )}
+        {step < 3 && (
+          <button onClick={()=>setStep(s=>s+1)} style={{ flex:1, padding:'11px', borderRadius:10, border:'none', background:C.primary, color:'#fff', fontSize:13, fontWeight:600, cursor:'pointer', fontFamily:F }}>
+            {lang==='sq'?'Vazhdo':'Continue'} →
+          </button>
+        )}
       </div>
-      <div style={{ background:C.bgWhite, borderRadius:14, border:`1px solid ${C.border}`, padding:24, marginBottom:20 }}>
-        <div style={{ fontSize:14, fontWeight:600, color:C.textPrimary, marginBottom:12 }}>{tr('nurse.nurseNotes')}</div>
-        <textarea value={form.notes} onChange={e=>setForm({...form,notes:e.target.value})} placeholder={tr('nurse.notesPlaceholder')} style={{...inp,minHeight:100,resize:'vertical'}} />
-      </div>
-      {error && <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:9, padding:'11px 14px', fontSize:13, color:'#DC2626', marginBottom:16 }}>{error}</div>}
-      <button onClick={handleSubmit} disabled={submitting} style={{ width:'100%', background:C.primary, color:'#fff', border:'none', borderRadius:12, padding:'14px', fontSize:15, fontWeight:600, cursor:submitting?'not-allowed':'pointer', opacity:submitting?0.7:1 }}>
-        {submitting ? tr('nurse.submitting') : tr('nurse.submitVisitReport')}
-      </button>
     </div>
   );
 }
