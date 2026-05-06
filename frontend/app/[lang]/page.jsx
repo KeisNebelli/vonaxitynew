@@ -203,11 +203,11 @@ export default async function HomePage({ params }) {
         timeLabel={t(lang, 'hero.timeLabel')}
         timeVal="10:00 AM"
         serviceLabel={t(lang, 'hero.serviceLabel')}
-        serviceVal="BP + glucose"
+        serviceVal={lang === 'sq' ? 'Presioni + Glukoza' : 'BP + Glucose'}
         patientName="Fatmira Murati"
-        patientSub="Tirana · Age 74"
-        statN1="500+"
-        statN2="8"
+        patientSub={lang === 'sq' ? 'Tiranë · Mosha 74' : 'Tirana · Age 74'}
+        statN1="50+"
+        statN2="2"
         statN3="100%"
         stat1={t(lang, 'hero.stat1')}
         stat2={t(lang, 'hero.stat2')}
@@ -356,10 +356,10 @@ export default async function HomePage({ params }) {
           <ScrollReveal delay={100}>
             <div className="hp-stat-bar" style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)', borderRadius: 18, padding: '28px 36px', display: 'flex', gap: 48, justifyContent: 'center', flexWrap: 'wrap', border: '1px solid rgba(124,58,237,0.1)', boxShadow:'0 4px 24px rgba(124,58,237,0.06)' }}>
               {[
-                ['500+', lang === 'sq' ? 'Infermierë Aktivë' : 'Active Nurses'],
+                ['18+', lang === 'sq' ? 'Infermierë Aktivë' : 'Active Nurses'],
                 ['4.9', lang === 'sq' ? 'Vlerësim Mesatar' : 'Avg Rating'],
                 ['100%', lang === 'sq' ? 'Të Licencuar' : 'Licensed'],
-                ['48h', lang === 'sq' ? 'Kohë Reagimi' : 'Avg Response'],
+                ['2h', lang === 'sq' ? 'Kohë Reagimi' : 'Avg Response'],
               ].map(([n, l]) => (
                 <div key={l} style={{ textAlign: 'center' }}>
                   <div style={{ fontSize: 28, fontWeight: 800, background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', letterSpacing: '-1px' }}>{n}</div>
