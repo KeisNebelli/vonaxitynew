@@ -245,10 +245,8 @@ export default function LoginPage({ params }) {
               {tr('nonEmergency')} <strong>127</strong>
             </div>
 
-            <p style={{ marginTop:20, fontSize:11, color:'#9CA3AF', lineHeight:1.6, textAlign:'center' }}>
-              {lang === 'sq'
-                ? 'Vonaxity verifikon çdo infermiere para aprovimit, por nuk është përgjegjëse për veprimet e pavarura të përdoruesve jashtë platformës. Gjithmonë kontrolloni identitetin e infermiereve tuaj. Vonaxity ofron vetëm kujdes jo-urgjent.'
-                : 'Vonaxity verifies every nurse before approval, but is not responsible for the independent actions of users outside the platform. Always verify your caregiver\'s identity. Vonaxity provides non-emergency care only.'}
+            <p style={{ marginTop:16, fontSize:11, color:'#9CA3AF', lineHeight:1.65, textAlign:'center' }}>
+              {tr('legalDisclaimer')}
             </p>
           </div>
         </div>

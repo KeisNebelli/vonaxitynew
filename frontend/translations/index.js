@@ -151,6 +151,7 @@ const translations = {
       continue:'Continue', back:'Back',
       loading:'Creating account...', submit:'Create account',
       nonEmergency:'Non-emergency care only. Emergency in Albania:',
+      legalDisclaimer:'Vonaxity provides non-emergency care services and does not offer medical advice. All care is provided by independent professionals. Always verify your caregiver\'s identity and consult a licensed provider for medical decisions. In emergencies, contact local emergency services immediately.',
     },
     login: {
       title:'Welcome back', subtitle:'Sign in to your Vonaxity account',
@@ -735,6 +736,7 @@ const translations = {
       continue:'Vazhdo', back:'Kthehu',
       loading:'Duke krijuar llogarinë...', submit:'Krijo llogarinë',
       nonEmergency:'Vetëm kujdes jo-urgjent. Urgjencë në Shqipëri:',
+      legalDisclaimer:'Vonaxity ofron shërbime kujdesi jo-urgjent dhe nuk ofron këshilla mjekësore. I gjithë kujdesi ofrohet nga profesionistë të pavarur. Gjithmonë verifikoni identitetin e kujdestarit tuaj dhe konsultohuni me një ofrues të licencuar për vendime mjekësore. Në raste urgjente, kontaktoni menjëherë shërbimet e urgjencës lokale.',
     },
     login: {
       title:'Mirë se keni ardhur', subtitle:'Hyni në llogarinë tuaj Vonaxity',
