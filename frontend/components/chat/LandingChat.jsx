@@ -77,56 +77,11 @@ function detectIntent(text) {
   return null;
 }
 
-// ── Vona floating pill trigger ────────────────────────────────────────────────
-function VonaTrigger() {
-  return (
-    <div style={{
-      display: 'flex', alignItems: 'center', gap: 11,
-      background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)',
-      borderRadius: 50,
-      padding: '9px 20px 9px 9px',
-      boxShadow: '0 8px 28px rgba(13,148,136,0.38), 0 2px 8px rgba(0,0,0,0.10)',
-      color: '#fff',
-      fontFamily: "'Inter', system-ui, sans-serif",
-      userSelect: 'none',
-    }}>
-      {/* Avatar bubble */}
-      <div style={{
-        width: 42, height: 42, borderRadius: '50%', flexShrink: 0,
-        background: 'rgba(255,255,255,0.18)',
-        border: '2px solid rgba(255,255,255,0.32)',
-        display: 'flex', alignItems: 'center', justifyContent: 'center',
-        overflow: 'hidden',
-      }}>
-        <svg width="26" height="26" viewBox="0 0 26 26" fill="none">
-          {/* Face */}
-          <circle cx="13" cy="10" r="7.5" fill="white" opacity="0.93"/>
-          {/* Eyes */}
-          <circle cx="10.2" cy="9"  r="1.6" fill="#0D9488"/>
-          <circle cx="15.8" cy="9"  r="1.6" fill="#0D9488"/>
-          {/* Eye glint */}
-          <circle cx="10.8" cy="8.4" r="0.6" fill="white"/>
-          <circle cx="16.4" cy="8.4" r="0.6" fill="white"/>
-          {/* Smile */}
-          <path d="M10 12 Q13 15 16 12" stroke="#0D9488" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
-          {/* Shoulders / body hint */}
-          <path d="M5.5 24 Q13 18 20.5 24" fill="rgba(255,255,255,0.28)"/>
-        </svg>
-      </div>
-      {/* Name card text */}
-      <div style={{ display: 'flex', flexDirection: 'column', lineHeight: 1 }}>
-        <span style={{ fontSize: 14, fontWeight: 700, letterSpacing: '-0.3px', marginBottom: 3 }}>Vona</span>
-        <span style={{ fontSize: 10.5, opacity: 0.80, fontWeight: 400 }}>Care Assistant</span>
-      </div>
-    </div>
-  );
-}
-
 // ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
-  @keyframes vonaFloat {
-    0%,100% { transform: translateY(0px); }
-    50%     { transform: translateY(-7px); }
+  @keyframes vonaPulse {
+    0%,100% { box-shadow: 0 4px 18px rgba(13,148,136,0.36), 0 0 0 0 rgba(13,148,136,0); }
+    50%      { box-shadow: 0 6px 24px rgba(13,148,136,0.50), 0 0 0 8px rgba(13,148,136,0.07); }
   }
   @keyframes chatSlideUp {
     from { opacity:0; transform:translateY(16px) scale(0.97); }
@@ -144,11 +99,12 @@ const CSS = `
     0%,100% { opacity:1; }
     50%     { opacity:0.6; }
   }
-  .vona-btn { animation: vonaFloat 3.2s ease-in-out infinite; }
+  .vona-btn { animation: vonaPulse 3s ease-in-out infinite; }
   .vona-btn:hover {
-    animation-play-state: paused !important;
-    transform: scale(1.07) translateY(-4px) !important;
-    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1) !important;
+    animation: none !important;
+    transform: scale(1.08) !important;
+    box-shadow: 0 8px 28px rgba(13,148,136,0.55) !important;
+    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease !important;
   }
   .nav-hint { animation: navPulse 1.4s ease-in-out infinite; }
 `;
@@ -279,7 +235,7 @@ export default function LandingChat({ lang = 'en' }) {
         <div
           onClick={() => { dismiss(); setOpen(true); }}
           style={{
-            position: 'fixed', bottom: 96, right: 24, zIndex: 9001,
+            position: 'fixed', bottom: 90, right: 24, zIndex: 9001,
             background: '#fff', borderRadius: 12, padding: '14px 16px',
             boxShadow: '0 4px 24px rgba(0,0,0,0.14)',
             cursor: 'pointer', minWidth: 210, maxWidth: 250,
@@ -315,33 +271,38 @@ export default function LandingChat({ lang = 'en' }) {
         </div>
       )}
 
-      {/* Floating pill trigger */}
+      {/* Floating button — clean teal circle with chat icon */}
       <button
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Close chat' : 'Chat with Vona'}
         className={!open ? 'vona-btn' : ''}
         style={{
-          position: 'fixed', bottom: 22, right: 22, zIndex: 9000,
-          background: 'none', border: 'none', cursor: 'pointer', padding: 0,
+          position: 'fixed', bottom: 24, right: 24, zIndex: 9000,
+          width: 56, height: 56, borderRadius: '50%',
+          background: '#0D9488',
+          border: 'none', cursor: 'pointer', padding: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
+          transition: 'transform 0.18s, box-shadow 0.18s',
+          boxShadow: '0 4px 18px rgba(13,148,136,0.38)',
         }}
       >
         {open ? (
-          /* Close — small teal circle with X */
-          <div style={{ width: 48, height: 48, borderRadius: '50%', background: 'linear-gradient(135deg,#0D9488,#0F766E)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 18px rgba(13,148,136,0.40)' }}>
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </div>
+          /* Close X */
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
         ) : (
-          <VonaTrigger />
+          /* Chat bubble icon */
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
         )}
       </button>
 
       {/* Chat panel */}
       {open && (
         <div style={{
-          position: 'fixed', bottom: 90, right: 24, zIndex: 8999,
+          position: 'fixed', bottom: 92, right: 24, zIndex: 8999,
           width: 'min(380px, calc(100vw - 32px))',
           height: 'min(520px, calc(100vh - 120px))',
           background: '#fff', borderRadius: 20,
@@ -353,19 +314,17 @@ export default function LandingChat({ lang = 'en' }) {
           animation: 'chatSlideUp 0.24s cubic-bezier(0.34,1.56,0.64,1)',
         }}>
 
-          {/* Header */}
-          <div style={{ padding: '14px 18px', background: 'linear-gradient(135deg, #0D9488 0%, #0F766E 100%)', display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* Avatar */}
-            <div style={{ width: 40, height: 40, borderRadius: '50%', flexShrink: 0, background: 'rgba(255,255,255,0.18)', border: '2px solid rgba(255,255,255,0.30)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <svg width="24" height="24" viewBox="0 0 26 26" fill="none">
-                <circle cx="13" cy="10" r="7.5" fill="white" opacity="0.93"/>
-                <circle cx="10.2" cy="9"  r="1.6" fill="#0D9488"/>
-                <circle cx="15.8" cy="9"  r="1.6" fill="#0D9488"/>
-                <circle cx="10.8" cy="8.4" r="0.6" fill="white"/>
-                <circle cx="16.4" cy="8.4" r="0.6" fill="white"/>
-                <path d="M10 12 Q13 15 16 12" stroke="#0D9488" strokeWidth="1.6" strokeLinecap="round" fill="none"/>
-                <path d="M5.5 24 Q13 18 20.5 24" fill="rgba(255,255,255,0.28)"/>
-              </svg>
+          {/* Header — clean warm teal, no gradient, no robot */}
+          <div style={{ padding: '14px 18px', background: '#0D9488', display: 'flex', alignItems: 'center', gap: 12 }}>
+            {/* Avatar: simple circle with "V" initial */}
+            <div style={{
+              width: 38, height: 38, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.18)',
+              border: '1.5px solid rgba(255,255,255,0.30)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>V</span>
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', letterSpacing: '-0.2px' }}>Vona</div>
