@@ -12,13 +12,9 @@ const GREETING = {
   en: "Hi! I'm Vona, your Vonaxity assistant. I can answer questions about our nursing services, pricing, and how to get started.",
   sq: "Përshëndetje! Unë jam Vona, asistentja juaj e Vonaxity. Mund t'ju ndihmoj me pyetje rreth shërbimeve tona infermierore, çmimeve dhe mënyrës si të filloni.",
 };
-const ONLINE_TEXT = {
-  en: "We're Online!",
-  sq: 'Jemi Online!',
-};
 const BUBBLE_TEXT = {
-  en: 'How may I help you today?',
-  sq: 'Si mund t\'ju ndihmoj sot?',
+  en: '👋 Need help booking a visit?',
+  sq: '👋 Doni ndihmë për rezervim?',
 };
 
 // ── Intent detection ──────────────────────────────────────────────────────────
@@ -77,19 +73,54 @@ function detectIntent(text) {
   return null;
 }
 
+// ── Icon ──────────────────────────────────────────────────────────────────────
+function VonaIcon({ size = 40 }) {
+  return (
+    <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lc-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="100%" stopColor="#7C3AED" />
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="50" fill="url(#lc-bg)" />
+      <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" />
+      <line x1="50" y1="14" x2="50" y2="23" stroke="rgba(255,255,255,0.75)" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="50" cy="11" r="4.5" fill="#BAE6FD" opacity="0.9" />
+      <circle cx="50" cy="11" r="2.5" fill="white" />
+      <rect x="18" y="33" width="7" height="12" rx="3.5" fill="rgba(255,255,255,0.82)" />
+      <rect x="75" y="33" width="7" height="12" rx="3.5" fill="rgba(255,255,255,0.82)" />
+      <rect x="25" y="22" width="50" height="40" rx="13" fill="white" opacity="0.97" />
+      <circle cx="38" cy="39" r="5" fill="#2563EB" />
+      <circle cx="38" cy="39" r="3" fill="#1D4ED8" />
+      <circle cx="36.5" cy="37.5" r="1.8" fill="white" opacity="0.55" />
+      <circle cx="62" cy="39" r="5" fill="#2563EB" />
+      <circle cx="62" cy="39" r="3" fill="#1D4ED8" />
+      <circle cx="60.5" cy="37.5" r="1.8" fill="white" opacity="0.55" />
+      <path d="M 42 50 Q 50 56 58 50" stroke="#3B82F6" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+      <circle cx="31" cy="46" r="3.5" fill="#FCA5A5" opacity="0.35" />
+      <circle cx="69" cy="46" r="3.5" fill="#FCA5A5" opacity="0.35" />
+      <rect x="44" y="62" width="12" height="6" rx="3" fill="rgba(255,255,255,0.8)" />
+      <rect x="27" y="68" width="46" height="22" rx="11" fill="white" opacity="0.93" />
+      <rect x="47.5" y="72" width="5" height="14" rx="2" fill="#EF4444" opacity="0.75" />
+      <rect x="43" y="76.5" width="14" height="5" rx="2" fill="#EF4444" opacity="0.75" />
+    </svg>
+  );
+}
+
 // ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
-  @keyframes vonaPulse {
-    0%,100% { box-shadow: 0 4px 18px rgba(13,148,136,0.36), 0 0 0 0 rgba(13,148,136,0); }
-    50%      { box-shadow: 0 6px 24px rgba(13,148,136,0.50), 0 0 0 8px rgba(13,148,136,0.07); }
+  @keyframes vonaGlow {
+    0%,100% { box-shadow:0 4px 20px rgba(99,102,241,0.38),0 0 0 0 rgba(99,102,241,0); }
+    50%      { box-shadow:0 6px 28px rgba(99,102,241,0.55),0 0 0 9px rgba(99,102,241,0.07); }
   }
   @keyframes chatSlideUp {
-    from { opacity:0; transform:translateY(16px) scale(0.97); }
-    to   { opacity:1; transform:translateY(0) scale(1); }
+    from { opacity:0;transform:translateY(18px) scale(0.96); }
+    to   { opacity:1;transform:translateY(0) scale(1); }
   }
   @keyframes bubblePop {
-    from { opacity:0; transform:translateY(8px) scale(0.93); }
-    to   { opacity:1; transform:translateY(0) scale(1); }
+    from { opacity:0;transform:translateY(8px) scale(0.92); }
+    to   { opacity:1;transform:translateY(0) scale(1); }
   }
   @keyframes dotBounce {
     0%,80%,100% { transform:translateY(0); }
@@ -99,14 +130,14 @@ const CSS = `
     0%,100% { opacity:1; }
     50%     { opacity:0.6; }
   }
-  .vona-btn { animation: vonaPulse 3s ease-in-out infinite; }
-  .vona-btn:hover {
-    animation: none !important;
-    transform: scale(1.08) !important;
-    box-shadow: 0 8px 28px rgba(13,148,136,0.55) !important;
-    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease !important;
+  .vona-idle { animation:vonaGlow 3s ease-in-out infinite; }
+  .vona-idle:hover {
+    animation:none !important;
+    transform:scale(1.1) !important;
+    box-shadow:0 8px 32px rgba(99,102,241,0.65) !important;
+    transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.18s ease !important;
   }
-  .nav-hint { animation: navPulse 1.4s ease-in-out infinite; }
+  .nav-hint { animation:navPulse 1.4s ease-in-out infinite; }
 `;
 
 // ── Component ─────────────────────────────────────────────────────────────────
@@ -118,8 +149,8 @@ export default function LandingChat({ lang = 'en' }) {
   const [loading, setLoading] = useState(false);
   const [showBubble, setShowBubble] = useState(false);
   const [bubbleDismissed, setBubbleDismissed] = useState(false);
-  const [pendingNav, setPendingNav] = useState(null);
-  const [rated, setRated] = useState({});
+  const [pendingNav, setPendingNav] = useState(null); // { id, anchor?, path? }
+  const [rated, setRated] = useState({}); // logId -> 'up'|'down'
   const bottomRef = useRef(null);
   const inputRef = useRef(null);
   const redirectTimer = useRef(null);
@@ -144,6 +175,7 @@ export default function LandingChat({ lang = 'en' }) {
 
   useEffect(() => { bottomRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, loading]);
 
+  // Cancel pending redirect when user starts typing
   const handleInput = (e) => {
     setInput(e.target.value);
     if (redirectTimer.current) {
@@ -156,8 +188,11 @@ export default function LandingChat({ lang = 'en' }) {
   const executeNav = (intent) => {
     if (intent.anchor) {
       const el = document.getElementById(intent.anchor);
-      if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' });
-      else router.push(`/${lang}#${intent.anchor}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      } else {
+        router.push(`/${lang}#${intent.anchor}`);
+      }
     } else if (intent.path) {
       router.push(`/${lang}${intent.path}`);
     }
@@ -176,6 +211,7 @@ export default function LandingChat({ lang = 'en' }) {
     const trimmed = (text || input).trim();
     if (!trimmed || loading) return;
 
+    // Cancel any pending redirect when user sends a new message
     if (redirectTimer.current) {
       clearTimeout(redirectTimer.current);
       redirectTimer.current = null;
@@ -185,6 +221,7 @@ export default function LandingChat({ lang = 'en' }) {
     setInput('');
     const intent = detectIntent(trimmed);
 
+    // Emergency: respond immediately, no redirect
     if (intent?.emergency) {
       setMessages(prev => [
         ...prev,
@@ -206,6 +243,7 @@ export default function LandingChat({ lang = 'en' }) {
       const aiMsg = { role: 'assistant', content: data.content, logId: data.logId || null };
       setMessages(prev => [...prev, aiMsg]);
 
+      // After AI responds, schedule navigation if intent found
       if (intent) {
         const navText = (NAV_MSGS[lang] || NAV_MSGS.en)[intent.id];
         if (navText) {
@@ -224,135 +262,106 @@ export default function LandingChat({ lang = 'en' }) {
 
   const onKey = (e) => { if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); } };
 
+  // Cleanup on unmount
   useEffect(() => () => { if (redirectTimer.current) clearTimeout(redirectTimer.current); }, []);
 
   return (
     <>
       <style suppressHydrationWarning>{CSS}</style>
 
-      {/* Prompt bubble — Zoho-style clean card */}
+      {/* Prompt bubble */}
       {showBubble && !open && (
         <div
           onClick={() => { dismiss(); setOpen(true); }}
           style={{
-            position: 'fixed', bottom: 90, right: 24, zIndex: 9001,
-            background: '#fff', borderRadius: 12, padding: '14px 16px',
-            boxShadow: '0 4px 24px rgba(0,0,0,0.14)',
-            cursor: 'pointer', minWidth: 210, maxWidth: 250,
-            fontFamily: "'Inter', system-ui, sans-serif",
-            animation: 'bubblePop 0.24s cubic-bezier(0.34,1.56,0.64,1)',
+            position: 'fixed', bottom: 94, right: 24, zIndex: 9001,
+            background: '#fff', borderRadius: 16, padding: '10px 12px 10px 14px',
+            boxShadow: '0 8px 30px rgba(15,23,42,0.13)', border: '1px solid #E2E8F0',
+            display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
+            fontFamily: "'DM Sans','Inter',system-ui,sans-serif",
+            fontSize: 13.5, fontWeight: 500, color: '#0F172A', maxWidth: 230,
+            animation: 'bubblePop 0.28s cubic-bezier(0.34,1.56,0.64,1)',
           }}
         >
-          {/* Dismiss X */}
+          <span style={{ flex: 1, lineHeight: 1.4 }}>{BUBBLE_TEXT[lang] || BUBBLE_TEXT.en}</span>
           <button
             onClick={e => { e.stopPropagation(); dismiss(); }}
-            style={{
-              position: 'absolute', top: 8, right: 8,
-              background: 'none', border: 'none', cursor: 'pointer',
-              color: '#C0C0C0', padding: 2, display: 'flex',
-            }}
+            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#CBD5E1', padding: 2, display: 'flex', flexShrink: 0 }}
           >
-            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
-          {/* Online indicator + title */}
-          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
-            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />
-            <span style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>
-              {ONLINE_TEXT[lang] || ONLINE_TEXT.en}
-            </span>
-          </div>
-          <p style={{ margin: 0, fontSize: 13, color: '#555', lineHeight: 1.45, paddingLeft: 15 }}>
-            {BUBBLE_TEXT[lang] || BUBBLE_TEXT.en}
-          </p>
-          {/* Tail */}
-          <div style={{ position: 'absolute', bottom: -7, right: 22, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '8px solid #fff', filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.08))' }} />
+          <div style={{ position: 'absolute', bottom: -7, right: 24, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '8px solid #fff', filter: 'drop-shadow(0 2px 1px rgba(15,23,42,0.06))' }} />
         </div>
       )}
 
-      {/* Floating button — clean teal circle with chat icon */}
+      {/* Floating button */}
       <button
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Close chat' : 'Chat with Vona'}
-        className={!open ? 'vona-btn' : ''}
+        className={!open ? 'vona-idle' : ''}
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 9000,
-          width: 56, height: 56, borderRadius: '50%',
-          background: '#0D9488',
-          border: 'none', cursor: 'pointer', padding: 0,
+          width: 58, height: 58, borderRadius: '50%',
+          background: 'linear-gradient(135deg,#3B82F6,#7C3AED)',
+          border: 'none', cursor: 'pointer', padding: 0, overflow: 'hidden',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'transform 0.18s, box-shadow 0.18s',
-          boxShadow: '0 4px 18px rgba(13,148,136,0.38)',
         }}
       >
-        {open ? (
-          /* Close X */
-          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
-            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-          </svg>
-        ) : (
-          /* Chat bubble icon */
-          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
-          </svg>
-        )}
+        {open
+          ? <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
+          : <VonaIcon size={58} />}
       </button>
 
       {/* Chat panel */}
       {open && (
         <div style={{
-          position: 'fixed', bottom: 92, right: 24, zIndex: 8999,
+          position: 'fixed', bottom: 94, right: 24, zIndex: 8999,
           width: 'min(380px, calc(100vw - 32px))',
           height: 'min(520px, calc(100vh - 120px))',
-          background: '#fff', borderRadius: 20,
-          boxShadow: '0 16px 56px rgba(15,23,42,0.16)',
-          border: '1px solid #E8DFD4',
+          background: '#fff', borderRadius: 22,
+          boxShadow: '0 16px 60px rgba(15,23,42,0.18)',
+          border: '1px solid #E2E8F0',
           display: 'flex', flexDirection: 'column',
-          fontFamily: "'Inter', system-ui, sans-serif",
+          fontFamily: "'DM Sans','Inter',system-ui,sans-serif",
           overflow: 'hidden',
-          animation: 'chatSlideUp 0.24s cubic-bezier(0.34,1.56,0.64,1)',
+          animation: 'chatSlideUp 0.26s cubic-bezier(0.34,1.56,0.64,1)',
         }}>
 
-          {/* Header — clean warm teal, no gradient, no robot */}
-          <div style={{ padding: '14px 18px', background: '#0D9488', display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* Avatar: simple circle with "V" initial */}
-            <div style={{
-              width: 38, height: 38, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.18)',
-              border: '1.5px solid rgba(255,255,255,0.30)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-              flexShrink: 0,
-            }}>
-              <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>V</span>
+          {/* Header */}
+          <div style={{ padding: '13px 18px', background: 'linear-gradient(135deg,#2563EB,#7C3AED)', display: 'flex', alignItems: 'center', gap: 11 }}>
+            <div style={{ width: 38, height: 38, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.22)' }}>
+              <VonaIcon size={38} />
             </div>
             <div style={{ flex: 1 }}>
-              <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', letterSpacing: '-0.2px' }}>Vona</div>
-              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.78)', fontWeight: 400 }}>
+              <div style={{ fontSize: 15, fontWeight: 800, color: '#fff', letterSpacing: '-0.2px' }}>Vona</div>
+              <div style={{ fontSize: 11, color: 'rgba(255,255,255,0.72)', fontWeight: 400 }}>
                 {lang === 'sq' ? 'Asistentja juaj e Kujdesit' : 'Your Care Assistant'}
               </div>
             </div>
-            {/* Online indicator */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
-              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#A7F3D0' }} />
-              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.72)' }}>Online</span>
+              <div style={{ width: 7, height: 7, borderRadius: '50%', background: '#4ADE80' }} />
+              <span style={{ fontSize: 10, color: 'rgba(255,255,255,0.6)' }}>Online</span>
             </div>
           </div>
 
           {/* Messages */}
-          <div style={{ flex: 1, overflowY: 'auto', padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: 10, background: '#FAFAF8' }}>
+          <div style={{ flex: 1, overflowY: 'auto', padding: '16px 14px', display: 'flex', flexDirection: 'column', gap: 10 }}>
             {messages.map((m, i) => (
               <div key={i} style={{ display: 'flex', justifyContent: m.role === 'user' ? 'flex-end' : 'flex-start' }}>
                 {m.isNav ? (
+                  // Navigation hint bubble
                   <div
                     className="nav-hint"
                     onClick={() => { if (redirectTimer.current) { clearTimeout(redirectTimer.current); executeNav(pendingNav); } }}
                     style={{
                       maxWidth: '82%', padding: '9px 14px',
-                      borderRadius: '16px 16px 16px 4px',
-                      background: '#EFF9F7',
-                      border: '1.5px solid rgba(13,148,136,0.25)',
-                      color: '#0D6E65', fontSize: 13, lineHeight: 1.55,
+                      borderRadius: '18px 18px 18px 4px',
+                      background: 'linear-gradient(135deg,#EFF6FF,#F5F3FF)',
+                      border: '1.5px solid #C4B5FD',
+                      color: '#5B21B6', fontSize: 13, lineHeight: 1.55,
                       cursor: 'pointer', fontWeight: 600,
                     }}
                   >
@@ -362,31 +371,25 @@ export default function LandingChat({ lang = 'en' }) {
                   <div style={{ maxWidth: '82%' }}>
                     <div style={{
                       padding: '10px 14px',
-                      borderRadius: m.role === 'user' ? '16px 16px 4px 16px' : '16px 16px 16px 4px',
+                      borderRadius: m.role === 'user' ? '18px 18px 4px 18px' : '18px 18px 18px 4px',
                       background: m.emergency
                         ? 'linear-gradient(135deg,#FEF2F2,#FFF1F2)'
                         : m.role === 'user'
-                          ? '#0D9488'
-                          : '#fff',
-                      border: m.emergency
-                        ? '1.5px solid #FECACA'
-                        : m.role === 'user'
-                          ? 'none'
-                          : '1px solid #EAE4DC',
-                      boxShadow: m.role === 'user' ? 'none' : '0 1px 4px rgba(0,0,0,0.05)',
-                      color: m.role === 'user' ? '#fff' : m.emergency ? '#DC2626' : '#1A2B3C',
-                      fontSize: 13.5, lineHeight: 1.58, whiteSpace: 'pre-wrap',
-                      fontWeight: m.emergency ? 600 : 400,
+                          ? 'linear-gradient(135deg,#2563EB,#7C3AED)'
+                          : '#F1F5F9',
+                      border: m.emergency ? '1.5px solid #FECACA' : 'none',
+                      color: m.role === 'user' ? '#fff' : m.emergency ? '#DC2626' : '#0F172A',
+                      fontSize: 13.5, lineHeight: 1.55, whiteSpace: 'pre-wrap', fontWeight: m.emergency ? 600 : 400,
                     }}>
                       {m.content}
                     </div>
                     {m.role === 'assistant' && m.logId && !m.emergency && (
                       <div style={{ display: 'flex', gap: 4, marginTop: 4, paddingLeft: 2 }}>
                         <button onClick={() => sendFeedback(m.logId, true)} title="Helpful" style={{ background: 'none', border: 'none', cursor: rated[m.logId] ? 'default' : 'pointer', padding: 2, opacity: rated[m.logId] === 'up' ? 1 : rated[m.logId] === 'down' ? 0.25 : 0.45, transition: 'opacity 0.15s' }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill={rated[m.logId] === 'up' ? '#16A34A' : 'none'} stroke={rated[m.logId] === 'up' ? '#16A34A' : '#94A3B8'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={rated[m.logId] === 'up' ? '#16A34A' : 'none'} stroke={rated[m.logId] === 'up' ? '#16A34A' : '#64748B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3H14z"/><path d="M7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg>
                         </button>
                         <button onClick={() => sendFeedback(m.logId, false)} title="Not helpful" style={{ background: 'none', border: 'none', cursor: rated[m.logId] ? 'default' : 'pointer', padding: 2, opacity: rated[m.logId] === 'down' ? 1 : rated[m.logId] === 'up' ? 0.25 : 0.45, transition: 'opacity 0.15s' }}>
-                          <svg width="14" height="14" viewBox="0 0 24 24" fill={rated[m.logId] === 'down' ? '#DC2626' : 'none'} stroke={rated[m.logId] === 'down' ? '#DC2626' : '#94A3B8'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
+                          <svg width="14" height="14" viewBox="0 0 24 24" fill={rated[m.logId] === 'down' ? '#DC2626' : 'none'} stroke={rated[m.logId] === 'down' ? '#DC2626' : '#64748B'} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10 15v4a3 3 0 0 0 3 3l4-9V2H5.72a2 2 0 0 0-2 1.7l-1.38 9a2 2 0 0 0 2 2.3H10z"/><path d="M17 2h2.67A2.31 2.31 0 0 1 22 4v7a2.31 2.31 0 0 1-2.33 2H17"/></svg>
                         </button>
                       </div>
                     )}
@@ -396,9 +399,9 @@ export default function LandingChat({ lang = 'en' }) {
             ))}
             {loading && (
               <div style={{ display: 'flex', justifyContent: 'flex-start' }}>
-                <div style={{ padding: '10px 16px', borderRadius: '16px 16px 16px 4px', background: '#fff', border: '1px solid #EAE4DC', display: 'flex', gap: 5, alignItems: 'center' }}>
+                <div style={{ padding: '10px 16px', borderRadius: '18px 18px 18px 4px', background: '#F1F5F9', display: 'flex', gap: 5, alignItems: 'center' }}>
                   {[0, 1, 2].map(i => (
-                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#C4C4C0', display: 'inline-block', animation: `dotBounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />
+                    <span key={i} style={{ width: 7, height: 7, borderRadius: '50%', background: '#94A3B8', display: 'inline-block', animation: `dotBounce 1.2s ease-in-out ${i * 0.2}s infinite` }} />
                   ))}
                 </div>
               </div>
@@ -406,22 +409,21 @@ export default function LandingChat({ lang = 'en' }) {
             <div ref={bottomRef} />
           </div>
 
-          {/* Suggestion chips */}
+          {/* Suggestions */}
           {messages.length === 1 && (
-            <div style={{ padding: '0 14px 10px', display: 'flex', flexWrap: 'wrap', gap: 6, background: '#FAFAF8' }}>
+            <div style={{ padding: '0 14px 10px', display: 'flex', flexWrap: 'wrap', gap: 6 }}>
               {(SUGGESTIONS[lang] || SUGGESTIONS.en).map(s => (
                 <button key={s} onClick={() => send(s)} style={{
                   fontSize: 12, fontWeight: 500, padding: '5px 11px', borderRadius: 20,
-                  border: '1px solid rgba(13,148,136,0.22)', background: '#EFF9F7', color: '#0D6E65',
+                  border: '1px solid #DDD6FE', background: '#F5F3FF', color: '#7C3AED',
                   cursor: 'pointer', fontFamily: 'inherit',
-                  transition: 'background 0.14s, border-color 0.14s',
                 }}>{s}</button>
               ))}
             </div>
           )}
 
-          {/* Input area */}
-          <div style={{ padding: '10px 14px 14px', borderTop: '1px solid #EAE4DC', display: 'flex', gap: 8, alignItems: 'flex-end', background: '#fff' }}>
+          {/* Input */}
+          <div style={{ padding: '10px 14px 14px', borderTop: '1px solid #F1F5F9', display: 'flex', gap: 8, alignItems: 'flex-end' }}>
             <textarea
               ref={inputRef}
               value={input}
@@ -431,13 +433,13 @@ export default function LandingChat({ lang = 'en' }) {
               rows={1}
               disabled={loading}
               style={{
-                flex: 1, resize: 'none', border: '1.5px solid #E8DFD4', borderRadius: 12,
+                flex: 1, resize: 'none', border: '1.5px solid #E2E8F0', borderRadius: 12,
                 padding: '9px 12px', fontSize: 13.5, fontFamily: 'inherit', outline: 'none',
-                lineHeight: 1.45, color: '#1A2B3C', background: '#FAF8F5',
+                lineHeight: 1.45, color: '#0F172A', background: '#F8FAFC',
                 transition: 'border-color 0.15s', maxHeight: 100, overflowY: 'auto',
               }}
-              onFocus={e => { e.target.style.borderColor = '#0D9488'; }}
-              onBlur={e => { e.target.style.borderColor = '#E8DFD4'; }}
+              onFocus={e => { e.target.style.borderColor = '#7C3AED'; }}
+              onBlur={e => { e.target.style.borderColor = '#E2E8F0'; }}
             />
             <button
               onClick={() => send()}
@@ -445,13 +447,13 @@ export default function LandingChat({ lang = 'en' }) {
               style={{
                 width: 38, height: 38, borderRadius: 11, border: 'none',
                 cursor: loading || !input.trim() ? 'default' : 'pointer',
-                background: loading || !input.trim() ? '#E8DFD4' : '#0D9488',
+                background: loading || !input.trim() ? '#E2E8F0' : 'linear-gradient(135deg,#2563EB,#7C3AED)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 transition: 'background 0.15s',
               }}
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="none"
-                stroke={loading || !input.trim() ? '#A0ACA8' : '#fff'}
+                stroke={loading || !input.trim() ? '#94A3B8' : '#fff'}
                 strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
                 <line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/>
               </svg>
