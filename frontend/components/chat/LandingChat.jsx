@@ -300,6 +300,31 @@ export default function LandingChat({ lang = 'en' }) {
         </div>
       )}
 
+      {/* Name card — sits above the mascot button */}
+      {!open && (
+        <div style={{
+          position: 'fixed', bottom: 88, right: 20, zIndex: 9000,
+          background: '#fff',
+          borderRadius: 20,
+          padding: '6px 14px 6px 10px',
+          boxShadow: '0 4px 18px rgba(0,0,0,0.12)',
+          display: 'flex', alignItems: 'center', gap: 7,
+          fontFamily: "'Inter', system-ui, sans-serif",
+          pointerEvents: 'none',
+        }}>
+          {/* Green online dot */}
+          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />
+          <span style={{ fontSize: 13, fontWeight: 700, color: '#1A2B3C', letterSpacing: '-0.1px' }}>Vona</span>
+          {/* Tail pointing down-right toward mascot */}
+          <div style={{
+            position: 'absolute', bottom: -6, right: 18,
+            borderLeft: '6px solid transparent', borderRight: '6px solid transparent',
+            borderTop: '7px solid #fff',
+            filter: 'drop-shadow(0 2px 1px rgba(0,0,0,0.06))',
+          }} />
+        </div>
+      )}
+
       {/* Floating button — friendly Zoho-style mascot */}
       <button
         onClick={() => setOpen(o => !o)}
