@@ -29,10 +29,10 @@ export default function Footer({ lang = 'en' }) {
             {/* Logo with warm teal cross */}
             <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
               <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <rect x="7" y="1" width="8" height="20" rx="3.5" fill="rgba(13,148,136,0.18)" stroke="#0D9488" strokeWidth="1.5"/>
-                <rect x="1" y="7" width="20" height="8" rx="3.5" fill="rgba(13,148,136,0.18)" stroke="#0D9488" strokeWidth="1.5"/>
+                <rect x="7" y="1" width="8" height="20" rx="3.5" fill="rgba(37,99,235,0.15)" stroke="#2563EB" strokeWidth="1.5"/>
+                <rect x="1" y="7" width="20" height="8" rx="3.5" fill="rgba(37,99,235,0.15)" stroke="#2563EB" strokeWidth="1.5"/>
               </svg>
-              <div style={{ fontSize: 18, fontWeight: 700, color: '#1A2B3C', letterSpacing: '-0.5px' }}>Vonaxity</div>
+              <div style={{ fontSize: 18, fontWeight: 700, color: '#2563EB', letterSpacing: '-0.5px' }}>Vonaxity</div>
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.7, color: textSub, maxWidth: 220 }}>{t(lang, 'footer.tagline')}</p>
             <div style={{ marginTop: 20, background: 'rgba(220,38,38,0.06)', border: '1px solid rgba(220,38,38,0.18)', borderRadius: 8, padding: '10px 14px' }}>
