@@ -642,8 +642,8 @@ export default function HowItWorksSection({ lang = 'en', tag, title, subtitle, s
         }
         .hiw-card:hover {
           transform: translateY(-5px);
-          box-shadow: 0 16px 36px rgba(124,58,237,0.13);
-          border-color: rgba(124,58,237,0.2);
+          box-shadow: 0 16px 36px rgba(13,148,136,0.12);
+          border-color: rgba(13,148,136,0.22);
         }
         .hiw-caret {
           display: inline-flex;
@@ -653,16 +653,16 @@ export default function HowItWorksSection({ lang = 'en', tag, title, subtitle, s
           padding-top: 18px;
           font-size: 12px;
           font-weight: 600;
-          color: #7C3AED;
-          background: rgba(124,58,237,0.07);
-          border: 1px solid rgba(124,58,237,0.15);
+          color: #0D9488;
+          background: rgba(13,148,136,0.07);
+          border: 1px solid rgba(13,148,136,0.16);
           padding: 5px 12px;
           border-radius: 99px;
           align-self: flex-start;
           transition: background 0.18s ease, gap 0.18s ease;
         }
         .hiw-card:hover .hiw-caret {
-          background: rgba(124,58,237,0.13);
+          background: rgba(13,148,136,0.13);
           gap: 9px;
         }
         .hiw-overlay {
@@ -737,13 +737,13 @@ export default function HowItWorksSection({ lang = 'en', tag, title, subtitle, s
       <section id="how-it-works" style={{ padding:'96px 24px', background:'#fff', scrollMarginTop:'76px', position:'relative', zIndex:1, overflow:'hidden' }}>
         {/* Watermark cross */}
         <div style={{ position:'absolute', top:'50%', right:-60, transform:'translateY(-50%)', opacity:0.025, pointerEvents:'none' }}>
-          <svg width="340" height="340" viewBox="0 0 54 54" fill="none"><rect x="19" y="0" width="16" height="54" rx="6" fill="#7C3AED"/><rect x="0" y="19" width="54" height="16" rx="6" fill="#7C3AED"/></svg>
+          <svg width="340" height="340" viewBox="0 0 54 54" fill="none"><rect x="19" y="0" width="16" height="54" rx="6" fill="#0D9488"/><rect x="0" y="19" width="54" height="16" rx="6" fill="#0D9488"/></svg>
         </div>
 
         <div style={{ maxWidth:1140, margin:'0 auto' }}>
           <ScrollReveal>
             <div style={{ textAlign:'center', marginBottom:64 }}>
-              <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:'#7C3AED', background:'rgba(124,58,237,0.08)', border:'1px solid rgba(124,58,237,0.15)', padding:'5px 13px', borderRadius:99, marginBottom:16 }}>
+              <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:'#0D9488', background:'rgba(13,148,136,0.07)', border:'1px solid rgba(13,148,136,0.16)', padding:'5px 13px', borderRadius:99, marginBottom:16 }}>
                 {tag}
               </div>
               <h2 style={{ fontSize:'clamp(30px,4vw,46px)', fontWeight:800, color:'#111827', margin:'0 0 14px', letterSpacing:'-1.5px' }}>{title}</h2>
@@ -876,7 +876,7 @@ export default function HowItWorksSection({ lang = 'en', tag, title, subtitle, s
             </div>
 
             {/* Right: mockup */}
-            <div className="hiw-modal-right" style={{ background:'linear-gradient(145deg,#F8FAFF 0%,#F5F3FF 100%)', borderRadius:'0 24px 24px 0' }}>
+            <div className="hiw-modal-right" style={{ background:'linear-gradient(145deg,#F8FAF9 0%,#F0F7F6 100%)', borderRadius:'0 24px 24px 0' }}>
               <div style={{ width:'100%' }}>
                 <step.Mockup plans={active === 0 ? plans : undefined} lang={lang} />
               </div>

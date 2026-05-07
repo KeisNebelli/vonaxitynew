@@ -81,7 +81,7 @@ const BLOBS = [
     style: {
       top: '-12%', right: '-8%',
       width: 780, height: 700,
-      background: 'radial-gradient(ellipse at 42% 38%, rgba(37,99,235,0.22) 0%, rgba(99,102,241,0.14) 45%, transparent 68%)',
+      background: 'radial-gradient(ellipse at 42% 38%, rgba(30,111,171,0.16) 0%, rgba(46,123,180,0.09) 45%, transparent 68%)',
       filter: 'blur(72px)',
       opacity: 0.9,
       animation: 'org-m1 26s ease-in-out infinite, org-breathe 14s ease-in-out infinite',
@@ -92,7 +92,7 @@ const BLOBS = [
     style: {
       top: '22%', left: '-10%',
       width: 660, height: 600,
-      background: 'radial-gradient(ellipse at 55% 50%, rgba(20,184,166,0.18) 0%, rgba(6,182,212,0.10) 50%, transparent 70%)',
+      background: 'radial-gradient(ellipse at 55% 50%, rgba(13,148,136,0.14) 0%, rgba(20,160,148,0.08) 50%, transparent 70%)',
       filter: 'blur(68px)',
       opacity: 0.85,
       animation: 'org-m2 22s ease-in-out infinite 2s, org-breathe 18s ease-in-out infinite 4s',
@@ -103,7 +103,7 @@ const BLOBS = [
     style: {
       bottom: '-8%', right: '-4%',
       width: 620, height: 580,
-      background: 'radial-gradient(ellipse at 48% 52%, rgba(124,58,237,0.15) 0%, rgba(99,102,241,0.10) 48%, transparent 68%)',
+      background: 'radial-gradient(ellipse at 48% 52%, rgba(195,165,120,0.11) 0%, rgba(210,180,140,0.07) 48%, transparent 68%)',
       filter: 'blur(64px)',
       opacity: 0.88,
       animation: 'org-m3 28s ease-in-out infinite 1s, org-breathe 20s ease-in-out infinite 6s',
@@ -114,7 +114,7 @@ const BLOBS = [
     style: {
       top: '38%', left: '22%',
       width: 860, height: 700,
-      background: 'radial-gradient(ellipse at 50% 50%, rgba(20,184,166,0.09) 0%, rgba(37,99,235,0.06) 55%, transparent 72%)',
+      background: 'radial-gradient(ellipse at 50% 50%, rgba(13,148,136,0.07) 0%, rgba(30,111,171,0.05) 55%, transparent 72%)',
       filter: 'blur(100px)',
       opacity: 0.9,
       animation: 'org-m4 34s ease-in-out infinite 3s',
@@ -125,7 +125,7 @@ const BLOBS = [
     style: {
       bottom: '8%', left: '4%',
       width: 500, height: 460,
-      background: 'radial-gradient(ellipse at 45% 55%, rgba(139,92,246,0.14) 0%, rgba(124,58,237,0.08) 50%, transparent 68%)',
+      background: 'radial-gradient(ellipse at 45% 55%, rgba(195,170,135,0.10) 0%, rgba(210,185,150,0.06) 50%, transparent 68%)',
       filter: 'blur(60px)',
       opacity: 0.82,
       animation: 'org-m5 20s ease-in-out infinite 5s, org-breathe 16s ease-in-out infinite 2s',
@@ -136,7 +136,7 @@ const BLOBS = [
     style: {
       top: '6%', left: '8%',
       width: 380, height: 340,
-      background: 'radial-gradient(ellipse at 50% 45%, rgba(6,182,212,0.16) 0%, rgba(20,184,166,0.08) 50%, transparent 70%)',
+      background: 'radial-gradient(ellipse at 50% 45%, rgba(13,148,136,0.11) 0%, rgba(30,111,171,0.07) 50%, transparent 70%)',
       filter: 'blur(52px)',
       opacity: 0.78,
       animation: 'org-m6 18s ease-in-out infinite 4s, org-breathe 22s ease-in-out infinite',
@@ -145,26 +145,26 @@ const BLOBS = [
 ];
 
 const RINGS = [
-  { top: '18%', left: '62%', size: 6, color: 'rgba(37,99,235,0.55)',  delay: '0s',   dur: '5s'  },
-  { top: '52%', left: '8%',  size: 5, color: 'rgba(20,184,166,0.50)', delay: '2s',   dur: '7s'  },
-  { top: '74%', left: '75%', size: 6, color: 'rgba(124,58,237,0.45)', delay: '1.5s', dur: '6s'  },
-  { top: '35%', left: '88%', size: 4, color: 'rgba(6,182,212,0.45)',  delay: '3s',   dur: '4.5s'},
+  { top: '18%', left: '62%', size: 6, color: 'rgba(30,111,171,0.45)',  delay: '0s',   dur: '5s'  },
+  { top: '52%', left: '8%',  size: 5, color: 'rgba(13,148,136,0.42)',  delay: '2s',   dur: '7s'  },
+  { top: '74%', left: '75%', size: 6, color: 'rgba(195,165,120,0.38)', delay: '1.5s', dur: '6s'  },
+  { top: '35%', left: '88%', size: 4, color: 'rgba(13,148,136,0.38)',  delay: '3s',   dur: '4.5s'},
 ];
 
 const ARCS = [
   {
     d: 'M -40 320 Q 280 80 620 260 T 1300 180',
-    stroke: 'rgba(37,99,235,0.12)', strokeWidth: 1.2,
+    stroke: 'rgba(30,111,171,0.10)', strokeWidth: 1.2,
     dasharray: 900, delay: '0s', dur: '18s',
   },
   {
     d: 'M 1440 600 Q 1100 340 740 500 T 80 380',
-    stroke: 'rgba(20,184,166,0.10)', strokeWidth: 1,
+    stroke: 'rgba(13,148,136,0.09)', strokeWidth: 1,
     dasharray: 900, delay: '6s', dur: '22s',
   },
   {
     d: 'M 200 800 Q 540 560 860 720 T 1500 550',
-    stroke: 'rgba(124,58,237,0.09)', strokeWidth: 1,
+    stroke: 'rgba(195,165,120,0.08)', strokeWidth: 1,
     dasharray: 900, delay: '12s', dur: '26s',
   },
 ];

@@ -11,11 +11,11 @@ import Link from 'next/link';
 import { t } from '@/translations';
 
 const C = {
-  primary: '#2563EB', primaryLight: '#EFF6FF', primaryDark: '#1D4ED8',
-  secondary: '#059669', secondaryLight: '#ECFDF5',
-  bg: '#FAFAF9', bgWhite: '#FFFFFF', bgSubtle: '#F5F5F4',
-  textPrimary: '#111827', textSecondary: '#6B7280', textTertiary: '#9CA3AF',
-  border: '#E5E7EB', borderSubtle: '#F3F4F6',
+  primary: '#2563EB', primaryLight: '#EFF6FF', primaryDark: '#1E6FAB',
+  secondary: '#0D9488', secondaryLight: '#F0FDFB',
+  bg: '#FAF8F5', bgWhite: '#FFFFFF', bgSubtle: '#F2EDE8',
+  textPrimary: '#1A2B3C', textSecondary: '#5D7070', textTertiary: '#9CA3A0',
+  border: '#E8DFD4', borderSubtle: '#F0EDE8',
   warning: '#D97706', warningLight: '#FFFBEB',
 };
 
@@ -139,7 +139,7 @@ export default async function HomePage({ params }) {
   ];
 
   return (
-    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: 'linear-gradient(168deg, #FFFFFF 0%, #F8F6FF 40%, #F0FFFE 75%, #F8F6FF 100%)' }}>
+    <div style={{ fontFamily: "'Inter', system-ui, sans-serif", background: 'linear-gradient(168deg, #FEFCF9 0%, #FAF7F3 35%, #F2F9F8 65%, #FAF8F5 100%)' }}>
       <style>{`
         .hp-hero-btn-primary{transition:all 0.18s ease;background:linear-gradient(135deg,#2563EB 0%,#1D4ED8 100%)!important;}
         .hp-hero-btn-primary:hover{background:linear-gradient(135deg,#1D4ED8 0%,#1E40AF 100%)!important;box-shadow:0 6px 22px rgba(37,99,235,0.5)!important;transform:translateY(-1px)}
@@ -150,11 +150,11 @@ export default async function HomePage({ params }) {
         .hp-service-card{transition:all 0.2s ease;}
         .hp-service-card:hover{transform:translateY(-3px);box-shadow:0 8px 24px rgba(0,0,0,0.09)!important;}
         .hp-pricing-card{transition:all 0.2s ease;}
-        .hp-pricing-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(37,99,235,0.15)!important;}
+        .hp-pricing-card:hover{transform:translateY(-4px);box-shadow:0 12px 36px rgba(13,148,136,0.14)!important;}
         .hp-pricing-btn-outline{transition:all 0.18s ease;}
         .hp-pricing-btn-outline:hover{background:#2563EB!important;color:#fff!important;}
         .hp-pricing-btn-featured{transition:all 0.18s ease;}
-        .hp-pricing-btn-featured:hover{background:#1D4ED8!important;}
+        .hp-pricing-btn-featured:hover{background:linear-gradient(135deg,#1A5F99,#0B8077)!important;}
         .hp-city-card{transition:all 0.18s ease;}
         .hp-city-card:hover{background:#EFF6FF!important;border-color:#BFDBFE!important;}
         .hp-city-card-new{transition:transform 0.2s,box-shadow 0.2s;}
@@ -216,11 +216,11 @@ export default async function HomePage({ params }) {
       />
 
       {/* ── Trust bar ── */}
-      <section style={{ background: '#fff', borderTop:`1px solid ${C.border}`, borderBottom:`1px solid ${C.border}`, padding:'32px 24px', position:'relative', zIndex:1 }}>
+      <section style={{ background: '#FEFCF9', borderTop:`1px solid ${C.border}`, borderBottom:`1px solid ${C.border}`, padding:'32px 24px', position:'relative', zIndex:1 }}>
         <div className="hp-trust-bar" style={{ maxWidth:1100, margin:'0 auto', display:'grid', gridTemplateColumns:'repeat(auto-fit,minmax(230px,1fr))', gap:0 }}>
           {TRUST_ITEMS.map((item, i) => (
             <div key={i} style={{ display:'flex', alignItems:'center', gap:16, padding:'0 28px', borderRight: i < TRUST_ITEMS.length - 1 ? `1px solid ${C.border}` : 'none' }}>
-              <div style={{ width:48, height:48, borderRadius:14, background:'linear-gradient(135deg,#EFF6FF 0%,#EDE9FE 100%)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 2px 8px rgba(37,99,235,0.10)' }}>
+              <div style={{ width:48, height:48, borderRadius:14, background:'linear-gradient(135deg,#EFF9F7 0%,#EBF5FF 100%)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, boxShadow:'0 2px 8px rgba(13,148,136,0.10)' }}>
                 {item.icon}
               </div>
               <div>
@@ -246,11 +246,11 @@ export default async function HomePage({ params }) {
       />
 
       {/* ── Services ── */}
-      <section id="services" className="hp-section-lg" style={{ padding: '96px 24px', background: 'linear-gradient(160deg,#FAF7FF 0%,#F5FAFF 45%,#F2FBF6 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1, overflow: 'hidden' }}>
-        {/* Aurora blobs */}
-        <div style={{ position:'absolute', top:-120, left:-100, width:560, height:560, borderRadius:'50%', background:'radial-gradient(circle,rgba(124,58,237,0.13) 0%,transparent 70%)', filter:'blur(48px)', pointerEvents:'none' }} />
-        <div style={{ position:'absolute', bottom:-100, right:-80, width:480, height:480, borderRadius:'50%', background:'radial-gradient(circle,rgba(5,150,105,0.11) 0%,transparent 70%)', filter:'blur(48px)', pointerEvents:'none' }} />
-        <div style={{ position:'absolute', top:'35%', right:'12%', width:320, height:320, borderRadius:'50%', background:'radial-gradient(circle,rgba(14,165,233,0.09) 0%,transparent 70%)', filter:'blur(56px)', pointerEvents:'none' }} />
+      <section id="services" className="hp-section-lg" style={{ padding: '96px 24px', background: 'linear-gradient(160deg,#FAF8F4 0%,#F5FAF9 45%,#F2F9F6 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1, overflow: 'hidden' }}>
+        {/* Aurora blobs — warm teal tones */}
+        <div style={{ position:'absolute', top:-120, left:-100, width:560, height:560, borderRadius:'50%', background:'radial-gradient(circle,rgba(13,148,136,0.09) 0%,transparent 70%)', filter:'blur(48px)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', bottom:-100, right:-80, width:480, height:480, borderRadius:'50%', background:'radial-gradient(circle,rgba(30,111,171,0.08) 0%,transparent 70%)', filter:'blur(48px)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', top:'35%', right:'12%', width:320, height:320, borderRadius:'50%', background:'radial-gradient(circle,rgba(195,165,120,0.07) 0%,transparent 70%)', filter:'blur(56px)', pointerEvents:'none' }} />
         <div style={{ maxWidth: 1100, margin: '0 auto', position: 'relative' }}>
           <ScrollReveal>
             <div style={{ marginBottom: 56, display:'flex', justifyContent:'space-between', alignItems:'flex-end', flexWrap:'wrap', gap:20 }}>
@@ -358,7 +358,7 @@ export default async function HomePage({ params }) {
           </div>
 
           <ScrollReveal delay={100}>
-            <div className="hp-stat-bar" style={{ background: 'linear-gradient(135deg, #EFF6FF 0%, #F5F3FF 100%)', borderRadius: 18, padding: '28px 36px', display: 'flex', gap: 48, justifyContent: 'center', flexWrap: 'wrap', border: '1px solid rgba(124,58,237,0.1)', boxShadow:'0 4px 24px rgba(124,58,237,0.06)' }}>
+            <div className="hp-stat-bar" style={{ background: 'linear-gradient(135deg, #EFF9F7 0%, #EBF5F3 100%)', borderRadius: 18, padding: '28px 36px', display: 'flex', gap: 48, justifyContent: 'center', flexWrap: 'wrap', border: '1px solid rgba(13,148,136,0.12)', boxShadow:'0 4px 24px rgba(13,148,136,0.06)' }}>
               {[
                 ['18+', lang === 'sq' ? 'Infermierë Aktivë' : 'Active Nurses'],
                 ['4.9', lang === 'sq' ? 'Vlerësim Mesatar' : 'Avg Rating'],
@@ -366,7 +366,7 @@ export default async function HomePage({ params }) {
                 ['2h', lang === 'sq' ? 'Kohë Reagimi' : 'Avg Response'],
               ].map(([n, l]) => (
                 <div key={l} style={{ textAlign: 'center' }}>
-                  <div style={{ fontSize: 28, fontWeight: 800, background: 'linear-gradient(135deg, #7C3AED 0%, #2563EB 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', letterSpacing: '-1px' }}>{n}</div>
+                  <div style={{ fontSize: 28, fontWeight: 800, background: 'linear-gradient(135deg, #1E6FAB 0%, #0D9488 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text', letterSpacing: '-1px' }}>{n}</div>
                   <div style={{ fontSize: 12, color: C.textTertiary, marginTop: 3, fontWeight: 500 }}>{l}</div>
                 </div>
               ))}
@@ -376,7 +376,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Pricing ── */}
-      <section id="pricing" className="hp-section-lg" style={{ padding: '96px 24px', background: 'linear-gradient(180deg, #F5F3FF 0%, #EFF6FF 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
+      <section id="pricing" className="hp-section-lg" style={{ padding: '96px 24px', background: 'linear-gradient(180deg, #F0F9F8 0%, #EBF5F9 100%)', scrollMarginTop: '76px', position: 'relative', zIndex: 1 }}>
         <div style={{ maxWidth: 1000, margin: '0 auto', textAlign: 'center' }}>
           <ScrollReveal>
             <TAG>{t(lang, 'pricing.tag')}</TAG>
@@ -388,11 +388,11 @@ export default async function HomePage({ params }) {
               <ScrollReveal key={p.name} delay={pi * 100}>
                 <div className="hp-pricing-card" style={{ background: C.bgWhite, borderRadius: 22, border: p.featured ? `2px solid ${C.primary}` : `1px solid ${C.border}`, padding: p.featured ? '0 0 32px' : '32px 26px', position: 'relative', boxShadow: p.featured ? '0 12px 48px rgba(37,99,235,0.2)' : '0 2px 12px rgba(0,0,0,0.05)', height:'100%', overflow:'hidden' }}>
                   {p.featured && (
-                    <div style={{ height:5, background:'linear-gradient(90deg,#7C3AED,#2563EB)', marginBottom:24 }} />
+                    <div style={{ height:5, background:'linear-gradient(90deg,#1E6FAB,#0D9488)', marginBottom:24 }} />
                   )}
                   <div style={{ paddingLeft: p.featured ? 26 : 0, paddingRight: p.featured ? 26 : 0 }}>
                   {p.featured && (
-                    <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#7C3AED,#2563EB)', color:'#fff', fontSize:10, fontWeight:700, padding:'3px 12px', borderRadius:99, marginBottom:14, whiteSpace:'nowrap' }}>
+                    <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#1E6FAB,#0D9488)', color:'#fff', fontSize:10, fontWeight:700, padding:'3px 12px', borderRadius:99, marginBottom:14, whiteSpace:'nowrap' }}>
                       <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                       {t(lang, 'pricing.mostPopular')}
                     </div>
@@ -400,12 +400,12 @@ export default async function HomePage({ params }) {
                   <div style={{ fontSize: 12, fontWeight: 700, color: p.featured ? C.primary : C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom: 10 }}>{p.name}</div>
                   <div style={{ fontSize: 48, fontWeight: 800, color: C.textPrimary, letterSpacing: '-2.5px', marginBottom: 2, lineHeight:1 }}>{p.price}</div>
                   <div style={{ fontSize: 13, color: C.textTertiary, marginBottom: 20 }}>{t(lang, 'pricing.perMonth')}</div>
-                  <div style={{ fontSize: 13, fontWeight: 600, color: p.featured ? '#7C3AED' : C.primary, background: p.featured ? 'rgba(124,58,237,0.08)' : C.primaryLight, display: 'inline-block', padding: '5px 14px', borderRadius: 99, marginBottom: 28 }}>
+                  <div style={{ fontSize: 13, fontWeight: 600, color: p.featured ? '#0D9488' : C.primary, background: p.featured ? 'rgba(13,148,136,0.08)' : C.primaryLight, display: 'inline-block', padding: '5px 14px', borderRadius: 99, marginBottom: 28 }}>
                     {p.visits} {p.visits === 1 ? t(lang, 'pricing.visitMonth') : t(lang, 'pricing.visitsMonth')}
                   </div>
                   <br />
                   <Link href={`/${lang}/signup?role=client&plan=${p.name.toLowerCase()}`}>
-                    <button className={p.featured ? 'hp-pricing-btn-featured' : 'hp-pricing-btn-outline'} style={{ width: '100%', padding: '13px', borderRadius: 12, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? 'linear-gradient(135deg,#7C3AED,#2563EB)' : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: p.featured ? '0 6px 20px rgba(124,58,237,0.3)' : 'none' }}>
+                    <button className={p.featured ? 'hp-pricing-btn-featured' : 'hp-pricing-btn-outline'} style={{ width: '100%', padding: '13px', borderRadius: 12, border: p.featured ? 'none' : `2px solid ${C.primary}`, background: p.featured ? 'linear-gradient(135deg,#1E6FAB,#0D9488)' : 'transparent', color: p.featured ? '#fff' : C.primary, fontSize: 14, fontWeight: 700, cursor: 'pointer', boxShadow: p.featured ? '0 6px 20px rgba(30,111,171,0.28)' : 'none' }}>
                       {t(lang, 'pricing.getStarted')}
                     </button>
                   </Link>
@@ -569,7 +569,7 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── CTA ── */}
-      <section className="hp-cta-section" style={{ padding: '104px 24px', background: 'linear-gradient(158deg, #022c1a 0%, #064E3B 55%, #065f46 100%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
+      <section className="hp-cta-section" style={{ padding: '104px 24px', background: 'linear-gradient(158deg, #0D2A38 0%, #0D4A55 50%, #0C5B5B 100%)', textAlign: 'center', position: 'relative', overflow: 'hidden' }}>
         {/* Decorative medicine crosses in background */}
         <div style={{ position:'absolute', inset:0, pointerEvents:'none' }}>
           {/* Large spinning cross — top right */}
@@ -578,14 +578,14 @@ export default async function HomePage({ params }) {
             <rect x="0" y="19" width="54" height="16" rx="6" fill="#fff"/>
           </svg>
           {/* Medium bobbing cross — bottom left */}
-          <svg style={{ position:'absolute', bottom:-10, left:'6%', opacity:0.06, animation:'vx-cta-cross-bob 6s ease-in-out infinite', transformOrigin:'center' }} width="110" height="110" viewBox="0 0 54 54" fill="none">
-            <rect x="19" y="0" width="16" height="54" rx="6" fill="#4ade80"/>
-            <rect x="0" y="19" width="54" height="16" rx="6" fill="#4ade80"/>
+          <svg style={{ position:'absolute', bottom:-10, left:'6%', opacity:0.10, animation:'vx-cta-cross-bob 6s ease-in-out infinite', transformOrigin:'center' }} width="110" height="110" viewBox="0 0 54 54" fill="none">
+            <rect x="19" y="0" width="16" height="54" rx="6" fill="#5EEAD4"/>
+            <rect x="0" y="19" width="54" height="16" rx="6" fill="#5EEAD4"/>
           </svg>
           {/* Small spinning cross — mid-left */}
-          <svg style={{ position:'absolute', top:'38%', left:'14%', opacity:0.05, animation:'vx-cta-cross-spin 40s linear infinite reverse', transformOrigin:'center' }} width="68" height="68" viewBox="0 0 54 54" fill="none">
-            <rect x="19" y="0" width="16" height="54" rx="6" fill="#6ee7b7"/>
-            <rect x="0" y="19" width="54" height="16" rx="6" fill="#6ee7b7"/>
+          <svg style={{ position:'absolute', top:'38%', left:'14%', opacity:0.08, animation:'vx-cta-cross-spin 40s linear infinite reverse', transformOrigin:'center' }} width="68" height="68" viewBox="0 0 54 54" fill="none">
+            <rect x="19" y="0" width="16" height="54" rx="6" fill="#99D4D0"/>
+            <rect x="0" y="19" width="54" height="16" rx="6" fill="#99D4D0"/>
           </svg>
           {/* Tiny cross — top left */}
           <svg style={{ position:'absolute', top:'18%', left:'3%', opacity:0.08, animation:'vx-cta-cross-spin 20s linear infinite', transformOrigin:'center' }} width="44" height="44" viewBox="0 0 54 54" fill="none">
@@ -593,13 +593,13 @@ export default async function HomePage({ params }) {
             <rect x="0" y="19" width="54" height="16" rx="6" fill="#fff"/>
           </svg>
           {/* Radial glow orb */}
-          <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:600, height:400, borderRadius:'50%', background:'radial-gradient(ellipse, rgba(16,185,129,0.12) 0%, transparent 70%)', animation:'vx-cta-orb 5s ease-in-out infinite' }} />
+          <div style={{ position:'absolute', top:'50%', left:'50%', transform:'translate(-50%,-50%)', width:600, height:400, borderRadius:'50%', background:'radial-gradient(ellipse, rgba(13,148,136,0.14) 0%, transparent 70%)', animation:'vx-cta-orb 5s ease-in-out infinite' }} />
         </div>
 
         {/* Content */}
         <div style={{ position:'relative', zIndex:1 }}>
           <div style={{ display:'inline-flex', alignItems:'center', gap:8, background:'rgba(255,255,255,0.1)', border:'1px solid rgba(255,255,255,0.15)', borderRadius:99, padding:'6px 16px', marginBottom:24, backdropFilter:'blur(8px)' }}>
-            <div style={{ width:7, height:7, borderRadius:'50%', background:'#4ade80', boxShadow:'0 0 8px #4ade80' }} />
+            <div style={{ width:7, height:7, borderRadius:'50%', background:'#5EEAD4', boxShadow:'0 0 8px rgba(94,234,212,0.7)' }} />
             <span style={{ fontSize:12, fontWeight:700, color:'rgba(255,255,255,0.85)', letterSpacing:'0.8px', textTransform:'uppercase' }}>
               {lang === 'sq' ? 'Tani disponueshëm' : 'Now available in Albania'}
             </span>
@@ -612,7 +612,7 @@ export default async function HomePage({ params }) {
           </p>
           <div style={{ display:'flex', gap:14, justifyContent:'center', flexWrap:'wrap' }}>
             <Link href={`/${lang}/signup?role=client`}>
-              <button className="hp-cta-btn" style={{ background: '#fff', color: '#064E3B', border: 'none', borderRadius: 12, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 28px rgba(0,0,0,0.25)' }}>
+              <button className="hp-cta-btn" style={{ background: '#fff', color: '#0D4A55', border: 'none', borderRadius: 12, padding: '16px 40px', fontSize: 16, fontWeight: 700, cursor: 'pointer', boxShadow: '0 4px 28px rgba(0,0,0,0.22)' }}>
                 {t(lang, 'cta.btn1')}
               </button>
             </Link>

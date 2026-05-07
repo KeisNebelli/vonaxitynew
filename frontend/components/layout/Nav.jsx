@@ -84,9 +84,9 @@ export default function Nav({ lang = 'en' }) {
           position: sticky;
           top: 0;
           z-index: 50;
-          background: rgba(255,255,255,0.96);
+          background: rgba(252,250,247,0.96);
           backdrop-filter: blur(12px);
-          border-bottom: 1px solid #E5E7EB;
+          border-bottom: 1px solid #E8DFD4;
           font-family: 'Inter', system-ui, sans-serif;
         }
         .vx-nav-inner {
@@ -165,10 +165,10 @@ export default function Nav({ lang = 'en' }) {
         }
         .vx-lang {
           display: flex;
-          background: #F5F5F4;
+          background: #F2EDE7;
           border-radius: 8px;
           padding: 3px;
-          border: 1px solid #E5E7EB;
+          border: 1px solid #E8DFD4;
         }
         .vx-lang-btn {
           padding: 4px 10px;
@@ -229,9 +229,9 @@ export default function Nav({ lang = 'en' }) {
         /* ── mobile menu ── */
         .vx-mobile-menu {
           display: none;
-          background: rgba(255,255,255,0.98);
+          background: rgba(252,250,247,0.98);
           backdrop-filter: blur(16px);
-          border-top: 1px solid #E5E7EB;
+          border-top: 1px solid #E8DFD4;
           padding: 8px 20px 24px;
         }
         /* mobile nav link */
