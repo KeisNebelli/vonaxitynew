@@ -1820,10 +1820,10 @@ function FindNurses({ lang, onBook }) {
   );
 }
 
-function SubscriptionSection({ userData, lang }) {
+function SubscriptionSection({ userData, lang, onRefresh }) {
   const tr = (key) => t(lang, key);
   const [loading, setLoading] = useState(null);
-  const [portalLoading, setPortalLoading] = useState(false);
+  const [cancelLoading, setCancelLoading] = useState(false);
   const [error, setError] = useState('');
   const [plans, setPlans] = useState([
     { id:'basic',    name:'Basic',    price:'€30',  visits:1, desc:'1 nurse visit per month' },
@@ -1841,31 +1841,49 @@ function SubscriptionSection({ userData, lang }) {
         { id:'premium',  name:'Premium',  price:`€${p.premiumPrice||120}`, visits:p.premiumVisits||4,  desc:`${p.premiumVisits||4} nurse visits per month` },
       ]))
       .catch(() => {});
+
+    // After PayPal redirect back: capture the subscription to confirm it in DB
+    if (typeof window !== 'undefined') {
+      const params = new URLSearchParams(window.location.search);
+      const subscriptionId = params.get('subscription_id');
+      const plan = params.get('plan');
+      if (params.get('payment') === 'success' && subscriptionId && plan) {
+        api.capturePayPalSubscription(subscriptionId, plan)
+          .then(() => { if (onRefresh) onRefresh(); })
+          .catch(() => {}); // webhook is backup — silent fail here is fine
+        // Clean up query params from URL without reload
+        window.history.replaceState({}, '', window.location.pathname);
+      }
+    }
   }, []);
+
   const sub = userData?.subscription;
   const currentPlan = sub?.plan || null;
   const status = sub?.status || 'TRIAL';
   const visitsUsed = sub?.visitsUsed || 0;
   const visitsTotal = sub?.visitsPerMonth || 0;
 
+  // Redirect to PayPal subscription approval page
   const handleCheckout = async (planId) => {
     setLoading(planId); setError('');
     try {
-      const data = await api.createCheckout(planId, lang);
+      const data = await api.createPayPalSubscription(planId, lang);
       if (data.url) window.location.href = data.url;
     } catch (err) {
       setError(err.message || tr('dashboard.checkoutFailed'));
     } finally { setLoading(null); }
   };
 
-  const handlePortal = async () => {
-    setPortalLoading(true); setError('');
+  // Cancel active PayPal subscription
+  const handleCancel = async () => {
+    if (!window.confirm(lang === 'sq' ? 'A jeni i sigurt që dëshironi të anuloni abonimin?' : 'Are you sure you want to cancel your subscription?')) return;
+    setCancelLoading(true); setError('');
     try {
-      const data = await api.createPortal();
-      if (data.url) window.location.href = data.url;
+      await api.cancelPayPalSubscription();
+      if (onRefresh) onRefresh();
     } catch (err) {
-      setError(err.message || tr('dashboard.portalFailed'));
-    } finally { setPortalLoading(false); }
+      setError(err.message || tr('dashboard.cancelFailed'));
+    } finally { setCancelLoading(false); }
   };
 
   return (
@@ -1884,9 +1902,9 @@ function SubscriptionSection({ userData, lang }) {
             <span style={{ fontSize:12, fontWeight:700, padding:'4px 12px', borderRadius:99, background:status==='ACTIVE'?C.secondaryLight:status==='TRIAL'?C.purpleLight:C.warningLight, color:status==='ACTIVE'?C.secondary:status==='TRIAL'?C.purple:C.warning }}>
               {status==='ACTIVE'?(lang==='sq'?'Aktiv':'Active'):status==='TRIAL'?(lang==='sq'?'Provë':'Trial'):status==='EXPIRED'?(lang==='sq'?'Skaduar':'Expired'):status}
             </span>
-            {sub?.stripeSubId && (
-              <button onClick={handlePortal} disabled={portalLoading} style={{ fontSize:13, fontWeight:600, padding:'8px 16px', borderRadius:9, border:`1px solid ${C.border}`, background:C.bgWhite, cursor:'pointer', color:C.textSecondary }}>
-                {portalLoading ? tr('dashboard.opening') : tr('dashboard.manageBilling')}
+            {sub?.paypalSubId && status === 'ACTIVE' && (
+              <button onClick={handleCancel} disabled={cancelLoading} style={{ fontSize:13, fontWeight:600, padding:'8px 16px', borderRadius:9, border:`1px solid #FECACA`, background:'#FEF2F2', cursor:'pointer', color:C.error }}>
+                {cancelLoading ? (lang==='sq'?'Duke anuluar...':'Cancelling...') : tr('dashboard.cancelSubscription')}
               </button>
             )}
           </div>
@@ -1943,7 +1961,7 @@ function SubscriptionSection({ userData, lang }) {
         })}
       </div>
       <div style={{ marginTop:16, fontSize:12, color:C.textTertiary, textAlign:'center' }}>
-        {tr('dashboard.stripeInfo')}
+        {tr('dashboard.paypalInfo')}
       </div>
     </div>
   );

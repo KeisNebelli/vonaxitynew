@@ -10,7 +10,7 @@ Founded 2026 by Keis Nebelli.
 
 ## Business Model
 
-- **Clients pay a monthly subscription** (Basic €30 / Standard €50 / Premium €120) that includes a set number of nurse visits per month. Payments are processed by Stripe.
+- **Clients pay a monthly subscription** (Basic €30 / Standard €50 / Premium €120) that includes a set number of nurse visits per month. Payments are processed by PayPal.
 - **Nurses earn a pay-per-visit fee** set by the platform (default €20/visit). Payouts are managed manually by admins via the CRM and paid through PayPal.
 - **7-day free trial** on all plans. No charge until trial ends.
 
@@ -51,13 +51,13 @@ Role is stored on `User.role` in the database. Protected routes are enforced in 
 
 ### 3. Payment Flow
 1. Client clicks "Upgrade" in the Subscription section
-2. Frontend calls `POST /payments/create-checkout` with the chosen plan
-3. Backend creates a Stripe Checkout Session and returns a redirect URL
-4. Client is sent to Stripe's hosted payment page
-5. On success, Stripe fires a `checkout.session.completed` webhook to `POST /payments/webhook`
-6. Webhook handler updates `Subscription` record in the database (`status: ACTIVE`, `visitsPerMonth`, dates)
-7. Client is redirected back to dashboard with `?payment=success`
-8. For cancellations/upgrades: `POST /payments/create-portal` → Stripe Billing Portal
+2. Frontend calls `POST /payments/create-subscription` with the chosen plan
+3. Backend gets a PayPal OAuth token, creates a PayPal subscription, returns approval URL
+4. Client is redirected to PayPal's hosted approval page
+5. On approval, PayPal redirects back to `/dashboard?payment=success&subscription_id=I-xxx`
+6. Frontend calls `POST /payments/capture` with the subscription ID — backend verifies it's ACTIVE in PayPal and updates the DB
+7. PayPal also fires `BILLING.SUBSCRIPTION.ACTIVATED` webhook to `POST /payments/webhook` (backup)
+8. For cancellations: client clicks "Cancel subscription" button → `POST /payments/cancel` → PayPal API + DB update
 
 ### 4. Nurse Approval Flow
 1. Nurse registers at `/[lang]/nurse-signup` — creates `User` (role: NURSE) + `Nurse` profile

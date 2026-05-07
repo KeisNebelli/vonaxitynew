@@ -62,8 +62,13 @@ PORT=4000
 FRONTEND_URL=http://localhost:3000
 
 # Leave these blank for local dev (features degrade gracefully without them):
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
+PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+PAYPAL_MODE=sandbox
+PAYPAL_PLAN_BASIC=
+PAYPAL_PLAN_STANDARD=
+PAYPAL_PLAN_PREMIUM=
+PAYPAL_WEBHOOK_ID=
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_PHONE_NUMBER=
@@ -75,7 +80,7 @@ CLOUDINARY_API_KEY=
 CLOUDINARY_API_SECRET=
 ```
 
-> **Note**: The app runs without Stripe, Twilio, Resend, and Cloudinary locally. Payments, SMS, emails, and file uploads will fail gracefully with error messages.
+> **Note**: The app runs without PayPal, Twilio, Resend, and Cloudinary locally. Payments, SMS, emails, and file uploads will fail gracefully with error messages.
 
 ---
 
@@ -135,7 +140,6 @@ Edit `.env.local`:
 
 ```env
 NEXT_PUBLIC_API_URL=http://localhost:4000
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_test_your_key_here
 NEXT_PUBLIC_BASE_URL=http://localhost:3000
 ```
 

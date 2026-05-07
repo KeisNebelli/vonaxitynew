@@ -50,7 +50,6 @@ This document lists every account, credential, service, and piece of infrastruct
 
 **Env vars needed in Vercel**:
 - `NEXT_PUBLIC_API_URL`
-- `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`
 - `NEXT_PUBLIC_BASE_URL`
 
 ---
@@ -76,7 +75,7 @@ This document lists every account, credential, service, and piece of infrastruct
 - `JWT_SECRET`
 - `PORT` (Railway sets this automatically)
 - `FRONTEND_URL`
-- All Stripe, Twilio, Resend, Anthropic, Cloudinary keys
+- All PayPal, Twilio, Resend, Anthropic, Cloudinary keys
 
 ---
 
@@ -99,24 +98,25 @@ This document lists every account, credential, service, and piece of infrastruct
 
 ---
 
-## Stripe (Payments)
+## PayPal (Payments)
 
 | Item | Detail |
 |---|---|
-| Platform | stripe.com |
-| Mode | Live (`sk_live_`, `pk_live_`) |
+| Platform | paypal.com (Business) / developer.paypal.com |
+| Mode | Live |
 | Products | Basic (€30/mo), Standard (€50/mo), Premium (€120/mo) |
 | Webhook endpoint | `https://vonaxitynew-production.up.railway.app/payments/webhook` |
 
 **Action for new owner**:
-1. Get Stripe account login from founder, or create new account and transfer funds
-2. Go to Stripe Dashboard → Developers → API Keys → copy Secret Key and Publishable Key
-3. Go to Developers → Webhooks → update endpoint URL if backend URL changes
-4. Copy webhook signing secret → update `STRIPE_WEBHOOK_SECRET` in Railway
-5. Verify products and Price IDs: Dashboard → Products → copy `price_*` IDs for each plan
-6. Update `STRIPE_PRICE_BASIC`, `STRIPE_PRICE_STANDARD`, `STRIPE_PRICE_PREMIUM` in Railway
+1. Get PayPal Business account login from founder, or create new account
+2. Go to [developer.paypal.com](https://developer.paypal.com) → Apps & Credentials → copy Client ID and Client Secret
+3. Go to PayPal Business dashboard → Subscriptions → Plans → copy Plan IDs (P-xxx) for each tier
+4. Register webhook: Developer Dashboard → Webhooks → Add Webhook → enter backend URL above
+5. Subscribe to events: `BILLING.SUBSCRIPTION.ACTIVATED`, `PAYMENT.SALE.COMPLETED`, `BILLING.SUBSCRIPTION.CANCELLED`, `BILLING.SUBSCRIPTION.PAYMENT.FAILED`
+6. Copy Webhook ID → update `PAYPAL_WEBHOOK_ID` in Railway
+7. Update all `PAYPAL_*` env vars in Railway (see `docs/ENV_VARIABLES.md`)
 
-**Note**: Stripe account must be verified (ID, business details) for live payments to work.
+**Note**: PayPal Business accounts in Albania are supported and can receive international payments.
 
 ---
 
@@ -201,12 +201,12 @@ This document lists every account, credential, service, and piece of infrastruct
 2. **Vercel**: Add to Vercel team as "Developer" (cannot delete project, cannot change domain)
 3. **Railway**: Add to Railway project as "Developer" (can view logs and env vars)
 4. **Database**: Developer should access the database via Prisma Studio locally (not directly on production)
-5. **Stripe**: Add as "Developer" role in Stripe → Settings → Team — they can view data but not withdraw funds
-6. **API Keys**: Give new developers their own API keys where possible (Anthropic, Cloudinary). Do NOT share the production JWT_SECRET or Stripe secret key unless necessary.
+5. **PayPal**: Add as a user in PayPal Business Account Settings → Manage Users — limited to view only, cannot withdraw funds
+6. **API Keys**: Give new developers their own API keys where possible (Anthropic, Cloudinary). Do NOT share the production JWT_SECRET or PayPal Client Secret unless necessary.
 
 **Never share**:
 - Production `JWT_SECRET` (rotating it logs out all users)
-- Stripe Secret Key (access to all revenue)
+- PayPal Client Secret (grants access to all payment operations)
 - Database root password
 - Twilio Auth Token (can send SMS globally)
 
@@ -218,14 +218,15 @@ This document lists every account, credential, service, and piece of infrastruct
 - [ ] Vercel project connected to new GitHub account
 - [ ] Railway project running with all env vars set
 - [ ] Database backup taken before any migration
-- [ ] Stripe account verified and live keys set
-- [ ] Stripe webhook URL updated to new backend URL (if changed)
+- [ ] PayPal Business account verified and live credentials set in Railway
+- [ ] PayPal Subscription Plans created (Basic, Standard, Premium) with correct pricing
+- [ ] PayPal webhook URL registered and all 4 events subscribed
 - [ ] Domain DNS pointing to new Vercel project
 - [ ] SSL certificate active on vonaxity.com (automatic via Vercel)
 - [ ] `GET /health` returns 200 OK
 - [ ] Test login works (client, nurse, admin)
 - [ ] Test booking flow works end-to-end
-- [ ] Test Stripe checkout with a test card (`4242 4242 4242 4242`)
+- [ ] Test PayPal checkout with a sandbox account (use `PAYPAL_MODE=sandbox` first)
 - [ ] Email delivery working (test password reset)
 - [ ] Resend domain verified for vonaxity.com
 - [ ] Cloudinary upload working (test nurse document upload)
@@ -240,7 +241,7 @@ This document lists every account, credential, service, and piece of infrastruct
 | Vercel (Hobby/Pro) | Free – $20/mo |
 | Railway (Starter) | ~$5–20/mo depending on usage |
 | PostgreSQL (Railway) | Included in Railway plan |
-| Stripe | 1.4% + €0.25 per transaction (EU cards) |
+| PayPal | 3.49% + fixed fee per transaction (varies by country) |
 | Cloudinary (free tier) | Free up to 25GB |
 | Resend | Free up to 3,000 emails/mo, then ~$20/mo |
 | Twilio | ~€0.04–0.08 per SMS |

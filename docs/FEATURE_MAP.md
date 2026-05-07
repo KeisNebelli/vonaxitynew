@@ -108,7 +108,7 @@ All admin code is in `frontend/app/[lang]/admin/page.jsx`.
 | Nurse management | List, approve, reject, suspend nurses; view uploaded documents |
 | Client management | List clients, view subscription status |
 | Visit management | View all visits, assign nurses, update status |
-| Payments | View all Stripe payment records |
+| Payments | View all PayPal payment records |
 | Payouts | Generate nurse payouts by period, approve, mark paid |
 | Platform settings | Adjust pricing (Basic/Standard/Premium), trial days, pay rate |
 | Announcements | Send notifications to all users |
@@ -131,9 +131,10 @@ All admin code is in `frontend/app/[lang]/admin/page.jsx`.
 
 | Feature | Backend File | Frontend File |
 |---|---|---|
-| Create Stripe checkout session | `backend/routes/payments.js` | `api.createCheckout()` |
-| Open Stripe billing portal | `backend/routes/payments.js` | `api.createPortal()` |
-| Handle Stripe webhook | `backend/routes/payments.js` | N/A (server-side only) |
+| Create PayPal subscription | `backend/routes/payments.js` | `api.createPayPalSubscription()` |
+| Capture subscription after redirect | `backend/routes/payments.js` | `api.capturePayPalSubscription()` |
+| Cancel active subscription | `backend/routes/payments.js` | `api.cancelPayPalSubscription()` |
+| Handle PayPal webhook | `backend/routes/payments.js` | N/A (server-side only) |
 | Trial expiry sweep | `backend/server.js` → `expireTrials()` | N/A |
 | Display subscription status | N/A | `Subscription` component in dashboard |
 

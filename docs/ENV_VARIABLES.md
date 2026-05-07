@@ -11,21 +11,31 @@
 | `DATABASE_URL` | `postgresql://user:pass@host:5432/vonaxity` | PostgreSQL connection string. On Railway, this is auto-set from the Postgres service. |
 | `JWT_SECRET` | `a-long-random-string-64-chars` | Used to sign and verify JWT tokens. Generate with `openssl rand -hex 32`. Never change in production — existing sessions will be invalidated. |
 | `PORT` | `4000` | Port the Express server listens on. Railway sets this automatically; set to `4000` for local dev. |
-| `FRONTEND_URL` | `https://vonaxity.com` | The frontend origin — used for CORS and Stripe redirect URLs. For local dev: `http://localhost:3000`. |
+| `FRONTEND_URL` | `https://vonaxity.com` | The frontend origin — used for CORS and PayPal redirect URLs. For local dev: `http://localhost:3000`. |
 
 ---
 
-### Stripe (Payments)
+### PayPal (Payments)
 
 | Variable | Example | Description |
 |---|---|---|
-| `STRIPE_SECRET_KEY` | `sk_live_...` | Stripe secret key. Find in Stripe Dashboard → Developers → API Keys. Use `sk_test_...` for local dev. |
-| `STRIPE_WEBHOOK_SECRET` | `whsec_...` | Webhook signing secret. Created when you add the webhook endpoint in Stripe Dashboard → Developers → Webhooks. Used to verify that webhook events actually come from Stripe. |
-| `STRIPE_PRICE_BASIC` | `price_1ABC...` | Stripe Price ID for the Basic plan (€30/month). Create in Stripe Dashboard → Products. |
-| `STRIPE_PRICE_STANDARD` | `price_1DEF...` | Stripe Price ID for the Standard plan (€50/month). |
-| `STRIPE_PRICE_PREMIUM` | `price_1GHI...` | Stripe Price ID for the Premium plan (€120/month). |
+| `PAYPAL_CLIENT_ID` | `AaBbCcDd...` | PayPal App Client ID. Found in PayPal Developer Dashboard → Apps & Credentials. |
+| `PAYPAL_CLIENT_SECRET` | `EeFfGgHh...` | PayPal App Client Secret. Keep secret — used to get OAuth2 access tokens. |
+| `PAYPAL_MODE` | `live` | `sandbox` for local/staging dev, `live` for production. |
+| `PAYPAL_PLAN_BASIC` | `P-1AB23456CD789012EF34GHIJ` | PayPal Subscription Plan ID for the Basic plan (€30/month). Create in PayPal Dashboard → Subscriptions → Plans. |
+| `PAYPAL_PLAN_STANDARD` | `P-2AB23456...` | PayPal Subscription Plan ID for the Standard plan (€50/month). |
+| `PAYPAL_PLAN_PREMIUM` | `P-3AB23456...` | PayPal Subscription Plan ID for the Premium plan (€120/month). |
+| `PAYPAL_WEBHOOK_ID` | `5AB12345CD678901EF2G` | Webhook ID from PayPal Dashboard → Webhooks → your endpoint. Used to verify webhook signatures. Optional — if missing, signature check is skipped (not recommended for production). |
 
-> If `STRIPE_SECRET_KEY` is empty, payment routes return a 500 error with "Stripe not configured". The rest of the app continues to work.
+> If `PAYPAL_CLIENT_ID` is empty, payment routes return a 500 error with "PayPal not configured". The rest of the app continues to work.
+
+**How to set up PayPal plans:**
+1. Log into [developer.paypal.com](https://developer.paypal.com) → Apps & Credentials → Create App
+2. Go to PayPal Business dashboard → Products & Subscriptions → Plans → Create Plan
+3. Create three plans (Basic €30, Standard €50, Premium €120) with monthly billing cycle
+4. Copy each Plan ID (starts with `P-`) into the env vars above
+5. Register the webhook URL: `https://your-backend.railway.app/payments/webhook`
+6. Subscribe to: `BILLING.SUBSCRIPTION.ACTIVATED`, `PAYMENT.SALE.COMPLETED`, `BILLING.SUBSCRIPTION.CANCELLED`, `BILLING.SUBSCRIPTION.PAYMENT.FAILED`
 
 ---
 
@@ -79,7 +89,6 @@
 | Variable | Example | Description |
 |---|---|---|
 | `NEXT_PUBLIC_API_URL` | `https://vonaxitynew-production.up.railway.app` | The backend API URL. The `NEXT_PUBLIC_` prefix exposes this to the browser. For local dev: `http://localhost:4000`. |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | `pk_live_...` | Stripe publishable key (safe to expose). Used for Stripe Elements if needed. For local dev: `pk_test_...`. |
 | `NEXT_PUBLIC_BASE_URL` | `https://vonaxity.com` | The frontend's own URL. Used for generating absolute URLs (e.g. in emails). For local dev: `http://localhost:3000`. |
 
 > All `NEXT_PUBLIC_` variables are bundled into the client-side JavaScript. Never put secrets here.
@@ -90,8 +99,8 @@
 
 1. **Never commit `.env` or `.env.local`** to Git. Both are in `.gitignore`.
 2. **JWT_SECRET**: If rotated in production, all active user sessions are invalidated (everyone gets logged out).
-3. **Stripe keys**: Use test keys (`sk_test_`, `pk_test_`) locally and in staging. Never use live keys locally.
-4. **Stripe webhook secret**: Unique per webhook endpoint — if you add a second webhook endpoint (e.g. staging), it gets a different secret.
+3. **PayPal Client Secret**: Never expose this on the frontend. Only used server-side for getting access tokens.
+4. **PayPal sandbox vs live**: Use `PAYPAL_MODE=sandbox` locally. Sandbox transactions are free and don't move real money. Switch to `live` only in production with real PayPal Business account credentials.
 5. **ANTHROPIC_API_KEY**: Billed per token. Monitor usage in Anthropic Console. The AI rate limiter (20 req/15 min per IP) limits exposure.
 
 ---
@@ -102,9 +111,9 @@
 |---|---|
 | `DATABASE_URL` | Railway dashboard → Postgres service → Connect tab |
 | `JWT_SECRET` | Generate: `openssl rand -hex 32` |
-| `STRIPE_SECRET_KEY` | [dashboard.stripe.com](https://dashboard.stripe.com) → Developers → API Keys |
-| `STRIPE_WEBHOOK_SECRET` | Stripe Dashboard → Developers → Webhooks → your endpoint |
-| `STRIPE_PRICE_*` | Stripe Dashboard → Products → each product → Price ID |
+| `PAYPAL_CLIENT_ID` / `PAYPAL_CLIENT_SECRET` | [developer.paypal.com](https://developer.paypal.com) → Apps & Credentials |
+| `PAYPAL_PLAN_*` | PayPal Business Dashboard → Subscriptions → Plans |
+| `PAYPAL_WEBHOOK_ID` | PayPal Developer Dashboard → Webhooks → your endpoint |
 | `TWILIO_*` | [console.twilio.com](https://console.twilio.com) |
 | `RESEND_API_KEY` | [resend.com](https://resend.com) → API Keys |
 | `ANTHROPIC_API_KEY` | [console.anthropic.com](https://console.anthropic.com) → API Keys |
@@ -120,12 +129,16 @@ JWT_SECRET=development-secret-change-this-in-production-please
 PORT=4000
 FRONTEND_URL=http://localhost:3000
 
+# PayPal — use sandbox for local dev
+PAYPAL_CLIENT_ID=
+PAYPAL_CLIENT_SECRET=
+PAYPAL_MODE=sandbox
+PAYPAL_PLAN_BASIC=
+PAYPAL_PLAN_STANDARD=
+PAYPAL_PLAN_PREMIUM=
+PAYPAL_WEBHOOK_ID=
+
 # Leave blank for local dev — features degrade gracefully
-STRIPE_SECRET_KEY=
-STRIPE_WEBHOOK_SECRET=
-STRIPE_PRICE_BASIC=
-STRIPE_PRICE_STANDARD=
-STRIPE_PRICE_PREMIUM=
 TWILIO_ACCOUNT_SID=
 TWILIO_AUTH_TOKEN=
 TWILIO_PHONE_NUMBER=

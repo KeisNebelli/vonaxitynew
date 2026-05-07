@@ -25,7 +25,7 @@ Vonaxity connects families living abroad (UK, Italy, Germany, USA, etc.) with ce
 | ORM | Prisma |
 | Database | PostgreSQL (hosted on Railway) |
 | Auth | JWT — stored in `localStorage` + cookie |
-| Payments | Stripe (monthly subscriptions) |
+| Payments | PayPal (monthly subscriptions) |
 | File uploads | Cloudinary |
 | Email | Resend |
 | SMS | Twilio |
@@ -79,7 +79,7 @@ vonaxity/
 │   │   ├── auth.js                # Register, login, forgot/reset password
 │   │   ├── visits.js              # Bookings, status updates, completion, vitals
 │   │   ├── nurses.js              # Nurse profiles, onboarding, approval
-│   │   ├── payments.js            # Stripe checkout, billing portal, webhook
+│   │   ├── payments.js            # PayPal subscriptions, capture, cancel, webhook
 │   │   ├── payouts.js             # Nurse payout generation and management
 │   │   ├── uploads.js             # Cloudinary file uploads (nurse docs + photos)
 │   │   └── other.js               # Users, notifications, analytics, settings, contact
@@ -160,7 +160,7 @@ See [`docs/DEPLOYMENT_GUIDE.md`](docs/DEPLOYMENT_GUIDE.md) for the full guide.
 | Database schema | `backend/prisma/schema.prisma` |
 | Route guards + i18n redirect | `frontend/middleware.js` |
 | JWT auth middleware | `backend/middleware/auth.js` |
-| Stripe payment flow | `backend/routes/payments.js` |
+| PayPal payment flow | `backend/routes/payments.js` |
 | Visit booking + completion | `backend/routes/visits.js` |
 | Nurse approval flow | `backend/routes/nurses.js` |
 | AI assistant (Vona) | `backend/server.js` → `/ai/chat` |

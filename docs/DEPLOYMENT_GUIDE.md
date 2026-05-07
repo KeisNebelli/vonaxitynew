@@ -38,11 +38,13 @@ JWT_SECRET=<generate a strong random string, 64+ chars>
 PORT=4000
 FRONTEND_URL=https://vonaxity.com
 
-STRIPE_SECRET_KEY=sk_live_...
-STRIPE_WEBHOOK_SECRET=whsec_...
-STRIPE_PRICE_BASIC=price_...
-STRIPE_PRICE_STANDARD=price_...
-STRIPE_PRICE_PREMIUM=price_...
+PAYPAL_CLIENT_ID=your_paypal_client_id
+PAYPAL_CLIENT_SECRET=your_paypal_client_secret
+PAYPAL_MODE=live
+PAYPAL_PLAN_BASIC=P-your_basic_plan_id
+PAYPAL_PLAN_STANDARD=P-your_standard_plan_id
+PAYPAL_PLAN_PREMIUM=P-your_premium_plan_id
+PAYPAL_WEBHOOK_ID=your_webhook_id_here
 
 TWILIO_ACCOUNT_SID=AC...
 TWILIO_AUTH_TOKEN=...
@@ -101,7 +103,7 @@ GET https://vonaxitynew-production.up.railway.app/health
 
 ```env
 NEXT_PUBLIC_API_URL=https://vonaxitynew-production.up.railway.app
-NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=pk_live_...
+# (no frontend PayPal key needed — server-side only)
 NEXT_PUBLIC_BASE_URL=https://vonaxity.com
 ```
 
@@ -128,34 +130,39 @@ vercel --prod
 
 ---
 
-## Stripe Webhook Setup
+## PayPal Webhook Setup
 
-Stripe must be able to reach the backend to confirm payments.
+PayPal must be able to reach the backend to confirm subscription events.
 
-1. Go to [Stripe Dashboard](https://dashboard.stripe.com) → Developers → Webhooks
+1. Go to [PayPal Developer Dashboard](https://developer.paypal.com) → My Apps & Credentials → your app → Webhooks
 2. Add endpoint: `https://vonaxitynew-production.up.railway.app/payments/webhook`
-3. Select events:
-   - `checkout.session.completed`
-   - `customer.subscription.updated`
-   - `customer.subscription.deleted`
-   - `invoice.payment_failed`
-4. Copy the **Webhook Signing Secret** → set as `STRIPE_WEBHOOK_SECRET` in Railway
+3. Subscribe to events:
+   - `BILLING.SUBSCRIPTION.ACTIVATED`
+   - `PAYMENT.SALE.COMPLETED`
+   - `BILLING.SUBSCRIPTION.CANCELLED`
+   - `BILLING.SUBSCRIPTION.PAYMENT.FAILED`
+4. Copy the **Webhook ID** → set as `PAYPAL_WEBHOOK_ID` in Railway
 
-**Important**: The webhook endpoint receives raw (unparsed) request bodies. This is handled in `server.js` before `express.json()` middleware. Do not move the webhook route or add JSON parsing before it.
+**Important**: The PayPal webhook uses standard JSON body — no raw body handling needed. This is different from the old Stripe integration.
 
 ---
 
-## Stripe Products Setup
+## PayPal Subscription Plans Setup
 
-Create 3 products in Stripe Dashboard → Products:
+Create 3 subscription plans in PayPal Business Dashboard → Subscriptions → Plans:
 
-| Product | Price | Billing | Price ID env var |
+| Plan | Price | Billing | Env var |
 |---|---|---|---|
-| Basic | €30.00 | Monthly | `STRIPE_PRICE_BASIC` |
-| Standard | €50.00 | Monthly | `STRIPE_PRICE_STANDARD` |
-| Premium | €120.00 | Monthly | `STRIPE_PRICE_PREMIUM` |
+| Basic | €30.00 | Monthly | `PAYPAL_PLAN_BASIC` |
+| Standard | €50.00 | Monthly | `PAYPAL_PLAN_STANDARD` |
+| Premium | €120.00 | Monthly | `PAYPAL_PLAN_PREMIUM` |
 
-Copy each Price ID (starts with `price_`) into Railway environment variables.
+Copy each Plan ID (starts with `P-`) into Railway environment variables.
+
+**Steps to create a plan:**
+1. PayPal Business Dashboard → Products & Services → Subscriptions → Plans → Create Plan
+2. First create a "Product" (Vonaxity Nursing Service), then create plans under it
+3. Set currency to EUR, billing cycle to Monthly, no setup fee
 
 ---
 
@@ -202,7 +209,7 @@ Currently there is one environment (production). To add staging:
 
 1. Create a second Railway project (same repo, `staging` branch)
 2. Create a second Vercel project pointing to `staging` branch
-3. Use separate Stripe test keys (`sk_test_`, `pk_test_`) for staging
+3. Use PayPal sandbox credentials (`PAYPAL_MODE=sandbox`) for staging — free and safe to test with
 4. Set `FRONTEND_URL` and `NEXT_PUBLIC_API_URL` to the staging URLs
 
 ---

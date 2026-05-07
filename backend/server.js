@@ -81,12 +81,6 @@ app.use(cors({
   credentials: true,
 }));
 
-// Raw body for Stripe webhooks — must be before express.json()
-app.use('/payments/webhook', express.raw({ type: 'application/json' }), (req, res, next) => {
-  req.rawBody = req.body;
-  next();
-});
-
 app.use(express.json());
 app.use(cookieParser());
 
@@ -103,7 +97,7 @@ app.get('/health', (req, res) => {
 app.use('/auth', authRoutes);
 app.use('/visits', bookingLimiter, visitRoutes);
 app.use('/nurses', nurseRoutes);
-app.use('/payments', paymentsRoute); // Stripe checkout + admin payments
+app.use('/payments', paymentsRoute); // PayPal subscriptions + admin payments
 app.use('/uploads', uploadLimiter, uploadsRoute);
 app.use('/users', usersRouter);
 app.use('/analytics', analyticsRouter);
@@ -140,7 +134,7 @@ async function getLivePricing() {
 
 function buildPricingBlock(p) {
   return `== PRICING ==
-All plans include a 7-day free trial. No hidden fees. Cancel anytime. Secure payments by Stripe.
+All plans include a 7-day free trial. No hidden fees. Cancel anytime. Secure payments by PayPal.
 - Basic: €${p.basicPrice}/month — ${p.basicVisits} nurse visit${p.basicVisits > 1 ? 's' : ''} per month
 - Standard: €${p.standardPrice}/month — ${p.standardVisits} nurse visits per month (most popular)
 - Premium: €${p.premiumPrice}/month — ${p.premiumVisits} nurse visits per month
@@ -236,7 +230,7 @@ Vonaxity was founded by Keis Nebelli, CEO & Founder, an Albanian living abroad w
 - Health: View health records and vital signs trends from past visits (blood pressure, glucose, and more).
 - Find Nurses: Browse verified nurse profiles in your area. Filter by name or city.
 - My Visits: Full history of all visits — statuses: Unassigned (waiting for nurse), Pending, Accepted, In Progress, Completed, Cancelled. You can edit or delete unassigned visits.
-- Subscription: View and manage your plan. Upgrade or downgrade anytime via Stripe. 7-day free trial on all plans.
+- Subscription: View and manage your plan. Upgrade or downgrade anytime via PayPal. 7-day free trial on all plans.
 - Settings: Update your personal info, manage loved ones (add/edit family members receiving care), change password, contact preferences, and emergency contact.
 
 ${pricingBlock}

@@ -71,8 +71,14 @@ export const api = {
   deleteVisit: (id) => apiFetch(`/visits/${id}`, { method: 'DELETE' }),
   forgotPassword: (email) => apiFetch('/auth/forgot-password', { method: 'POST', body: JSON.stringify({ email }) }),
   resetPassword: (token, password) => apiFetch('/auth/reset-password', { method: 'POST', body: JSON.stringify({ token, password }) }),
-  createCheckout: (plan, lang='en') => apiFetch('/payments/create-checkout', { method: 'POST', body: JSON.stringify({ plan, lang }) }),
-  createPortal: () => apiFetch('/payments/create-portal', { method: 'POST' }),
+  // PayPal subscription flow:
+  //   1. createPayPalSubscription → get approval URL → redirect user to PayPal
+  //   2. PayPal redirects back with ?subscription_id=I-xxx in the URL
+  //   3. capturePayPalSubscription → verify & activate in DB
+  //   4. cancelPayPalSubscription → cancel active subscription
+  createPayPalSubscription: (plan, lang='en') => apiFetch('/payments/create-subscription', { method: 'POST', body: JSON.stringify({ plan, lang }) }),
+  capturePayPalSubscription: (subscriptionId, plan) => apiFetch('/payments/capture', { method: 'POST', body: JSON.stringify({ subscriptionId, plan }) }),
+  cancelPayPalSubscription: () => apiFetch('/payments/cancel', { method: 'POST' }),
   uploadNurseDoc: async (file, type) => {
     const token = typeof window !== 'undefined' ? localStorage.getItem('vonaxity-token') : null;
     const formData = new FormData();

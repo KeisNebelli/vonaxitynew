@@ -105,7 +105,7 @@ Relations: `visits` (Visit[])
 
 ### `Subscription`
 
-One subscription per client. Managed by Stripe. Trial is created at signup, upgraded to ACTIVE after payment.
+One subscription per client. Managed by PayPal. Trial is created at signup, upgraded to ACTIVE after payment.
 
 | Column | Type | Notes |
 |---|---|---|
@@ -113,12 +113,11 @@ One subscription per client. Managed by Stripe. Trial is created at signup, upgr
 | `userId` | String | FK → User (unique) |
 | `plan` | String | `basic` · `standard` · `premium` |
 | `status` | String | `TRIAL` · `ACTIVE` · `PAST_DUE` · `CANCELLED` · `FAILED` · `EXPIRED` |
-| `stripeSubId` | String? | Stripe subscription ID (e.g. `sub_...`) |
-| `stripeCustomerId` | String? | Stripe customer ID (e.g. `cus_...`) |
+| `paypalSubId` | String? | PayPal subscription ID (e.g. `I-...`) |
 | `visitsPerMonth` | Int | Allowed visits — set by plan (1/2/4) |
 | `visitsUsed` | Int | How many visits booked this cycle |
-| `currentPeriodStart` | DateTime? | Stripe billing period start |
-| `currentPeriodEnd` | DateTime? | Stripe billing period end |
+| `currentPeriodStart` | DateTime? | Billing period start |
+| `currentPeriodEnd` | DateTime? | Billing period end |
 | `trialEndsAt` | DateTime? | When free trial expires (7 days from signup) |
 | `cancelledAt` | DateTime? | When subscription was cancelled |
 
@@ -193,13 +192,13 @@ When a review is created, the nurse's `rating` (average) is recalculated in the 
 
 ### `Payment`
 
-A record of each Stripe payment event.
+A record of each PayPal payment event.
 
 | Column | Type | Notes |
 |---|---|---|
 | `id` | String (cuid) | Primary key |
 | `userId` | String | FK → User |
-| `stripeId` | String? | Stripe payment intent or invoice ID |
+| `paypalId` | String? | PayPal transaction or sale ID |
 | `amount` | Float | Amount in euros |
 | `currency` | String | Default `eur` |
 | `status` | String | e.g. `succeeded`, `failed` |

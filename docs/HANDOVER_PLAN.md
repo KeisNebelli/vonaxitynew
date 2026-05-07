@@ -45,14 +45,15 @@ Go through [`ENV_VARIABLES.md`](ENV_VARIABLES.md) line by line and confirm every
 - [ ] `DATABASE_URL` — Railway Postgres
 - [ ] `JWT_SECRET` — strong, 64+ chars
 - [ ] `FRONTEND_URL` — `https://vonaxity.com`
-- [ ] `STRIPE_SECRET_KEY` — live key (`sk_live_`)
-- [ ] `STRIPE_WEBHOOK_SECRET` — from Stripe dashboard
-- [ ] `STRIPE_PRICE_BASIC`, `STRIPE_PRICE_STANDARD`, `STRIPE_PRICE_PREMIUM`
+- [ ] `PAYPAL_CLIENT_ID`, `PAYPAL_CLIENT_SECRET` — from PayPal Developer Dashboard
+- [ ] `PAYPAL_MODE` — `live` for production
+- [ ] `PAYPAL_PLAN_BASIC`, `PAYPAL_PLAN_STANDARD`, `PAYPAL_PLAN_PREMIUM` — Plan IDs (P-xxx)
+- [ ] `PAYPAL_WEBHOOK_ID` — from PayPal webhook registration
 - [ ] `TWILIO_ACCOUNT_SID`, `TWILIO_AUTH_TOKEN`, `TWILIO_PHONE_NUMBER`
 - [ ] `RESEND_API_KEY`, `EMAIL_FROM`
 - [ ] `ANTHROPIC_API_KEY`
 - [ ] `CLOUDINARY_CLOUD_NAME`, `CLOUDINARY_API_KEY`, `CLOUDINARY_API_SECRET`
-- [ ] Frontend: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY`, `NEXT_PUBLIC_BASE_URL`
+- [ ] Frontend: `NEXT_PUBLIC_API_URL`, `NEXT_PUBLIC_BASE_URL`
 
 ### 1.3 — Take a full database backup
 
@@ -78,9 +79,9 @@ SELECT COUNT(*) FROM "Visit" WHERE status = 'COMPLETED';
 
 Hand this summary to the new owner — it's part of the business valuation and the new owner's baseline.
 
-### 1.5 — Document all active Stripe subscriptions
+### 1.5 — Document all active PayPal subscriptions
 
-Log into Stripe Dashboard → Customers. Export the list of active subscribers. The new owner needs to know exactly who is paying and what plan they're on.
+Log into PayPal Business Dashboard → Subscriptions. Export or screenshot the list of active subscribers. The new owner needs to know exactly who is paying and what plan they're on.
 
 ### 1.6 — Ensure monitoring exists
 
@@ -88,7 +89,7 @@ Before handover, the new owner needs visibility. Set up at minimum:
 
 - **Uptime monitoring**: Add `https://vonaxitynew-production.up.railway.app/health` to [UptimeRobot](https://uptimerobot.com) (free). Email alerts on downtime.
 - **Error visibility**: If not already done, add basic Railway log alerts for `console.error` output
-- **Stripe alerts**: Enable payment failure email alerts in Stripe Dashboard → Settings → Email notifications
+- **PayPal alerts**: Enable payment failure email alerts in PayPal Business → Account Settings → Notifications
 
 ### 1.7 — Write a 1-page "known issues" note
 
@@ -116,7 +117,7 @@ Go through every flow manually on production. Check off:
 - [ ] Book a visit → work order created, nurses notified
 - [ ] See applicants → select a nurse
 - [ ] View visit in calendar
-- [ ] Upgrade to a paid plan (use Stripe test card `4242 4242 4242 4242`)
+- [ ] Upgrade to a paid plan (use PayPal sandbox account with `PAYPAL_MODE=sandbox`)
 - [ ] View health records
 - [ ] Download PDF report on a completed visit
 - [ ] Rate a visit
@@ -196,9 +197,9 @@ This is the actual handover session. Plan 3–4 hours. Do it over a video call w
 - Transfer the domain or add new owner as admin
 - Make sure DNS stays pointing to Vercel during transfer (don't touch nameservers mid-handover)
 
-**5. Stripe**
-- Dashboard → Settings → Team → Add new owner as Administrator
-- Walk through: Products, Prices, Webhook endpoints, Active subscriptions
+**5. PayPal**
+- PayPal Business Account Settings → Manage Users → Add new owner as Admin
+- Walk through: Subscription Plans (P-xxx IDs), Webhook endpoints, Active subscriptions
 
 **6. Cloudinary**
 - Add new owner as Admin in Cloudinary team settings
@@ -229,7 +230,7 @@ Screen share the codebase. Cover these in order:
 2. **How to run it locally** — run through `SETUP_GUIDE.md` together; new owner should have it running on their machine by end of call
 3. **The three big pages** — open `nurse/page.jsx`, `dashboard/page.jsx`, `admin/page.jsx` and explain the component structure at a high level
 4. **The booking flow** — open `backend/routes/visits.js`, walk through the comment at the top and the key endpoints
-5. **Stripe** — open `backend/routes/payments.js`, explain the webhook and why raw body matters
+5. **PayPal** — open `backend/routes/payments.js`, explain the 3-step flow: create-subscription → PayPal redirect → capture, and the webhook events
 6. **The AI assistant** — open `backend/server.js`, explain the `SYSTEM_BASE` prompts and the RAG setup
 7. **Database** — open Prisma Studio together: `npx prisma studio` — walk through the main tables
 8. **How to deploy** — make a small code change together and push it; watch both Vercel and Railway deploy
@@ -240,7 +241,7 @@ Give them:
 - This document
 - `docs/HANDOFF_CHECKLIST.md` with all account names/URLs filled in
 - The latest database backup file
-- A written list of all active paying customers (from Stripe export)
+- A written list of all active paying customers (from PayPal Business → Subscriptions export)
 - The "known issues" note from Phase 1.7
 
 ### 3.4 — Rotate secrets
@@ -248,7 +249,7 @@ Give them:
 After all accounts are transferred:
 
 1. **Generate a new `JWT_SECRET`** — update in Railway, accept that all active users get logged out once
-2. **Roll Stripe keys** — new owner generates new API keys in Stripe; old keys are revoked
+2. **Roll PayPal keys** — new owner generates new Client ID/Secret in PayPal Developer Dashboard; old keys are revoked
 3. **Roll Cloudinary keys** — new owner generates new API keys; old revoked
 4. **Roll Resend key** — new owner generates new key; old revoked
 
@@ -285,7 +286,7 @@ Once the shadowing period ends:
 - [ ] Remove yourself from GitHub repo (confirm new owner has Owner access first)
 - [ ] Remove yourself from Vercel
 - [ ] Remove yourself from Railway
-- [ ] Remove yourself from Stripe
+- [ ] Remove yourself from PayPal Business account (revoke your user access)
 - [ ] Remove yourself from Cloudinary, Resend, Twilio, Anthropic
 - [ ] Remove access to domain registrar
 - [ ] Delete any local copies of production `.env` files from your machine
@@ -301,7 +302,7 @@ Document and hand over contact info for:
 |---|---|
 | Railway | railway.app/help — Discord community is very active |
 | Vercel | vercel.com/support |
-| Stripe | support.stripe.com — live chat available |
+| PayPal | paypal.com/smarthelp — live chat + developer forum at developer.paypal.com/community |
 | Twilio | support.twilio.com |
 | Resend | resend.com/docs + Discord |
 | Anthropic | console.anthropic.com/support |
@@ -316,7 +317,7 @@ These are the most likely failure points during handover — based on this speci
 | Risk | What happens | Prevention |
 |---|---|---|
 | DNS misconfiguration | `vonaxity.com` goes down during domain transfer | Do domain transfer last, after all other accounts are transferred; use Vercel's DNS guide exactly |
-| Stripe webhook URL not updated | Payments succeed but subscriptions don't activate | After any backend URL change, update the webhook endpoint in Stripe Dashboard immediately |
+| PayPal webhook URL not updated | Payments succeed but subscriptions don't activate | After any backend URL change, update the webhook endpoint in PayPal Developer Dashboard immediately |
 | JWT_SECRET rotated without warning | All logged-in users get logged out simultaneously | Send a platform email 24h before rotating; rotate during low-traffic hours |
 | Database not backed up before migration | Data loss on schema changes | Always backup before `prisma migrate deploy`, even if automated |
 | Anthropic key not replaced | AI chat goes silent | New owner generates their own key before old one is revoked |

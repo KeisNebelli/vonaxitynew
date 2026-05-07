@@ -139,28 +139,30 @@ taskkill /PID <PID> /F
 
 ---
 
-### "Stripe not configured" error
+### "PayPal not configured" error
 
 **Symptom**: Users can't subscribe / checkout fails.
 
-**Fix**: Set `STRIPE_SECRET_KEY` in Railway environment variables. Ensure the key starts with `sk_live_` for production.
+**Fix**: Set `PAYPAL_CLIENT_ID` and `PAYPAL_CLIENT_SECRET` in Railway environment variables. Ensure `PAYPAL_MODE=live` for production.
 
 ---
 
-### Stripe webhook not triggering subscription updates
+### PayPal webhook not triggering subscription updates
 
-**Symptom**: User completes payment on Stripe but their account doesn't upgrade.
+**Symptom**: User approves payment on PayPal but their account doesn't upgrade.
 
 **Causes**:
-1. `STRIPE_WEBHOOK_SECRET` is wrong or missing in Railway
-2. Webhook endpoint is not registered in Stripe Dashboard
-3. The backend is returning non-200 responses to Stripe (Stripe retries up to 3 days)
+1. Webhook endpoint not registered in PayPal Developer Dashboard
+2. Wrong events subscribed (must include `BILLING.SUBSCRIPTION.ACTIVATED`)
+3. `PAYPAL_WEBHOOK_ID` is wrong — verification fails and events are rejected
+4. Backend returning non-200 to PayPal (PayPal retries for 3 days)
 
 **Fix**:
-1. Stripe Dashboard → Developers → Webhooks → check your endpoint is listed and has status "Enabled"
-2. Check "Recent deliveries" for errors
-3. Verify `STRIPE_WEBHOOK_SECRET` matches the secret shown on the webhook endpoint page
-4. Re-register the webhook if needed: `https://vonaxitynew-production.up.railway.app/payments/webhook`
+1. PayPal Developer Dashboard → My Apps → your app → Webhooks → check endpoint is listed
+2. Verify the 4 required events are subscribed
+3. Check Railway logs for "Webhook verification failed" messages
+4. Re-register webhook if needed: `https://vonaxitynew-production.up.railway.app/payments/webhook`
+5. Note: the `/payments/capture` frontend call also activates the subscription as backup — check if that fired first
 
 ---
 
