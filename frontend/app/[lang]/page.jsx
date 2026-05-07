@@ -419,24 +419,24 @@ export default async function HomePage({ params }) {
       </section>
 
       {/* ── Cities ── */}
-      <section className="hp-section-lg" style={{ padding:'96px 24px', background:'linear-gradient(135deg,#0F172A 0%,#1E3A5F 45%,#1D4ED8 75%,#0F172A 100%)', position:'relative', overflow:'hidden', zIndex:1 }}>
+      <section className="hp-section-lg" style={{ padding:'96px 24px', background:'linear-gradient(135deg,#0D1F2D 0%,#0D3545 45%,#0C4A50 75%,#0D2A38 100%)', position:'relative', overflow:'hidden', zIndex:1 }}>
         {/* Background grid */}
-        <div style={{ position:'absolute', inset:0, opacity:0.06, pointerEvents:'none' }}>
+        <div style={{ position:'absolute', inset:0, opacity:0.05, pointerEvents:'none' }}>
           <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
             <defs><pattern id="cg" width="60" height="60" patternUnits="userSpaceOnUse"><path d="M 60 0 L 0 0 0 60" fill="none" stroke="white" strokeWidth="0.5"/></pattern></defs>
             <rect width="100%" height="100%" fill="url(#cg)"/>
           </svg>
         </div>
-        {/* Glow orbs */}
-        <div style={{ position:'absolute', top:-80, left:'10%', width:500, height:500, borderRadius:'50%', background:'rgba(37,99,235,0.18)', filter:'blur(120px)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', bottom:-80, right:'10%', width:420, height:420, borderRadius:'50%', background:'rgba(5,150,105,0.14)', filter:'blur(110px)', pointerEvents:'none' }}/>
-        <div style={{ position:'absolute', top:'40%', left:'50%', transform:'translateX(-50%)', width:300, height:300, borderRadius:'50%', background:'rgba(124,58,237,0.08)', filter:'blur(90px)', pointerEvents:'none' }}/>
+        {/* Glow orbs — warm teal */}
+        <div style={{ position:'absolute', top:-80, left:'10%', width:500, height:500, borderRadius:'50%', background:'rgba(13,148,136,0.16)', filter:'blur(120px)', pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', bottom:-80, right:'10%', width:420, height:420, borderRadius:'50%', background:'rgba(30,111,171,0.14)', filter:'blur(110px)', pointerEvents:'none' }}/>
+        <div style={{ position:'absolute', top:'40%', left:'50%', transform:'translateX(-50%)', width:300, height:300, borderRadius:'50%', background:'rgba(13,148,136,0.10)', filter:'blur(90px)', pointerEvents:'none' }}/>
 
         <div style={{ maxWidth:1100, margin:'0 auto', position:'relative', zIndex:1 }}>
           {/* Header */}
           <ScrollReveal>
             <div style={{ textAlign:'center', marginBottom:64 }}>
-              <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(147,197,253,0.9)', background:'rgba(37,99,235,0.2)', padding:'6px 16px', borderRadius:99, marginBottom:20, border:'1px solid rgba(147,197,253,0.15)' }}>{t(lang,'cities.tag')}</div>
+              <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(94,234,212,0.90)', background:'rgba(13,148,136,0.20)', padding:'6px 16px', borderRadius:99, marginBottom:20, border:'1px solid rgba(94,234,212,0.18)' }}>{t(lang,'cities.tag')}</div>
               <h2 style={{ fontSize:'clamp(30px,4vw,52px)', fontWeight:800, color:'#fff', margin:'0 0 18px', letterSpacing:'-2px', lineHeight:1.05 }}>
                 {t(lang,'cities.title')}
               </h2>
