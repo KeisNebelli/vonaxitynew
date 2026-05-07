@@ -67,7 +67,25 @@ router.post('/create-portal', ...requireRole('CLIENT'), async (req, res) => {
   }
 });
 
-// POST /payments/webhook — Stripe webhook handler (raw body handled in server.js)
+/**
+ * POST /payments/webhook — Stripe webhook handler
+ *
+ * IMPORTANT: This route receives raw (unparsed) request body.
+ * The express.raw() middleware is applied BEFORE express.json() in server.js.
+ * Do NOT move this route or add JSON parsing before it — Stripe signature
+ * verification will fail if the body is parsed.
+ *
+ * Webhook secret (STRIPE_WEBHOOK_SECRET) is set in Stripe Dashboard → Developers → Webhooks.
+ * Each endpoint URL has its own unique signing secret.
+ *
+ * Events handled:
+ *   checkout.session.completed  → activate subscription after successful payment
+ *   invoice.payment_succeeded   → reset monthly visit count at billing period renewal
+ *   customer.subscription.deleted → cancel subscription if user cancels via Stripe portal
+ *   customer.subscription.updated → sync status changes (e.g. PAST_DUE)
+ *
+ * userId and plan are passed via Stripe metadata, set when creating the checkout session.
+ */
 router.post('/webhook', async (req, res) => {
   const sig = req.headers['stripe-signature'];
   let event;
@@ -86,7 +104,7 @@ router.post('/webhook', async (req, res) => {
         if (!userId || !plan) break;
         const planData = PLANS[plan];
         if (!planData) break;
-        // Reset monthly visits and activate subscription
+        // Activate or create subscription — reset visitsUsed so new billing cycle starts fresh
         const existing = await prisma.subscription.findUnique({ where: { userId } });
         if (existing) {
           await prisma.subscription.update({ where: { userId }, data: { plan, status: 'ACTIVE', visitsPerMonth: planData.visits, visitsUsed: 0, stripeSubId: session.subscription, stripeCustomerId: session.customer } });
@@ -98,16 +116,18 @@ router.post('/webhook', async (req, res) => {
         break;
       }
       case 'invoice.payment_succeeded': {
+        // Fires at every successful billing cycle renewal
+        // Reset the monthly visit counter so the client can book again
         const invoice = event.data.object;
         const sub = await stripe.subscriptions.retrieve(invoice.subscription);
         const userId = sub.metadata?.userId;
         if (!userId) break;
-        // Reset visits at start of new billing period
         await prisma.subscription.updateMany({ where: { stripeSubId: invoice.subscription }, data: { visitsUsed: 0, status: 'ACTIVE' } });
 
         break;
       }
       case 'customer.subscription.deleted': {
+        // Fires when subscription is cancelled (user cancels via Stripe portal or admin cancels)
         const sub = event.data.object;
         const userId = sub.metadata?.userId;
         if (!userId) break;
@@ -117,6 +137,7 @@ router.post('/webhook', async (req, res) => {
         break;
       }
       case 'customer.subscription.updated': {
+        // Fires on plan changes, payment failures (past_due), etc.
         const sub = event.data.object;
         const userId = sub.metadata?.userId;
         if (!userId) break;

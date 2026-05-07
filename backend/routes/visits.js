@@ -1,3 +1,25 @@
+/**
+ * routes/visits.js — Visit (work order) lifecycle management
+ *
+ * Booking flow summary:
+ *   1. CLIENT: POST /visits → creates visit with status UNASSIGNED + work order number
+ *              → notifies approved nurses in the same city (in-app + email)
+ *   2. NURSE:  POST /visits/:id/apply → nurse applies to the open visit
+ *   3. CLIENT: GET /visits/:id/applicants → client sees list of nurses who applied
+ *   4. CLIENT: POST /visits/:id/select/:nurseId → client picks a nurse → status: ACCEPTED
+ *   5. NURSE:  PUT /visits/:id/status → nurse updates: ON_THE_WAY → ARRIVED → IN_PROGRESS
+ *   6. NURSE:  POST /visits/:id/complete → nurse submits vitals + notes → status: COMPLETED
+ *              → increments nurse.totalVisits + subscription.visitsUsed
+ *              → sends health report email to client
+ *   7. CLIENT: POST /visits/:id/review → client rates the nurse (1–5 stars)
+ *              → recalculates nurse.rating average
+ *
+ * Visit status values (stored as strings):
+ *   UNASSIGNED → PENDING → ACCEPTED → ON_THE_WAY → ARRIVED → IN_PROGRESS → COMPLETED
+ *   (or) → CANCELLED | NO_SHOW at any point
+ *
+ * Rate limiting: 30 requests / 15 min per IP (applied in server.js on /visits prefix)
+ */
 const router = require('express').Router();
 const prisma = require('../lib/db');
 const { authMiddleware, requireRole } = require('../middleware/auth');

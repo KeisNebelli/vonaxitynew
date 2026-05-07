@@ -1,180 +1,194 @@
-# Vonaxity — Home Nurse Visits in Albania
+# Vonaxity
 
-Subscription-based home healthcare platform for Albania.
-Built with Next.js (frontend) + Express/PostgreSQL (backend).
+> Professional home nursing care for Albanian families — bookable from anywhere in the world.
+
+Vonaxity connects families living abroad (UK, Italy, Germany, USA, etc.) with certified nurses who visit their loved ones at home in Albania. Founded 2026 by Keis Nebelli.
 
 ---
 
-## 📁 Project Structure
+## What It Does
+
+- **Clients** (families abroad) subscribe, book nurse visits for a family member in Albania, and receive a health report after every visit.
+- **Nurses** (licensed Albanian nurses) apply for open visits, perform the visit, and submit a structured health report (vitals + clinical notes) through a 3-step wizard.
+- **Admins** manage nurse approvals, subscriptions, payouts, platform settings, and monitor analytics via a built-in CRM.
+- **Vona** — an AI assistant (Claude Haiku) — answers questions on the landing page, inside the client dashboard, nurse dashboard, and admin CRM.
+
+---
+
+## Tech Stack
+
+| Layer | Technology |
+|---|---|
+| Frontend | Next.js 14 (App Router), React 18 |
+| Styling | Inline styles only (no CSS framework) |
+| Backend | Node.js + Express |
+| ORM | Prisma |
+| Database | PostgreSQL (hosted on Railway) |
+| Auth | JWT — stored in `localStorage` + cookie |
+| Payments | Stripe (monthly subscriptions) |
+| File uploads | Cloudinary |
+| Email | Resend |
+| SMS | Twilio |
+| AI assistant | Anthropic Claude Haiku 4.5 |
+| Frontend hosting | Vercel |
+| Backend hosting | Railway |
+| i18n | Custom bilingual EN / Albanian (SQ) via `[lang]` URL prefix |
+
+---
+
+## Project Structure
 
 ```
 vonaxity/
-├── frontend/     ← Next.js website + all 3 portals
-└── backend/      ← Express API + PostgreSQL database
+├── README.md
+├── frontend/                      # Next.js application → Vercel
+│   ├── app/
+│   │   ├── [lang]/                # All bilingual pages
+│   │   │   ├── page.jsx           # Homepage / landing
+│   │   │   ├── dashboard/         # Client dashboard (visits, health, billing)
+│   │   │   ├── nurse/             # Nurse dashboard (jobs, visits, complete wizard)
+│   │   │   ├── admin/             # Admin CRM
+│   │   │   ├── signup/            # Client registration
+│   │   │   ├── nurse-signup/      # Nurse registration
+│   │   │   ├── login/
+│   │   │   ├── pricing/
+│   │   │   ├── nurses/            # Public nurse directory
+│   │   │   └── [about|contact|faq|services|how-it-works|terms|privacy]/
+│   │   └── api/pricing/           # Next.js API route (reads pricing from backend)
+│   ├── components/
+│   │   ├── layout/                # Nav, Footer
+│   │   ├── chat/                  # Vona AI chat (3 variants: landing, client, nurse)
+│   │   ├── map/                   # MapComponent, VisitLocationCard, NavigationButton
+│   │   ├── ui/                    # Toast notifications, NurseAvatar
+│   │   └── visuals/               # SVG illustrations, step animations
+│   ├── context/
+│   │   └── AuthContext.jsx        # React context — user session state
+│   ├── hooks/
+│   │   ├── useLang.js             # Reads [lang] from URL
+│   │   └── useNurseLocation.js    # Browser geolocation for nurses
+│   ├── lib/
+│   │   ├── api.js                 # All frontend → backend API calls
+│   │   └── design.js              # Shared design tokens
+│   ├── translations/
+│   │   └── index.js               # All bilingual strings (EN + SQ)
+│   └── middleware.js              # Route guards + language redirect
+│
+├── backend/                       # Express API → Railway
+│   ├── server.js                  # Entry point, rate limiting, AI proxy, trial sweep
+│   ├── routes/
+│   │   ├── auth.js                # Register, login, forgot/reset password
+│   │   ├── visits.js              # Bookings, status updates, completion, vitals
+│   │   ├── nurses.js              # Nurse profiles, onboarding, approval
+│   │   ├── payments.js            # Stripe checkout, billing portal, webhook
+│   │   ├── payouts.js             # Nurse payout generation and management
+│   │   ├── uploads.js             # Cloudinary file uploads (nurse docs + photos)
+│   │   └── other.js               # Users, notifications, analytics, settings, contact
+│   ├── middleware/
+│   │   └── auth.js                # JWT verification + role guard factory
+│   ├── lib/
+│   │   ├── db.js                  # Prisma client singleton
+│   │   ├── email.js               # Resend email helpers
+│   │   └── notifications.js       # In-app notification helpers
+│   └── prisma/
+│       ├── schema.prisma          # Full database schema (source of truth)
+│       └── seed.js                # Dev seed — creates 3 test accounts
+│
+└── docs/                          # All handoff documentation
+    ├── PROJECT_OVERVIEW.md
+    ├── SETUP_GUIDE.md
+    ├── DEPLOYMENT_GUIDE.md
+    ├── DATABASE_SCHEMA.md
+    ├── FEATURE_MAP.md
+    ├── API_ROUTES.md
+    ├── ENV_VARIABLES.md
+    ├── TROUBLESHOOTING.md
+    └── HANDOFF_CHECKLIST.md
 ```
 
 ---
 
-## 🚀 Quick Start (Run Locally)
-
-### Step 1 — Install PostgreSQL
-Download and install PostgreSQL from https://postgresql.org/download
-Then create a database:
-```
-psql -U postgres
-CREATE DATABASE vonaxity;
-\q
-```
-
-### Step 2 — Set up the Backend
+## Quick Start (Local Development)
 
 ```bash
-cd vonaxity/backend
+# 1. Clone
+git clone https://github.com/KeisNebelli/vonaxitynew.git
+cd vonaxitynew
 
-# 1. Install dependencies
+# 2. Backend
+cd backend
+cp .env.example .env          # fill in all values — see docs/ENV_VARIABLES.md
 npm install
+npx prisma migrate dev
+npm run db:seed               # creates 3 test accounts
+npm run dev                   # http://localhost:4000
 
-# 2. Copy env file and fill in your values
-cp .env.example .env
-
-# Open .env and set:
-# DATABASE_URL=postgresql://postgres:YOUR_PASSWORD@localhost:5432/vonaxity
-# JWT_SECRET=any-random-string-at-least-32-characters-long
-# (leave Stripe and Twilio as-is for now — test version works without them)
-
-# 3. Run database migration (creates all tables)
-npx prisma migrate dev --name init
-
-# 4. Seed test data (creates 3 test accounts)
-npm run db:seed
-
-# 5. Start the backend server
-npm run dev
-```
-
-Backend will run at: http://localhost:4000
-Test it: http://localhost:4000/health
-
----
-
-### Step 3 — Set up the Frontend
-
-```bash
-cd vonaxity/frontend
-
-# 1. Install dependencies
+# 3. Frontend (new terminal)
+cd ../frontend
+cp .env.example .env.local    # set NEXT_PUBLIC_API_URL=http://localhost:4000
 npm install
-
-# 2. Copy env file
-cp .env.example .env.local
-
-# (No changes needed for local testing — defaults point to localhost:4000)
-
-# 3. Start the frontend
-npm run dev
+npm run dev                   # http://localhost:3000
 ```
 
-Frontend will run at: http://localhost:3000
+**Test accounts** (created by seed):
+
+| Role | Email | Password |
+|---|---|---|
+| Client | client@test.com | test123 |
+| Nurse | nurse@test.com | test123 |
+| Admin | admin@test.com | test123 |
+
+See [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md) for the full guide.
 
 ---
 
-## 🔑 Test Accounts
+## Deploy
 
-| Role   | Email             | Password |
-|--------|-------------------|----------|
-| Client | client@test.com   | test123  |
-| Nurse  | nurse@test.com    | test123  |
-| Admin  | admin@test.com    | test123  |
+| Service | Platform | Trigger |
+|---|---|---|
+| Frontend | Vercel | Auto-deploy on push to `main` |
+| Backend | Railway | Auto-deploy on push to `main` |
 
-These are created automatically when you run `npm run db:seed`.
-
----
-
-## 🌐 Pages & Portals
-
-| URL                        | What it is              |
-|----------------------------|-------------------------|
-| localhost:3000/en          | Homepage (English)      |
-| localhost:3000/sq          | Homepage (Albanian)     |
-| localhost:3000/en/login    | Login (all roles)       |
-| localhost:3000/en/signup   | Client signup           |
-| localhost:3000/en/dashboard | Client portal          |
-| localhost:3000/en/nurse    | Nurse panel             |
-| localhost:3000/en/admin    | Admin dashboard         |
-| localhost:3000/en/pricing  | Pricing page            |
-| localhost:3000/en/about    | About us                |
-| localhost:3000/en/contact  | Contact                 |
-| localhost:3000/en/faq      | FAQ                     |
-| localhost:3000/en/how-it-works | How it works       |
-| localhost:3000/en/services | Services                |
+See [`docs/DEPLOYMENT_GUIDE.md`](docs/DEPLOYMENT_GUIDE.md) for the full guide.
 
 ---
 
-## 🚢 Deploy to Production
+## Key Files at a Glance
 
-### Frontend → Vercel (free)
-```bash
-cd vonaxity/frontend
-npx vercel
-```
-Set environment variable in Vercel dashboard:
-- NEXT_PUBLIC_API_URL = your Railway backend URL
-
-### Backend → Railway (free tier available)
-1. Go to railway.app and create a new project
-2. Connect your GitHub repo
-3. Select the `vonaxity/backend` folder
-4. Add a PostgreSQL service in Railway
-5. Set environment variables (copy from .env, use Railway's DATABASE_URL)
-6. Deploy
-
----
-
-## 🔧 What's Included (Test Version)
-
-✅ Public website — homepage, pricing, services, how it works, about, contact, FAQ
-✅ English + Albanian language toggle
-✅ Client signup flow (3 steps)
-✅ Login with role-based redirect
-✅ Client dashboard — visits, subscription, overview
-✅ Nurse panel — dashboard, visits list, complete visit form, earnings
-✅ Admin dashboard — overview, nurse management (approve/suspend), client list, visit assignment, payments, settings
-✅ Full REST API — auth, visits, nurses, users, payments, analytics
-✅ PostgreSQL database with Prisma ORM
-✅ Test seed data with 3 accounts
-
-## 🔜 Phase 2 (Not included yet)
-
-⬜ Real Stripe payment processing
-⬜ Twilio SMS notifications
-⬜ Email health reports
-⬜ Real-time visit tracking
-⬜ Nurse profile photos
-⬜ Google Maps integration
-⬜ Mobile app
+| Purpose | File |
+|---|---|
+| All API calls (frontend) | `frontend/lib/api.js` |
+| Database schema | `backend/prisma/schema.prisma` |
+| Route guards + i18n redirect | `frontend/middleware.js` |
+| JWT auth middleware | `backend/middleware/auth.js` |
+| Stripe payment flow | `backend/routes/payments.js` |
+| Visit booking + completion | `backend/routes/visits.js` |
+| Nurse approval flow | `backend/routes/nurses.js` |
+| AI assistant (Vona) | `backend/server.js` → `/ai/chat` |
+| All bilingual strings | `frontend/translations/index.js` |
+| Client dashboard | `frontend/app/[lang]/dashboard/page.jsx` |
+| Nurse dashboard | `frontend/app/[lang]/nurse/page.jsx` |
+| Admin CRM | `frontend/app/[lang]/admin/page.jsx` |
 
 ---
 
-## ❓ Common Issues
+## Documentation Index
 
-**"Cannot connect to database"**
-→ Make sure PostgreSQL is running and your DATABASE_URL password is correct
-
-**"Module not found"**
-→ Run `npm install` again in both frontend/ and backend/ folders
-
-**"Prisma Client not found"**
-→ Run `npx prisma generate` in the backend/ folder
-
-**Login not working**
-→ Make sure you ran `npm run db:seed` to create test accounts
-→ Make sure backend is running on port 4000
+| Doc | What's Inside |
+|---|---|
+| [`docs/PROJECT_OVERVIEW.md`](docs/PROJECT_OVERVIEW.md) | Business model, user roles, all product flows |
+| [`docs/SETUP_GUIDE.md`](docs/SETUP_GUIDE.md) | Local dev from scratch |
+| [`docs/DEPLOYMENT_GUIDE.md`](docs/DEPLOYMENT_GUIDE.md) | Railway + Vercel production deploy |
+| [`docs/DATABASE_SCHEMA.md`](docs/DATABASE_SCHEMA.md) | Every table, field, relationship, and enum |
+| [`docs/FEATURE_MAP.md`](docs/FEATURE_MAP.md) | Every feature and where its code lives |
+| [`docs/API_ROUTES.md`](docs/API_ROUTES.md) | All backend endpoints with method, auth, and params |
+| [`docs/ENV_VARIABLES.md`](docs/ENV_VARIABLES.md) | Every env variable — what it does and where to get it |
+| [`docs/TROUBLESHOOTING.md`](docs/TROUBLESHOOTING.md) | Known issues and fixes |
+| [`docs/HANDOFF_CHECKLIST.md`](docs/HANDOFF_CHECKLIST.md) | Accounts, credentials, hosting info for handoff/sale |
 
 ---
 
-## 📞 Support
+## Contact
 
-Email: hello@vonaxity.com
-Emergency in Albania: 127
-
-⚠️ Vonaxity is non-emergency care only.
+- **Founder**: Keis Nebelli — CEO & Founder
+- **Support**: hello@vonaxity.com
+- **Emergency in Albania**: 127 (Vonaxity is non-emergency care only)

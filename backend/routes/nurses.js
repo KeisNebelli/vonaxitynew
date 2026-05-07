@@ -1,3 +1,27 @@
+/**
+ * routes/nurses.js — Nurse profile and approval management
+ *
+ * Nurse approval flow:
+ *   1. Nurse registers → User created (role: NURSE) + Nurse record (status: INCOMPLETE)
+ *   2. Nurse completes profile in dashboard → PUT /nurses/me/onboarding
+ *      → status changes from INCOMPLETE to PENDING
+ *   3. Admin reviews in CRM → views uploaded documents (diplomaUrl, licenseUrl)
+ *   4. Admin approves → PUT /nurses/:id/approve → status: APPROVED
+ *      → nurse receives in-app notification + approval email
+ *   5. Admin rejects → PUT /nurses/:id/reject → status: REJECTED, rejectionReason set
+ *      → nurse sees reason in their dashboard
+ *
+ * Only APPROVED nurses:
+ *   - Appear in the public nurse directory (GET /nurses/public)
+ *   - Can apply to open visit requests
+ *   - Receive NEW_JOB notifications when a booking is made in their city
+ *
+ * Nurse-specific JSON fields (stored as strings, must be JSON.parse'd when reading):
+ *   - availability: string[] (days of week)
+ *   - languages:    string[]
+ *   - specialties:  string[]
+ *   - services:     string[]
+ */
 const router = require('express').Router();
 const prisma = require('../lib/db');
 const { requireRole } = require('../middleware/auth');

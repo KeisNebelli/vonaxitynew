@@ -1,3 +1,20 @@
+/**
+ * lib/api.js — All frontend → backend API calls
+ *
+ * Auth pattern:
+ *   After login, the JWT token is stored in two places:
+ *     1. localStorage key 'vonaxity-token' — used here for all API calls (Authorization header)
+ *     2. Cookie 'vonaxity-token' + 'vonaxity-role' — used by Next.js middleware.js for
+ *        server-side route protection (redirect unauthenticated users to /login)
+ *   Both are set in the login page after a successful /auth/login response.
+ *
+ * All API functions throw an Error on non-OK responses (message from server's { error } field).
+ * Components catch these errors and display them to the user.
+ *
+ * To add a new endpoint:
+ *   1. Add to the `api` object below: myEndpoint: (body) => apiFetch('/path', { method:'POST', body: JSON.stringify(body) })
+ *   2. Import and call in your component: const data = await api.myEndpoint(body)
+ */
 const BASE = process.env.NEXT_PUBLIC_API_URL || 'http://localhost:4000';
 
 function getToken() {
