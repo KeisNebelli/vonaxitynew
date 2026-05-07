@@ -27,11 +27,7 @@ export default function Footer({ lang = 'en' }) {
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit,minmax(180px,1fr))', gap: 40, marginBottom: 48 }}>
           <div>
             {/* Logo with warm teal cross */}
-            <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12 }}>
-              <svg width="22" height="22" viewBox="0 0 22 22" fill="none">
-                <rect x="7" y="1" width="8" height="20" rx="3.5" fill="rgba(37,99,235,0.15)" stroke="#2563EB" strokeWidth="1.5"/>
-                <rect x="1" y="7" width="20" height="8" rx="3.5" fill="rgba(37,99,235,0.15)" stroke="#2563EB" strokeWidth="1.5"/>
-              </svg>
+            <div style={{ marginBottom:12 }}>
               <div style={{ fontSize: 18, fontWeight: 700, color: '#2563EB', letterSpacing: '-0.5px' }}>Vonaxity</div>
             </div>
             <p style={{ fontSize: 13, lineHeight: 1.7, color: textSub, maxWidth: 220 }}>{t(lang, 'footer.tagline')}</p>
