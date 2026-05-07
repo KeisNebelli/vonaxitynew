@@ -77,31 +77,37 @@ function detectIntent(text) {
   return null;
 }
 
-// ── Vona mascot — friendly Zoho-style robot, clean + approachable ─────────────
+// ── Vona icon — exact same as dashboard ───────────────────────────────────────
 function VonaMascot({ size = 56 }) {
   return (
-    <svg width={size} height={size} viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Teal circle background */}
-      <circle cx="28" cy="28" r="28" fill="#0D9488" />
-      {/* Head — white rounded rect */}
-      <rect x="14" y="12" width="28" height="24" rx="10" fill="white" />
-      {/* Antenna */}
-      <line x1="28" y1="12" x2="28" y2="7" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-      <circle cx="28" cy="6" r="2.5" fill="white" />
-      {/* Visor — black oval across eyes, Zoho style */}
-      <rect x="16" y="19" width="24" height="9" rx="4.5" fill="#1A2B3C" />
-      {/* Eye shine dots on visor */}
-      <circle cx="22" cy="23.5" r="2" fill="white" opacity="0.9" />
-      <circle cx="34" cy="23.5" r="2" fill="white" opacity="0.9" />
-      {/* Smile */}
-      <path d="M23 31 Q28 35 33 31" stroke="#1A2B3C" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-      {/* Body */}
-      <rect x="18" y="37" width="20" height="13" rx="6" fill="white" />
-      {/* Waving arm — right side */}
-      <path d="M38 40 Q44 36 42 30" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-      <circle cx="42" cy="29" r="2.5" fill="white" />
-      {/* Left arm */}
-      <path d="M18 42 Q12 40 13 35" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
+    <svg width={size} height={size} viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">
+      <defs>
+        <linearGradient id="lc-bg" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" stopColor="#3B82F6" />
+          <stop offset="100%" stopColor="#7C3AED" />
+        </linearGradient>
+      </defs>
+      <circle cx="50" cy="50" r="50" fill="url(#lc-bg)" />
+      <circle cx="50" cy="50" r="46" fill="none" stroke="rgba(255,255,255,0.1)" strokeWidth="1.5" />
+      <line x1="50" y1="14" x2="50" y2="23" stroke="rgba(255,255,255,0.75)" strokeWidth="2.5" strokeLinecap="round" />
+      <circle cx="50" cy="11" r="4.5" fill="#BAE6FD" opacity="0.9" />
+      <circle cx="50" cy="11" r="2.5" fill="white" />
+      <rect x="18" y="33" width="7" height="12" rx="3.5" fill="rgba(255,255,255,0.82)" />
+      <rect x="75" y="33" width="7" height="12" rx="3.5" fill="rgba(255,255,255,0.82)" />
+      <rect x="25" y="22" width="50" height="40" rx="13" fill="white" opacity="0.97" />
+      <circle cx="38" cy="39" r="5" fill="#2563EB" />
+      <circle cx="38" cy="39" r="3" fill="#1D4ED8" />
+      <circle cx="36.5" cy="37.5" r="1.8" fill="white" opacity="0.55" />
+      <circle cx="62" cy="39" r="5" fill="#2563EB" />
+      <circle cx="62" cy="39" r="3" fill="#1D4ED8" />
+      <circle cx="60.5" cy="37.5" r="1.8" fill="white" opacity="0.55" />
+      <path d="M 42 50 Q 50 56 58 50" stroke="#3B82F6" strokeWidth="2.2" fill="none" strokeLinecap="round" />
+      <circle cx="31" cy="46" r="3.5" fill="#FCA5A5" opacity="0.35" />
+      <circle cx="69" cy="46" r="3.5" fill="#FCA5A5" opacity="0.35" />
+      <rect x="44" y="62" width="12" height="6" rx="3" fill="rgba(255,255,255,0.8)" />
+      <rect x="27" y="68" width="46" height="22" rx="11" fill="white" opacity="0.93" />
+      <rect x="47.5" y="72" width="5" height="14" rx="2" fill="#EF4444" opacity="0.75" />
+      <rect x="43" y="76.5" width="14" height="5" rx="2" fill="#EF4444" opacity="0.75" />
     </svg>
   );
 }
@@ -109,8 +115,8 @@ function VonaMascot({ size = 56 }) {
 // ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
   @keyframes vonaPulse {
-    0%,100% { box-shadow: 0 4px 18px rgba(13,148,136,0.36), 0 0 0 0 rgba(13,148,136,0); }
-    50%      { box-shadow: 0 6px 24px rgba(13,148,136,0.50), 0 0 0 8px rgba(13,148,136,0.07); }
+    0%,100% { box-shadow: 0 4px 20px rgba(99,102,241,0.45), 0 0 0 0 rgba(99,102,241,0); }
+    50%      { box-shadow: 0 6px 28px rgba(99,102,241,0.65), 0 0 0 9px rgba(99,102,241,0.1); }
   }
   @keyframes chatSlideUp {
     from { opacity:0; transform:translateY(16px) scale(0.97); }
@@ -131,8 +137,8 @@ const CSS = `
   .vona-btn { animation: vonaPulse 3s ease-in-out infinite; }
   .vona-btn:hover {
     animation: none !important;
-    transform: scale(1.08) !important;
-    box-shadow: 0 8px 28px rgba(13,148,136,0.55) !important;
+    transform: scale(1.1) !important;
+    box-shadow: 0 8px 32px rgba(99,102,241,0.7) !important;
     transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease !important;
   }
   .nav-hint { animation: navPulse 1.4s ease-in-out infinite; }
@@ -315,8 +321,8 @@ export default function LandingChat({ lang = 'en' }) {
         }}
       >
         {open ? (
-          /* Close — teal circle with X */
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 18px rgba(13,148,136,0.38)' }}>
+          /* Close — purple circle with X */
+          <div style={{ width: 56, height: 56, borderRadius: '50%', background: 'linear-gradient(135deg,#3B82F6,#7C3AED)', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 18px rgba(99,102,241,0.5)' }}>
             <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
