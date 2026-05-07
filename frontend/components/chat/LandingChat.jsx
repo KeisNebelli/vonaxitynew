@@ -77,40 +77,57 @@ function detectIntent(text) {
   return null;
 }
 
-// ── Vona mascot — friendly Zoho-style robot, clean + approachable ─────────────
-function VonaMascot({ size = 56 }) {
+// ── Vona mascot — healthcare robot with name badge on torso ───────────────────
+function VonaMascot() {
   return (
-    <svg width={size} height={size} viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Teal circle background */}
-      <circle cx="28" cy="28" r="28" fill="#0D9488" />
-      {/* Head — white rounded rect */}
-      <rect x="14" y="12" width="28" height="24" rx="10" fill="white" />
-      {/* Antenna */}
-      <line x1="28" y1="12" x2="28" y2="7" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-      <circle cx="28" cy="6" r="2.5" fill="white" />
-      {/* Visor — black oval across eyes, Zoho style */}
-      <rect x="16" y="19" width="24" height="9" rx="4.5" fill="#1A2B3C" />
-      {/* Eye shine dots on visor */}
-      <circle cx="22" cy="23.5" r="2" fill="white" opacity="0.9" />
-      <circle cx="34" cy="23.5" r="2" fill="white" opacity="0.9" />
+    <svg width="72" height="96" viewBox="0 0 72 96" fill="none" xmlns="http://www.w3.org/2000/svg"
+      style={{ filter: 'drop-shadow(0 8px 18px rgba(0,0,0,0.18))' }}>
+      <defs>
+        <filter id="vona-glow">
+          <feGaussianBlur stdDeviation="1.5" result="blur"/>
+          <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+        </filter>
+      </defs>
+
+      {/* ── Head ── */}
+      <rect x="10" y="2" width="52" height="46" rx="14" fill="white"/>
+      {/* Ear nubs */}
+      <rect x="2"  y="14" width="10" height="18" rx="5" fill="white"/>
+      <rect x="60" y="14" width="10" height="18" rx="5" fill="white"/>
+      {/* Dark face panel */}
+      <rect x="14" y="6" width="44" height="38" rx="10" fill="#1B2D3E"/>
+      {/* Teal eyes — rounded squares like reference */}
+      <rect x="19" y="13" width="14" height="14" rx="4" fill="#2DD4BF" filter="url(#vona-glow)"/>
+      <rect x="39" y="13" width="14" height="14" rx="4" fill="#2DD4BF" filter="url(#vona-glow)"/>
+      {/* Eye shine */}
+      <rect x="21" y="15" width="5"  height="5"  rx="2" fill="white" opacity="0.35"/>
+      <rect x="41" y="15" width="5"  height="5"  rx="2" fill="white" opacity="0.35"/>
       {/* Smile */}
-      <path d="M23 31 Q28 35 33 31" stroke="#1A2B3C" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-      {/* Body */}
-      <rect x="18" y="37" width="20" height="13" rx="6" fill="white" />
-      {/* Waving arm — right side */}
-      <path d="M38 40 Q44 36 42 30" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-      <circle cx="42" cy="29" r="2.5" fill="white" />
-      {/* Left arm */}
-      <path d="M18 42 Q12 40 13 35" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
+      <path d="M24 33 Q36 41 48 33" stroke="#2DD4BF" strokeWidth="2.2" fill="none" strokeLinecap="round"/>
+
+      {/* ── Body ── */}
+      <rect x="6" y="49" width="60" height="44" rx="18" fill="white"/>
+      {/* Name badge on torso */}
+      <rect x="14" y="62" width="44" height="20" rx="6" fill="#F0FDFB" stroke="#5EEAD4" strokeWidth="1.2"/>
+      {/* Teal left accent stripe on badge */}
+      <rect x="14" y="62" width="6" height="20" rx="6" fill="#0D9488"/>
+      <rect x="17" y="62" width="3"  height="20" fill="#0D9488"/>
+      {/* "Vona" text */}
+      <text x="41" y="76" textAnchor="middle" fontSize="10" fontWeight="800"
+        fill="#0D9488" fontFamily="Inter, system-ui, sans-serif" letterSpacing="-0.3">Vona</text>
+
+      {/* ── Arms ── */}
+      <rect x="-1" y="54" width="12" height="28" rx="6" fill="white"/>
+      <rect x="61" y="54" width="12" height="28" rx="6" fill="white"/>
     </svg>
   );
 }
 
 // ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
-  @keyframes vonaPulse {
-    0%,100% { box-shadow: 0 4px 18px rgba(13,148,136,0.36), 0 0 0 0 rgba(13,148,136,0); }
-    50%      { box-shadow: 0 6px 24px rgba(13,148,136,0.50), 0 0 0 8px rgba(13,148,136,0.07); }
+  @keyframes vonaFloat {
+    0%,100% { transform: translateY(0px); }
+    50%     { transform: translateY(-7px); }
   }
   @keyframes chatSlideUp {
     from { opacity:0; transform:translateY(16px) scale(0.97); }
@@ -128,12 +145,11 @@ const CSS = `
     0%,100% { opacity:1; }
     50%     { opacity:0.6; }
   }
-  .vona-btn { animation: vonaPulse 3s ease-in-out infinite; }
+  .vona-btn { animation: vonaFloat 3.2s ease-in-out infinite; }
   .vona-btn:hover {
-    animation: none !important;
-    transform: scale(1.08) !important;
-    box-shadow: 0 8px 28px rgba(13,148,136,0.55) !important;
-    transition: transform 0.2s cubic-bezier(0.34,1.56,0.64,1), box-shadow 0.18s ease !important;
+    animation-play-state: paused !important;
+    transform: scale(1.07) translateY(-4px) !important;
+    transition: transform 0.22s cubic-bezier(0.34,1.56,0.64,1) !important;
   }
   .nav-hint { animation: navPulse 1.4s ease-in-out infinite; }
 `;
@@ -264,7 +280,7 @@ export default function LandingChat({ lang = 'en' }) {
         <div
           onClick={() => { dismiss(); setOpen(true); }}
           style={{
-            position: 'fixed', bottom: 90, right: 24, zIndex: 9001,
+            position: 'fixed', bottom: 122, right: 24, zIndex: 9001,
             background: '#fff', borderRadius: 12, padding: '14px 16px',
             boxShadow: '0 4px 24px rgba(0,0,0,0.14)',
             cursor: 'pointer', minWidth: 210, maxWidth: 250,
@@ -300,61 +316,35 @@ export default function LandingChat({ lang = 'en' }) {
         </div>
       )}
 
-      {/* Name card — sits above the mascot button */}
-      {!open && (
-        <div style={{
-          position: 'fixed', bottom: 88, right: 20, zIndex: 9000,
-          background: '#fff',
-          borderRadius: 20,
-          padding: '6px 14px 6px 10px',
-          boxShadow: '0 4px 18px rgba(0,0,0,0.12)',
-          display: 'flex', alignItems: 'center', gap: 7,
-          fontFamily: "'Inter', system-ui, sans-serif",
-          pointerEvents: 'none',
-        }}>
-          {/* Green online dot */}
-          <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />
-          <span style={{ fontSize: 13, fontWeight: 700, color: '#1A2B3C', letterSpacing: '-0.1px' }}>Vona</span>
-          {/* Tail pointing down-right toward mascot */}
-          <div style={{
-            position: 'absolute', bottom: -6, right: 18,
-            borderLeft: '6px solid transparent', borderRight: '6px solid transparent',
-            borderTop: '7px solid #fff',
-            filter: 'drop-shadow(0 2px 1px rgba(0,0,0,0.06))',
-          }} />
-        </div>
-      )}
+      {/* no separate name card — name is on the robot torso */}
 
-      {/* Floating button — friendly Zoho-style mascot */}
+      {/* Floating robot — no circle, just the mascot hovering */}
       <button
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Close chat' : 'Chat with Vona'}
         className={!open ? 'vona-btn' : ''}
         style={{
-          position: 'fixed', bottom: 24, right: 24, zIndex: 9000,
-          width: 56, height: 56, borderRadius: '50%',
-          background: 'none',
-          border: 'none', cursor: 'pointer', padding: 0,
+          position: 'fixed', bottom: 16, right: 20, zIndex: 9000,
+          background: 'none', border: 'none', cursor: 'pointer', padding: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          transition: 'transform 0.18s, box-shadow 0.18s',
         }}
       >
         {open ? (
-          /* Close — teal circle with X */
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 18px rgba(13,148,136,0.38)' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
+          /* Close — small teal pill with X */
+          <div style={{ width: 44, height: 44, borderRadius: '50%', background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 18px rgba(13,148,136,0.40)' }}>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </div>
         ) : (
-          <VonaMascot size={56} />
+          <VonaMascot />
         )}
       </button>
 
       {/* Chat panel */}
       {open && (
         <div style={{
-          position: 'fixed', bottom: 92, right: 24, zIndex: 8999,
+          position: 'fixed', bottom: 124, right: 24, zIndex: 8999,
           width: 'min(380px, calc(100vw - 32px))',
           height: 'min(520px, calc(100vh - 120px))',
           background: '#fff', borderRadius: 20,
