@@ -12,9 +12,13 @@ const GREETING = {
   en: "Hi! I'm Vona, your Vonaxity assistant. I can answer questions about our nursing services, pricing, and how to get started.",
   sq: "Përshëndetje! Unë jam Vona, asistentja juaj e Vonaxity. Mund t'ju ndihmoj me pyetje rreth shërbimeve tona infermierore, çmimeve dhe mënyrës si të filloni.",
 };
+const ONLINE_TEXT = {
+  en: "We're Online!",
+  sq: 'Jemi Online!',
+};
 const BUBBLE_TEXT = {
-  en: '👋 Need help booking a visit?',
-  sq: '👋 Doni ndihmë për rezervim?',
+  en: 'How may I help you today?',
+  sq: 'Si mund t\'ju ndihmoj sot?',
 };
 
 // ── Intent detection ──────────────────────────────────────────────────────────
@@ -226,31 +230,44 @@ export default function LandingChat({ lang = 'en' }) {
     <>
       <style suppressHydrationWarning>{CSS}</style>
 
-      {/* Prompt bubble */}
+      {/* Prompt bubble — Zoho-style clean card */}
       {showBubble && !open && (
         <div
           onClick={() => { dismiss(); setOpen(true); }}
           style={{
-            position: 'fixed', bottom: 94, right: 24, zIndex: 9001,
-            background: '#fff', borderRadius: 16, padding: '10px 12px 10px 16px',
-            boxShadow: '0 8px 30px rgba(15,23,42,0.12)', border: '1px solid #E8DFD4',
-            display: 'flex', alignItems: 'center', gap: 8, cursor: 'pointer',
+            position: 'fixed', bottom: 90, right: 24, zIndex: 9001,
+            background: '#fff', borderRadius: 12, padding: '14px 16px',
+            boxShadow: '0 4px 24px rgba(0,0,0,0.14)',
+            cursor: 'pointer', minWidth: 210, maxWidth: 250,
             fontFamily: "'Inter', system-ui, sans-serif",
-            fontSize: 13.5, fontWeight: 500, color: '#1A2B3C', maxWidth: 230,
-            animation: 'bubblePop 0.28s cubic-bezier(0.34,1.56,0.64,1)',
+            animation: 'bubblePop 0.24s cubic-bezier(0.34,1.56,0.64,1)',
           }}
         >
-          <span style={{ flex: 1, lineHeight: 1.4 }}>{BUBBLE_TEXT[lang] || BUBBLE_TEXT.en}</span>
+          {/* Dismiss X */}
           <button
             onClick={e => { e.stopPropagation(); dismiss(); }}
-            style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#CBD5E1', padding: 2, display: 'flex', flexShrink: 0 }}
+            style={{
+              position: 'absolute', top: 8, right: 8,
+              background: 'none', border: 'none', cursor: 'pointer',
+              color: '#C0C0C0', padding: 2, display: 'flex',
+            }}
           >
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
+            <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round">
               <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
             </svg>
           </button>
-          {/* Speech bubble tail */}
-          <div style={{ position: 'absolute', bottom: -7, right: 24, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '8px solid #fff', filter: 'drop-shadow(0 2px 1px rgba(15,23,42,0.05))' }} />
+          {/* Online indicator + title */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 7, marginBottom: 4 }}>
+            <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#22C55E', flexShrink: 0 }} />
+            <span style={{ fontSize: 13, fontWeight: 700, color: '#111' }}>
+              {ONLINE_TEXT[lang] || ONLINE_TEXT.en}
+            </span>
+          </div>
+          <p style={{ margin: 0, fontSize: 13, color: '#555', lineHeight: 1.45, paddingLeft: 15 }}>
+            {BUBBLE_TEXT[lang] || BUBBLE_TEXT.en}
+          </p>
+          {/* Tail */}
+          <div style={{ position: 'absolute', bottom: -7, right: 22, borderLeft: '7px solid transparent', borderRight: '7px solid transparent', borderTop: '8px solid #fff', filter: 'drop-shadow(0 2px 2px rgba(0,0,0,0.08))' }} />
         </div>
       )}
 
