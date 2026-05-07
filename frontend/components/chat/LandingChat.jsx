@@ -77,35 +77,6 @@ function detectIntent(text) {
   return null;
 }
 
-// ── Vona mascot — friendly Zoho-style robot, clean + approachable ─────────────
-function VonaMascot({ size = 56 }) {
-  return (
-    <svg width={size} height={size} viewBox="0 0 56 56" fill="none" xmlns="http://www.w3.org/2000/svg">
-      {/* Teal circle background */}
-      <circle cx="28" cy="28" r="28" fill="#0D9488" />
-      {/* Head — white rounded rect */}
-      <rect x="14" y="12" width="28" height="24" rx="10" fill="white" />
-      {/* Antenna */}
-      <line x1="28" y1="12" x2="28" y2="7" stroke="white" strokeWidth="2" strokeLinecap="round"/>
-      <circle cx="28" cy="6" r="2.5" fill="white" />
-      {/* Visor — black oval across eyes, Zoho style */}
-      <rect x="16" y="19" width="24" height="9" rx="4.5" fill="#1A2B3C" />
-      {/* Eye shine dots on visor */}
-      <circle cx="22" cy="23.5" r="2" fill="white" opacity="0.9" />
-      <circle cx="34" cy="23.5" r="2" fill="white" opacity="0.9" />
-      {/* Smile */}
-      <path d="M23 31 Q28 35 33 31" stroke="#1A2B3C" strokeWidth="1.8" fill="none" strokeLinecap="round"/>
-      {/* Body */}
-      <rect x="18" y="37" width="20" height="13" rx="6" fill="white" />
-      {/* Waving arm — right side */}
-      <path d="M38 40 Q44 36 42 30" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-      <circle cx="42" cy="29" r="2.5" fill="white" />
-      {/* Left arm */}
-      <path d="M18 42 Q12 40 13 35" stroke="white" strokeWidth="3" strokeLinecap="round" fill="none"/>
-    </svg>
-  );
-}
-
 // ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
   @keyframes vonaPulse {
@@ -300,7 +271,7 @@ export default function LandingChat({ lang = 'en' }) {
         </div>
       )}
 
-      {/* Floating button — friendly Zoho-style mascot */}
+      {/* Floating button — clean teal circle with chat icon */}
       <button
         onClick={() => setOpen(o => !o)}
         aria-label={open ? 'Close chat' : 'Chat with Vona'}
@@ -308,21 +279,23 @@ export default function LandingChat({ lang = 'en' }) {
         style={{
           position: 'fixed', bottom: 24, right: 24, zIndex: 9000,
           width: 56, height: 56, borderRadius: '50%',
-          background: 'none',
+          background: '#0D9488',
           border: 'none', cursor: 'pointer', padding: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'transform 0.18s, box-shadow 0.18s',
+          boxShadow: '0 4px 18px rgba(13,148,136,0.38)',
         }}
       >
         {open ? (
-          /* Close — teal circle with X */
-          <div style={{ width: 56, height: 56, borderRadius: '50%', background: '#0D9488', display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: '0 4px 18px rgba(13,148,136,0.38)' }}>
-            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
-              <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
-            </svg>
-          </div>
+          /* Close X */
+          <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round">
+            <line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/>
+          </svg>
         ) : (
-          <VonaMascot size={56} />
+          /* Chat bubble icon */
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/>
+          </svg>
         )}
       </button>
 
@@ -343,9 +316,15 @@ export default function LandingChat({ lang = 'en' }) {
 
           {/* Header — clean warm teal, no gradient, no robot */}
           <div style={{ padding: '14px 18px', background: '#0D9488', display: 'flex', alignItems: 'center', gap: 12 }}>
-            {/* Avatar: mascot */}
-            <div style={{ width: 38, height: 38, flexShrink: 0 }}>
-              <VonaMascot size={38} />
+            {/* Avatar: simple circle with "V" initial */}
+            <div style={{
+              width: 38, height: 38, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.18)',
+              border: '1.5px solid rgba(255,255,255,0.30)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+              flexShrink: 0,
+            }}>
+              <span style={{ fontSize: 16, fontWeight: 700, color: '#fff' }}>V</span>
             </div>
             <div style={{ flex: 1 }}>
               <div style={{ fontSize: 15, fontWeight: 700, color: '#fff', letterSpacing: '-0.2px' }}>Vona</div>
