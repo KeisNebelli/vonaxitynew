@@ -761,6 +761,52 @@ function NurseVisitCard({ v, lang, onStatusChange, onComplete, isHighlighted, hi
           </span>
         </div>
 
+        {/* Status timeline — not for cancelled */}
+        {st !== 'CANCELLED' && (() => {
+          const STEPS = [
+            { id:'SCHEDULED',   label: lang==='sq'?'Planifikuar':'Scheduled' },
+            { id:'ACCEPTED',    label: lang==='sq'?'Pranuar':'Accepted' },
+            { id:'ON_THE_WAY',  label: lang==='sq'?'Në Rrugë':'On the Way' },
+            { id:'ARRIVED',     label: lang==='sq'?'Mbërriti':'Arrived' },
+            { id:'IN_PROGRESS', label: lang==='sq'?'Në Progres':'In Progress' },
+            { id:'COMPLETED',   label: lang==='sq'?'Përfunduar':'Completed' },
+          ];
+          const ORDER = ['SCHEDULED','ACCEPTED','ON_THE_WAY','ARRIVED','IN_PROGRESS','COMPLETED'];
+          const currentIdx = ORDER.indexOf(st) === -1 ? 0 : ORDER.indexOf(st);
+          return (
+            <div style={{ marginBottom:14, paddingBottom:14, borderBottom:`1px solid ${C.border}` }}>
+              <div style={{ display:'flex', alignItems:'center', gap:0 }}>
+                {STEPS.map((step, i) => {
+                  const isDone    = i < currentIdx;
+                  const isCurrent = i === currentIdx;
+                  const stepColor = isDone || isCurrent ? (st==='COMPLETED' ? '#059669' : C.primary) : C.border;
+                  const dotBg     = isDone ? (st==='COMPLETED' ? '#059669' : C.primary) : isCurrent ? '#fff' : '#F1F5F9';
+                  const dotBorder = isDone || isCurrent ? (st==='COMPLETED' ? '#059669' : C.primary) : C.border;
+                  return (
+                    <div key={step.id} style={{ display:'flex', alignItems:'center', flex: i < STEPS.length-1 ? 1 : 'none', minWidth:0 }}>
+                      <div style={{ display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
+                        <div style={{ width:isCurrent?12:8, height:isCurrent?12:8, borderRadius:'50%', background:dotBg, border:`2px solid ${dotBorder}`, transition:'all 0.2s', boxShadow: isCurrent?`0 0 0 3px ${C.primary}22`:'none' }}>
+                          {isDone && (
+                            <svg width={isCurrent?12:8} height={isCurrent?12:8} viewBox="0 0 12 12" fill="none">
+                              <polyline points="2,6 5,9 10,3" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+                            </svg>
+                          )}
+                        </div>
+                        <div style={{ fontSize:7, fontWeight: isCurrent?700:500, color: isCurrent?(st==='COMPLETED'?'#059669':C.primary) : isDone?C.textSecondary : C.textTertiary, marginTop:3, whiteSpace:'nowrap', maxWidth:44, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis' }}>
+                          {step.label}
+                        </div>
+                      </div>
+                      {i < STEPS.length-1 && (
+                        <div style={{ flex:1, height:2, background: isDone?(st==='COMPLETED'?'#059669':C.primary):C.border, margin:'0 2px', marginBottom:14, transition:'background 0.2s' }}/>
+                      )}
+                    </div>
+                  );
+                })}
+              </div>
+            </div>
+          );
+        })()}
+
         {/* Vitals row — completed only */}
         {st === 'COMPLETED' && (v.bp || v.hr || v.glucose || v.temperature || v.oxygenSat) && (
           <div style={{ display:'flex', gap:20, padding:'10px 0', borderTop:`1px solid ${C.border}`, borderBottom:`1px solid ${C.border}`, marginBottom:12, flexWrap:'wrap' }}>
@@ -788,15 +834,47 @@ function NurseVisitCard({ v, lang, onStatusChange, onComplete, isHighlighted, hi
         )}
 
         {/* Action buttons */}
-        <div style={{ display:'flex', gap:8, marginTop:4 }}>
+        <div style={{ display:'flex', gap:8, marginTop:4, flexWrap:'wrap' }}>
           <button
             onClick={() => setShowDetails(d => !d)}
-            style={{ flex:1, padding:'11px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:F, fontSize:13, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:7,
+            style={{ flex:1, minWidth:120, padding:'11px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:F, fontSize:13, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:7,
               background: st==='COMPLETED' ? 'linear-gradient(135deg,#059669,#34D399)' : 'linear-gradient(135deg,#2563EB,#3B82F6)',
               color:'#fff' }}>
             <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
-            {showDetails ? (lang==='sq'?'Mbyll':'Close') : (lang==='sq'?'Shiko Raportin e Plotë':'View Full Details')}
+            {showDetails ? (lang==='sq'?'Mbyll':'Close') : (lang==='sq'?'Shiko Detajet':'View Details')}
           </button>
+          {st === 'COMPLETED' && (
+            <button onClick={() => {
+              const wo = v.workOrderNumber ? `VON-${v.workOrderNumber}` : `#${v.id?.slice(-6)?.toUpperCase()}`;
+              const patientName = v.relative?.name || (lang==='sq'?'Pacient':'Patient');
+              const dateStr = new Date(v.scheduledAt).toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{weekday:'long',day:'numeric',month:'long',year:'numeric'});
+              const timeStr = new Date(v.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+              const vitalsRows = [
+                v.bp          ? `<tr><td>${lang==='sq'?'Presioni':'Blood Pressure'}</td><td><strong>${v.bp} mmHg</strong></td></tr>` : '',
+                v.hr          ? `<tr><td>${lang==='sq'?'Pulsi':'Heart Rate'}</td><td><strong>${v.hr} bpm</strong></td></tr>` : '',
+                v.glucose     ? `<tr><td>${lang==='sq'?'Glukoza':'Glucose'}</td><td><strong>${v.glucose} mmol/L</strong></td></tr>` : '',
+                v.oxygenSat   ? `<tr><td>SpO₂</td><td><strong>${v.oxygenSat}%</strong></td></tr>` : '',
+                v.temperature ? `<tr><td>${lang==='sq'?'Temperatura':'Temperature'}</td><td><strong>${v.temperature}°C</strong></td></tr>` : '',
+              ].filter(Boolean).join('');
+              const notes = (v.nurseNotes || v.notes || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+              const html = `<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"/><title>Vonaxity – Visit Report</title>
+              <style>body{font-family:'Helvetica Neue',Arial,sans-serif;color:#111;margin:0;padding:40px;font-size:13px;line-height:1.6;}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2563EB;padding-bottom:20px;margin-bottom:28px;}.brand{font-size:22px;font-weight:900;color:#2563EB;}.badge{display:inline-block;background:#ECFDF5;color:#059669;padding:4px 12px;border-radius:999px;font-weight:700;font-size:11px;border:1px solid #BBF7D0;}h2{font-size:20px;font-weight:800;margin:0 0 4px;}.meta{color:#6B7280;font-size:12px;margin-bottom:20px;}.section-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9CA3AF;margin:22px 0 8px;}.card{background:#F8FAFC;border-radius:10px;padding:14px 18px;margin-bottom:10px;}table{width:100%;border-collapse:collapse;}td{padding:7px 10px;border-bottom:1px solid #F1F5F9;font-size:13px;}td:first-child{color:#6B7280;width:45%;}td:last-child{font-weight:600;}.notes{background:#F8FAFC;border-left:3px solid #2563EB;border-radius:0 8px 8px 0;padding:12px 16px;font-style:italic;color:#374151;white-space:pre-wrap;}.footer{margin-top:40px;padding-top:16px;border-top:1px solid #E5E7EB;display:flex;justify-content:space-between;font-size:11px;color:#9CA3AF;}</style></head><body>
+              <div class="header"><div><div class="brand">Vonaxity</div><div style="font-size:11px;color:#6B7280;margin-top:2px;">${lang==='sq'?'Raport Infermiereje':'Nurse Visit Report'}</div></div><div style="text-align:right"><div class="badge">✓ ${lang==='sq'?'E Përfunduar':'Completed'}</div><div style="font-size:11px;color:#9CA3AF;margin-top:6px;">${wo}</div></div></div>
+              <h2>${trService(v.serviceType,lang)}</h2><div class="meta">${dateStr} · ${timeStr}</div>
+              <div class="section-title">${lang==='sq'?'Pacienti':'Patient'}</div><div class="card"><table><tr><td>${lang==='sq'?'Emri':'Name'}</td><td>${patientName}</td></tr>${v.relative?.age?`<tr><td>${lang==='sq'?'Mosha':'Age'}</td><td>${v.relative.age}</td></tr>`:''}</table></div>
+              ${vitalsRows?`<div class="section-title">${lang==='sq'?'Shenjat Vitale':'Vitals'}</div><div class="card"><table>${vitalsRows}</table></div>`:''}
+              ${notes?`<div class="section-title">${lang==='sq'?'Shënimet Klinike':'Clinical Notes'}</div><div class="notes">${notes}</div>`:''}
+              <div class="footer"><div>vonaxity.com</div><div>${lang==='sq'?'Gjeneruar':'Generated'}: ${new Date().toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{day:'numeric',month:'long',year:'numeric'})}</div></div>
+              </body></html>`;
+              const win = window.open('','_blank','width=750,height=900');
+              if (!win) return;
+              win.document.write(html); win.document.close(); win.focus();
+              setTimeout(()=>win.print(), 400);
+            }} style={{ padding:'11px 14px', borderRadius:10, border:'1.5px solid #BBF7D0', background:'#ECFDF5', color:'#059669', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, display:'flex', alignItems:'center', gap:6 }}>
+              <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              PDF
+            </button>
+          )}
           {(st === 'SCHEDULED' || st === 'IN_PROGRESS') && (
             <button onClick={onComplete} style={{ padding:'11px 16px', borderRadius:10, border:`1.5px solid ${C.primary}`, background:'transparent', color:C.primary, fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, whiteSpace:'nowrap' }}>
               {lang==='sq'?'Përfundo':'Complete'}

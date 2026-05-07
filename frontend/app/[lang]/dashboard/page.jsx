@@ -1433,6 +1433,77 @@ function VisitDetailModal({ visit, lang, onClose }) {
   const serviceLabel = (en) => { const s = SERVICES_MAP.find(x => x.en === en); return lang === 'sq' && s ? s.sq : en; };
   const hasVitals = visit.bpSystolic || visit.glucose || visit.heartRate || visit.oxygenSat || visit.temperature;
 
+  const printReport = () => {
+    const patientName = visit.relative?.name || (lang==='sq'?'Pacient':'Patient');
+    const serviceLabel2 = serviceLabel(visit.serviceType);
+    const dateStr = fmtDate(visit.scheduledAt, lang, {weekday:'long',day:'numeric',month:'long',year:'numeric'});
+    const timeStr = new Date(visit.scheduledAt).toLocaleTimeString('en-GB',{hour:'2-digit',minute:'2-digit'});
+    const wo = visit.workOrderNumber || visit.id?.slice(-8)?.toUpperCase();
+    const nurseName = visit.nurse?.user?.name || '—';
+
+    const vitalsRows = [
+      visit.bpSystolic ? `<tr><td>${lang==='sq'?'Presioni i Gjakut':'Blood Pressure'}</td><td><strong>${visit.bpSystolic}/${visit.bpDiastolic} mmHg</strong></td></tr>` : '',
+      visit.heartRate  ? `<tr><td>${lang==='sq'?'Pulsi':'Heart Rate'}</td><td><strong>${visit.heartRate} bpm</strong></td></tr>` : '',
+      visit.glucose    ? `<tr><td>${lang==='sq'?'Glukoza':'Glucose'}</td><td><strong>${visit.glucose} mmol/L</strong></td></tr>` : '',
+      visit.oxygenSat  ? `<tr><td>SpO₂</td><td><strong>${visit.oxygenSat}%</strong></td></tr>` : '',
+      visit.temperature? `<tr><td>${lang==='sq'?'Temperatura':'Temperature'}</td><td><strong>${visit.temperature}°C</strong></td></tr>` : '',
+    ].filter(Boolean).join('');
+
+    const html = `<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"/><title>Vonaxity – Visit Report</title>
+    <style>
+      body{font-family:'Helvetica Neue',Arial,sans-serif;color:#111;margin:0;padding:40px;font-size:13px;line-height:1.6;}
+      .header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2563EB;padding-bottom:20px;margin-bottom:28px;}
+      .brand{font-size:22px;font-weight:900;color:#2563EB;letter-spacing:-0.5px;}
+      .badge{display:inline-block;background:#ECFDF5;color:#059669;padding:4px 12px;border-radius:999px;font-weight:700;font-size:11px;border:1px solid #BBF7D0;}
+      h2{font-size:20px;font-weight:800;margin:0 0 4px;color:#111;}
+      .meta{color:#6B7280;font-size:12px;margin-bottom:20px;}
+      .section-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9CA3AF;margin:22px 0 8px;}
+      .card{background:#F8FAFC;border-radius:10px;padding:14px 18px;margin-bottom:10px;}
+      table{width:100%;border-collapse:collapse;}
+      td{padding:7px 10px;border-bottom:1px solid #F1F5F9;font-size:13px;}
+      td:first-child{color:#6B7280;width:45%;}
+      td:last-child{font-weight:600;}
+      .notes{background:#F8FAFC;border-left:3px solid #2563EB;border-radius:0 8px 8px 0;padding:12px 16px;font-style:italic;color:#374151;white-space:pre-wrap;}
+      .footer{margin-top:40px;padding-top:16px;border-top:1px solid #E5E7EB;display:flex;justify-content:space-between;font-size:11px;color:#9CA3AF;}
+      @media print{body{padding:20px;}}
+    </style></head><body>
+      <div class="header">
+        <div><div class="brand">Vonaxity</div><div style="font-size:11px;color:#6B7280;margin-top:2px;">${lang==='sq'?'Shërbime Infermieristike në Shtëpi':'Home Nursing Care'}</div></div>
+        <div style="text-align:right"><div class="badge">✓ ${lang==='sq'?'E Përfunduar':'Completed'}</div><div style="font-size:11px;color:#9CA3AF;margin-top:6px;">${lang==='sq'?'WO':'WO'} ${wo}</div></div>
+      </div>
+      <h2>${serviceLabel2}</h2>
+      <div class="meta">${dateStr} · ${timeStr}</div>
+
+      <div class="section-title">${lang==='sq'?'Pacienti':'Patient'}</div>
+      <div class="card">
+        <table>
+          <tr><td>${lang==='sq'?'Emri':'Name'}</td><td>${patientName}</td></tr>
+          ${visit.relative?.age ? `<tr><td>${lang==='sq'?'Mosha':'Age'}</td><td>${visit.relative.age}</td></tr>` : ''}
+          ${visit.relative?.address ? `<tr><td>${lang==='sq'?'Adresa':'Address'}</td><td>${visit.relative.address}</td></tr>` : ''}
+        </table>
+      </div>
+
+      <div class="section-title">${lang==='sq'?'Infermierja':'Nurse'}</div>
+      <div class="card"><table><tr><td>${lang==='sq'?'Emri':'Name'}</td><td>${nurseName}</td></tr>${visit.nurse?.city?`<tr><td>${lang==='sq'?'Qyteti':'City'}</td><td>${visit.nurse.city}</td></tr>`:''}</table></div>
+
+      ${vitalsRows ? `<div class="section-title">${lang==='sq'?'Shenjat Vitale':'Vitals Recorded'}</div><div class="card"><table>${vitalsRows}</table></div>` : ''}
+
+      ${visit.nurseNotes ? `<div class="section-title">${lang==='sq'?'Shënimet Klinike':'Clinical Notes'}</div><div class="notes">${visit.nurseNotes.replace(/</g,'&lt;').replace(/>/g,'&gt;')}</div>` : ''}
+
+      <div class="footer">
+        <div>vonaxity.com</div>
+        <div>${lang==='sq'?'Gjeneruar':'Generated'}: ${new Date().toLocaleDateString(lang==='sq'?'sq-AL':'en-GB',{day:'numeric',month:'long',year:'numeric'})}</div>
+      </div>
+    </body></html>`;
+
+    const win = window.open('','_blank','width=750,height=900');
+    if (!win) return;
+    win.document.write(html);
+    win.document.close();
+    win.focus();
+    setTimeout(() => { win.print(); }, 400);
+  };
+
   const VitalCard = ({ label, value, unit, bg, col }) => (
     <div style={{ background:bg, borderRadius:11, padding:'14px 16px' }}>
       <div style={{ fontSize:10, fontWeight:700, color:col, textTransform:'uppercase', letterSpacing:'0.8px', marginBottom:6, opacity:0.8 }}>{label}</div>
@@ -1563,11 +1634,17 @@ function VisitDetailModal({ visit, lang, onClose }) {
         </div>{/* end scrollable body */}
 
         {/* Sticky footer */}
-        <div style={{ padding:'14px 24px', borderTop:`1px solid ${C.border}`, flexShrink:0, display:'flex', justifyContent:'space-between', alignItems:'center', background:'#F8FAFC' }}>
+        <div style={{ padding:'14px 24px', borderTop:`1px solid ${C.border}`, flexShrink:0, display:'flex', justifyContent:'space-between', alignItems:'center', gap:10, background:'#F8FAFC', flexWrap:'wrap' }}>
           <Badge s="COMPLETED" lang={lang} />
-          <button onClick={onClose} style={{ fontSize:13, fontWeight:700, padding:'9px 22px', borderRadius:10, border:'1.5px solid #E2E8F0', background:'#fff', cursor:'pointer', color:C.textSecondary, fontFamily:F }}>
-            {lang==='sq'?'Mbyll':'Close'}
-          </button>
+          <div style={{ display:'flex', gap:8 }}>
+            <button onClick={printReport} style={{ fontSize:13, fontWeight:700, padding:'9px 18px', borderRadius:10, border:'1.5px solid #BBF7D0', background:'#ECFDF5', cursor:'pointer', color:'#059669', fontFamily:F, display:'flex', alignItems:'center', gap:6 }}>
+              <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
+              {lang==='sq'?'Shkarko PDF':'Download PDF'}
+            </button>
+            <button onClick={onClose} style={{ fontSize:13, fontWeight:700, padding:'9px 22px', borderRadius:10, border:'1.5px solid #E2E8F0', background:'#fff', cursor:'pointer', color:C.textSecondary, fontFamily:F }}>
+              {lang==='sq'?'Mbyll':'Close'}
+            </button>
+          </div>
         </div>
 
       </div>
