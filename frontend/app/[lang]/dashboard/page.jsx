@@ -7,7 +7,7 @@ import DashboardChat from '@/components/chat/DashboardChat';
 import Settings from './settings';
 import HealthProgress from './health';
 
-const C = { primary:'#2563EB',primaryLight:'#EFF6FF',primaryDark:'#1D4ED8',secondary:'#059669',secondaryLight:'#ECFDF5',warning:'#D97706',warningLight:'#FFFBEB',error:'#DC2626',errorLight:'#FEF2F2',purple:'#7C3AED',purpleLight:'#F5F3FF',bg:'#F8FAFC',bgWhite:'#FFFFFF',bgSubtle:'#F1F5F9',textPrimary:'#0F172A',textSecondary:'#475569',textTertiary:'#94A3B8',border:'#E2E8F0',borderSubtle:'#F1F5F9',sidebarBg:'#111827' };
+const C = { primary:'#2563EB',primaryLight:'#EFF6FF',primaryDark:'#1D4ED8',secondary:'#0D9488',secondaryLight:'#ECFDF5',warning:'#D97706',warningLight:'#FFFBEB',error:'#DC2626',errorLight:'#FEF2F2',purple:'#0D9488',purpleLight:'#F0FDFB',bg:'#F8FAFC',bgWhite:'#FFFFFF',bgSubtle:'#F1F5F9',textPrimary:'#0F172A',textSecondary:'#475569',textTertiary:'#94A3B8',border:'#E2E8F0',borderSubtle:'#F1F5F9',sidebarBg:'#111827' };
 const F = "'DM Sans','Inter',system-ui,sans-serif";
 const SSM = '0 1px 3px rgba(15,23,42,0.06)';
 const SMD = '0 4px 12px rgba(15,23,42,0.08)';
@@ -64,7 +64,7 @@ const makeNAV = (tr) => [
 ];
 
 function Badge({ s, lang='en' }) {
-  const m = { COMPLETED:[C.secondaryLight,'#059669'], PENDING:[C.primaryLight,C.primary], ACCEPTED:[C.secondaryLight,C.secondary], CANCELLED:[C.bgSubtle,C.textTertiary], UNASSIGNED:[C.warningLight,C.warning], REJECTED:[C.errorLight,C.error] };
+  const m = { COMPLETED:[C.secondaryLight,'#0D9488'], PENDING:[C.primaryLight,C.primary], ACCEPTED:[C.secondaryLight,C.secondary], CANCELLED:[C.bgSubtle,C.textTertiary], UNASSIGNED:[C.warningLight,C.warning], REJECTED:[C.errorLight,C.error] };
   const [bg,col] = m[s]||[C.bgSubtle,C.textTertiary];
   const label = t(lang,'visits.status.'+s) || s;
   return <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:bg, color:col, textTransform:'uppercase', whiteSpace:'nowrap' }}>{label}</span>;
@@ -110,14 +110,14 @@ function NotificationBell({ lang, onNavigate }) {
   const iconFor = (type) => {
     const icons = {
       NURSE_APPLIED:   { bg:'#EFF6FF', color:'#2563EB', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
-      NURSE_ASSIGNED:  { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
-      JOB_ASSIGNED:    { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
+      NURSE_ASSIGNED:  { bg:'#ECFDF5', color:'#0D9488', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
+      JOB_ASSIGNED:    { bg:'#ECFDF5', color:'#0D9488', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
       JOB_UPDATED:     { bg:'#FEF3C7', color:'#D97706', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> },
       NURSE_ON_WAY:    { bg:'#EFF6FF', color:'#2563EB', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
-      NURSE_ARRIVED:   { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
-      VISIT_COMPLETED: { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
+      NURSE_ARRIVED:   { bg:'#ECFDF5', color:'#0D9488', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+      VISIT_COMPLETED: { bg:'#ECFDF5', color:'#0D9488', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
       VISIT_CANCELLED: { bg:'#FEF2F2', color:'#DC2626', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> },
-      NEW_JOB:         { bg:'#EDE9FE', color:'#7C3AED', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> },
+      NEW_JOB:         { bg:'#F0FDFB', color:'#0D9488', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> },
       announcement:    { bg:'#F1F5F9', color:'#475569', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> },
     };
     const cfg = icons[type] || icons.announcement;
@@ -189,7 +189,7 @@ function NotificationBell({ lang, onNavigate }) {
                   {actorPhoto ? (
                     <img src={actorPhoto} alt={actorName||''} style={{ width:32, height:32, borderRadius:9, objectFit:'cover', flexShrink:0, border:'1.5px solid #E2E8F0' }} />
                   ) : actorName ? (
-                    <div style={{ width:32, height:32, borderRadius:9, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:800, color:'#fff', flexShrink:0 }}>
+                    <div style={{ width:32, height:32, borderRadius:9, background:'linear-gradient(135deg,#2563EB,#0D9488)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:12, fontWeight:800, color:'#fff', flexShrink:0 }}>
                       {actorName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase()}
                     </div>
                   ) : iconFor(n.type)}
@@ -542,7 +542,7 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits, onViewNe
         const readingDate = fmtDate(lastWithVitals.scheduledAt, lang, {day:'numeric',month:'short',year:'numeric'});
         const vitals = [
           lastWithVitals.bpSystolic && { label:'Blood Pressure', labelSq:'Presioni', value:`${lastWithVitals.bpSystolic}/${lastWithVitals.bpDiastolic}`, unit:'mmHg', bg:'#FEF3C7', col:'#92400E', iconCol:'#D97706' },
-          lastWithVitals.glucose && { label:'Glucose', labelSq:'Glukoza', value:lastWithVitals.glucose, unit:'mmol/L', bg:'#ECFDF5', col:'#14532D', iconCol:'#059669' },
+          lastWithVitals.glucose && { label:'Glucose', labelSq:'Glukoza', value:lastWithVitals.glucose, unit:'mmol/L', bg:'#ECFDF5', col:'#14532D', iconCol:'#0D9488' },
           lastWithVitals.heartRate && { label:'Heart Rate', labelSq:'Pulsi', value:lastWithVitals.heartRate, unit:'bpm', bg:'#FEF2F2', col:'#991B1B', iconCol:'#DC2626' },
           lastWithVitals.oxygenSat && { label:'O₂ Sat', labelSq:'Oksigjen', value:`${lastWithVitals.oxygenSat}%`, unit:'SpO₂', bg:'#EFF6FF', col:'#1E40AF', iconCol:'#2563EB' },
         ].filter(Boolean);
@@ -592,9 +592,9 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits, onViewNe
           COMPLETED:   { bar:'#22C55E', bg:'#F0FDF4', icon:<svg width="13" height="13" fill="none" stroke="#16A34A" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
           UNASSIGNED:  { bar:'#F59E0B', bg:'#FFFBEB', icon:<svg width="13" height="13" fill="none" stroke="#D97706" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
           PENDING:     { bar:'#2563EB', bg:'#EFF6FF', icon:<svg width="13" height="13" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
-          ACCEPTED:    { bar:'#059669', bg:'#ECFDF5', icon:<svg width="13" height="13" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> },
-          NURSE_ON_WAY:{ bar:'#6366F1', bg:'#EEF2FF', icon:<svg width="13" height="13" fill="none" stroke="#4F46E5" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
-          NURSE_ARRIVED:{ bar:'#059669', bg:'#ECFDF5', icon:<svg width="13" height="13" fill="none" stroke="#059669" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+          ACCEPTED:    { bar:'#0D9488', bg:'#ECFDF5', icon:<svg width="13" height="13" fill="none" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg> },
+          NURSE_ON_WAY:{ bar:'#1E6FAB', bg:'#F0FDFB', icon:<svg width="13" height="13" fill="none" stroke="#1E6FAB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+          NURSE_ARRIVED:{ bar:'#0D9488', bg:'#ECFDF5', icon:<svg width="13" height="13" fill="none" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
           CANCELLED:   { bar:'#EF4444', bg:'#FEF2F2', icon:<svg width="13" height="13" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> },
         };
         return (
@@ -648,7 +648,7 @@ function Overview({ user, visits, relative, lang, onBook, onViewVisits, onViewNe
                 {relative.age && <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99, background:C.bgSubtle, color:C.textSecondary }}>{relative.age} {lang==='sq'?'vjeç':'yrs'}</span>}
               </div>
             </div>
-            <span style={{ fontSize:11, fontWeight:700, padding:'5px 13px', borderRadius:99, background:C.secondaryLight, color:C.secondary, flexShrink:0, border:`1px solid rgba(5,150,105,0.2)` }}>{tr('dashboard.activeCare')}</span>
+            <span style={{ fontSize:11, fontWeight:700, padding:'5px 13px', borderRadius:99, background:C.secondaryLight, color:C.secondary, flexShrink:0, border:`1px solid rgba(13,148,136,0.2)` }}>{tr('dashboard.activeCare')}</span>
           </div>
 
           {/* Address — full width */}
@@ -742,7 +742,7 @@ function BookVisit({ relatives=[], subscription, onSuccess, onCancel, lang='en' 
       `}</style>
 
       {/* Gradient header */}
-      <div style={{ background:'linear-gradient(145deg,#0F4C8A 0%,#2563EB 60%,#6366F1 100%)', padding:'24px 24px 20px', position:'relative', overflow:'hidden' }}>
+      <div style={{ background:'linear-gradient(145deg,#0F4C8A 0%,#2563EB 60%,#1E6FAB 100%)', padding:'24px 24px 20px', position:'relative', overflow:'hidden' }}>
         <div style={{ position:'absolute', inset:0, opacity:0.07, pointerEvents:'none' }}>
           <svg width="100%" height="100%"><defs><pattern id="bv-dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#bv-dots)"/></svg>
         </div>
@@ -864,7 +864,7 @@ function BookVisit({ relatives=[], subscription, onSuccess, onCancel, lang='en' 
             {tr('dashboard.cancel')}
           </button>
           <button onClick={handleSubmit} disabled={isDisabled}
-            style={{ flex:2, background: isDisabled ? '#94A3B8' : 'linear-gradient(135deg,#2563EB,#4F46E5)', color:'#fff', border:'none', borderRadius:12, padding:'13px', fontSize:14, fontWeight:800, cursor:isDisabled?'not-allowed':'pointer', fontFamily:F, boxShadow: isDisabled?'none':'0 4px 14px rgba(37,99,235,0.3)', display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'box-shadow 0.15s' }}>
+            style={{ flex:2, background: isDisabled ? '#94A3B8' : 'linear-gradient(135deg,#2563EB,#1E6FAB)', color:'#fff', border:'none', borderRadius:12, padding:'13px', fontSize:14, fontWeight:800, cursor:isDisabled?'not-allowed':'pointer', fontFamily:F, boxShadow: isDisabled?'none':'0 4px 14px rgba(37,99,235,0.3)', display:'flex', alignItems:'center', justifyContent:'center', gap:8, transition:'box-shadow 0.15s' }}>
             {loading
               ? <><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{ animation:'spin 0.8s linear infinite' }}><path d="M12 2a10 10 0 0110 10"/><circle cx="12" cy="12" r="10" strokeOpacity="0.25"/></svg>{tr('dashboard.booking')}</>
               : <>{tr('dashboard.bookVisitBtn')} <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></>
@@ -947,8 +947,8 @@ function BookingConfirmation({ visit, onClose, onViewApplicants, lang='en' }) {
           <div style={{ display:'flex', flexDirection:'column', gap:8, marginBottom:20 }}>
             {[
               { icon:<svg width="15" height="15" fill="none" stroke="#2563EB" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>, bg:'#EFF6FF', label:lang==='sq'?'Shërbimi':'Service', value:serviceLabel(visit?.serviceType) },
-              { icon:<svg width="15" height="15" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, bg:'#F5F3FF', label:lang==='sq'?'Data':'Date', value:dateStr },
-              { icon:<svg width="15" height="15" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>, bg:'#F5F3FF', label:lang==='sq'?'Ora':'Time', value:timeStr },
+              { icon:<svg width="15" height="15" fill="none" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>, bg:'#F0FDFB', label:lang==='sq'?'Data':'Date', value:dateStr },
+              { icon:<svg width="15" height="15" fill="none" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>, bg:'#F0FDFB', label:lang==='sq'?'Ora':'Time', value:timeStr },
               { icon:<svg width="15" height="15" fill="none" stroke="#DC2626" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>, bg:'#FEF2F2', label:lang==='sq'?'Vendndodhja':'Location', value:visit?.relative?.city||visit?.relativeCity||(lang==='sq'?'Do konfirmohet':'To be confirmed') },
             ].map(({ icon, bg, label, value }) => (
               <div key={label} style={{ display:'flex', alignItems:'center', gap:12, padding:'10px 14px', background:'#F8FAFC', borderRadius:12, border:'1px solid #F1F5F9' }}>
@@ -975,7 +975,7 @@ function BookingConfirmation({ visit, onClose, onViewApplicants, lang='en' }) {
           {/* Buttons */}
           <div style={{ display:'flex', flexDirection:'column', gap:10 }}>
             <button onClick={()=>{ onClose(); onViewApplicants(visit); }}
-              style={{ width:'100%', background:'linear-gradient(135deg,#2563EB,#4F46E5)', color:'#fff', border:'none', borderRadius:13, padding:'14px', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 16px rgba(37,99,235,0.3)', letterSpacing:'-0.2px', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
+              style={{ width:'100%', background:'linear-gradient(135deg,#2563EB,#1E6FAB)', color:'#fff', border:'none', borderRadius:13, padding:'14px', fontSize:14, fontWeight:800, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 16px rgba(37,99,235,0.3)', letterSpacing:'-0.2px', display:'flex', alignItems:'center', justifyContent:'center', gap:8 }}>
               <svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
               {lang==='sq'?'Monitoroni Aplikimet':'Track Applicants'}
             </button>
@@ -1305,7 +1305,7 @@ function Visits({ visits, lang, onViewApplicants, onRefresh, viewingDetail: _vie
         const statusMeta = {
           UNASSIGNED:  { bar:'#F59E0B', bg:'#FFFBEB' },
           SCHEDULED:   { bar:'#2563EB', bg:'#EFF6FF' },
-          IN_PROGRESS: { bar:'#7C3AED', bg:'#F5F3FF' },
+          IN_PROGRESS: { bar:'#0D9488', bg:'#F0FDFB' },
           COMPLETED:   { bar:'#22C55E', bg:'#F0FDF4' },
           CANCELLED:   { bar:'#EF4444', bg:'#FEF2F2' },
         };
@@ -1376,7 +1376,7 @@ function Visits({ visits, lang, onViewApplicants, onRefresh, viewingDetail: _vie
 
             {/* CTA buttons */}
             {v.status === 'UNASSIGNED' && (
-              <button onClick={()=>onViewApplicants(v)} style={{ width:'100%', background:`linear-gradient(135deg,#EFF6FF,#F5F3FF)`, color:C.primary, border:`1.5px solid rgba(37,99,235,0.2)`, borderRadius:10, padding:'10px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, display:'flex', alignItems:'center', justifyContent:'center', gap:7 }}>
+              <button onClick={()=>onViewApplicants(v)} style={{ width:'100%', background:`linear-gradient(135deg,#EFF6FF,#F0FDFB)`, color:C.primary, border:`1.5px solid rgba(37,99,235,0.2)`, borderRadius:10, padding:'10px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, display:'flex', alignItems:'center', justifyContent:'center', gap:7 }}>
                 <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
                 {tr('dashboard.viewApplicants')}
               </button>
@@ -1400,7 +1400,7 @@ function Visits({ visits, lang, onViewApplicants, onRefresh, viewingDetail: _vie
                   {reviewError && <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:8, padding:'8px 12px', fontSize:12, color:'#DC2626', marginBottom:10 }}>{reviewError}</div>}
                   <div style={{ display:'flex', gap:8 }}>
                     <button onClick={()=>{ setReviewing(null); setReviewError(''); }} style={{ flex:1, padding:'10px', borderRadius:9, border:`1px solid ${C.border}`, background:'transparent', fontSize:13, cursor:'pointer', color:C.textSecondary, fontFamily:F }}>{tr('dashboard.cancel')}</button>
-                    <button onClick={()=>submitReview(v.id)} disabled={!rating||submitting} style={{ flex:2, padding:'10px', borderRadius:9, border:'none', background:'linear-gradient(135deg,#2563EB,#4F46E5)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity:!rating||submitting?0.6:1, fontFamily:F }}>{submitting?tr('dashboard.submitting'):tr('dashboard.submitReview')}</button>
+                    <button onClick={()=>submitReview(v.id)} disabled={!rating||submitting} style={{ flex:2, padding:'10px', borderRadius:9, border:'none', background:'linear-gradient(135deg,#2563EB,#1E6FAB)', color:'#fff', fontSize:13, fontWeight:700, cursor:'pointer', opacity:!rating||submitting?0.6:1, fontFamily:F }}>{submitting?tr('dashboard.submitting'):tr('dashboard.submitReview')}</button>
                   </div>
                 </div>
               ) : (
@@ -1454,7 +1454,7 @@ function VisitDetailModal({ visit, lang, onClose }) {
       body{font-family:'Helvetica Neue',Arial,sans-serif;color:#111;margin:0;padding:40px;font-size:13px;line-height:1.6;}
       .header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2563EB;padding-bottom:20px;margin-bottom:28px;}
       .brand{font-size:22px;font-weight:900;color:#2563EB;letter-spacing:-0.5px;}
-      .badge{display:inline-block;background:#ECFDF5;color:#059669;padding:4px 12px;border-radius:999px;font-weight:700;font-size:11px;border:1px solid #BBF7D0;}
+      .badge{display:inline-block;background:#ECFDF5;color:#0D9488;padding:4px 12px;border-radius:999px;font-weight:700;font-size:11px;border:1px solid #BBF7D0;}
       h2{font-size:20px;font-weight:800;margin:0 0 4px;color:#111;}
       .meta{color:#6B7280;font-size:12px;margin-bottom:20px;}
       .section-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9CA3AF;margin:22px 0 8px;}
@@ -1517,7 +1517,7 @@ function VisitDetailModal({ visit, lang, onClose }) {
       <div onClick={e=>e.stopPropagation()} style={{ background:C.bgWhite, borderRadius:24, maxWidth:540, width:'100%', boxShadow:'0 32px 80px rgba(0,0,0,0.25)', maxHeight:'90vh', display:'flex', flexDirection:'column', overflow:'hidden' }}>
 
         {/* Gradient header */}
-        <div style={{ background:'linear-gradient(145deg,#1e3a5f 0%,#2563EB 60%,#4F46E5 100%)', padding:'26px 24px 22px', flexShrink:0, position:'relative', overflow:'hidden' }}>
+        <div style={{ background:'linear-gradient(145deg,#1e3a5f 0%,#2563EB 60%,#1E6FAB 100%)', padding:'26px 24px 22px', flexShrink:0, position:'relative', overflow:'hidden' }}>
           {/* Dot texture */}
           <div style={{ position:'absolute', inset:0, opacity:0.07, pointerEvents:'none' }}>
             <svg width="100%" height="100%"><defs><pattern id="vd-dots" width="18" height="18" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1.2" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#vd-dots)"/></svg>
@@ -1574,7 +1574,7 @@ function VisitDetailModal({ visit, lang, onClose }) {
         {/* Nurse */}
         {visit.nurse?.user && (
           <div style={{ background:C.bgSubtle, borderRadius:12, padding:'14px 16px', marginBottom:20, display:'flex', gap:12, alignItems:'center' }}>
-            <div style={{ width:42, height:42, borderRadius:11, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, fontWeight:800, color:'#fff', flexShrink:0, overflow:'hidden' }}>
+            <div style={{ width:42, height:42, borderRadius:11, background:'linear-gradient(135deg,#2563EB,#0D9488)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:15, fontWeight:800, color:'#fff', flexShrink:0, overflow:'hidden' }}>
               {visit.nurse.profilePhotoUrl
                 ? <img src={visit.nurse.profilePhotoUrl} alt="" style={{ width:'100%',height:'100%',objectFit:'cover' }} />
                 : (visit.nurse.user.name||'N').charAt(0).toUpperCase()}
@@ -1605,9 +1605,9 @@ function VisitDetailModal({ visit, lang, onClose }) {
             <div style={{ fontSize:11, fontWeight:700, color:C.textTertiary, letterSpacing:'1px', textTransform:'uppercase', marginBottom:12 }}>{lang==='sq'?'Shenjat Vitale':'Vitals Recorded'}</div>
             <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:10 }}>
               {visit.bpSystolic && <VitalCard label={lang==='sq'?'Presioni Gjakut':'Blood Pressure'} value={`${visit.bpSystolic}/${visit.bpDiastolic}`} unit="mmHg" bg="#EFF6FF" col="#2563EB" />}
-              {visit.glucose && <VitalCard label={lang==='sq'?'Glukoza':'Glucose'} value={visit.glucose} unit="mmol/L" bg="#ECFDF5" col="#059669" />}
+              {visit.glucose && <VitalCard label={lang==='sq'?'Glukoza':'Glucose'} value={visit.glucose} unit="mmol/L" bg="#ECFDF5" col="#0D9488" />}
               {visit.heartRate && <VitalCard label={lang==='sq'?'Rrahjet e Zemrës':'Heart Rate'} value={visit.heartRate} unit="bpm" bg="#FEF2F2" col="#DC2626" />}
-              {visit.oxygenSat && <VitalCard label="SpO₂" value={`${visit.oxygenSat}%`} unit={lang==='sq'?'Saturimi i O₂':'Oxygen Saturation'} bg="#F5F3FF" col="#7C3AED" />}
+              {visit.oxygenSat && <VitalCard label="SpO₂" value={`${visit.oxygenSat}%`} unit={lang==='sq'?'Saturimi i O₂':'Oxygen Saturation'} bg="#F0FDFB" col="#0D9488" />}
               {visit.temperature && <VitalCard label={lang==='sq'?'Temperatura':'Temperature'} value={`${visit.temperature}°C`} unit="Celsius" bg="#FFFBEB" col="#D97706" />}
             </div>
           </div>
@@ -1637,7 +1637,7 @@ function VisitDetailModal({ visit, lang, onClose }) {
         <div style={{ padding:'14px 24px', borderTop:`1px solid ${C.border}`, flexShrink:0, display:'flex', justifyContent:'space-between', alignItems:'center', gap:10, background:'#F8FAFC', flexWrap:'wrap' }}>
           <Badge s="COMPLETED" lang={lang} />
           <div style={{ display:'flex', gap:8 }}>
-            <button onClick={printReport} style={{ fontSize:13, fontWeight:700, padding:'9px 18px', borderRadius:10, border:'1.5px solid #BBF7D0', background:'#ECFDF5', cursor:'pointer', color:'#059669', fontFamily:F, display:'flex', alignItems:'center', gap:6 }}>
+            <button onClick={printReport} style={{ fontSize:13, fontWeight:700, padding:'9px 18px', borderRadius:10, border:'1.5px solid #BBF7D0', background:'#ECFDF5', cursor:'pointer', color:'#0D9488', fontFamily:F, display:'flex', alignItems:'center', gap:6 }}>
               <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
               {lang==='sq'?'Shkarko PDF':'Download PDF'}
             </button>
@@ -1713,7 +1713,7 @@ function FindNurses({ lang, onBook }) {
 
   return (
     <div>
-      <style>{`.fn-card{transition:transform 0.18s,box-shadow 0.18s}.fn-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.11) !important}.fn-book:hover{background:linear-gradient(135deg,#1D4ED8,#4338CA) !important}`}</style>
+      <style>{`.fn-card{transition:transform 0.18s,box-shadow 0.18s}.fn-card:hover{transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,0.11) !important}.fn-book:hover{background:linear-gradient(135deg,#1D4ED8,#1E6FAB) !important}`}</style>
 
       {/* Search + filter */}
       <div style={{ display:'flex', gap:10, marginBottom:20, flexWrap:'wrap' }}>
@@ -1760,7 +1760,7 @@ function FindNurses({ lang, onBook }) {
 
             {/* Top row: avatar + name + verified */}
             <div style={{ display:'flex', alignItems:'center', gap:14 }}>
-              <div style={{ width:54, height:54, borderRadius:14, background:'linear-gradient(135deg,#2563EB,#7C3AED)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden' }}>
+              <div style={{ width:54, height:54, borderRadius:14, background:'linear-gradient(135deg,#2563EB,#0D9488)', display:'flex', alignItems:'center', justifyContent:'center', fontSize:20, fontWeight:900, color:'#fff', flexShrink:0, overflow:'hidden' }}>
                 {nurse.profilePhotoUrl
                   ? <img src={nurse.profilePhotoUrl} alt={nurse.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
                   : (nurse.name||'N').charAt(0).toUpperCase()
@@ -1773,8 +1773,8 @@ function FindNurses({ lang, onBook }) {
                   {nurse.experience && <span>· {nurse.experience}</span>}
                 </div>
               </div>
-              <span style={{ fontSize:11, fontWeight:700, padding:'4px 9px', borderRadius:99, background:'#ECFDF5', color:'#059669', whiteSpace:'nowrap', flexShrink:0, display:'flex', alignItems:'center', gap:3 }}>
-                <svg width="9" height="9" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
+              <span style={{ fontSize:11, fontWeight:700, padding:'4px 9px', borderRadius:99, background:'#ECFDF5', color:'#0D9488', whiteSpace:'nowrap', flexShrink:0, display:'flex', alignItems:'center', gap:3 }}>
+                <svg width="9" height="9" fill="none" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>
                 {tr('dashboard.nurseVerified')}
               </span>
             </div>
@@ -1808,7 +1808,7 @@ function FindNurses({ lang, onBook }) {
             <button
               className="fn-book"
               onClick={() => onBook()}
-              style={{ width:'100%', background:'linear-gradient(135deg,#2563EB,#4F46E5)', color:'#fff', border:'none', borderRadius:11, padding:'11px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.22)', display:'flex', alignItems:'center', justifyContent:'center', gap:7, marginTop:'auto', transition:'background 0.15s' }}
+              style={{ width:'100%', background:'linear-gradient(135deg,#2563EB,#1E6FAB)', color:'#fff', border:'none', borderRadius:11, padding:'11px', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, boxShadow:'0 4px 12px rgba(37,99,235,0.22)', display:'flex', alignItems:'center', justifyContent:'center', gap:7, marginTop:'auto', transition:'background 0.15s' }}
             >
               {tr('dashboard.bookWithNurse')}
               <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg>
@@ -1952,7 +1952,7 @@ function SubscriptionSection({ userData, lang, onRefresh }) {
               <button className="sub-btn"
                 onClick={()=>handleCheckout(p.id)}
                 disabled={loading===p.id || isCurrent}
-                style={{ width:'100%', padding:'10px', borderRadius:9, border:'none', background:isCurrent?C.bgSubtle:isPopular?'linear-gradient(135deg,#2563EB,#4F46E5)':C.primary, color:isCurrent?C.textTertiary:'#fff', fontSize:13, fontWeight:700, cursor:isCurrent?'not-allowed':'pointer', opacity:loading===p.id?0.7:1, fontFamily:F, transition:'background 0.15s' }}
+                style={{ width:'100%', padding:'10px', borderRadius:9, border:'none', background:isCurrent?C.bgSubtle:isPopular?'linear-gradient(135deg,#2563EB,#1E6FAB)':C.primary, color:isCurrent?C.textTertiary:'#fff', fontSize:13, fontWeight:700, cursor:isCurrent?'not-allowed':'pointer', opacity:loading===p.id?0.7:1, fontFamily:F, transition:'background 0.15s' }}
               >
                 {loading===p.id ? tr('dashboard.loadingPlan') : isCurrent ? tr('dashboard.currentPlanBtn') : tr('dashboard.selectPlanBtn')}
               </button>
@@ -2073,7 +2073,7 @@ export default function Dashboard({ params }) {
           <div style={{ padding:'22px 18px 14px', borderBottom:'1px solid rgba(255,255,255,0.08)' }}>
             <div style={{ fontSize:17,fontWeight:800,color:'#fff',letterSpacing:'-0.5px',marginBottom:14 }}>Vonaxity</div>
             <div style={{ display:'flex',alignItems:'center',gap:9 }}>
-              <div style={{ width:34,height:34,borderRadius:10,background:'linear-gradient(135deg,#2563EB,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
+              <div style={{ width:34,height:34,borderRadius:10,background:'linear-gradient(135deg,#2563EB,#0D9488)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
               <div>
                 <div style={{ fontSize:12,fontWeight:700,color:'#fff' }}>{userData.name}</div>
                 <div style={{ fontSize:10,color:'rgba(255,255,255,0.55)' }}>{tr('dashboard.clientRole')} · {plan}</div>
@@ -2163,7 +2163,7 @@ export default function Dashboard({ params }) {
               <>
                 {/* Trial expired paywall banner */}
                 {isExpired && (
-                  <div style={{ background:'linear-gradient(135deg,#7C3AED,#2563EB)', padding:'18px 28px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
+                  <div style={{ background:'linear-gradient(135deg,#0D9488,#2563EB)', padding:'18px 28px', display:'flex', alignItems:'center', justifyContent:'space-between', gap:16, flexWrap:'wrap' }}>
                     <div>
                       <div style={{ fontSize:15, fontWeight:700, color:'#fff', marginBottom:3 }}>
                         {lang==='sq' ? 'Periudha e provës ka përfunduar' : 'Your free trial has ended'}
@@ -2174,7 +2174,7 @@ export default function Dashboard({ params }) {
                     </div>
                     <button
                       onClick={() => setActive('subscription')}
-                      style={{ background:'#fff', color:'#7C3AED', border:'none', borderRadius:10, padding:'10px 22px', fontSize:14, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}
+                      style={{ background:'#fff', color:'#0D9488', border:'none', borderRadius:10, padding:'10px 22px', fontSize:14, fontWeight:700, cursor:'pointer', whiteSpace:'nowrap', flexShrink:0 }}
                     >
                       {lang==='sq' ? 'Shiko planet →' : 'View plans →'}
                     </button>

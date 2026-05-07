@@ -99,9 +99,9 @@ export default function LoginPage({ params }) {
   };
 
   const isNurse  = role === 'NURSE';
-  const accent   = isNurse ? '#2563EB' : '#059669';
-  const accentDk = isNurse ? '#1D4ED8' : '#047857';
-  const accentLt = isNurse ? '#EFF6FF'  : '#ECFDF5';
+  const accent   = isNurse ? '#2563EB' : '#0D9488';
+  const accentDk = isNurse ? '#1D4ED8' : '#0F766E';
+  const accentLt = isNurse ? '#EFF6FF'  : '#F0FDFB';
   const clientGrad = 'linear-gradient(160deg,rgba(4,68,48,0.78) 0%,rgba(5,120,78,0.55) 100%)';
   const nurseGrad  = 'linear-gradient(160deg,rgba(17,50,130,0.78) 0%,rgba(37,99,235,0.55) 100%)';
 
@@ -166,7 +166,7 @@ export default function LoginPage({ params }) {
                 </div>
               ))}
             </div>
-            <button className="rp-cta" style={{ marginTop:12, background:'#fff', color:'#059669', border:'none', borderRadius:14, padding:'14px 44px', fontSize:16, fontWeight:800, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 20px rgba(0,0,0,0.28)', letterSpacing:'-0.2px' }}>
+            <button className="rp-cta" style={{ marginTop:12, background:'#fff', color:'#0D9488', border:'none', borderRadius:14, padding:'14px 44px', fontSize:16, fontWeight:800, cursor:'pointer', fontFamily:'inherit', boxShadow:'0 4px 20px rgba(0,0,0,0.28)', letterSpacing:'-0.2px' }}>
               {tr('continue')}
             </button>
           </div>
@@ -211,7 +211,7 @@ export default function LoginPage({ params }) {
             style={{ background:'#fff', borderRadius:24, width:'100%', maxWidth:420, boxShadow:'0 32px 80px rgba(0,0,0,0.35)', animation:'modalIn 0.3s cubic-bezier(0.4,0,0.2,1) both', overflow:'hidden' }}>
 
             {/* Gradient top accent bar */}
-            <div style={{ height:5, background: isNurse ? 'linear-gradient(90deg,#1D4ED8,#7C3AED)' : 'linear-gradient(90deg,#059669,#0891B2)' }}/>
+            <div style={{ height:5, background: isNurse ? 'linear-gradient(90deg,#1D4ED8,#0D9488)' : 'linear-gradient(90deg,#0D9488,#0891B2)' }}/>
 
             <div style={{ padding:'28px 32px 32px' }}>
               {/* Header row */}

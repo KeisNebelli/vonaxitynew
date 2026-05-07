@@ -105,9 +105,9 @@ function MockupBooking({ plans, lang = 'en' }) {
         <div style={{ fontSize:13, fontWeight:700, color:'#111827', marginBottom:12 }}>{t('choosePlan')}</div>
         <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr 1fr', gap:7, marginBottom:14 }}>
           {displayPlans.map((p) => (
-            <div key={p.name} style={{ border: p.featured ? '2px solid #7C3AED' : '1px solid #E5E7EB', borderRadius:10, padding:'9px 7px', textAlign:'center', background: p.featured ? '#F5F3FF' : '#fff', position:'relative' }}>
-              {p.featured && <div style={{ position:'absolute', top:-8, left:'50%', transform:'translateX(-50%)', background:'#7C3AED', color:'#fff', fontSize:8, fontWeight:700, padding:'2px 7px', borderRadius:99, whiteSpace:'nowrap' }}>{t('popular')}</div>}
-              <div style={{ fontSize:10, fontWeight:600, color: p.featured ? '#7C3AED':'#6B7280', marginBottom:2 }}>{p.name}</div>
+            <div key={p.name} style={{ border: p.featured ? '2px solid #0D9488' : '1px solid #E5E7EB', borderRadius:10, padding:'9px 7px', textAlign:'center', background: p.featured ? '#F0FDFB' : '#fff', position:'relative' }}>
+              {p.featured && <div style={{ position:'absolute', top:-8, left:'50%', transform:'translateX(-50%)', background:'#0D9488', color:'#fff', fontSize:8, fontWeight:700, padding:'2px 7px', borderRadius:99, whiteSpace:'nowrap' }}>{t('popular')}</div>}
+              <div style={{ fontSize:10, fontWeight:600, color: p.featured ? '#0D9488':'#6B7280', marginBottom:2 }}>{p.name}</div>
               <div style={{ fontSize:15, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>{p.price}</div>
               <div style={{ fontSize:9, color:'#9CA3AF', marginTop:1 }}>{t('visitMo')(p.visits)}</div>
             </div>
@@ -120,7 +120,7 @@ function MockupBooking({ plans, lang = 'en' }) {
             <div style={{ background:'#fff', border:'1px solid #D1D5DB', borderRadius:7, padding:'6px 10px', fontSize:11, color:'#374151' }}>{val}</div>
           </div>
         ))}
-        <div style={{ background:'linear-gradient(135deg,#7C3AED,#2563EB)', borderRadius:8, padding:'9px', textAlign:'center', color:'#fff', fontWeight:700, fontSize:12, marginTop:6 }}>
+        <div style={{ background:'linear-gradient(135deg,#0D9488,#1E6FAB)', borderRadius:8, padding:'9px', textAlign:'center', color:'#fff', fontWeight:700, fontSize:12, marginTop:6 }}>
           {t('confirmBooking')}
         </div>
       </div>
@@ -135,13 +135,13 @@ function MockupJobBoard({ lang = 'en' }) {
       <BrowserBar url="vonaxity.com/dashboard" />
       <div style={{ padding:'16px' }}>
         {/* Success banner */}
-        <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:10, padding:'10px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
-          <div style={{ width:26, height:26, borderRadius:'50%', background:'#059669', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+        <div style={{ background:'#F0FDFB', border:'1px solid #6EE7B7', borderRadius:10, padding:'10px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
+          <div style={{ width:26, height:26, borderRadius:'50%', background:'#0D9488', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div>
-            <div style={{ fontSize:11, fontWeight:700, color:'#065F46' }}>{tr(lang,'bookingConfirmed')}</div>
-            <div style={{ fontSize:10, color:'#059669' }}>{tr(lang,'matchingNow')}</div>
+            <div style={{ fontSize:11, fontWeight:700, color:'#0F766E' }}>{tr(lang,'bookingConfirmed')}</div>
+            <div style={{ fontSize:10, color:'#0D9488' }}>{tr(lang,'matchingNow')}</div>
           </div>
         </div>
         {/* Visit card — UNASSIGNED state */}
@@ -164,7 +164,7 @@ function MockupJobBoard({ lang = 'en' }) {
           {/* Matching progress bar */}
           <div style={{ fontSize:9, color:'#6B7280', marginBottom:5, fontWeight:600 }}>{tr(lang,'searchingNurses')}</div>
           <div style={{ height:5, borderRadius:99, background:'#F3F4F6', overflow:'hidden' }}>
-            <div style={{ height:'100%', width:'65%', borderRadius:99, background:'linear-gradient(90deg,#7C3AED,#2563EB)', opacity:0.85 }} />
+            <div style={{ height:'100%', width:'65%', borderRadius:99, background:'linear-gradient(90deg,#0D9488,#1E6FAB)', opacity:0.85 }} />
           </div>
           <div style={{ fontSize:9, color:'#9CA3AF', marginTop:5 }}>{tr(lang,'matchedHours')}</div>
         </div>
@@ -188,19 +188,19 @@ function MockupApplicants({ lang = 'en' }) {
       <BrowserBar url="vonaxity.com/dashboard" />
       <div style={{ padding:'16px' }}>
         {/* Notification banner */}
-        <div style={{ background:'#EDE9FE', border:'1px solid #C4B5FD', borderRadius:10, padding:'9px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
-          <div style={{ width:26, height:26, borderRadius:'50%', background:'#7C3AED', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+        <div style={{ background:'#F0FDFB', border:'1px solid #99F6E4', borderRadius:10, padding:'9px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
+          <div style={{ width:26, height:26, borderRadius:'50%', background:'#0D9488', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87M16 3.13a4 4 0 010 7.75"/></svg>
           </div>
           <div>
-            <div style={{ fontSize:11, fontWeight:700, color:'#4C1D95' }}>{tr(lang,'nursesReady')}</div>
-            <div style={{ fontSize:10, color:'#7C3AED' }}>{tr(lang,'pickOrLet')}</div>
+            <div style={{ fontSize:11, fontWeight:700, color:'#0F766E' }}>{tr(lang,'nursesReady')}</div>
+            <div style={{ fontSize:10, color:'#0D9488' }}>{tr(lang,'pickOrLet')}</div>
           </div>
         </div>
         {/* Nurse cards */}
         {nurses.map((n) => (
-          <div key={n.name} style={{ background:'#fff', border: n.top ? '2px solid #059669':'1px solid #E5E7EB', borderRadius:12, padding:'11px 12px', marginBottom:8, position:'relative' }}>
-            {n.top && <div style={{ position:'absolute', top:-8, right:12, background:'#059669', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 8px', borderRadius:99 }}>{tr(lang,'recommended')}</div>}
+          <div key={n.name} style={{ background:'#fff', border: n.top ? '2px solid #0D9488':'1px solid #E5E7EB', borderRadius:12, padding:'11px 12px', marginBottom:8, position:'relative' }}>
+            {n.top && <div style={{ position:'absolute', top:-8, right:12, background:'#0D9488', color:'#fff', fontSize:8, fontWeight:800, padding:'2px 8px', borderRadius:99 }}>{tr(lang,'recommended')}</div>}
             <div style={{ display:'flex', gap:10, alignItems:'center', marginBottom:8 }}>
               <img src={n.photo} alt={n.name} style={{ width:38, height:38, borderRadius:'50%', objectFit:'cover', border:'2px solid #DBEAFE', flexShrink:0 }} />
               <div style={{ flex:1 }}>
@@ -211,15 +211,15 @@ function MockupApplicants({ lang = 'en' }) {
                   <span style={{ fontSize:9, color:'#6B7280', marginLeft:3 }}>{n.rating} ({n.reviews})</span>
                 </div>
               </div>
-              <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:6, padding:'2px 7px', fontSize:9, fontWeight:700, color:'#059669', flexShrink:0 }}>{tr(lang,'verified')}</div>
+              <div style={{ background:'#F0FDFB', border:'1px solid #6EE7B7', borderRadius:6, padding:'2px 7px', fontSize:9, fontWeight:700, color:'#0D9488', flexShrink:0 }}>{tr(lang,'verified')}</div>
             </div>
-            <div style={{ background: n.top ? '#059669':'#F3F4F6', borderRadius:7, padding:'6px', textAlign:'center', color: n.top ? '#fff':'#374151', fontWeight:700, fontSize:10 }}>
+            <div style={{ background: n.top ? '#0D9488':'#F3F4F6', borderRadius:7, padding:'6px', textAlign:'center', color: n.top ? '#fff':'#374151', fontWeight:700, fontSize:10 }}>
               {n.top ? tr(lang,'selectConfirm') : tr(lang,'viewProfile')}
             </div>
           </div>
         ))}
         <div style={{ background:'#F9FAFB', border:'1px solid #E5E7EB', borderRadius:8, padding:'8px 12px', fontSize:10, color:'#6B7280', textAlign:'center' }}>
-          {tr(lang,'letVonaxity')} <strong style={{ color:'#7C3AED' }}>{tr(lang,'letVonaxityBold')}</strong> {tr(lang,'letVonaxityEnd')}
+          {tr(lang,'letVonaxity')} <strong style={{ color:'#0D9488' }}>{tr(lang,'letVonaxityBold')}</strong> {tr(lang,'letVonaxityEnd')}
         </div>
       </div>
     </div>
@@ -233,13 +233,13 @@ function MockupNurseConfirmed({ lang = 'en' }) {
       <BrowserBar url="vonaxity.com/dashboard" />
       <div style={{ padding:'16px' }}>
         {/* Confirmation banner */}
-        <div style={{ background:'#ECFDF5', border:'1px solid #6EE7B7', borderRadius:10, padding:'10px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
-          <div style={{ width:28, height:28, borderRadius:'50%', background:'#059669', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+        <div style={{ background:'#F0FDFB', border:'1px solid #6EE7B7', borderRadius:10, padding:'10px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
+          <div style={{ width:28, height:28, borderRadius:'50%', background:'#0D9488', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
             <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div>
-            <div style={{ fontSize:12, fontWeight:700, color:'#065F46' }}>{tr(lang,'nurseConfirmed')}</div>
-            <div style={{ fontSize:10, color:'#059669' }}>{tr(lang,'arrivingTime')}</div>
+            <div style={{ fontSize:12, fontWeight:700, color:'#0F766E' }}>{tr(lang,'nurseConfirmed')}</div>
+            <div style={{ fontSize:10, color:'#0D9488' }}>{tr(lang,'arrivingTime')}</div>
           </div>
         </div>
         {/* Nurse card */}
@@ -264,7 +264,7 @@ function MockupNurseConfirmed({ lang = 'en' }) {
               </div>
             ))}
           </div>
-          <div style={{ marginTop:10, background:'#F5F3FF', borderRadius:8, padding:'8px 10px', fontSize:10, color:'#7C3AED', fontWeight:600, textAlign:'center' }}>
+          <div style={{ marginTop:10, background:'#F0FDFB', borderRadius:8, padding:'8px 10px', fontSize:10, color:'#0D9488', fontWeight:600, textAlign:'center' }}>
             <span style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:5 }}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 16.92v3a2 2 0 01-2.18 2 19.79 19.79 0 01-8.63-3.07A19.5 19.5 0 013.07 9.81 19.79 19.79 0 011 1.18 2 2 0 012.98 0h3a2 2 0 012 1.72c.127.96.361 1.903.7 2.81a2 2 0 01-.45 2.11L7.09 7.91a16 16 0 006 6l1.27-1.27a2 2 0 012.11-.45c.907.339 1.85.573 2.81.7A2 2 0 0122 14.92z"/></svg>SMS + email reminder sent</span>
           </div>
         </div>
@@ -288,8 +288,8 @@ function MockupVisitTracking() {
       <div style={{ padding:'16px' }}>
         {/* Live status pill */}
         <div style={{ display:'flex', alignItems:'center', gap:8, marginBottom:13 }}>
-          <div style={{ width:8, height:8, borderRadius:'50%', background:'#059669', boxShadow:'0 0 0 3px rgba(5,150,105,0.2)', animation:'pulse 1.5s infinite' }} />
-          <div style={{ fontSize:12, fontWeight:700, color:'#059669' }}>Nurse has arrived · Live</div>
+          <div style={{ width:8, height:8, borderRadius:'50%', background:'#0D9488', boxShadow:'0 0 0 3px rgba(13,148,136,0.2)', animation:'pulse 1.5s infinite' }} />
+          <div style={{ fontSize:12, fontWeight:700, color:'#0D9488' }}>Nurse has arrived · Live</div>
         </div>
         {/* Nurse strip */}
         <div style={{ display:'flex', gap:10, alignItems:'center', background:'#fff', border:'1px solid #E5E7EB', borderRadius:11, padding:'10px 12px', marginBottom:14 }}>
@@ -298,7 +298,7 @@ function MockupVisitTracking() {
             <div style={{ fontWeight:700, color:'#111827', fontSize:11 }}>Elona Berberi</div>
             <div style={{ fontSize:10, color:'#6B7280' }}>ETA: Arrived 10:03 AM</div>
           </div>
-          <div style={{ background:'#ECFDF5', borderRadius:7, padding:'4px 9px', fontSize:10, fontWeight:700, color:'#059669' }}>On site</div>
+          <div style={{ background:'#F0FDFB', borderRadius:7, padding:'4px 9px', fontSize:10, fontWeight:700, color:'#0D9488' }}>On site</div>
         </div>
         {/* Timeline */}
         <div style={{ position:'relative', paddingLeft:20 }}>
@@ -306,16 +306,16 @@ function MockupVisitTracking() {
           {steps.map((s, i) => (
             <div key={i} style={{ display:'flex', alignItems:'center', gap:10, marginBottom:11, position:'relative' }}>
               <div style={{ width:14, height:14, borderRadius:'50%', flexShrink:0, zIndex:1, position:'relative',
-                background: s.active ? '#059669' : s.done ? '#059669' : '#E5E7EB',
+                background: s.active ? '#0D9488' : s.done ? '#0D9488' : '#E5E7EB',
                 border: s.active ? '2px solid #fff' : 'none',
-                boxShadow: s.active ? '0 0 0 3px rgba(5,150,105,0.25)' : 'none',
+                boxShadow: s.active ? '0 0 0 3px rgba(13,148,136,0.25)' : 'none',
                 display:'flex', alignItems:'center', justifyContent:'center',
               }}>
                 {s.done && !s.active && <svg width="8" height="8" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>}
               </div>
-              <div style={{ fontSize:11, fontWeight: s.active ? 700 : s.done ? 600 : 400, color: s.active ? '#059669' : s.done ? '#374151' : '#9CA3AF' }}>
+              <div style={{ fontSize:11, fontWeight: s.active ? 700 : s.done ? 600 : 400, color: s.active ? '#0D9488' : s.done ? '#374151' : '#9CA3AF' }}>
                 {s.label}
-                {s.active && <span style={{ marginLeft:6, fontSize:9, background:'#ECFDF5', color:'#059669', padding:'1px 6px', borderRadius:99, fontWeight:700 }}>NOW</span>}
+                {s.active && <span style={{ marginLeft:6, fontSize:9, background:'#F0FDFB', color:'#0D9488', padding:'1px 6px', borderRadius:99, fontWeight:700 }}>NOW</span>}
               </div>
             </div>
           ))}
@@ -335,13 +335,13 @@ function MockupHealthReport() {
       <BrowserBar url="vonaxity.com/dashboard/health" />
       <div style={{ padding:'16px' }}>
         {/* Done banner */}
-        <div style={{ background:'linear-gradient(135deg,#EFF6FF,#F5F3FF)', border:'1px solid #C4B5FD', borderRadius:10, padding:'9px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
-          <div style={{ width:26, height:26, borderRadius:'50%', background:'linear-gradient(135deg,#7C3AED,#2563EB)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+        <div style={{ background:'#F0FDFB', border:'1px solid #99F6E4', borderRadius:10, padding:'9px 13px', display:'flex', gap:10, alignItems:'center', marginBottom:13 }}>
+          <div style={{ width:26, height:26, borderRadius:'50%', background:'linear-gradient(135deg,#0D9488,#1E6FAB)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           </div>
           <div>
-            <div style={{ fontSize:11, fontWeight:700, color:'#4C1D95' }}>Visit completed · May 5</div>
-            <div style={{ fontSize:10, color:'#7C3AED' }}>10:00–10:48 AM · Elona Berberi</div>
+            <div style={{ fontSize:11, fontWeight:700, color:'#0F766E' }}>Visit completed · May 5</div>
+            <div style={{ fontSize:10, color:'#0D9488' }}>10:00–10:48 AM · Elona Berberi</div>
           </div>
         </div>
         {/* Vitals grid */}
@@ -356,7 +356,7 @@ function MockupHealthReport() {
             <div key={r.label} style={{ background:'#fff', border:'1px solid #E5E7EB', borderRadius:10, padding:'9px 10px' }}>
               <div style={{ fontSize:9, color:'#9CA3AF', marginBottom:3 }}>{r.label}</div>
               <div style={{ fontSize:14, fontWeight:800, color:'#111827', letterSpacing:'-0.5px' }}>{r.val} <span style={{ fontSize:9, fontWeight:400, color:'#6B7280' }}>{r.unit}</span></div>
-              <div style={{ fontSize:9, fontWeight:700, color:'#059669', marginTop:3 }}>✓ Normal</div>
+              <div style={{ fontSize:9, fontWeight:700, color:'#0D9488', marginTop:3 }}>✓ Normal</div>
             </div>
           ))}
         </div>
@@ -365,7 +365,7 @@ function MockupHealthReport() {
           <div style={{ fontSize:9, fontWeight:700, color:'#92400E', marginBottom:2, textTransform:'uppercase', letterSpacing:'0.5px' }}>Nurse Note</div>
           <div style={{ fontSize:10, color:'#78350F', lineHeight:1.6 }}>Patient stable. Recommend continuing current medication. Next check-in in 2 weeks.</div>
         </div>
-        <div style={{ background:'#ECFDF5', borderRadius:8, padding:'7px 12px', fontSize:10, fontWeight:600, color:'#059669', textAlign:'center' }}>
+        <div style={{ background:'#F0FDFB', borderRadius:8, padding:'7px 12px', fontSize:10, fontWeight:600, color:'#0D9488', textAlign:'center' }}>
           <span style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:5 }}><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>Full report sent to your email</span>
         </div>
       </div>
@@ -394,8 +394,8 @@ const getSteps = (lang) => {
     {
       num: '01',
       title: sq ? 'Zgjidhni planin & rezervoni' : 'Pick a plan & book',
-      color: '#7C3AED',
-      colorLight: 'rgba(124,58,237,0.08)',
+      color: '#0D9488',
+      colorLight: 'rgba(13,148,136,0.08)',
       badge: sq ? 'Zgjat 2 minuta' : 'Takes 2 minutes',
       headline: sq ? 'Zgjidhni planin, tregoni për të dashurin tuaj' : 'Pick a plan, tell us about your loved one',
       description: sq
@@ -463,8 +463,8 @@ const getSteps = (lang) => {
     {
       num: '04',
       title: sq ? 'Infermierja u konfirmua' : 'Nurse confirmed',
-      color: '#059669',
-      colorLight: 'rgba(5,150,105,0.08)',
+      color: '#0D9488',
+      colorLight: 'rgba(13,148,136,0.08)',
       badge: sq ? 'Brenda 24 orësh' : 'Within 24 hours',
       headline: sq ? 'Infermierja juaj konfirmohet me orën dhe detajet e sakta' : 'Your nurse is confirmed with exact time and details',
       description: sq
@@ -509,8 +509,8 @@ const getSteps = (lang) => {
     {
       num: '06',
       title: sq ? 'Raporti shëndetësor dërgohet' : 'Health report delivered',
-      color: '#7C3AED',
-      colorLight: 'rgba(124,58,237,0.08)',
+      color: '#0D9488',
+      colorLight: 'rgba(13,148,136,0.08)',
       badge: sq ? 'Të njëjtën ditë' : 'Same day',
       headline: sq ? 'Raporti i plotë i vitaleve dhe shënimet e infermierës — direkt në emailin tuaj' : 'Full vitals report and nurse notes — straight to your inbox',
       description: sq

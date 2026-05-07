@@ -7,7 +7,7 @@ import NurseAvatar, { StarRating } from '@/components/ui/NurseAvatar';
 import { t } from '@/translations';
 
 const C = {
-  primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5',
+  primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#0D9488', secondaryLight:'#F0FDFB',
   warning:'#D97706', warningLight:'#FFFBEB',
   bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4',
   textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF',
@@ -29,7 +29,7 @@ const FALLBACK_NURSE = {
 };
 
 function CheckIcon() {
-  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
+  return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 }
 function MapPinIcon() {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg>;
@@ -251,12 +251,12 @@ export default function NurseProfilePage({ params }) {
                 )}
                 {nurse.specialties?.length > 0 && (
                   <div style={{ display:'flex', gap:10 }}>
-                    <div style={{ width:7, height:7, borderRadius:'50%', background:'#7C3AED', flexShrink:0, marginTop:5 }} />
+                    <div style={{ width:7, height:7, borderRadius:'50%', background:'#0D9488', flexShrink:0, marginTop:5 }} />
                     <div>
                       <div style={{ fontSize:11, fontWeight:600, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px', marginBottom:4 }}>{tr('nurses.specialties')}</div>
                       <div style={{ display:'flex', flexWrap:'wrap', gap:5 }}>
                         {nurse.specialties.map(s => (
-                          <span key={s} style={{ fontSize:12, fontWeight:600, padding:'2px 8px', borderRadius:99, background:'#F5F3FF', color:'#7C3AED' }}>{s}</span>
+                          <span key={s} style={{ fontSize:12, fontWeight:600, padding:'2px 8px', borderRadius:99, background:'#F0FDFB', color:'#0D9488' }}>{s}</span>
                         ))}
                       </div>
                     </div>
@@ -275,7 +275,7 @@ export default function NurseProfilePage({ params }) {
                   {DAYS_EN.map((dayEn, i) => {
                     const active = nurse.availability.includes(dayEn);
                     return (
-                      <span key={dayEn} style={{ fontSize:12, fontWeight:600, padding:'4px 10px', borderRadius:8, background:active?C.secondaryLight:C.bgSubtle, color:active?C.secondary:C.textTertiary, border:`1px solid ${active?'rgba(5,150,105,0.15)':C.border}` }}>
+                      <span key={dayEn} style={{ fontSize:12, fontWeight:600, padding:'4px 10px', borderRadius:8, background:active?C.secondaryLight:C.bgSubtle, color:active?C.secondary:C.textTertiary, border:`1px solid ${active?'rgba(13,148,136,0.15)':C.border}` }}>
                         {Array.isArray(shortDays) ? shortDays[i] : dayEn.slice(0,3)}
                       </span>
                     );

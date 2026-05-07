@@ -37,8 +37,7 @@ const TICKER_ICONS = {
 // Accent color → light background (10% opacity via hex)
 const ACCENT_BG = {
   '#2563EB': 'rgba(37,99,235,0.08)',
-  '#059669': 'rgba(5,150,105,0.08)',
-  '#7C3AED': 'rgba(124,58,237,0.08)',
+  '#0D9488': 'rgba(13,148,136,0.08)',
 };
 
 export default function WellnessTicker({ lang = 'en' }) {
@@ -56,7 +55,7 @@ export default function WellnessTicker({ lang = 'en' }) {
     <section
       aria-label="Wellness tips"
       style={{
-        background: 'linear-gradient(to right, #EFF6FF 0%, #F0FDF4 50%, #F5F3FF 100%)',
+        background: 'linear-gradient(to right, #EFF6FF 0%, #F0FDFB 50%, #F0FDFB 100%)',
         borderTop: '1px solid #E5E7EB',
         borderBottom: '1px solid #E5E7EB',
         padding: '14px 0 10px',
@@ -78,7 +77,7 @@ export default function WellnessTicker({ lang = 'en' }) {
         onMouseLeave={() => setPaused(false)}
       >
         <div aria-hidden style={{ position:'absolute', left:0, top:0, bottom:0, width:64, background:'linear-gradient(to right, #EFF6FF, transparent)', zIndex:2, pointerEvents:'none' }} />
-        <div aria-hidden style={{ position:'absolute', right:0, top:0, bottom:0, width:64, background:'linear-gradient(to left, #F5F3FF, transparent)', zIndex:2, pointerEvents:'none' }} />
+        <div aria-hidden style={{ position:'absolute', right:0, top:0, bottom:0, width:64, background:'linear-gradient(to left, #F0FDFB, transparent)', zIndex:2, pointerEvents:'none' }} />
 
         {/* Scrolling track */}
         <div

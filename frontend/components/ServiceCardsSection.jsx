@@ -115,8 +115,8 @@ const AnimNursing = () => (
 
 const SERVICE_META = [
   {
-    color: '#7C3AED', colorLight: 'rgba(124,58,237,0.08)', colorBorder: 'rgba(124,58,237,0.18)',
-    gradient: 'linear-gradient(135deg,#7C3AED 0%,#5B21B6 100%)',
+    color: '#0D9488', colorLight: 'rgba(13,148,136,0.08)', colorBorder: 'rgba(13,148,136,0.18)',
+    gradient: 'linear-gradient(135deg,#0D9488 0%,#0F766E 100%)',
     duration: '15–20 min',
     Anim: AnimHeartbeat,
     en: {
@@ -155,8 +155,8 @@ const SERVICE_META = [
     },
   },
   {
-    color: '#059669', colorLight: 'rgba(5,150,105,0.08)', colorBorder: 'rgba(5,150,105,0.18)',
-    gradient: 'linear-gradient(135deg,#059669 0%,#065F46 100%)',
+    color: '#0D9488', colorLight: 'rgba(13,148,136,0.08)', colorBorder: 'rgba(13,148,136,0.18)',
+    gradient: 'linear-gradient(135deg,#0D9488 0%,#0F766E 100%)',
     duration: '20–30 min',
     Anim: AnimVitals,
     en: {
@@ -568,7 +568,7 @@ export default function ServiceCardsSection({ lang = 'en', services }) {
           cursor:pointer; box-shadow:0 2px 12px rgba(0,0,0,0.08);
           transition:all 0.18s ease; z-index:20;
         }
-        .fan-arrow:hover { border-color:#7C3AED; background:#F5F3FF; box-shadow:0 4px 20px rgba(124,58,237,0.2); }
+        .fan-arrow:hover { border-color:#0D9488; background:#F0FDFB; box-shadow:0 4px 20px rgba(13,148,136,0.2); }
         .fan-arrow.left  { left:calc(50% - 214px); }
         .fan-arrow.right { right:calc(50% - 214px); }
         .fan-dots { display:flex; gap:6px; justify-content:center; margin-bottom:36px; }
@@ -603,13 +603,13 @@ export default function ServiceCardsSection({ lang = 'en', services }) {
           display:flex; align-items:center; justify-content:center; cursor:pointer;
           transition:all .15s ease; flex-shrink:0;
         }
-        .svc-nav-btn:hover:not(:disabled) { border-color:#7C3AED; background:#F5F3FF; }
+        .svc-nav-btn:hover:not(:disabled) { border-color:#0D9488; background:#F0FDFB; }
         .svc-nav-btn:disabled { opacity:.3; cursor:default; }
         .svc-item {
           display:flex; gap:10px; align-items:flex-start; padding:9px 12px; border-radius:10px;
           background:#FAFAF9; border:1px solid #F3F4F6; transition:background .15s;
         }
-        .svc-item:hover { background:#F5F3FF; border-color:rgba(124,58,237,.12); }
+        .svc-item:hover { background:#F0FDFB; border-color:rgba(13,148,136,.12); }
         @media (max-width:640px) {
           .fan-arrow.left  { left:8px; }
           .fan-arrow.right { right:8px; }

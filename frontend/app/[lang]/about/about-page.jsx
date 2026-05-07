@@ -5,8 +5,8 @@ import { t } from '@/translations';
 
 const C = {
   primary:'#2563EB', primaryLight:'#EFF6FF', primaryDark:'#1D4ED8',
-  secondary:'#059669', secondaryLight:'#ECFDF5',
-  purple:'#7C3AED', purpleLight:'#F5F3FF',
+  secondary:'#0D9488', secondaryLight:'#F0FDFB',
+  purple:'#0D9488', purpleLight:'#F0FDFB',
   amber:'#D97706', amberLight:'#FFFBEB',
   bg:'#FAFAF9', bgWhite:'#FFFFFF',
   textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF',
@@ -14,9 +14,9 @@ const C = {
 };
 
 const VALUE_META = [
-  { color:'#7C3AED', light:'#F5F3FF', border:'rgba(124,58,237,0.2)', gradient:'linear-gradient(135deg,#7C3AED,#5B21B6)',
+  { color:'#0D9488', light:'#F0FDFB', border:'rgba(13,148,136,0.2)', gradient:'linear-gradient(135deg,#0D9488,#0F766E)',
     icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20.84 4.61a5.5 5.5 0 00-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 00-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 000-7.78z"/></svg> },
-  { color:'#059669', light:'#ECFDF5', border:'rgba(5,150,105,0.2)', gradient:'linear-gradient(135deg,#059669,#065F46)',
+  { color:'#0D9488', light:'#F0FDFB', border:'rgba(13,148,136,0.2)', gradient:'linear-gradient(135deg,#0D9488,#0F766E)',
     icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg> },
   { color:'#2563EB', light:'#EFF6FF', border:'rgba(37,99,235,0.2)', gradient:'linear-gradient(135deg,#2563EB,#1D4ED8)',
     icon:<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="2" y1="12" x2="22" y2="12"/><path d="M12 2a15.3 15.3 0 014 10 15.3 15.3 0 01-4 10 15.3 15.3 0 01-4-10 15.3 15.3 0 014-10z"/></svg> },
@@ -96,13 +96,13 @@ export default function AboutPage({ params }) {
           </svg>
         </div>
         {/* Gradient blobs */}
-        <div style={{ position:'absolute', top:'-80px', right:'-60px', width:480, height:480, borderRadius:'50%', background:'radial-gradient(circle,rgba(124,58,237,0.3) 0%,transparent 70%)', pointerEvents:'none' }} />
+        <div style={{ position:'absolute', top:'-80px', right:'-60px', width:480, height:480, borderRadius:'50%', background:'radial-gradient(circle,rgba(13,148,136,0.3) 0%,transparent 70%)', pointerEvents:'none' }} />
         <div style={{ position:'absolute', bottom:'-60px', left:'-40px', width:360, height:360, borderRadius:'50%', background:'radial-gradient(circle,rgba(37,99,235,0.25) 0%,transparent 70%)', pointerEvents:'none' }} />
 
         <div style={{ maxWidth:1100, margin:'0 auto', padding:'96px 24px 88px', position:'relative', zIndex:1, width:'100%' }}>
           {/* Mission tag */}
-          <div style={{ display:'inline-flex', alignItems:'center', gap:8, fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(196,181,253,0.9)', background:'rgba(124,58,237,0.2)', padding:'6px 16px', borderRadius:99, marginBottom:28, border:'1px solid rgba(124,58,237,0.3)' }}>
-            <div style={{ width:6, height:6, borderRadius:'50%', background:'#A78BFA', animation:'pulse 2s infinite' }} />
+          <div style={{ display:'inline-flex', alignItems:'center', gap:8, fontSize:11, fontWeight:700, letterSpacing:'1.5px', textTransform:'uppercase', color:'rgba(153,245,227,0.9)', background:'rgba(13,148,136,0.2)', padding:'6px 16px', borderRadius:99, marginBottom:28, border:'1px solid rgba(13,148,136,0.3)' }}>
+            <div style={{ width:6, height:6, borderRadius:'50%', background:'#99F5E3', animation:'pulse 2s infinite' }} />
             {t(lang,'about.tag')}
           </div>
 
@@ -117,8 +117,8 @@ export default function AboutPage({ params }) {
           {/* Floating stat pills */}
           <div style={{ display:'flex', gap:12, flexWrap:'wrap' }}>
             {[
-              { val:'500+', label: lang==='sq'?'Infermierë':'Nurses', color:'#A78BFA', bg:'rgba(124,58,237,0.2)', border:'rgba(124,58,237,0.3)' },
-              { val:'8',    label: lang==='sq'?'Qytete':'Cities', color:'#6EE7B7', bg:'rgba(5,150,105,0.2)', border:'rgba(5,150,105,0.3)' },
+              { val:'500+', label: lang==='sq'?'Infermierë':'Nurses', color:'#99F5E3', bg:'rgba(13,148,136,0.2)', border:'rgba(13,148,136,0.3)' },
+              { val:'8',    label: lang==='sq'?'Qytete':'Cities', color:'#6EE7B7', bg:'rgba(13,148,136,0.2)', border:'rgba(13,148,136,0.3)' },
               { val:'100%', label: lang==='sq'?'E licencuar':'Licensed', color:'#93C5FD', bg:'rgba(37,99,235,0.2)', border:'rgba(37,99,235,0.3)' },
               { val:'24h',  label: lang==='sq'?'Caktim':'Assignment', color:'#FDE68A', bg:'rgba(217,119,6,0.2)', border:'rgba(217,119,6,0.3)' },
             ].map(s => (
@@ -137,7 +137,7 @@ export default function AboutPage({ params }) {
           <div className="ab-story-grid" style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:64, alignItems:'center' }}>
             {/* Left — text */}
             <div>
-              <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.secondary, background:C.secondaryLight, padding:'5px 13px', borderRadius:99, marginBottom:24, border:'1px solid rgba(5,150,105,0.15)' }}>
+              <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.secondary, background:C.secondaryLight, padding:'5px 13px', borderRadius:99, marginBottom:24, border:'1px solid rgba(13,148,136,0.15)' }}>
                 {lang==='sq' ? 'Historia jonë' : 'Our story'}
               </div>
               <h2 style={{ fontSize:'clamp(26px,3.5vw,40px)', fontWeight:800, color:C.textPrimary, letterSpacing:'-1.2px', lineHeight:1.15, marginBottom:22 }}>
@@ -156,7 +156,7 @@ export default function AboutPage({ params }) {
                   : ['Founded by Albanian diaspora members','Verified & licensed nurse network','Health report after every visit']
                 ).map(item => (
                   <div key={item} style={{ display:'flex', alignItems:'center', gap:10, fontSize:14, color:C.textPrimary, fontWeight:500 }}>
-                    <div style={{ width:22, height:22, borderRadius:'50%', background:C.secondaryLight, border:'1.5px solid rgba(5,150,105,0.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <div style={{ width:22, height:22, borderRadius:'50%', background:C.secondaryLight, border:'1.5px solid rgba(13,148,136,0.2)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                       <svg width="10" height="10" viewBox="0 0 24 24" fill="none" stroke={C.secondary} strokeWidth="3.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     </div>
                     {item}
@@ -174,7 +174,7 @@ export default function AboutPage({ params }) {
                   <svg width="160" height="160" viewBox="0 0 54 54" fill="none"><rect x="19" y="0" width="16" height="54" rx="6" fill="#fff"/><rect x="0" y="19" width="54" height="16" rx="6" fill="#fff"/></svg>
                 </div>
 
-                <div style={{ fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:'rgba(196,181,253,0.7)', marginBottom:20 }}>
+                <div style={{ fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:'rgba(153,245,227,0.7)', marginBottom:20 }}>
                   {lang==='sq' ? 'Pse e ndërtuat Vonaxity?' : 'Why we built Vonaxity'}
                 </div>
 
@@ -194,7 +194,7 @@ export default function AboutPage({ params }) {
               </div>
 
               {/* Floating badge */}
-              <div style={{ position:'absolute', bottom:-20, left:-20, background:'linear-gradient(135deg,#059669,#065F46)', borderRadius:16, padding:'14px 20px', boxShadow:'0 8px 24px rgba(5,150,105,0.35)', display:'flex', alignItems:'center', gap:10 }}>
+              <div style={{ position:'absolute', bottom:-20, left:-20, background:'linear-gradient(135deg,#0D9488,#0F766E)', borderRadius:16, padding:'14px 20px', boxShadow:'0 8px 24px rgba(13,148,136,0.35)', display:'flex', alignItems:'center', gap:10 }}>
                 <div style={{ width:36, height:36, borderRadius:10, background:'rgba(255,255,255,0.2)', display:'flex', alignItems:'center', justifyContent:'center' }}>
                   <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                 </div>
@@ -209,10 +209,10 @@ export default function AboutPage({ params }) {
       </section>
 
       {/* ── Values ── */}
-      <section style={{ padding:'88px 24px', background:'linear-gradient(180deg,#F8FAFF,#F5F3FF)' }}>
+      <section style={{ padding:'88px 24px', background:'linear-gradient(180deg,#F8FAFF,#F0FDFB)' }}>
         <div style={{ maxWidth:1100, margin:'0 auto' }}>
           <div style={{ textAlign:'center', marginBottom:56 }}>
-            <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.purple, background:C.purpleLight, padding:'5px 13px', borderRadius:99, marginBottom:16, border:'1px solid rgba(124,58,237,0.15)' }}>
+            <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.purple, background:C.purpleLight, padding:'5px 13px', borderRadius:99, marginBottom:16, border:'1px solid rgba(13,148,136,0.15)' }}>
               {lang==='sq' ? 'Vlerat tona' : 'Our values'}
             </div>
             <h2 style={{ fontSize:'clamp(26px,3.5vw,42px)', fontWeight:800, color:C.textPrimary, letterSpacing:'-1.5px', margin:'0 0 14px' }}>
@@ -259,11 +259,11 @@ export default function AboutPage({ params }) {
           {/* Horizontal timeline */}
           <div className="ab-milestone" style={{ display:'flex', alignItems:'flex-start', gap:0, position:'relative' }}>
             {/* Connecting line */}
-            <div className="ab-milestone-line" style={{ position:'absolute', top:28, left:'12.5%', right:'12.5%', height:2, background:'linear-gradient(90deg,#7C3AED,#2563EB,#059669,#D97706)', borderRadius:99 }} />
+            <div className="ab-milestone-line" style={{ position:'absolute', top:28, left:'12.5%', right:'12.5%', height:2, background:'linear-gradient(90deg,#0D9488,#2563EB,#0D9488,#D97706)', borderRadius:99 }} />
 
             {milestones.map((m, i) => {
-              const colors = ['#7C3AED','#2563EB','#059669','#D97706'];
-              const lights = ['#F5F3FF','#EFF6FF','#ECFDF5','#FFFBEB'];
+              const colors = ['#0D9488','#2563EB','#0D9488','#D97706'];
+              const lights = ['#F0FDFB','#EFF6FF','#F0FDFB','#FFFBEB'];
               const col = colors[i]; const light = lights[i];
               return (
                 <div key={i} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', padding:'0 12px', position:'relative', zIndex:1 }}>
@@ -284,7 +284,7 @@ export default function AboutPage({ params }) {
       <section style={{ padding:'88px 24px', background:'linear-gradient(180deg,#F8FAFF,#F0F4FF)' }}>
         <div style={{ maxWidth:1000, margin:'0 auto' }}>
           <div style={{ textAlign:'center', marginBottom:56 }}>
-            <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.secondary, background:C.secondaryLight, padding:'5px 13px', borderRadius:99, marginBottom:16, border:'1px solid rgba(5,150,105,0.15)' }}>
+            <div style={{ display:'inline-block', fontSize:11, fontWeight:700, letterSpacing:'1.2px', textTransform:'uppercase', color:C.secondary, background:C.secondaryLight, padding:'5px 13px', borderRadius:99, marginBottom:16, border:'1px solid rgba(13,148,136,0.15)' }}>
               {lang==='sq' ? 'Ekipi ynë' : 'Our team'}
             </div>
             <h2 style={{ fontSize:'clamp(26px,3.5vw,42px)', fontWeight:800, color:C.textPrimary, letterSpacing:'-1.5px', margin:'0 0 14px' }}>
@@ -326,9 +326,9 @@ export default function AboutPage({ params }) {
                     {[
                       { label:lang==='sq'?'New Jersey, SHBA':'New Jersey, USA', col:'#2563EB', bg:'rgba(37,99,235,0.08)',
                         icon:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
-                      { label:lang==='sq'?'Siguria Kibernetike B.Sc.':'Cybersecurity B.Sc.', col:'#7C3AED', bg:'rgba(124,58,237,0.08)',
+                      { label:lang==='sq'?'Siguria Kibernetike B.Sc.':'Cybersecurity B.Sc.', col:'#0D9488', bg:'rgba(13,148,136,0.08)',
                         icon:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M22 10v6M2 10l10-5 10 5-10 5z"/><path d="M6 12v5c3 3 9 3 12 0v-5"/></svg> },
-                      { label:lang==='sq'?'Ndërtues':'Builder', col:'#059669', bg:'rgba(5,150,105,0.08)',
+                      { label:lang==='sq'?'Ndërtues':'Builder', col:'#0D9488', bg:'rgba(13,148,136,0.08)',
                         icon:<svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="16 18 22 12 16 6"/><polyline points="8 6 2 12 8 18"/></svg> },
                     ].map(tag => (
                       <span key={tag.label} style={{ fontSize:12, fontWeight:600, color:tag.col, background:tag.bg, border:`1px solid ${tag.col}25`, borderRadius:99, padding:'5px 13px', display:'flex', alignItems:'center', gap:6 }}>
@@ -350,7 +350,7 @@ export default function AboutPage({ params }) {
               {lang==='sq' ? 'Jemi të interesuar për infermierë, inxhinierë dhe ekspertë të kujdesit shëndetësor.' : 'We\'re interested in nurses, engineers, and healthcare operations experts.'}
             </div>
             <Link href={`/${lang}/contact`}>
-              <button style={{ background:'linear-gradient(135deg,#7C3AED,#2563EB)', color:'#fff', border:'none', borderRadius:10, padding:'10px 28px', fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:'0 4px 14px rgba(124,58,237,0.3)' }}>
+              <button style={{ background:'linear-gradient(135deg,#0D9488,#2563EB)', color:'#fff', border:'none', borderRadius:10, padding:'10px 28px', fontSize:13, fontWeight:700, cursor:'pointer', boxShadow:'0 4px 14px rgba(13,148,136,0.3)' }}>
                 {lang==='sq' ? 'Na kontaktoni' : 'Get in touch →'}
               </button>
             </Link>

@@ -21,7 +21,7 @@ const BASE = {
 /* ── 1. Woman booking on phone ───────────────────────────────────────────── */
 export function AnimBooking() {
   return (
-    <div style={{ ...BASE, background: 'linear-gradient(135deg,#F5F3FF 0%,#EDE9FE 100%)' }}>
+    <div style={{ ...BASE, background: 'linear-gradient(135deg,#F0FDFB 0%,#F0FDFB 100%)' }}>
       <style>{`
         @keyframes anim-phone-tap {
           0%,60%,100% { transform:translateY(0); }
@@ -55,7 +55,7 @@ export function AnimBooking() {
       <svg width="220" height="124" viewBox="0 0 220 124" fill="none" xmlns="http://www.w3.org/2000/svg">
 
         {/* Decorative blob */}
-        <ellipse cx="110" cy="78" rx="88" ry="42" fill="#DDD6FE" fillOpacity="0.45"/>
+        <ellipse cx="110" cy="78" rx="88" ry="42" fill="#CCFBF1" fillOpacity="0.45"/>
 
         {/* Plant left */}
         <g style={{ transformOrigin:'28px 100px', animation:'anim-plant-bob 3.2s ease-in-out infinite' }}>
@@ -80,14 +80,14 @@ export function AnimBooking() {
           <path d="M70 40 Q68 28 82 26 Q96 28 94 40" fill="#1E293B"/>
           <path d="M70 40 Q66 52 72 56 Q68 44 70 40Z" fill="#1E293B"/>
           {/* Body / top */}
-          <rect x="68" y="54" width="28" height="28" rx="8" fill="#8B5CF6"/>
+          <rect x="68" y="54" width="28" height="28" rx="8" fill="#0D9488"/>
           {/* Left arm holding phone */}
           <path d="M68 60 Q56 64 58 76" stroke="#FBBF24" strokeWidth="7" strokeLinecap="round" fill="none"/>
           {/* Right arm */}
           <path d="M96 60 Q104 64 103 72" stroke="#FBBF24" strokeWidth="7" strokeLinecap="round" fill="none"/>
           {/* Legs */}
-          <rect x="72" y="80" width="10" height="22" rx="4" fill="#7C3AED"/>
-          <rect x="84" y="80" width="10" height="22" rx="4" fill="#7C3AED"/>
+          <rect x="72" y="80" width="10" height="22" rx="4" fill="#0D9488"/>
+          <rect x="84" y="80" width="10" height="22" rx="4" fill="#0D9488"/>
         </g>
 
         {/* Phone */}
@@ -96,20 +96,20 @@ export function AnimBooking() {
           <rect x="55" y="65" width="22" height="38" rx="3" fill="#F8FAFF"/>
           {/* Plan cards on phone */}
           <rect x="57" y="68" width="8" height="10" rx="2" fill="#E5E7EB"/>
-          <rect x="67" y="68" width="8" height="10" rx="2" fill="#EDE9FE" stroke="#7C3AED" strokeWidth="0.8"/>
+          <rect x="67" y="68" width="8" height="10" rx="2" fill="#F0FDFB" stroke="#0D9488" strokeWidth="0.8"/>
           {/* Highlighted plan */}
           <g style={{ transformOrigin:'71px 73px', animation:'anim-plan-highlight 3s ease-in-out infinite' }}>
-            <rect x="66.5" y="67.5" width="9" height="11" rx="2.5" fill="#7C3AED" fillOpacity="0.12" stroke="#7C3AED" strokeWidth="1.2"/>
-            <circle cx="71" cy="70" r="1.5" fill="#7C3AED"/>
-            <line x1="68.5" y1="73" x2="73.5" y2="73" stroke="#7C3AED" strokeWidth="0.8" strokeLinecap="round"/>
+            <rect x="66.5" y="67.5" width="9" height="11" rx="2.5" fill="#0D9488" fillOpacity="0.12" stroke="#0D9488" strokeWidth="1.2"/>
+            <circle cx="71" cy="70" r="1.5" fill="#0D9488"/>
+            <line x1="68.5" y1="73" x2="73.5" y2="73" stroke="#0D9488" strokeWidth="0.8" strokeLinecap="round"/>
           </g>
           {/* Confirm button */}
           <g style={{ animation:'anim-confirm-pulse 3s ease-in-out infinite' }}>
-            <rect x="57" y="82" width="22" height="7" rx="3" fill="#7C3AED"/>
+            <rect x="57" y="82" width="22" height="7" rx="3" fill="#0D9488"/>
             <line x1="61" y1="85.5" x2="75" y2="85.5" stroke="white" strokeWidth="1.2" strokeLinecap="round"/>
           </g>
           {/* Tap ring */}
-          <circle cx="71" cy="73" style={{ animation:'anim-tap-ring 3s ease-in-out infinite' }} stroke="#7C3AED" strokeWidth="1.2" fill="none"/>
+          <circle cx="71" cy="73" style={{ animation:'anim-tap-ring 3s ease-in-out infinite' }} stroke="#0D9488" strokeWidth="1.2" fill="none"/>
         </g>
       </svg>
     </div>
@@ -184,19 +184,19 @@ export function AnimMatching() {
           <circle cx="0" cy="0" r="12" fill="white" stroke="#BAE6FD" strokeWidth="1.5"/>
           <circle cx="0" cy="-2" r="4" fill="#A5B4FC"/>
           <rect x="-5" y="3" width="10" height="6" rx="3" fill="#A5B4FC"/>
-          <line x1="-6" y1="9" x2="6" y2="9" stroke="#6366F1" strokeWidth="1" strokeDasharray="3 2"/>
+          <line x1="-6" y1="9" x2="6" y2="9" stroke="#1E6FAB" strokeWidth="1" strokeDasharray="3 2"/>
         </g>
 
         <g style={{ transformOrigin:'110px 62px', animation:'anim-dot-orbit-3 4.2s linear infinite' }}>
           <circle cx="0" cy="0" r="12" fill="white" stroke="#BAE6FD" strokeWidth="1.5"/>
           <circle cx="0" cy="-2" r="4" fill="#86EFAC"/>
           <rect x="-5" y="3" width="10" height="6" rx="3" fill="#86EFAC"/>
-          <line x1="-6" y1="9" x2="6" y2="9" stroke="#059669" strokeWidth="1" strokeDasharray="3 2"/>
+          <line x1="-6" y1="9" x2="6" y2="9" stroke="#0D9488" strokeWidth="1" strokeDasharray="3 2"/>
         </g>
 
         {/* Match badge pop */}
         <g style={{ transformOrigin:'140px 38px', animation:'anim-match-pop 4.2s ease-out infinite' }}>
-          <rect x="128" y="28" width="36" height="18" rx="9" fill="#059669"/>
+          <rect x="128" y="28" width="36" height="18" rx="9" fill="#0D9488"/>
           <text x="146" y="40" textAnchor="middle" fontSize="8" fontWeight="700" fill="white" fontFamily="Inter,sans-serif">MATCHED!</text>
         </g>
 
@@ -270,11 +270,11 @@ export function AnimChooseNurse() {
           <rect x="118" y="26" width="88" height="72" rx="10" fill="white" stroke="#6EE7B7" strokeWidth="1.5"/>
           {/* Recommended badge */}
           <g style={{ transformOrigin:'162px 28px', animation:'anim-select-badge 3.6s ease-in-out infinite' }}>
-            <rect x="138" y="18" width="48" height="14" rx="7" fill="#059669"/>
+            <rect x="138" y="18" width="48" height="14" rx="7" fill="#0D9488"/>
             <text x="162" y="28" textAnchor="middle" fontSize="6.5" fontWeight="700" fill="white" fontFamily="Inter,sans-serif">RECOMMENDED</text>
           </g>
           {/* Avatar */}
-          <circle cx="146" cy="50" r="14" fill="#ECFDF5"/>
+          <circle cx="146" cy="50" r="14" fill="#F0FDFB"/>
           <circle cx="146" cy="46" r="6" fill="#6EE7B7"/>
           <path d="M134 62 Q134 56 146 56 Q158 56 158 62" fill="#6EE7B7"/>
           {/* Name */}
@@ -289,7 +289,7 @@ export function AnimChooseNurse() {
             />
           ))}
           {/* Select button */}
-          <rect x="118" y="84" width="88" height="12" rx="5" fill="#059669"/>
+          <rect x="118" y="84" width="88" height="12" rx="5" fill="#0D9488"/>
           <g style={{ strokeDasharray:16, animation:'anim-check-draw 3.6s ease-in-out infinite' }}>
             <polyline points="148,89 153,93 163,85" stroke="white" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
           </g>
@@ -303,7 +303,7 @@ export function AnimChooseNurse() {
 /* ── 4. Confirmation — checkmark + Elona Hoxha ───────────────────────────── */
 export function AnimConfirmed() {
   return (
-    <div style={{ ...BASE, background: 'linear-gradient(135deg,#ECFDF5 0%,#D1FAE5 100%)' }}>
+    <div style={{ ...BASE, background: 'linear-gradient(135deg,#F0FDFB 0%,#D1FAE5 100%)' }}>
       <style>{`
         @keyframes anim-circle-fill {
           0%,20% { r:0; opacity:0; }
@@ -350,8 +350,8 @@ export function AnimConfirmed() {
         <circle cx="90" cy="58" r="44" fill="#6EE7B7" fillOpacity="0.18"/>
 
         {/* Animated green circle */}
-        <circle cx="90" cy="58" style={{ animation:'anim-circle-fill 3s ease-out infinite' }} fill="#059669"/>
-        <circle cx="90" cy="58" r="28" fill="#059669"/>
+        <circle cx="90" cy="58" style={{ animation:'anim-circle-fill 3s ease-out infinite' }} fill="#0D9488"/>
+        <circle cx="90" cy="58" r="28" fill="#0D9488"/>
 
         {/* Checkmark */}
         <polyline
@@ -366,15 +366,15 @@ export function AnimConfirmed() {
           <circle cx="90" cy="102" r="10" fill="#D1FAE5" stroke="#6EE7B7" strokeWidth="1.2"/>
           <circle cx="90" cy="99" r="4" fill="#6EE7B7"/>
           <path d="M83 108 Q83 104 90 104 Q97 104 97 108" fill="#6EE7B7"/>
-          <text x="104" y="105" fontSize="9" fontWeight="700" fill="#065F46" fontFamily="Inter,sans-serif">Elona Hoxha</text>
-          <text x="104" y="113" fontSize="7.5" fill="#059669" fontFamily="Inter,sans-serif">General Nursing · Confirmed</text>
+          <text x="104" y="105" fontSize="9" fontWeight="700" fill="#0F766E" fontFamily="Inter,sans-serif">Elona Hoxha</text>
+          <text x="104" y="113" fontSize="7.5" fill="#0D9488" fontFamily="Inter,sans-serif">General Nursing · Confirmed</text>
         </g>
 
         {/* SMS notification */}
         <g style={{ animation:'anim-sms-slide 3s ease-out infinite' }}>
           <rect x="132" y="36" width="70" height="22" rx="8" fill="white" stroke="#6EE7B7" strokeWidth="1"/>
-          <rect x="138" y="42" width="8" height="8" rx="2" fill="#059669"/>
-          <text x="149" y="47" fontSize="7.5" fontWeight="600" fill="#065F46" fontFamily="Inter,sans-serif">SMS sent ✓</text>
+          <rect x="138" y="42" width="8" height="8" rx="2" fill="#0D9488"/>
+          <text x="149" y="47" fontSize="7.5" fontWeight="600" fill="#0F766E" fontFamily="Inter,sans-serif">SMS sent ✓</text>
           <text x="149" y="55" fontSize="6.5" fill="#6B7280" fontFamily="Inter,sans-serif">Your nurse is confirmed</text>
         </g>
 
@@ -455,9 +455,9 @@ export function AnimTracking() {
 
         {/* Home destination */}
         <g style={{ transformOrigin:'172px 46px', animation:'anim-pin-bounce 3s ease-in-out infinite' }}>
-          <circle cx="172" cy="46" r="12" fill="#7C3AED"/>
+          <circle cx="172" cy="46" r="12" fill="#0D9488"/>
           <path d="M165 46 L172 38 L179 46 L179 54 L165 54 Z" fill="white"/>
-          <rect x="168" y="47" width="8" height="7" fill="#7C3AED"/>
+          <rect x="168" y="47" width="8" height="7" fill="#0D9488"/>
         </g>
 
         {/* Nurse pin */}
@@ -468,8 +468,8 @@ export function AnimTracking() {
         </g>
 
         {/* Start point */}
-        <circle cx="52" cy="88" r="5" fill="#059669"/>
-        <circle cx="52" cy="88" style={{ animation:'anim-live-pulse 1.5s ease-in-out infinite' }} stroke="#059669" strokeWidth="1.5" fill="none"/>
+        <circle cx="52" cy="88" r="5" fill="#0D9488"/>
+        <circle cx="52" cy="88" style={{ animation:'anim-live-pulse 1.5s ease-in-out infinite' }} stroke="#0D9488" strokeWidth="1.5" fill="none"/>
 
         {/* ETA badge */}
         <g style={{ transformOrigin:'80px 18px', animation:'anim-eta-pop 3s ease-in-out infinite' }}>
@@ -484,7 +484,7 @@ export function AnimTracking() {
 /* ── 6. Health report delivered ─────────────────────────────────────────── */
 export function AnimReport() {
   return (
-    <div style={{ ...BASE, background: 'linear-gradient(135deg,#F5F3FF 0%,#EDE9FE 100%)' }}>
+    <div style={{ ...BASE, background: 'linear-gradient(135deg,#F0FDFB 0%,#F0FDFB 100%)' }}>
       <style>{`
         @keyframes anim-report-rise {
           0%,15% { transform:translateY(12px); opacity:0; }
@@ -528,46 +528,46 @@ export function AnimReport() {
 
       <svg width="220" height="124" viewBox="0 0 220 124" fill="none">
         {/* Background glow */}
-        <circle cx="90" cy="62" r="55" fill="#7C3AED" style={{ animation:'anim-glow-pulse 2.4s ease-in-out infinite' }}/>
+        <circle cx="90" cy="62" r="55" fill="#0D9488" style={{ animation:'anim-glow-pulse 2.4s ease-in-out infinite' }}/>
 
         {/* Report card */}
         <g style={{ animation:'anim-report-rise 3s ease-in-out infinite' }}>
-          <rect x="24" y="18" width="110" height="90" rx="10" fill="white" stroke="#DDD6FE" strokeWidth="1.2"/>
+          <rect x="24" y="18" width="110" height="90" rx="10" fill="white" stroke="#CCFBF1" strokeWidth="1.2"/>
           {/* Header */}
-          <rect x="24" y="18" width="110" height="20" rx="10" fill="#7C3AED"/>
-          <rect x="24" y="28" width="110" height="10" fill="#7C3AED"/>
+          <rect x="24" y="18" width="110" height="20" rx="10" fill="#0D9488"/>
+          <rect x="24" y="28" width="110" height="10" fill="#0D9488"/>
           <text x="79" y="32" textAnchor="middle" fontSize="8" fontWeight="700" fill="white" fontFamily="Inter,sans-serif">Health Report · May 5</text>
 
           {/* Vitals */}
           <text x="33" y="52" fontSize="7.5" fill="#9CA3AF" fontFamily="Inter,sans-serif">Blood Pressure</text>
           <text x="33" y="62" fontSize="11" fontWeight="800" fill="#111827" fontFamily="Inter,sans-serif" style={{ animation:'anim-vital-count-bp 3s ease-in-out infinite' }}>118/76</text>
           <text x="75" y="62" fontSize="7" fill="#6B7280" fontFamily="Inter,sans-serif">mmHg</text>
-          <rect x="33" y="65" height="5" rx="2.5" fill="#7C3AED" fillOpacity="0.2" width="80"/>
-          <rect x="33" y="65" height="5" rx="2.5" fill="#7C3AED" style={{ animation:'anim-bar-grow-1 3s ease-out infinite' }}/>
+          <rect x="33" y="65" height="5" rx="2.5" fill="#0D9488" fillOpacity="0.2" width="80"/>
+          <rect x="33" y="65" height="5" rx="2.5" fill="#0D9488" style={{ animation:'anim-bar-grow-1 3s ease-out infinite' }}/>
 
           <text x="33" y="80" fontSize="7.5" fill="#9CA3AF" fontFamily="Inter,sans-serif">Glucose</text>
           <text x="33" y="90" fontSize="11" fontWeight="800" fill="#111827" fontFamily="Inter,sans-serif" style={{ animation:'anim-vital-count-bp 3s ease-in-out infinite 0.1s' }}>94</text>
           <text x="50" y="90" fontSize="7" fill="#6B7280" fontFamily="Inter,sans-serif">mg/dL</text>
-          <rect x="33" y="93" height="5" rx="2.5" fill="#059669" fillOpacity="0.2" width="80"/>
-          <rect x="33" y="93" height="5" rx="2.5" fill="#059669" style={{ animation:'anim-bar-grow-2 3s ease-out infinite 0.12s' }}/>
+          <rect x="33" y="93" height="5" rx="2.5" fill="#0D9488" fillOpacity="0.2" width="80"/>
+          <rect x="33" y="93" height="5" rx="2.5" fill="#0D9488" style={{ animation:'anim-bar-grow-2 3s ease-out infinite 0.12s' }}/>
 
           {/* Normal badge */}
-          <rect x="90" y="78" width="36" height="14" rx="7" fill="#ECFDF5" stroke="#6EE7B7" strokeWidth="0.8"/>
-          <polyline points="97,85 100,88 106,81" stroke="#059669" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" strokeDasharray="12" style={{ animation:'anim-check-small 3s ease-in-out infinite' }}/>
-          <text x="110" y="87" fontSize="7" fontWeight="700" fill="#059669" fontFamily="Inter,sans-serif">Normal</text>
+          <rect x="90" y="78" width="36" height="14" rx="7" fill="#F0FDFB" stroke="#6EE7B7" strokeWidth="0.8"/>
+          <polyline points="97,85 100,88 106,81" stroke="#0D9488" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none" strokeDasharray="12" style={{ animation:'anim-check-small 3s ease-in-out infinite' }}/>
+          <text x="110" y="87" fontSize="7" fontWeight="700" fill="#0D9488" fontFamily="Inter,sans-serif">Normal</text>
         </g>
 
         {/* Envelope flying in */}
         <g style={{ transformOrigin:'162px 76px', animation:'anim-envelope-fly 3s ease-out infinite' }}>
-          <rect x="142" y="64" width="40" height="28" rx="5" fill="white" stroke="#DDD6FE" strokeWidth="1.2"/>
-          <polyline points="142,64 162,80 182,64" stroke="#7C3AED" strokeWidth="1.2" fill="none"/>
+          <rect x="142" y="64" width="40" height="28" rx="5" fill="white" stroke="#CCFBF1" strokeWidth="1.2"/>
+          <polyline points="142,64 162,80 182,64" stroke="#0D9488" strokeWidth="1.2" fill="none"/>
           {/* Report doc inside */}
-          <rect x="152" y="72" width="20" height="14" rx="2" fill="#F5F3FF"/>
-          <line x1="155" y1="76" x2="169" y2="76" stroke="#7C3AED" strokeWidth="0.8" strokeDasharray="3 2"/>
-          <line x1="155" y1="79" x2="169" y2="79" stroke="#DDD6FE" strokeWidth="0.8"/>
-          <line x1="155" y1="82" x2="165" y2="82" stroke="#DDD6FE" strokeWidth="0.8"/>
+          <rect x="152" y="72" width="20" height="14" rx="2" fill="#F0FDFB"/>
+          <line x1="155" y1="76" x2="169" y2="76" stroke="#0D9488" strokeWidth="0.8" strokeDasharray="3 2"/>
+          <line x1="155" y1="79" x2="169" y2="79" stroke="#CCFBF1" strokeWidth="0.8"/>
+          <line x1="155" y1="82" x2="165" y2="82" stroke="#CCFBF1" strokeWidth="0.8"/>
           {/* Sent tick */}
-          <circle cx="182" cy="64" r="7" fill="#059669"/>
+          <circle cx="182" cy="64" r="7" fill="#0D9488"/>
           <polyline points="178,64 181,67 186,61" stroke="white" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" fill="none"/>
         </g>
       </svg>

@@ -2,13 +2,13 @@
 import { useEffect, useState } from 'react';
 
 const EVENTS = [
-  { icon: '✓', text: 'Visit completed in Tirana', color: '#059669', bg: '#ECFDF5', border: '#D1FAE5' },
+  { icon: '✓', text: 'Visit completed in Tirana', color: '#0D9488', bg: '#F0FDFB', border: '#D1FAE5' },
   { icon: '→', text: 'Nurse assigned in Durrës', color: '#2563EB', bg: '#EFF6FF', border: '#DBEAFE' },
-  { icon: '♥', text: 'Family joined from Italy', color: '#7C3AED', bg: '#F5F3FF', border: '#EDE9FE' },
-  { icon: '✓', text: 'BP check done · Elbasan', color: '#059669', bg: '#ECFDF5', border: '#D1FAE5' },
+  { icon: '♥', text: 'Family joined from Italy', color: '#0D9488', bg: '#F0FDFB', border: '#CCFBF1' },
+  { icon: '✓', text: 'BP check done · Elbasan', color: '#0D9488', bg: '#F0FDFB', border: '#D1FAE5' },
   { icon: '→', text: 'Nurse assigned in Tirana', color: '#2563EB', bg: '#EFF6FF', border: '#DBEAFE' },
-  { icon: '♥', text: 'Family joined from Germany', color: '#7C3AED', bg: '#F5F3FF', border: '#EDE9FE' },
-  { icon: '✓', text: 'Glucose check done · Fier', color: '#059669', bg: '#ECFDF5', border: '#D1FAE5' },
+  { icon: '♥', text: 'Family joined from Germany', color: '#0D9488', bg: '#F0FDFB', border: '#CCFBF1' },
+  { icon: '✓', text: 'Glucose check done · Fier', color: '#0D9488', bg: '#F0FDFB', border: '#D1FAE5' },
   { icon: '→', text: 'Visit booked · Durrës', color: '#2563EB', bg: '#EFF6FF', border: '#DBEAFE' },
 ];
 

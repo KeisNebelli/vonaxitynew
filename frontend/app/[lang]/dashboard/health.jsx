@@ -48,7 +48,7 @@ const METRICS = [
   {
     id: 'oxygen', label: 'Oxygen Sat.', labelSq: 'Saturimi O₂',
     unit: '%', normalLo: 95, normalHi: 100,
-    color: '#7C3AED',
+    color: '#0D9488',
     icon: <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 6v6l4 2"/></svg>,
   },
   {
@@ -431,7 +431,7 @@ function PatientCard({ patient, onClick, lang }) {
       {/* Avatar */}
       <div style={{
         width: 46, height: 46, borderRadius: 14, flexShrink: 0,
-        background: 'linear-gradient(135deg, #2563EB, #7C3AED)',
+        background: 'linear-gradient(135deg, #2563EB, #0D9488)',
         display: 'flex', alignItems: 'center', justifyContent: 'center',
         fontSize: 16, fontWeight: 800, color: '#fff',
       }}>{initials}</div>

@@ -63,7 +63,7 @@ function VonaIcon({ size = 40 }) {
       <defs>
         <linearGradient id="nc-bg" x1="0%" y1="0%" x2="100%" y2="100%">
           <stop offset="0%" stopColor="#3B82F6" />
-          <stop offset="100%" stopColor="#7C3AED" />
+          <stop offset="100%" stopColor="#0D9488" />
         </linearGradient>
       </defs>
       <circle cx="50" cy="50" r="50" fill="url(#nc-bg)" />
@@ -94,8 +94,8 @@ function VonaIcon({ size = 40 }) {
 // ── CSS ───────────────────────────────────────────────────────────────────────
 const CSS = `
   @keyframes ncVonaGlowDark {
-    0%,100% { box-shadow:0 4px 20px rgba(99,102,241,0.45),0 0 0 0 rgba(99,102,241,0); }
-    50%      { box-shadow:0 6px 28px rgba(99,102,241,0.65),0 0 0 9px rgba(99,102,241,0.1); }
+    0%,100% { box-shadow:0 4px 20px rgba(13,148,136,0.45),0 0 0 0 rgba(13,148,136,0); }
+    50%      { box-shadow:0 6px 28px rgba(13,148,136,0.65),0 0 0 9px rgba(13,148,136,0.1); }
   }
   @keyframes ncSlideUp {
     from { opacity:0;transform:translateY(18px) scale(0.96); }
@@ -117,7 +117,7 @@ const CSS = `
   .nc-vona-idle-dark:hover {
     animation:none !important;
     transform:scale(1.1) !important;
-    box-shadow:0 8px 32px rgba(99,102,241,0.7) !important;
+    box-shadow:0 8px 32px rgba(13,148,136,0.7) !important;
     transition:transform 0.2s cubic-bezier(0.34,1.56,0.64,1),box-shadow 0.18s ease !important;
   }
   .nc-nav-hint-dark { animation:ncNavPulseDark 1.4s ease-in-out infinite; }
@@ -277,7 +277,7 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
         style={{
           position: 'fixed', bottom: 80, right: 20, zIndex: 9000,
           width: 54, height: 54, borderRadius: '50%',
-          background: open ? '#334155' : 'linear-gradient(135deg,#3B82F6,#7C3AED)',
+          background: open ? '#334155' : 'linear-gradient(135deg,#3B82F6,#0D9488)',
           border: '2px solid rgba(255,255,255,0.12)', cursor: 'pointer', padding: 0, overflow: 'hidden',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
           transition: 'transform 0.18s, box-shadow 0.18s, background 0.2s',
@@ -304,7 +304,7 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
         }}>
 
           {/* Header */}
-          <div style={{ padding: '12px 16px', background: 'linear-gradient(135deg,#1D4ED8,#6D28D9)', display: 'flex', alignItems: 'center', gap: 10 }}>
+          <div style={{ padding: '12px 16px', background: 'linear-gradient(135deg,#1D4ED8,#0D9488)', display: 'flex', alignItems: 'center', gap: 10 }}>
             <div style={{ width: 36, height: 36, borderRadius: '50%', overflow: 'hidden', flexShrink: 0, boxShadow: '0 2px 8px rgba(0,0,0,0.3)' }}>
               <VonaIcon size={36} />
             </div>
@@ -331,9 +331,9 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
                     style={{
                       maxWidth: '84%', padding: '9px 13px',
                       borderRadius: '16px 16px 16px 4px',
-                      background: 'rgba(109,40,217,0.25)',
-                      border: '1.5px solid rgba(167,139,250,0.4)',
-                      color: '#C4B5FD', fontSize: 13, lineHeight: 1.55,
+                      background: 'rgba(13,148,136,0.25)',
+                      border: '1.5px solid rgba(153,245,227,0.4)',
+                      color: '#99F5E3', fontSize: 13, lineHeight: 1.55,
                       cursor: 'pointer', fontWeight: 600,
                     }}
                   >
@@ -347,7 +347,7 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
                       background: m.emergency
                         ? 'rgba(220,38,38,0.15)'
                         : m.role === 'user'
-                          ? 'linear-gradient(135deg,#1D4ED8,#6D28D9)'
+                          ? 'linear-gradient(135deg,#1D4ED8,#0D9488)'
                           : '#1E293B',
                       border: m.emergency ? '1px solid rgba(220,38,38,0.35)' : 'none',
                       color: m.emergency ? '#FCA5A5' : '#F1F5F9',
@@ -388,8 +388,8 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
               {(SUGGESTIONS[lang] || SUGGESTIONS.en).map(s => (
                 <button key={s} onClick={() => send(s)} style={{
                   fontSize: 11.5, fontWeight: 500, padding: '5px 10px', borderRadius: 20,
-                  border: '1px solid rgba(109,40,217,0.4)', background: 'rgba(109,40,217,0.15)',
-                  color: '#A78BFA', cursor: 'pointer', fontFamily: 'inherit',
+                  border: '1px solid rgba(13,148,136,0.4)', background: 'rgba(13,148,136,0.15)',
+                  color: '#99F5E3', cursor: 'pointer', fontFamily: 'inherit',
                 }}>{s}</button>
               ))}
             </div>
@@ -411,7 +411,7 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
                 lineHeight: 1.45, color: '#F1F5F9', background: '#1E293B',
                 maxHeight: 90, overflowY: 'auto', transition: 'border-color 0.15s',
               }}
-              onFocus={e => { e.target.style.borderColor = '#7C3AED'; }}
+              onFocus={e => { e.target.style.borderColor = '#0D9488'; }}
               onBlur={e => { e.target.style.borderColor = 'rgba(255,255,255,0.1)'; }}
             />
             <button
@@ -420,7 +420,7 @@ export default function NurseChat({ lang = 'en', nurseStatus = 'INCOMPLETE', onN
               style={{
                 width: 36, height: 36, borderRadius: 10, border: 'none',
                 cursor: loading || !input.trim() ? 'default' : 'pointer',
-                background: loading || !input.trim() ? '#1E293B' : 'linear-gradient(135deg,#1D4ED8,#6D28D9)',
+                background: loading || !input.trim() ? '#1E293B' : 'linear-gradient(135deg,#1D4ED8,#0D9488)',
                 display: 'flex', alignItems: 'center', justifyContent: 'center', flexShrink: 0,
                 transition: 'background 0.15s',
               }}

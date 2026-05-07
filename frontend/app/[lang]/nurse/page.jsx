@@ -12,7 +12,7 @@ let _currentLang = 'en';
 const tr = (key) => t(_currentLang, key);
 
 
-const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#7C3AED', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827' };
+const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#0D9488', secondaryLight:'#F0FDFB', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#0D9488', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827' };
 
 
 const DAYS = ['Monday','Tuesday','Wednesday','Thursday','Friday','Saturday','Sunday'];
@@ -96,7 +96,7 @@ function NurseSidebarInner({ mobile=false, initials, nurse, status, sbg, scol, a
           {nurse?.profilePhotoUrl ? (
             <img src={nurse.profilePhotoUrl} alt={initials} style={{ width:34,height:34,borderRadius:10,objectFit:'cover',flexShrink:0,border:'1.5px solid rgba(255,255,255,0.15)' }} />
           ) : (
-            <div style={{ width:34,height:34,borderRadius:10,background:'linear-gradient(135deg,#2563EB,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
+            <div style={{ width:34,height:34,borderRadius:10,background:'linear-gradient(135deg,#2563EB,#0D9488)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:12,fontWeight:800,color:'#fff',flexShrink:0 }}>{initials}</div>
           )}
           <div style={{ minWidth:0 }}>
             <div style={{ fontSize:13, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{nurse?.name||'Nurse'}</div>
@@ -127,7 +127,7 @@ function NurseSidebarInner({ mobile=false, initials, nurse, status, sbg, scol, a
 function NurseSidebar({ nurse, active, setActive, onLogout, open, setOpen, lang="en" }) {
   const initials = nurse?.name ? nurse.name.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() : 'N';
   const status = nurse?.status || 'INCOMPLETE';
-  const statusMap = { APPROVED:['#ECFDF5','#059669'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
+  const statusMap = { APPROVED:['#F0FDFB','#0D9488'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
   const [sbg, scol] = statusMap[status] || statusMap.INCOMPLETE;
 
   return (
@@ -191,13 +191,13 @@ function NotificationBell({ lang, onNavigate }) {
 
   const iconFor = (type) => {
     const icons = {
-      NEW_JOB:         { bg:'#EDE9FE', color:'#7C3AED', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> },
-      JOB_ASSIGNED:    { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
+      NEW_JOB:         { bg:'#F0FDFB', color:'#0D9488', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="2" y="7" width="20" height="14" rx="2"/><path d="M16 7V5a2 2 0 00-2-2h-4a2 2 0 00-2 2v2"/></svg> },
+      JOB_ASSIGNED:    { bg:'#F0FDFB', color:'#0D9488', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
       JOB_UPDATED:     { bg:'#FEF3C7', color:'#D97706', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M11 4H4a2 2 0 00-2 2v14a2 2 0 002 2h14a2 2 0 002-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 013 3L12 15l-4 1 1-4 9.5-9.5z"/></svg> },
-      VISIT_COMPLETED: { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
+      VISIT_COMPLETED: { bg:'#F0FDFB', color:'#0D9488', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg> },
       VISIT_CANCELLED: { bg:'#FEF2F2', color:'#DC2626', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></svg> },
       NURSE_ON_WAY:    { bg:'#EFF6FF', color:'#2563EB', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
-      NURSE_ARRIVED:   { bg:'#ECFDF5', color:'#059669', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
+      NURSE_ARRIVED:   { bg:'#F0FDFB', color:'#0D9488', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/></svg> },
       announcement:    { bg:'#F1F5F9', color:'#475569', svg:<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 8A6 6 0 006 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 01-3.46 0"/></svg> },
     };
     const cfg = icons[type] || icons.announcement;
@@ -300,7 +300,7 @@ function DashboardCalendar({ visits=[], lang='en', onOpenCalendar, onVisitSelect
     ? ['Janar','Shkurt','Mars','Prill','Maj','Qershor','Korrik','Gusht','Shtator','Tetor','Nëntor','Dhjetor']
     : ['January','February','March','April','May','June','July','August','September','October','November','December'];
 
-  const statusColor = (s) => s==='COMPLETED'?'#059669':s==='CANCELLED'?'#DC2626':'#2563EB';
+  const statusColor = (s) => s==='COMPLETED'?'#0D9488':s==='CANCELLED'?'#DC2626':'#2563EB';
 
   const dayKey = (d) => d ? `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}` : null;
   const selectedKey = selectedDay ? dayKey(selectedDay) : null;
@@ -420,7 +420,7 @@ function DashboardCalendar({ visits=[], lang='en', onOpenCalendar, onVisitSelect
 
       {/* Legend */}
       <div style={{ display:'flex', gap:12, marginTop:10, paddingTop:10, borderTop:`1px solid ${C.border}` }}>
-        {[['#2563EB', lang==='sq'?'Planifikuar':'Scheduled'], ['#059669', lang==='sq'?'Kryer':'Completed'], ['#DC2626', lang==='sq'?'Anuluar':'Cancelled']].map(([col,lbl])=>(
+        {[['#2563EB', lang==='sq'?'Planifikuar':'Scheduled'], ['#0D9488', lang==='sq'?'Kryer':'Completed'], ['#DC2626', lang==='sq'?'Anuluar':'Cancelled']].map(([col,lbl])=>(
           <div key={lbl} style={{ display:'flex', alignItems:'center', gap:4 }}>
             <div style={{ width:10, height:8, borderRadius:2, background:col+'22', borderLeft:`2.5px solid ${col}` }}/>
             <span style={{ fontSize:10, color:C.textTertiary, fontWeight:500 }}>{lbl}</span>
@@ -453,7 +453,7 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
   const ratingValue = nurse?.rating > 0 ? nurse.rating : null;
   const totalVisits = nurse?.totalVisits || 0;
   const specialtiesArray = nurse?.specialties ? (typeof nurse.specialties === 'string' ? JSON.parse(nurse.specialties) : nurse.specialties) : [];
-  const statusMap = { APPROVED:['#ECFDF5','#059669','Approved'], PENDING:['#FEF3C7','#D97706','Pending'], INCOMPLETE:['#FFFBEB','#D97706','Incomplete'], REJECTED:['#FEF2F2','#DC2626','Rejected'], SUSPENDED:['#F1F5F9','#475569','Suspended'] };
+  const statusMap = { APPROVED:['#F0FDFB','#0D9488','Approved'], PENDING:['#FEF3C7','#D97706','Pending'], INCOMPLETE:['#FFFBEB','#D97706','Incomplete'], REJECTED:['#FEF2F2','#DC2626','Rejected'], SUSPENDED:['#F1F5F9','#475569','Suspended'] };
   const [statusBg, statusColor, statusLabel] = statusMap[nurse?.status] || statusMap.INCOMPLETE;
   const hourNow = new Date().getHours();
   const greeting = lang==='sq' ? (hourNow < 12 ? 'Mirëmëngjes' : hourNow < 18 ? 'Mirëdita' : 'Mirëmbrëma') : (hourNow < 12 ? 'Good morning' : hourNow < 18 ? 'Good afternoon' : 'Good evening');
@@ -484,7 +484,7 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
       `}</style>
 
       {/* ── Profile hero card ── */}
-      <div style={{ borderRadius:20, overflow:'hidden', background:'linear-gradient(135deg,#2563EB 0%,#4F46E5 55%,#7C3AED 100%)', boxShadow:'0 6px 24px rgba(37,99,235,0.28)', position:'relative' }}>
+      <div style={{ borderRadius:20, overflow:'hidden', background:'linear-gradient(135deg,#2563EB 0%,#1E6FAB 55%,#0D9488 100%)', boxShadow:'0 6px 24px rgba(37,99,235,0.28)', position:'relative' }}>
         {/* Subtle noise texture */}
         <div style={{ position:'absolute', inset:0, opacity:0.04, pointerEvents:'none' }}>
           <svg width="100%" height="100%"><defs><pattern id="nd" width="32" height="32" patternUnits="userSpaceOnUse"><circle cx="1" cy="1" r="1" fill="white"/></pattern></defs><rect width="100%" height="100%" fill="url(#nd)"/></svg>
@@ -574,21 +574,21 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
         </div>
         {/* Total visits */}
         <div className="nd-stat" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer' }} onClick={()=>setActive('visits')}>
-          <div style={{ width:32, height:32, borderRadius:10, background:'#ECFDF5', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10 }}>
-            <svg width="15" height="15" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
+          <div style={{ width:32, height:32, borderRadius:10, background:'#F0FDFB', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10 }}>
+            <svg width="15" height="15" fill="none" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M22 11.08V12a10 10 0 11-5.93-9.14"/><polyline points="22 4 12 14.01 9 11.01"/></svg>
           </div>
           <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:4 }}>{tr('nurse.totalVisits')}</div>
-          <div className="nd-stat-val" style={{ fontSize:24, fontWeight:800, color:'#059669', letterSpacing:'-0.5px', lineHeight:1 }}>{totalVisits}</div>
+          <div className="nd-stat-val" style={{ fontSize:24, fontWeight:800, color:'#0D9488', letterSpacing:'-0.5px', lineHeight:1 }}>{totalVisits}</div>
           <div style={{ fontSize:11, color:C.textTertiary, marginTop:4 }}>{lang==='sq'?'gjithsej':'all time'}</div>
         </div>
         {/* Earnings — spans full width on mobile */}
         <div className="nd-stat nd-stat-earn" style={{ background:C.bgWhite, borderRadius:14, border:`1.5px solid ${C.border}`, padding:'16px 18px', boxShadow:SSM, cursor:'pointer', display:'flex', flexDirection:'column' }} onClick={()=>setActive('earnings')}>
-          <div style={{ width:32, height:32, borderRadius:10, background:'#F5F3FF', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10, flexShrink:0 }}>
-            <svg width="15" height="15" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+          <div style={{ width:32, height:32, borderRadius:10, background:'#F0FDFB', display:'flex', alignItems:'center', justifyContent:'center', marginBottom:10, flexShrink:0 }}>
+            <svg width="15" height="15" fill="none" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
           </div>
           <div>
             <div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, letterSpacing:'0.5px', textTransform:'uppercase', marginBottom:4 }}>{tr('nurse.earningsLabel')}</div>
-            <div className="nd-stat-val" style={{ fontSize:24, fontWeight:800, color:'#7C3AED', letterSpacing:'-0.5px', lineHeight:1 }}>€{(visits.filter(v=>v.status==='COMPLETED').length*(nurse?.payRatePerVisit||20))}</div>
+            <div className="nd-stat-val" style={{ fontSize:24, fontWeight:800, color:'#0D9488', letterSpacing:'-0.5px', lineHeight:1 }}>€{(visits.filter(v=>v.status==='COMPLETED').length*(nurse?.payRatePerVisit||20))}</div>
             <div style={{ fontSize:11, color:C.textTertiary, marginTop:4 }}>{lang==='sq'?'fituar':'earned'}</div>
           </div>
         </div>
@@ -678,8 +678,8 @@ function Dashboard({ setActive, setSelectedVisit, lang='en', visits=[], nurse=nu
               const dayLabel = d.toLocaleDateString(lang==='sq'?'sq-AL':'en-GB', { weekday:'short', day:'numeric', month:'short' });
               const timeLabel = d.toLocaleTimeString('en-GB', { hour:'2-digit', minute:'2-digit' });
               const svc = trService(v.serviceType, lang);
-              const statusColors = { ACCEPTED:'#059669', PENDING:'#2563EB', UNASSIGNED:'#D97706' };
-              const statusBg = { ACCEPTED:'#ECFDF5', PENDING:'#EFF6FF', UNASSIGNED:'#FFFBEB' };
+              const statusColors = { ACCEPTED:'#0D9488', PENDING:'#2563EB', UNASSIGNED:'#D97706' };
+              const statusBg = { ACCEPTED:'#F0FDFB', PENDING:'#EFF6FF', UNASSIGNED:'#FFFBEB' };
               const sc = statusColors[v.status] || C.textTertiary;
               const sb = statusBg[v.status] || C.bgSubtle;
               return (
@@ -713,11 +713,11 @@ function NurseVisitCard({ v, lang, onStatusChange, onComplete, isHighlighted, hi
   const [showDetails, setShowDetails] = useState(false);
   const st = (v.status || 'SCHEDULED').toUpperCase();
   const statusCfg = {
-    COMPLETED:   { label: lang==='sq'?'E Përfunduar':'Completed',   color:'#059669', bg:'#ECFDF5', border:'#BBF7D0', accent:'#059669' },
+    COMPLETED:   { label: lang==='sq'?'E Përfunduar':'Completed',   color:'#0D9488', bg:'#F0FDFB', border:'#99F6E4', accent:'#0D9488' },
     SCHEDULED:   { label: lang==='sq'?'E Planifikuar':'Scheduled',  color:'#2563EB', bg:'#EFF6FF', border:'#BFDBFE', accent:'#2563EB' },
     IN_PROGRESS: { label: lang==='sq'?'Në Progres':'In Progress',   color:'#D97706', bg:'#FFFBEB', border:'#FDE68A', accent:'#D97706' },
     CANCELLED:   { label: lang==='sq'?'Anuluar':'Cancelled',        color:'#DC2626', bg:'#FEF2F2', border:'#FECACA', accent:'#DC2626' },
-    PENDING:     { label: lang==='sq'?'Në Pritje':'Pending',        color:'#7C3AED', bg:'#F5F3FF', border:'#DDD6FE', accent:'#7C3AED' },
+    PENDING:     { label: lang==='sq'?'Në Pritje':'Pending',        color:'#0D9488', bg:'#F0FDFB', border:'#99F6E4', accent:'#0D9488' },
   };
   const s = statusCfg[st] || statusCfg.SCHEDULED;
   const wo = v.workOrderNumber ? `VON-${v.workOrderNumber}` : `#${v.id?.slice(-6)?.toUpperCase()}`;
@@ -779,9 +779,9 @@ function NurseVisitCard({ v, lang, onStatusChange, onComplete, isHighlighted, hi
                 {STEPS.map((step, i) => {
                   const isDone    = i < currentIdx;
                   const isCurrent = i === currentIdx;
-                  const stepColor = isDone || isCurrent ? (st==='COMPLETED' ? '#059669' : C.primary) : C.border;
-                  const dotBg     = isDone ? (st==='COMPLETED' ? '#059669' : C.primary) : isCurrent ? '#fff' : '#F1F5F9';
-                  const dotBorder = isDone || isCurrent ? (st==='COMPLETED' ? '#059669' : C.primary) : C.border;
+                  const stepColor = isDone || isCurrent ? (st==='COMPLETED' ? '#0D9488' : C.primary) : C.border;
+                  const dotBg     = isDone ? (st==='COMPLETED' ? '#0D9488' : C.primary) : isCurrent ? '#fff' : '#F1F5F9';
+                  const dotBorder = isDone || isCurrent ? (st==='COMPLETED' ? '#0D9488' : C.primary) : C.border;
                   return (
                     <div key={step.id} style={{ display:'flex', alignItems:'center', flex: i < STEPS.length-1 ? 1 : 'none', minWidth:0 }}>
                       <div style={{ display:'flex', flexDirection:'column', alignItems:'center', flexShrink:0 }}>
@@ -792,12 +792,12 @@ function NurseVisitCard({ v, lang, onStatusChange, onComplete, isHighlighted, hi
                             </svg>
                           )}
                         </div>
-                        <div style={{ fontSize:7, fontWeight: isCurrent?700:500, color: isCurrent?(st==='COMPLETED'?'#059669':C.primary) : isDone?C.textSecondary : C.textTertiary, marginTop:3, whiteSpace:'nowrap', maxWidth:44, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis' }}>
+                        <div style={{ fontSize:7, fontWeight: isCurrent?700:500, color: isCurrent?(st==='COMPLETED'?'#0D9488':C.primary) : isDone?C.textSecondary : C.textTertiary, marginTop:3, whiteSpace:'nowrap', maxWidth:44, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis' }}>
                           {step.label}
                         </div>
                       </div>
                       {i < STEPS.length-1 && (
-                        <div style={{ flex:1, height:2, background: isDone?(st==='COMPLETED'?'#059669':C.primary):C.border, margin:'0 2px', marginBottom:14, transition:'background 0.2s' }}/>
+                        <div style={{ flex:1, height:2, background: isDone?(st==='COMPLETED'?'#0D9488':C.primary):C.border, margin:'0 2px', marginBottom:14, transition:'background 0.2s' }}/>
                       )}
                     </div>
                   );
@@ -838,7 +838,7 @@ function NurseVisitCard({ v, lang, onStatusChange, onComplete, isHighlighted, hi
           <button
             onClick={() => setShowDetails(d => !d)}
             style={{ flex:1, minWidth:120, padding:'11px', borderRadius:10, border:'none', cursor:'pointer', fontFamily:F, fontSize:13, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', gap:7,
-              background: st==='COMPLETED' ? 'linear-gradient(135deg,#059669,#34D399)' : 'linear-gradient(135deg,#2563EB,#3B82F6)',
+              background: st==='COMPLETED' ? 'linear-gradient(135deg,#0D9488,#34D399)' : 'linear-gradient(135deg,#2563EB,#3B82F6)',
               color:'#fff' }}>
             <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
             {showDetails ? (lang==='sq'?'Mbyll':'Close') : (lang==='sq'?'Shiko Detajet':'View Details')}
@@ -858,7 +858,7 @@ function NurseVisitCard({ v, lang, onStatusChange, onComplete, isHighlighted, hi
               ].filter(Boolean).join('');
               const notes = (v.nurseNotes || v.notes || '').replace(/</g,'&lt;').replace(/>/g,'&gt;');
               const html = `<!DOCTYPE html><html lang="${lang}"><head><meta charset="UTF-8"/><title>Vonaxity – Visit Report</title>
-              <style>body{font-family:'Helvetica Neue',Arial,sans-serif;color:#111;margin:0;padding:40px;font-size:13px;line-height:1.6;}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2563EB;padding-bottom:20px;margin-bottom:28px;}.brand{font-size:22px;font-weight:900;color:#2563EB;}.badge{display:inline-block;background:#ECFDF5;color:#059669;padding:4px 12px;border-radius:999px;font-weight:700;font-size:11px;border:1px solid #BBF7D0;}h2{font-size:20px;font-weight:800;margin:0 0 4px;}.meta{color:#6B7280;font-size:12px;margin-bottom:20px;}.section-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9CA3AF;margin:22px 0 8px;}.card{background:#F8FAFC;border-radius:10px;padding:14px 18px;margin-bottom:10px;}table{width:100%;border-collapse:collapse;}td{padding:7px 10px;border-bottom:1px solid #F1F5F9;font-size:13px;}td:first-child{color:#6B7280;width:45%;}td:last-child{font-weight:600;}.notes{background:#F8FAFC;border-left:3px solid #2563EB;border-radius:0 8px 8px 0;padding:12px 16px;font-style:italic;color:#374151;white-space:pre-wrap;}.footer{margin-top:40px;padding-top:16px;border-top:1px solid #E5E7EB;display:flex;justify-content:space-between;font-size:11px;color:#9CA3AF;}</style></head><body>
+              <style>body{font-family:'Helvetica Neue',Arial,sans-serif;color:#111;margin:0;padding:40px;font-size:13px;line-height:1.6;}.header{display:flex;justify-content:space-between;align-items:flex-start;border-bottom:3px solid #2563EB;padding-bottom:20px;margin-bottom:28px;}.brand{font-size:22px;font-weight:900;color:#2563EB;}.badge{display:inline-block;background:#F0FDFB;color:#0D9488;padding:4px 12px;border-radius:999px;font-weight:700;font-size:11px;border:1px solid #99F6E4;}h2{font-size:20px;font-weight:800;margin:0 0 4px;}.meta{color:#6B7280;font-size:12px;margin-bottom:20px;}.section-title{font-size:10px;font-weight:700;letter-spacing:1px;text-transform:uppercase;color:#9CA3AF;margin:22px 0 8px;}.card{background:#F8FAFC;border-radius:10px;padding:14px 18px;margin-bottom:10px;}table{width:100%;border-collapse:collapse;}td{padding:7px 10px;border-bottom:1px solid #F1F5F9;font-size:13px;}td:first-child{color:#6B7280;width:45%;}td:last-child{font-weight:600;}.notes{background:#F8FAFC;border-left:3px solid #2563EB;border-radius:0 8px 8px 0;padding:12px 16px;font-style:italic;color:#374151;white-space:pre-wrap;}.footer{margin-top:40px;padding-top:16px;border-top:1px solid #E5E7EB;display:flex;justify-content:space-between;font-size:11px;color:#9CA3AF;}</style></head><body>
               <div class="header"><div><div class="brand">Vonaxity</div><div style="font-size:11px;color:#6B7280;margin-top:2px;">${lang==='sq'?'Raport Infermiereje':'Nurse Visit Report'}</div></div><div style="text-align:right"><div class="badge">✓ ${lang==='sq'?'E Përfunduar':'Completed'}</div><div style="font-size:11px;color:#9CA3AF;margin-top:6px;">${wo}</div></div></div>
               <h2>${trService(v.serviceType,lang)}</h2><div class="meta">${dateStr} · ${timeStr}</div>
               <div class="section-title">${lang==='sq'?'Pacienti':'Patient'}</div><div class="card"><table><tr><td>${lang==='sq'?'Emri':'Name'}</td><td>${patientName}</td></tr>${v.relative?.age?`<tr><td>${lang==='sq'?'Mosha':'Age'}</td><td>${v.relative.age}</td></tr>`:''}</table></div>
@@ -870,7 +870,7 @@ function NurseVisitCard({ v, lang, onStatusChange, onComplete, isHighlighted, hi
               if (!win) return;
               win.document.write(html); win.document.close(); win.focus();
               setTimeout(()=>win.print(), 400);
-            }} style={{ padding:'11px 14px', borderRadius:10, border:'1.5px solid #BBF7D0', background:'#ECFDF5', color:'#059669', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, display:'flex', alignItems:'center', gap:6 }}>
+            }} style={{ padding:'11px 14px', borderRadius:10, border:'1.5px solid #99F6E4', background:'#F0FDFB', color:'#0D9488', fontSize:13, fontWeight:700, cursor:'pointer', fontFamily:F, display:'flex', alignItems:'center', gap:6 }}>
               <svg width="13" height="13" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="6 9 6 2 18 2 18 9"/><path d="M6 18H4a2 2 0 01-2-2v-5a2 2 0 012-2h16a2 2 0 012 2v5a2 2 0 01-2 2h-2"/><rect x="6" y="14" width="12" height="8"/></svg>
               PDF
             </button>
@@ -1024,7 +1024,7 @@ function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
   const ta = { ...inp, minHeight:80, resize:'vertical', lineHeight:1.6 };
 
   const FLAGS = [
-    { id:'stable',   color:'#059669', bg:'#ECFDF5', border:'#BBF7D0', icon:'🟢', label: lang==='sq'?'Stabil':'Stable',   sub: lang==='sq'?'Gjendje e mirë, pa shqetësime':'Good condition, no concerns' },
+    { id:'stable',   color:'#0D9488', bg:'#F0FDFB', border:'#99F6E4', icon:'🟢', label: lang==='sq'?'Stabil':'Stable',   sub: lang==='sq'?'Gjendje e mirë, pa shqetësime':'Good condition, no concerns' },
     { id:'monitor',  color:'#D97706', bg:'#FFFBEB', border:'#FDE68A', icon:'🟡', label: lang==='sq'?'Monitoro':'Monitor', sub: lang==='sq'?'Shqetësim i lehtë, ndiq nga afër':'Mild concern, watch closely' },
     { id:'escalate', color:'#DC2626', bg:'#FEF2F2', border:'#FECACA', icon:'🔴', label: lang==='sq'?'Eskalim':'Escalate', sub: lang==='sq'?'Kërkon vëmendje urgjente / mjek':'Needs urgent attention / GP referral' },
   ];
@@ -1111,7 +1111,7 @@ function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
       <div style={{ display:'flex', gap:0, marginBottom:24, background:C.bgWhite, borderRadius:12, border:`1px solid ${C.border}`, overflow:'hidden' }}>
         {STEPS.map((s,i) => (
           <button key={s.n} onClick={()=>setStep(s.n)} style={{ flex:1, padding:'11px 8px', border:'none', borderRight:i<2?`1px solid ${C.border}`:'none', cursor:'pointer', fontFamily:F, fontWeight:step===s.n?700:500, fontSize:12, color:step===s.n?C.primary:C.textTertiary, background:step===s.n?C.primaryLight:'#fff', transition:'all 0.15s', display:'flex', alignItems:'center', justifyContent:'center', gap:6 }}>
-            <span style={{ width:18, height:18, borderRadius:'50%', background:step===s.n?C.primary:step>s.n?'#059669':C.border, color:'#fff', fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+            <span style={{ width:18, height:18, borderRadius:'50%', background:step===s.n?C.primary:step>s.n?'#0D9488':C.border, color:'#fff', fontSize:10, fontWeight:700, display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
               {step > s.n ? '✓' : s.n}
             </span>
             {s.label}
@@ -1228,7 +1228,7 @@ function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
                 {[['assessment',lang==='sq'?'Vlerësimi':'Assessment'],['intervention',lang==='sq'?'Ndërhyrja':'Intervention'],['patientResponse',lang==='sq'?'Reagimi i Pacientit':'Patient Response'],['followUp',lang==='sq'?'Rekomandim':'Follow-up']].map(([k,lbl])=>
                   form[k] ? <div key={k} style={{ marginBottom:12 }}><div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.4px', marginBottom:4 }}>{lbl}</div><div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6, background:'#F8FAFC', borderRadius:8, padding:'8px 12px', borderLeft:`3px solid ${C.primary}` }}>{form[k]}</div></div> : null
                 )}
-                {form.medications && <div><div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.4px', marginBottom:4 }}>{lang==='sq'?'Medikamentet':'Medications'}</div><div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6, background:'#F8FAFC', borderRadius:8, padding:'8px 12px', borderLeft:'3px solid #7C3AED' }}>{form.medications}</div></div>}
+                {form.medications && <div><div style={{ fontSize:10, fontWeight:700, color:C.textTertiary, textTransform:'uppercase', letterSpacing:'0.4px', marginBottom:4 }}>{lang==='sq'?'Medikamentet':'Medications'}</div><div style={{ fontSize:13, color:C.textSecondary, lineHeight:1.6, background:'#F8FAFC', borderRadius:8, padding:'8px 12px', borderLeft:'3px solid #0D9488' }}>{form.medications}</div></div>}
               </div>
             )}
 
@@ -1241,7 +1241,7 @@ function CompleteVisit({ visit, setActive, onComplete, lang='en' }) {
             {error && <div style={{ background:'#FEF2F2', border:'1px solid #FECACA', borderRadius:9, padding:'11px 14px', fontSize:13, color:'#DC2626' }}>{error}</div>}
 
             <button onClick={handleSubmit} disabled={submitting}
-              style={{ width:'100%', background: submitting?'#94A3B8':'linear-gradient(135deg,#059669,#10B981)', color:'#fff', border:'none', borderRadius:12, padding:'15px', fontSize:15, fontWeight:700, cursor:submitting?'not-allowed':'pointer', letterSpacing:'-0.2px', display:'flex', alignItems:'center', justifyContent:'center', gap:8, fontFamily:F }}>
+              style={{ width:'100%', background: submitting?'#94A3B8':'linear-gradient(135deg,#0D9488,#10B981)', color:'#fff', border:'none', borderRadius:12, padding:'15px', fontSize:15, fontWeight:700, cursor:submitting?'not-allowed':'pointer', letterSpacing:'-0.2px', display:'flex', alignItems:'center', justifyContent:'center', gap:8, fontFamily:F }}>
               {submitting
                 ? <><svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" style={{ animation:'spin 0.8s linear infinite' }}><path d="M21 12a9 9 0 11-18 0 9 9 0 0118 0"/></svg>{lang==='sq'?'Duke dërguar...':'Submitting...'}</>
                 : <><svg width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></svg>{lang==='sq'?'Dërgo Raportin':'Submit Visit Report'}</>}
@@ -1291,7 +1291,7 @@ function EarningsRow({ visit, payRate, lang }) {
       </td>
       <td style={{ padding:'13px 16px' }}>
         <span style={{ fontSize:11, fontWeight:700, padding:'3px 10px', borderRadius:99,
-          background:'#ECFDF5', color:'#059669', border:'1px solid #86efac44' }}>
+          background:'#F0FDFB', color:'#0D9488', border:'1px solid #99F6E444' }}>
           {lang==='sq'?'E fituar':'Earned'}
         </span>
       </td>
@@ -1361,7 +1361,7 @@ function Earnings({ lang='en', nurse=null, visits=[] }) {
                 return (
                   <div key={m.key} style={{ flex:1, display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
                     <div style={{ fontSize:9, fontWeight:700, color: earnings[i]>0 ? C.purple : C.textTertiary, letterSpacing:'-0.2px' }}>{earnings[i]>0?`€${earnings[i]}`:''}</div>
-                    <div style={{ width:'100%', height:h, borderRadius:'6px 6px 3px 3px', background: isLatest ? 'linear-gradient(180deg,#7C3AED,#4F46E5)' : earnings[i]>0 ? 'rgba(124,58,237,0.35)' : C.bgSubtle, transition:'height 0.3s', minHeight:4 }}/>
+                    <div style={{ width:'100%', height:h, borderRadius:'6px 6px 3px 3px', background: isLatest ? 'linear-gradient(180deg,#0D9488,#1E6FAB)' : earnings[i]>0 ? 'rgba(13,148,136,0.35)' : C.bgSubtle, transition:'height 0.3s', minHeight:4 }}/>
                     <div style={{ fontSize:10, fontWeight:600, color: isLatest ? C.textPrimary : C.textTertiary }}>{m.label}</div>
                   </div>
                 );
@@ -1583,12 +1583,12 @@ function BrowseJobs({ nurse, lang='en' }) {
                           {job.workOrderNumber}
                         </span>
                       )}
-                      {applied && <span style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:99, background:'#ECFDF5', color:'#059669', border:'1px solid rgba(5,150,105,0.2)' }}>✓ {t(lang,'nurse.applied')}</span>}
+                      {applied && <span style={{ fontSize:10, fontWeight:700, padding:'3px 9px', borderRadius:99, background:'#F0FDFB', color:'#0D9488', border:'1px solid rgba(13,148,136,0.2)' }}>✓ {t(lang,'nurse.applied')}</span>}
                     </div>
                     {/* Pay chip */}
-                    <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'#F5F3FF', borderRadius:99, padding:'4px 11px', border:'1px solid rgba(124,58,237,0.15)' }}>
-                      <svg width="12" height="12" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
-                      <span style={{ fontSize:12, fontWeight:800, color:'#7C3AED' }}>€{payRate} {lang==='sq'?'për vizitë':'per visit'}</span>
+                    <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'#F0FDFB', borderRadius:99, padding:'4px 11px', border:'1px solid rgba(13,148,136,0.15)' }}>
+                      <svg width="12" height="12" fill="none" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" viewBox="0 0 24 24"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg>
+                      <span style={{ fontSize:12, fontWeight:800, color:'#0D9488' }}>€{payRate} {lang==='sq'?'për vizitë':'per visit'}</span>
                     </div>
                   </div>
                   {postedAgo && <span style={{ fontSize:11, color:C.textTertiary, flexShrink:0, marginTop:2 }}>{postedAgo}</span>}
@@ -1603,7 +1603,7 @@ function BrowseJobs({ nurse, lang='en' }) {
                   </div>
                   {/* Location */}
                   <div style={{ display:'flex', alignItems:'center', gap:7, fontSize:13, color:C.textSecondary }}>
-                    <div style={{ width:28, height:28, borderRadius:8, background:'#ECFDF5', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:'#059669' }}>{iconPin}</div>
+                    <div style={{ width:28, height:28, borderRadius:8, background:'#F0FDFB', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, color:'#0D9488' }}>{iconPin}</div>
                     <span>{job.relativeAddress || job.city || 'Albania'}</span>
                   </div>
                   {/* Patient */}
@@ -1632,8 +1632,8 @@ function BrowseJobs({ nurse, lang='en' }) {
 
                 {/* CTA */}
                 {applied ? (
-                  <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:700, color:'#059669', background:'#ECFDF5', borderRadius:10, padding:'11px 14px', border:'1px solid rgba(5,150,105,0.2)' }}>
-                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+                  <div style={{ display:'flex', alignItems:'center', gap:6, fontSize:13, fontWeight:700, color:'#0D9488', background:'#F0FDFB', borderRadius:10, padding:'11px 14px', border:'1px solid rgba(13,148,136,0.2)' }}>
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
                     {lang==='sq'?'Aplikimi u dërgua':'Application submitted'}
                   </div>
                 ) : (
@@ -1734,7 +1734,7 @@ function NurseProfile({ lang='en', nurse=null }) {
   const totalVisits = nurse?.totalVisits || 0;
   const nurseName = nurse?.user?.name || nurse?.name || 'Nurse';
   const nurseInitials = nurseName.split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase();
-  const statusMap = { APPROVED:['#ECFDF5','#059669'], PENDING:['#FEF3C7','#D97706'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
+  const statusMap = { APPROVED:['#F0FDFB','#0D9488'], PENDING:['#FEF3C7','#D97706'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
   const [statusBg, statusColor] = statusMap[nurse?.status] || statusMap.INCOMPLETE;
 
   const isPending = (nurse?.status || 'INCOMPLETE') === 'PENDING';
@@ -1916,7 +1916,7 @@ function NurseProfile({ lang='en', nurse=null }) {
       {/* Save button */}
       {profileStatus==='success' && (
         <div style={{ background:C.secondaryLight, border:`1px solid #A7F3D0`, borderRadius:10, padding:'12px 16px', marginBottom:16, display:'flex', alignItems:'center', gap:10 }}>
-          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0D9488" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>
           <span style={{ fontSize:14, fontWeight:600, color:C.secondary }}>{tr('nurse.profileSavedSuccess')}</span>
         </div>
       )}
@@ -2170,7 +2170,7 @@ function OnboardingWizard({ nurse, user, onComplete, onSave, lang='en' }) {
               <div style={{ fontSize:12, color:C.textSecondary, marginBottom:10 }}>{desc}</div>
               {form[`${docType}Url`] && form[`${docType}Url`] !== 'pending-upload' ? (
                 <div style={{ display:'flex', alignItems:'center', gap:8, padding:'12px', background:C.secondaryLight, borderRadius:10, border:'1px solid #6EE7B7' }}>
-                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#059669" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+                  <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#0D9488" strokeWidth="2.5"><polyline points="20 6 9 17 4 12"/></svg>
                   <span style={{ fontSize:13, color:C.secondary, fontWeight:600 }}>{_currentLang==='sq'?'U ngarkua me sukses':'Uploaded successfully'}</span>
                   <a href={form[`${docType}Url`]} target="_blank" rel="noopener noreferrer" style={{ fontSize:12, color:C.primary, marginLeft:'auto' }}>{_currentLang==='sq'?'Shiko →':'View →'}</a>
                 </div>
@@ -2274,7 +2274,7 @@ function JobHistory({ visits = [], lang = 'en', setActive, setSelectedVisit }) {
   const statusColor = (s) => {
     if (!s) return '#6B7280';
     const u = s.toUpperCase();
-    if (u === 'COMPLETED') return '#059669';
+    if (u === 'COMPLETED') return '#0D9488';
     if (u === 'CANCELLED') return '#DC2626';
     if (u === 'IN_PROGRESS') return '#D97706';
     return '#2563EB';
@@ -2311,9 +2311,9 @@ function JobHistory({ visits = [], lang = 'en', setActive, setSelectedVisit }) {
     const ok = normal ? (num >= normal[0] && num <= normal[1]) : true;
     return (
       <div style={{ background: ok ? '#F0FDF4' : '#FEF2F2', border: `1px solid ${ok ? '#BBF7D0' : '#FECACA'}`, borderRadius: 10, padding: '8px 12px', minWidth: 80, textAlign: 'center' }}>
-        <div style={{ fontSize: 11, fontWeight: 600, color: ok ? '#059669' : '#DC2626', marginBottom: 2 }}>{label}</div>
-        <div style={{ fontSize: 18, fontWeight: 800, color: ok ? '#065F46' : '#991B1B', lineHeight: 1 }}>{value}<span style={{ fontSize: 10, fontWeight: 500, marginLeft: 2 }}>{unit}</span></div>
-        <div style={{ fontSize: 9, color: ok ? '#059669' : '#DC2626', marginTop: 2, fontWeight: 600 }}>{ok ? (lang === 'sq' ? 'Normal' : 'Normal') : (lang === 'sq' ? 'Jashtë normës' : 'Out of range')}</div>
+        <div style={{ fontSize: 11, fontWeight: 600, color: ok ? '#0D9488' : '#DC2626', marginBottom: 2 }}>{label}</div>
+        <div style={{ fontSize: 18, fontWeight: 800, color: ok ? '#0F766E' : '#991B1B', lineHeight: 1 }}>{value}<span style={{ fontSize: 10, fontWeight: 500, marginLeft: 2 }}>{unit}</span></div>
+        <div style={{ fontSize: 9, color: ok ? '#0D9488' : '#DC2626', marginTop: 2, fontWeight: 600 }}>{ok ? (lang === 'sq' ? 'Normal' : 'Normal') : (lang === 'sq' ? 'Jashtë normës' : 'Out of range')}</div>
       </div>
     );
   };
@@ -2553,7 +2553,7 @@ function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }
   const statusColor = (s) => {
     if (!s) return '#2563EB';
     const u = s.toUpperCase();
-    if (u === 'COMPLETED') return '#059669';
+    if (u === 'COMPLETED') return '#0D9488';
     if (u === 'CANCELLED') return '#DC2626';
     return '#2563EB';
   };
@@ -2692,7 +2692,7 @@ function NurseCalendar({ visits = [], lang = 'en', setActive, setSelectedVisit }
 
       {/* Legend */}
       <div style={{ display:'flex', gap:16, marginTop:12, flexWrap:'wrap' }}>
-        {[['#2563EB', lang==='sq'?'Planifikuar':'Scheduled'], ['#059669', lang==='sq'?'Kompletuar':'Completed'], ['#DC2626', lang==='sq'?'Anuluar':'Cancelled']].map(([col, label]) => (
+        {[['#2563EB', lang==='sq'?'Planifikuar':'Scheduled'], ['#0D9488', lang==='sq'?'Kompletuar':'Completed'], ['#DC2626', lang==='sq'?'Anuluar':'Cancelled']].map(([col, label]) => (
           <div key={label} style={{ display:'flex', alignItems:'center', gap:6, fontSize:12, color:C.textSecondary }}>
             <div style={{ width:10, height:10, borderRadius:3, background:col+'22', borderLeft:`3px solid ${col}` }} />
             {label}
@@ -2840,13 +2840,13 @@ export default function NursePage({ params }) {
   const displayNurse = { name: nurse?.user?.name||nurse?.name||'Nurse', email: nurse?.user?.email||'', city: nurse?.city||'', rating: nurse?.rating||0, totalVisits: nurse?.totalVisits||0, totalEarnings: nurse?.totalEarnings||0, status: nurse?.status||'INCOMPLETE', ...nurse, initials:(nurse?.user?.name||nurse?.name||'N').split(' ').map(w=>w[0]).join('').slice(0,2).toUpperCase() };
   const TITLES = { dashboard:tr('nurse.dashboard'), jobs:tr('nurse.browseJobs'), visits:tr('nurse.myVisits'), calendar: lang==='sq'?'Kalendar':'Calendar', history: lang==='sq'?'Historia e Punëve':'Job History', map:tr('nurse.navigation'), complete:tr('nurse.completeVisit'), earnings:tr('nurse.earnings'), profile:tr('nurse.profile'), onboarding:tr('nurse.completeProfile') };
   const status = nurse?.status || 'INCOMPLETE';
-  const statusColors = { APPROVED:['#ECFDF5','#059669'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
+  const statusColors = { APPROVED:['#F0FDFB','#0D9488'], PENDING:['#EFF6FF','#2563EB'], INCOMPLETE:['#FFFBEB','#D97706'], REJECTED:['#FEF2F2','#DC2626'], SUSPENDED:['#F1F5F9','#475569'] };
   const [sbg, scol] = statusColors[status] || statusColors.INCOMPLETE;
 
   if (loading) return (
     <div style={{ minHeight:'100vh', display:'flex', alignItems:'center', justifyContent:'center', background:'#F8FAFC', fontFamily:F }}>
       <div style={{ textAlign:'center' }}>
-        <div style={{ width:36,height:36,borderRadius:'50%',border:'3px solid #ECFDF5',borderTopColor:'#059669',animation:'spin 0.8s linear infinite',margin:'0 auto 12px' }}/>
+        <div style={{ width:36,height:36,borderRadius:'50%',border:'3px solid #F0FDFB',borderTopColor:'#0D9488',animation:'spin 0.8s linear infinite',margin:'0 auto 12px' }}/>
         <div style={{ fontSize:13, color:'#94A3B8' }}>Loading...</div>
       </div>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>

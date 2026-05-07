@@ -5,10 +5,10 @@ import Footer from '@/components/layout/Footer';
 import Link from 'next/link';
 import { t } from '@/translations';
 
-const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
+const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#0D9488', secondaryLight:'#F0FDFB', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB' };
 const DEFAULT_PRICING = { basicPrice:30, standardPrice:50, premiumPrice:120, basicVisits:1, standardVisits:2, premiumVisits:4 };
 
-function CheckIcon({ color = '#059669' }) {
+function CheckIcon({ color = '#0D9488' }) {
   return <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg>;
 }
 
@@ -125,7 +125,7 @@ export default function PricingPage({ params }) {
                   <div style={{ display:'flex', alignItems:'center', gap:10, marginBottom:12, flexWrap:'wrap' }}>
                     <div style={{ fontSize:13, fontWeight:700, color: p.featured ? C.primary : C.textTertiary, textTransform:'uppercase', letterSpacing:'0.5px' }}>{p.name}</div>
                     {p.featured && (
-                      <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#7C3AED,#2563EB)', color:'#fff', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, letterSpacing:'0.4px', whiteSpace:'nowrap' }}>
+                      <div style={{ display:'inline-flex', alignItems:'center', gap:5, background:'linear-gradient(135deg,#0D9488,#2563EB)', color:'#fff', fontSize:10, fontWeight:700, padding:'3px 10px', borderRadius:99, letterSpacing:'0.4px', whiteSpace:'nowrap' }}>
                         <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
                         {t(lang,'pricing.mostPopular')}
                       </div>

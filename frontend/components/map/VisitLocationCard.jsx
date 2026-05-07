@@ -5,7 +5,7 @@ import NavigationButton, { QuickNavButtons } from './NavigationButton';
 import { useNurseLocation } from '@/hooks/useNurseLocation';
 import { t } from '@/translations';
 
-const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#059669', secondaryLight:'#ECFDF5', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#7C3AED', purpleLight:'#F5F3FF', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6' };
+const C = { primary:'#2563EB', primaryLight:'#EFF6FF', secondary:'#0D9488', secondaryLight:'#F0FDFB', warning:'#D97706', warningLight:'#FFFBEB', error:'#DC2626', errorLight:'#FEF2F2', purple:'#0D9488', purpleLight:'#F0FDFB', bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4', textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF', border:'#E5E7EB', borderSubtle:'#F3F4F6' };
 
 const STATUS_STYLES = {
   upcoming:    { bg:C.primaryLight, color:C.primary },
@@ -60,7 +60,7 @@ export default function VisitLocationCard({ visit, onStatusChange, onComplete, c
             <div style={{ fontSize:13, fontWeight:600, color:C.primary, marginBottom:4 }}>{visit.service}</div>
             <div style={{ fontSize:12, color:C.textTertiary }}>{t(lang,'nurse.ageLabel')} {visit.age} · {visit.date}</div>
           </div>
-          <a href={`tel:${visit.phone}`} style={{ width:42, height:42, borderRadius:'50%', background:C.secondaryLight, display:'flex', alignItems:'center', justifyContent:'center', color:C.secondary, textDecoration:'none', border:`1px solid rgba(5,150,105,0.15)`, flexShrink:0 }}>
+          <a href={`tel:${visit.phone}`} style={{ width:42, height:42, borderRadius:'50%', background:C.secondaryLight, display:'flex', alignItems:'center', justifyContent:'center', color:C.secondary, textDecoration:'none', border:`1px solid rgba(13,148,136,0.15)`, flexShrink:0 }}>
             <PhoneIcon />
           </a>
         </div>

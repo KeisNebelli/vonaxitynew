@@ -7,10 +7,10 @@ import { toastSuccess, toastError } from '@/components/ui/Toast';
 
 const C = {
   primary:'#2563EB', primaryLight:'#EFF6FF', primaryDark:'#1D4ED8',
-  secondary:'#059669', secondaryLight:'#ECFDF5',
+  secondary:'#0D9488', secondaryLight:'#ECFDF5',
   warning:'#D97706', warningLight:'#FFFBEB',
   error:'#DC2626', errorLight:'#FEF2F2',
-  purple:'#7C3AED', purpleLight:'#F5F3FF',
+  purple:'#0D9488', purpleLight:'#F0FDFB',
   bg:'#FAFAF9', bgWhite:'#FFFFFF', bgSubtle:'#F5F5F4',
   textPrimary:'#111827', textSecondary:'#6B7280', textTertiary:'#9CA3AF',
   border:'#E5E7EB', borderSubtle:'#F3F4F6', dark:'#111827',
@@ -25,7 +25,7 @@ const BADGE_STYLES = {
   slate:  { background:'#F1F5F9', color:'#475569' },
   red:    { background:'#FEE2E2', color:'#991B1B' },
   blue:   { background:'#DBEAFE', color:'#1E40AF' },
-  purple: { background:'#EDE9FE', color:'#5B21B6' },
+  purple: { background:'#F0FDFB', color:'#0F766E' },
   default:{ background:'#F1F5F9', color:'#475569' },
 };
 
@@ -51,7 +51,7 @@ const Badge = ({ label, type='default', small=false }) => {
 const PlanBadge = ({ label }) => {
   const lower = (label||'').toLowerCase();
   const style = lower==='premium'
-    ? { background:'#EDE9FE', color:'#5B21B6' }
+    ? { background:'#F0FDFB', color:'#0F766E' }
     : lower==='standard'
     ? { background:'#EFF6FF', color:'#1D4ED8' }
     : { background:'#F8FAFC', color:'#475569', border:'0.5px solid #E2E8F0' };
@@ -129,7 +129,7 @@ function SidebarContent({ mobile=false, active, setActive, onLogout, alertCount,
           </div>
         )}
         <div style={{ display:'flex', alignItems:'center', gap:9 }}>
-          <div style={{ width:32,height:32,borderRadius:9,background:'linear-gradient(135deg,#2563EB,#7C3AED)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>A</div>
+          <div style={{ width:32,height:32,borderRadius:9,background:'linear-gradient(135deg,#2563EB,#0D9488)',display:'flex',alignItems:'center',justifyContent:'center',fontSize:13,fontWeight:800,color:'#fff',flexShrink:0 }}>A</div>
           <div>
             <div style={{ fontSize:12, fontWeight:700, color:'#fff' }}>Admin</div>
             <div style={{ fontSize:10, color:'rgba(255,255,255,0.55)' }}>admin@vonaxity.com</div>
@@ -139,7 +139,7 @@ function SidebarContent({ mobile=false, active, setActive, onLogout, alertCount,
       <nav style={{ flex:1, padding:'10px', overflowY:'auto' }}>
         {NAV.map(item=>(
           <button key={item.id} onClick={()=>{ setActive(item.id); if(mobile)setOpen(false); }}
-            style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:mobile?'12px 12px':'10px 12px', borderRadius:10, border:'none', borderLeft:active===item.id?'2px solid #60A5FA':'2px solid transparent', background:active===item.id?(item.highlight?'rgba(124,58,237,0.25)':'rgba(37,99,235,0.2)'):'transparent', color:active===item.id?(item.highlight?'#C4B5FD':'#93C5FD'):'rgba(255,255,255,0.72)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
+            style={{ width:'100%', display:'flex', alignItems:'center', gap:10, padding:mobile?'12px 12px':'10px 12px', borderRadius:10, border:'none', borderLeft:active===item.id?'2px solid #60A5FA':'2px solid transparent', background:active===item.id?(item.highlight?'rgba(13,148,136,0.25)':'rgba(37,99,235,0.2)'):'transparent', color:active===item.id?(item.highlight?'#5EEAD4':'#93C5FD'):'rgba(255,255,255,0.72)', cursor:'pointer', fontSize:mobile?14:13, fontWeight:active===item.id?700:500, marginBottom:2, textAlign:'left', fontFamily:F, transition:'all 0.15s' }}>
             {item.icon}
             <span style={{ flex:1 }}>{(ADMIN_LABELS[lang]||ADMIN_LABELS.en)[item.id]||item.label}</span>
             {item.id==='alerts' && alertCount>0 && <span style={{ fontSize:10,fontWeight:800,background:'#DC2626',color:'#fff',borderRadius:99,padding:'2px 6px',minWidth:18,textAlign:'center' }}>{alertCount}</span>}
@@ -183,7 +183,7 @@ function Overview({ setActive, onNavigateToVisit, nurses, clients, visits, payme
   const statCards = [
     { label:tr('admin.totalClients'), value:clients.length, tab:'clients', accent:C.primary, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg> },
     { label:tr('admin.activeNurses'), value:nurses.filter(n=>n.status==='APPROVED').length, tab:'nurses', accent:C.secondary, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg> },
-    { label:tr('admin.visitsToday'), value:todayVisits.length, tab:'visits', accent:'#7C3AED', icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+    { label:tr('admin.visitsToday'), value:todayVisits.length, tab:'visits', accent:'#0D9488', icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
     { label:tr('admin.revenue'), value:`€${revenue}`, tab:'payments', accent:C.secondary, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="1" y="4" width="22" height="16" rx="2"/><line x1="1" y1="10" x2="23" y2="10"/></svg> },
     { label:tr('admin.unassigned'), value:unassigned.length, tab:'alerts', accent:unassigned.length>0?C.error:C.textTertiary, alert:unassigned.length>0, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 001.71 3h16.94a2 2 0 001.71-3L13.71 3.86a2 2 0 00-3.42 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg> },
     { label:tr('admin.pendingNurses'), value:pending.length, tab:'nurses', accent:pending.length>0?C.warning:C.textTertiary, icon:<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> },
@@ -633,7 +633,7 @@ function NurseDetail({ nurse, onBack, onApprove, onSuspend, onReject, onRefresh,
               ))}
               <div style={{ marginTop:16, display:'flex', gap:8 }}>
                 {(nurse.status==='PENDING'||nurse.status==='INCOMPLETE') && <>
-                  <button onClick={()=>onApprove(nurse.id)} className="adm-btn-primary adm-btn-sm" style={{ background:'#059669' }}>{tr('admin.approve')}</button>
+                  <button onClick={()=>onApprove(nurse.id)} className="adm-btn-primary adm-btn-sm" style={{ background:'#0D9488' }}>{tr('admin.approve')}</button>
                   <button onClick={()=>onReject(nurse.id, 'Rejected by admin')} style={{ fontSize:13, fontWeight:600, padding:'9px 18px', background:C.errorLight, color:C.error, border:'none', borderRadius:9, cursor:'pointer' }}>{tr('admin.reject')}</button>
                 </>}
                 {nurse.status==='APPROVED' && <button onClick={()=>onSuspend(nurse.id)} style={{ fontSize:13, padding:'9px 18px', background:C.bgSubtle, color:C.textSecondary, border:`1px solid ${C.border}`, borderRadius:9, cursor:'pointer' }}>{tr('admin.suspend')}</button>}
@@ -926,7 +926,7 @@ function Payments({ payments, lang='en' }) {
     { label: tr('admin.totalRevenue')||'Total Revenue', value:`€${total.toLocaleString()}`, color:C.secondary, bg:'#ECFDF5', icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.secondary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="12" y1="1" x2="12" y2="23"/><path d="M17 5H9.5a3.5 3.5 0 000 7h5a3.5 3.5 0 010 7H6"/></svg> },
     { label: tr('admin.successful')||'Successful', value: paid.length, color:C.primary, bg:C.primaryLight, icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={C.primary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><polyline points="20 6 9 17 4 12"/></svg> },
     { label: tr('admin.failedPayments')||'Failed', value: failed.length, color: failed.length>0?C.error:C.textTertiary, bg: failed.length>0?'#FEF2F2':'#F8FAFC', icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke={failed.length>0?C.error:C.textTertiary} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg> },
-    { label: 'This Month', value: `€${payments.filter(p=>{ const d=new Date(p.date||''); const n=new Date(); return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()&&p.status==='paid'; }).reduce((s,p)=>s+(p.amount||0),0).toLocaleString()}`, color:'#7C3AED', bg:'#F5F3FF', icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#7C3AED" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
+    { label: 'This Month', value: `€${payments.filter(p=>{ const d=new Date(p.date||''); const n=new Date(); return d.getMonth()===n.getMonth()&&d.getFullYear()===n.getFullYear()&&p.status==='paid'; }).reduce((s,p)=>s+(p.amount||0),0).toLocaleString()}`, color:'#0D9488', bg:'#F0FDFB', icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0D9488" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> },
   ];
 
   return (
@@ -1096,7 +1096,7 @@ function Analytics({ clients, nurses, visits, payments=[], lang='en' }) {
       <Card>
         <SectionTitle>{tr('admin.nursePipeline')}</SectionTitle>
         <div style={{ display:'flex', gap:8, flexWrap:'wrap' }}>
-          {[[t(lang,'admin.status.APPROVED'),nurses.filter(n=>n.status==='APPROVED').length,'#ECFDF5','#059669'],[t(lang,'admin.status.PENDING'),nurses.filter(n=>n.status==='PENDING').length,'#FFFBEB','#D97706'],[t(lang,'admin.status.INCOMPLETE'),nurses.filter(n=>n.status==='INCOMPLETE').length,'#F1F5F9','#475569'],[t(lang,'admin.status.REJECTED'),nurses.filter(n=>n.status==='REJECTED').length,'#FEF2F2','#DC2626'],[t(lang,'admin.status.SUSPENDED'),nurses.filter(n=>n.status==='SUSPENDED').length,'#F5F3FF','#7C3AED']].map(([label,count,bg,color])=>(
+          {[[t(lang,'admin.status.APPROVED'),nurses.filter(n=>n.status==='APPROVED').length,'#ECFDF5','#0D9488'],[t(lang,'admin.status.PENDING'),nurses.filter(n=>n.status==='PENDING').length,'#FFFBEB','#D97706'],[t(lang,'admin.status.INCOMPLETE'),nurses.filter(n=>n.status==='INCOMPLETE').length,'#F1F5F9','#475569'],[t(lang,'admin.status.REJECTED'),nurses.filter(n=>n.status==='REJECTED').length,'#FEF2F2','#DC2626'],[t(lang,'admin.status.SUSPENDED'),nurses.filter(n=>n.status==='SUSPENDED').length,'#F0FDFB','#0D9488']].map(([label,count,bg,color])=>(
             <div key={label} style={{ background:bg, borderRadius:10, padding:'12px 16px', minWidth:100, textAlign:'center' }}>
               <div style={{ fontSize:20, fontWeight:800, color }}>{count}</div>
               <div style={{ fontSize:11, color, marginTop:2, fontWeight:600 }}>{label}</div>
@@ -1191,7 +1191,7 @@ function AIAssistant({ clients, nurses, visits, payments=[], lang='en' }) {
             <defs>
               <linearGradient id="adm-vona-bg" x1="0%" y1="0%" x2="100%" y2="100%">
                 <stop offset="0%" stopColor="#2563EB" />
-                <stop offset="100%" stopColor="#7C3AED" />
+                <stop offset="100%" stopColor="#0D9488" />
               </linearGradient>
             </defs>
             <circle cx="50" cy="50" r="50" fill="url(#adm-vona-bg)" />
@@ -1221,7 +1221,7 @@ function AIAssistant({ clients, nurses, visits, payments=[], lang='en' }) {
                   <defs>
                     <linearGradient id="adm-vona-avatar" x1="0%" y1="0%" x2="100%" y2="100%">
                       <stop offset="0%" stopColor="#2563EB" />
-                      <stop offset="100%" stopColor="#7C3AED" />
+                      <stop offset="100%" stopColor="#0D9488" />
                     </linearGradient>
                   </defs>
                   <circle cx="50" cy="50" r="50" fill="url(#adm-vona-avatar)" />
@@ -1241,7 +1241,7 @@ function AIAssistant({ clients, nurses, visits, payments=[], lang='en' }) {
                 <defs>
                   <linearGradient id="adm-vona-loading" x1="0%" y1="0%" x2="100%" y2="100%">
                     <stop offset="0%" stopColor="#2563EB" />
-                    <stop offset="100%" stopColor="#7C3AED" />
+                    <stop offset="100%" stopColor="#0D9488" />
                   </linearGradient>
                 </defs>
                 <circle cx="50" cy="50" r="50" fill="url(#adm-vona-loading)" />
@@ -1507,7 +1507,7 @@ function TestDataCard({ lang='en' }) {
         {resetting ? 'Resetting…' : '🗑 Reset test visits'}
       </button>
       {result && (
-        <div style={{ marginTop:10, fontSize:12, fontWeight:600, color: result.ok ? '#059669' : '#DC2626' }}>
+        <div style={{ marginTop:10, fontSize:12, fontWeight:600, color: result.ok ? '#0D9488' : '#DC2626' }}>
           {result.msg}
         </div>
       )}
@@ -1670,7 +1670,7 @@ export default function AdminPage({ params }) {
                 <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><polyline points="1 4 1 10 7 10"/><path d="M3.51 15a9 9 0 102.13-9.36L1 10"/></svg>
                 {tr('admin.refresh')}
               </button>
-              <button onClick={()=>setActive('ai')} style={{ display:'inline-flex',alignItems:'center',gap:6,fontSize:12,fontWeight:600,padding:'7px 14px',background:'linear-gradient(135deg,#7C3AED,#5B21B6)',color:'#fff',border:'none',borderRadius:10,cursor:'pointer',fontFamily:F,boxShadow:'0 2px 8px rgba(124,58,237,0.3)' }}>
+              <button onClick={()=>setActive('ai')} style={{ display:'inline-flex',alignItems:'center',gap:6,fontSize:12,fontWeight:600,padding:'7px 14px',background:'linear-gradient(135deg,#0D9488,#0F766E)',color:'#fff',border:'none',borderRadius:10,cursor:'pointer',fontFamily:F,boxShadow:'0 2px 8px rgba(13,148,136,0.3)' }}>
                 <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M12 2a10 10 0 100 20A10 10 0 0012 2z"/><path d="M12 8v4l3 3"/></svg>
                 {tr('admin.ai')}
               </button>

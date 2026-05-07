@@ -4,7 +4,7 @@ export const C = {
   secondary:'#059669', secondaryLight:'#ECFDF5', secondaryMid:'#A7F3D0',
   warning:'#D97706', warningLight:'#FFFBEB', warningMid:'#FDE68A',
   error:'#DC2626', errorLight:'#FEF2F2', errorMid:'#FECACA',
-  purple:'#7C3AED', purpleLight:'#F5F3FF',
+  purple:'#0D9488', purpleLight:'#F0FDFB',
   bg:'#FAF8F5', bgWhite:'#FFFFFF', bgSubtle:'#F0EDE8', bgCard:'#FFFFFF',
   textPrimary:'#1A2B3C', textSecondary:'#475569', textTertiary:'#94A3B8',
   border:'#E4DDD4', borderSubtle:'#F0EDE8',
