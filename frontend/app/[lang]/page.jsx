@@ -6,6 +6,7 @@ import ScrollReveal from '@/components/ScrollReveal';
 import HowItWorksSection from '@/components/HowItWorksSection';
 import ServiceCardsSection from '@/components/ServiceCardsSection';
 import LandingChat from '@/components/chat/LandingChat';
+import WellnessTicker from '@/components/WellnessTicker';
 import Link from 'next/link';
 import { t } from '@/translations';
 
@@ -230,6 +231,9 @@ export default async function HomePage({ params }) {
           ))}
         </div>
       </section>
+
+      {/* ── Wellness ticker ── */}
+      <WellnessTicker lang={lang} />
 
       {/* ── How it works ── */}
       <HowItWorksSection
